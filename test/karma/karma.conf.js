@@ -23,16 +23,17 @@ module.exports = function(config) {
       // {pattern: 'client-src/app/client/css/**/*.css', included: false, served: true},
       // {pattern: 'client-src/**/*.map', included: false, served: true},
       "../helpers/testhelper.js", "../helpers/**-helper.js",
+      "../../app/packages/*/test/**/*-test.js",
       '../client/**/*-test.js',
       '../lib/**/*-test.js',
       '../models/**/*-test.js',
-      '../packages/**/*-test.js',
       {pattern: 'startup-client.js', included: false, served: true},
     ],
 
 
     // list of files to exclude
     exclude: [
+      '../../app/packages/*/test/**/server/**/*-test.js',
       '../**/server/**/*-test.js',
     ],
 

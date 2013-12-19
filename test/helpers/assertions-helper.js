@@ -292,13 +292,40 @@
       refuteMessage: "Expected select not to find {$htmlClue}",
     });
 
+    function filter(elms, func) {
+      return Array.prototype.filter.call(elms, func);
+    }
+
+    function findAll(elms, query) {
+      var directChild = query[0] === '>';
+
+      var result = [];
+      for(var i = 0; i < elms.length; ++i) {
+        var elm = elms[i];
+        if (directChild) {
+          if (elm.id)
+            var se = elm.querySelectorAll(elm.tagName+'#'+elm.id+query);
+          else {
+            elm.id = '_querySelector_tempId_';
+            var se = elm.querySelectorAll(elm.tagName+'#_querySelector_tempId_'+query);
+            elm.removeAttribute('id');
+          }
+        } else {
+          var se = elms[i].querySelectorAll(query);
+        }
+
+        result.push.apply(result, se);
+      }
+      return result;
+    }
+
     function select(elm, options, body /* arguments */) {
       var msg, old = selectNode, orig = elm;
       try {
         if (typeof elm === "string") {
           msg = elm;
           if (selectNode != null) {
-            elm = selectNode[0].querySelectorAll(elm); // FIXME
+            elm = findAll(selectNode, elm);
           } else {
             elm = document.querySelectorAll(elm);
           }
@@ -330,7 +357,7 @@
               return false;
             }
             if (options.value != null) {
-              var ef = elm.filter(function (i) {return options.value === i.value});
+              var ef = filter(elm, function (i) {return options.value === i.value});
               if (ef.length === 0) {
                 this.htmlClue = 'value: "' + options.value + '" == "' + elm[0].value + '" for ' + this.htmlClue;
                 return false;
@@ -339,7 +366,7 @@
               }
             }
             if(typeof options.text === 'string') {
-              var ef = elm.filter(function (i) {return options.text === i.textContent.trim()});
+              var ef = filter(elm, function (i) {return options.text === i.textContent.trim()});
               if (ef.length === 0) {
                 this.htmlClue = 'text: "' + options.text + '" == "' + elm[0].textContent.trim() + '" for ' + this.htmlClue;
                 return false;
@@ -348,7 +375,7 @@
               }
             }
             if(typeof options.text === 'object') {
-              var ef = elm.filter(function (i) {return options.text.test(i.textContent.trim())});
+              var ef = filter(elm, function (i) {return options.text.test(i.textContent.trim())});
               if (ef.length === 0) {
                 this.htmlClue = 'text does not match "' + elm[0].textContent.trim() + '" for ' + this.htmlClue;
                 return false;
@@ -358,7 +385,7 @@
             }
             break;
           case "string":
-            var ef = elm.filter(function (i) {return options === i.textContent.trim()});
+            var ef = filter(elm, function (i) {return options === i.textContent.trim()});
             if (ef.length === 0) {
               this.htmlClue = '"' + options + '" == "' + elm[0].textContent.trim() + '" for ' + this.htmlClue;
               return false;

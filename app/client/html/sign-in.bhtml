@@ -1,0 +1,3 @@
+<template name="SignIn">
+  <button class="link" type="button" name="signIn">Sign in / register</button>
+</template>

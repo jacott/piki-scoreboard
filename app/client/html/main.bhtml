@@ -1,0 +1,18 @@
+<template name="Main">
+  <template name="Head">
+    <title>Piki</title>
+    <!-- <meta name="viewport" content="width=device-width initial-scale=1, user-scalable=no, maximum-scale=1"> -->
+    <meta name="viewport" content="initial-scale=1, user-scalable=no, maximum-scale=1">
+  </template>
+
+  <header id="header">
+    <nav class="left">
+      <button class="link" type="button" name="connect">Climbing NZ</button>
+    </nav>
+    <nav class="right">
+      {{signIn}}
+    </nav>
+  </header>
+  <section id="main">
+  </section>
+</template>

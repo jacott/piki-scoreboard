@@ -21,13 +21,17 @@ Plugin.registerSourceHandler("bhtml", function (compileStep) {
 });
 
 if (process.env.METEOR_MODE === 'test') {
-  var fs = Npm.require('fs');
+  (function () {
+    var fs = Npm.require('fs');
 
-  var template = fs.readFileSync(process.cwd()+'/../test/packages/bart/plugin/template.bhtml');
+    var dir = process.cwd()+'/packages/bart/test/plugin/';
 
-  var result = compile(template);
+    var template = fs.readFileSync(dir + 'template.bhtml');
 
-  fs.writeFileSync(process.cwd()+'/../test/packages/bart/plugin/template-test.js', '_BartTest = function(Bart) {'+result+'\n};');
+    var result = compile(template);
+
+    fs.writeFileSync(dir + 'template-test.js', '_BartTest = function(Bart) {'+result+'\n};');
+  })();
 }
 
 

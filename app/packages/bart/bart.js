@@ -22,6 +22,18 @@ Bart = {
 
   _helpers: {},
 
+  autoElm: function (func) {
+    return function () {
+      var elm = Bart.$ctx.element;
+
+      if (elm.nodeType === document.ELEMENT_NODE) return elm;
+      if ('$autoRender' in func)
+        return func.$autoRender(this);
+      else
+        return func.apply(this, arguments);
+    };
+  },
+
   html: function (html) {
     var elm = document.createElement('div');
     elm.innerHTML = html;

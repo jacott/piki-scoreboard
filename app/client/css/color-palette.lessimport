@@ -1,0 +1,5 @@
+@colorBackground: #fff;
+@colorText: #444;
+
+@colorHeaderBackground: #000;
+@colorHeaderText: #fff;

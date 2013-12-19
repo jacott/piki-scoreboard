@@ -64,6 +64,7 @@ else
 
     $METEORDIR/dev_bundle/mongodb/bin/mongod --quiet --nojournal --oplogSize 2 --replSet meteor --smallfiles --port 3003 --dbpath .meteor/local/db/ >../tmp/pikidb.log 2>&1 &
     mongo=$!
+    sleep 2
     exec $METEORDIR/meteor run --port $PORT &
     meteor=$!
 

@@ -1,0 +1,48 @@
+@import "global.lessimport";
+
+@import "geometry.lessimport";
+@import "color-palette.lessimport";
+
+html,body {
+  overflow: hidden;
+  overflow-x: auto;
+  margin: 0;
+  padding: 0;
+  min-width: 800px;
+  min-height: 300px;
+  background-color: @colorBackground;
+  color: @colorText;
+  -webkit-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+}
+
+*, :after, :before {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+#header {
+  width: 100%;
+  background-color: @colorHeaderBackground;
+  color: @colorHeaderText;
+  height: @headerHeight;
+  line-height: @headerHeight;
+  font-size: 1.2em;
+
+  nav.left {
+    float: left;
+  }
+  nav.right {
+    float: right;
+  }
+}
+
+#main {
+  width: 100%;
+}
+
+
+body {
+  font-family: Arial,Helvetica,sans-serif;
+  font-size: @defaultFontSize;
+}
