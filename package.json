@@ -1,0 +1,26 @@
+{
+  "name": "piki",
+  "description": "Indoor climbing competition scoring system.",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@goblin.jacott:piki.git"
+  },
+  "bugs": {
+  },
+  "keywords": [
+    "climbing",
+    "meteor",
+    "js",
+    "javascript"
+  ],
+  "author": "Geoff Jacobsen <geoffjacobsen@gmail.com>",
+  "devDependencies": {
+    "geddon": "git+ssh://git@dev.obeya.co:geddon.git",
+    "karma": "http://dev.obeya.co/karma-0.9.4.tgz",
+    "source-map": "~0.1.31"
+  },
+  "engines": {
+    "node": "~0.10"
+  },
+  "version": "0.0.2"
+}

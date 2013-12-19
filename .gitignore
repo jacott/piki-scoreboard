@@ -1,0 +1,10 @@
+test/karma/context.html
+node_modules
+*~
+*#
+TAG*
+tmp
+app/server/bootstrap.js
+app/public/images/board-backgrounds
+app/.meteor/local-sym-link
+app/private/restart.txt
