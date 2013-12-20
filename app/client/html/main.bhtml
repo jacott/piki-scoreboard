@@ -10,7 +10,7 @@
       <button class="link" type="button" name="connect">Climbing NZ</button>
     </nav>
     <nav class="right">
-      {{signIn}}
+      {{> /SignIn}}
     </nav>
   </header>
   <section id="main">

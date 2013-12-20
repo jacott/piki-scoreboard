@@ -19,49 +19,49 @@ Meteor.isClient && (function (test, v) {
       },
     },
 
-    "autoElm": {
+    "partial": {
       setUp: function () {
-        v.iElm = Bart.html('<i></i>');
-        v.divElm = Bart.html('<div></div>');
-        v.stub = test.stub().returns(v.iElm);
-        v.data = {};
+        Bart.newTemplate({
+          name: "Foo",
+          nodes:[{
+            name:"section",
+            children:[' ', ['>', '/Bar']],
+          }],
+        });
+
+        Bart.newTemplate({
+          name: "Bar",
+          nodes:[{
+            name:"div",
+            children:[' ', ['>', 'Baz', ['=', 'initials', 'myFunc']]],
+          }],
+        });
+
+        Bart.newTemplate({
+          name: "Bar.Baz",
+          nodes:[{
+            name:"i",
+            children:[['', 'initials']]
+          }],
+        });
       },
 
       tearDown: function () {
-        Bart.$ctx = null;
+        delete Bart.Bar;
       },
 
-      "test func": function () {
-        var func = Bart.autoElm(v.stub);
+      "test scoping": function () {
+        var initials = 'BJ';
+        Bart.Bar.$helpers({
+          myFunc: function () {
+            return initials;
+          },
+        });
+        var result = Bart.Foo.$render({});
 
-        Bart.$ctx = {element: v.divElm};
-        assert.same(func.call(v.data), v.divElm);
-
-        refute.called(v.stub);
-
-
-        Bart.$ctx = {element: document.createComment()};
-
-        assert.same(func.call(v.data, 1, 2), v.iElm);
-
-        assert.calledWithExactly(v.stub, 1, 2);
-        assert.same(v.stub.thisValues[0], v.data);
-      },
-
-      "test template": function () {
-        var func = Bart.autoElm({$autoRender: v.stub});
-
-        Bart.$ctx = {element: v.divElm};
-        assert.same(func.call(v.data), v.divElm);
-
-        refute.called(v.stub);
-
-
-        Bart.$ctx = {element: document.createComment()};
-
-        assert.same(func.call(v.data, 1, 2), v.iElm);
-
-        assert.calledWithExactly(v.stub, v.data);
+        assert.select(result, function () {
+          assert.select('>div>i', 'BJ');
+        });
       },
     },
 

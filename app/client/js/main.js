@@ -5,11 +5,4 @@ App._startup = function () {
   document.body.appendChild(Tpl.$render({}));
 };
 
-Tpl.$helpers({
-  signIn: Bart.autoElm(Bart.SignIn),
-});
-
-
-
-
 Meteor.startup(App._startup);

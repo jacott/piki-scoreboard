@@ -22,18 +22,6 @@ Bart = {
 
   _helpers: {},
 
-  autoElm: function (func) {
-    return function () {
-      var elm = Bart.$ctx.element;
-
-      if (elm.nodeType === document.ELEMENT_NODE) return elm;
-      if ('$autoRender' in func)
-        return func.$autoRender(this);
-      else
-        return func.apply(this, arguments);
-    };
-  },
-
   html: function (html) {
     var elm = document.createElement('div');
     elm.innerHTML = html;
@@ -381,7 +369,7 @@ function getValue(data, func, args) {
     if (func === 'this') return data;
     var value = data[func];
     if (value === undefined) {
-      value = Bart._helpers[func];
+      value = Bart.$ctx.template._helpers[func] || Bart._helpers[func];
     }
     if (value !== undefined) {
       if (typeof value === 'function')
@@ -391,9 +379,28 @@ function getValue(data, func, args) {
     return;
   case 'number':
     return func;
+  case 'object':
+    if ('$autoRender' in func) {
+      return evalPartial.call(data, func, args, Bart.$ctx);
+    }
   default:
-    throw new Error('Unexpected type: ', typeof func);
+    throw new Error('Unexpected type: '+ (typeof func));
   }
+}
+
+function evalPartial(func, args, ctx) {
+  args = evalArgs(this, args);
+  if (args.length === 1)
+    args = args[0];
+  var elm = ctx.element;
+  if (ctx = elm._bart) {
+    return ctx.updateAllTags(args);
+  }
+
+  if ('$autoRender' in func)
+    return func.$autoRender(args);
+  else
+    return func.call(this, args);
 }
 
 function evalArgs(data, args) {
@@ -607,6 +614,7 @@ function addNodes(parent, nodes) {
 
 function parseNode(template, node, result) {
   var m = /^([^\.]+)\.(.*)$/.exec(node[1]);
+  var partial = node[0] === '>';
 
   if (m) {
     var name = m[1];
@@ -616,8 +624,29 @@ function parseNode(template, node, result) {
     node = node.slice(2);
   }
 
-  result.push(template._helpers[name] || name);
-  result.push(node);
+  if (partial) {
+    result.push(fetchTemplate(template, name, m && node.dotted));
+    result.push(m ? node.opts: node);
+  } else {
+    result.push(template._helpers[name] || name);
+    result.push(node);
+  }
+
+  return result;
+}
+
+function fetchTemplate(template, name, rest) {
+  if (name[0] === '/') {
+    var result = Bart[name.slice(1)];
+  } else {
+    var result = template[name];
+  }
+  if (rest) for(var i = 0; i < rest.length; ++i) {
+    result = result && result[rest[i]];
+  }
+
+  if (! result) throw new Error("Invalid partial '"  + name + (rest ? "."+rest.join(".") : '') + "' in Template: " + template.name);
+
   return result;
 }
 

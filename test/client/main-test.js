@@ -15,7 +15,9 @@
         assert.select('title', 'Piki');
       });
       assert.select('body', function () {
-        assert.select('body>header');
+        assert.select('body>header', function () {
+          assert.select('button[name=signIn]');
+        });
       });
     },
   });
