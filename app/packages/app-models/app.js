@@ -20,6 +20,14 @@ App = {
     return obj;
   },
 
+  reverseExtend: function (obj,properties) {
+    for(var prop in properties) {
+      if (! (prop in obj))
+        Object.defineProperty(obj,prop,Object.getOwnPropertyDescriptor(properties,prop));
+    }
+    return obj;
+  },
+
   closure: function () {
     return arguments[arguments.length-1].apply(arguments[0], arguments);
   },

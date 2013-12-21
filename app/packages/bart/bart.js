@@ -101,6 +101,8 @@ Bart = {
 
   getCtx: function (elm) {
     if (! elm) return;
+    if (typeof elm === 'string')
+      elm = document.querySelector(elm);
     var ctx = elm._bart;
     while(! ctx && elm.parentNode)
       ctx = (elm = elm.parentNode)._bart;
@@ -266,6 +268,7 @@ BartCtx.prototype = {
   constructor: BartCtx,
 
   onDestroy: function (obj) {
+    if (! obj) return;
     var list = this._onDestroy || (this._onDestroy = []);
     list.push(obj);
     return this;
@@ -528,33 +531,44 @@ function onEvent(event) {
   var later = {};
   var elm = event.target;
 
-  for(var key in eventTypes) {
-    if (key === ':TOP') {
-      if (elm === event.currentTarget) {
+  try {
+    for(var key in eventTypes) {
+      if (key === ':TOP') {
+        if (elm === event.currentTarget) {
+          if (fire(event, elm, eventTypes[key])) return;
+        } else
+          later[key] = true;
+      }
+      else if (matches.call(elm, key)) {
         if (fire(event, elm, eventTypes[key])) return;
-      } else
+      } else if (matches.call(elm, key.replace(/,/g, ' *,')+' *')) // FIXME should split "," selectors early like in $events()
         later[key] = true;
     }
-    else if (matches.call(elm, key)) {
-      if (fire(event, elm, eventTypes[key])) return;
-    } else if (matches.call(elm, key.replace(/,/g, ' *,')+' *')) // FIXME should split "," selectors early like in $events()
-      later[key] = true;
-  }
 
-  for(var key in later) {
-    for (elm = elm && elm.parentNode;elm && elm !== event.currentTarget; elm = elm.parentNode) {
-      for(var key in later) {
-        if (key !== ':TOP' && matches.call(elm, key)) {
-          if (fire(event, elm, eventTypes[key])) return;
-          delete later[key];
+    for(var key in later) {
+      for (elm = elm && elm.parentNode;elm && elm !== event.currentTarget; elm = elm.parentNode) {
+        for(var key in later) {
+          if (key !== ':TOP' && matches.call(elm, key)) {
+            if (fire(event, elm, eventTypes[key])) return;
+            delete later[key];
+          }
         }
       }
+      break;
     }
-    break;
-  }
 
-  for(var key in later) {
-    if (fire(event, elm, eventTypes[key])) return;
+    for(var key in later) {
+      if (fire(event, elm, eventTypes[key])) return;
+    }
+  } catch(ex) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    if (! (Bart.globalErrorCatch && Bart.globalErrorCatch(ex))) {
+      if('stack' in ex)
+        console.log(ex.stack);
+      else
+        throw ex;
+    }
   }
 }
 

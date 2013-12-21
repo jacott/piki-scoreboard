@@ -22,6 +22,6 @@ App.extend(App, {
       onReady: callback,
     });
 
-    Meteor.subscribe.apply(Meteor, args);
+    return Meteor.subscribe.apply(Meteor, args);
   },
 });

@@ -8,6 +8,12 @@ TH = (function () {
   var user;
 
   return {
+    replaceObject: function (parent, objectName, replacement) {
+      var orig = parent[objectName];
+      geddon.test.onEnd(function () {parent[objectName] = orig});
+      return parent[objectName] = replacement;
+    },
+
     nestedDivs: function (spec) {
       spec = spec.split(' ');
       var frag = document.createDocumentFragment();
@@ -153,7 +159,7 @@ TH = (function () {
     },
 
     flushClick: function (node) {
-      this.clickElement(node);
+      this.click(node);
       Deps.flush();
     },
 
@@ -161,14 +167,11 @@ TH = (function () {
       if (typeof node === 'string') {
         var args = Apputil.slice(arguments);
         args.push(function () {
-          TH.clickElement(this);
+          TH.click(this);
         });
         assert.select.apply(assert, args);
       } else {
-        if (node.click)
-          node.click(); // supported by form controls cross-browser; most native way
-        else
-          TH.trigger(node, 'click');
+        TH.trigger(node, 'click');
       }
     },
 
@@ -191,6 +194,7 @@ TH = (function () {
 
     clearDB: function () {
       TH.Factory && TH.Factory.clear();
+      if (Meteor.isServer) AppModel.User._clearGuestUser();
       (Meteor.users._collection || Meteor.users).remove({});
       for(var name in AppModel) {
         var docs = AppModel[name].docs;
@@ -347,9 +351,6 @@ if (Meteor.isServer) {
 } else {
   TH.global = window;
 
-  // Deprecated
-  TH.clickElement = TH.click;
-  TH.simulateEvent = TH.trigger;
   TH.MockFileReader = function (v) {
     function MockFileReader() {
       v.fileReaderargs = arguments;

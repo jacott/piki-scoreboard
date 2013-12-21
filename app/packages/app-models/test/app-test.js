@@ -24,6 +24,21 @@
 
     },
 
+    'test reverseExtend': function () {
+      var item = 5,
+          sub={a: 1, b: 2},
+          sup = {b: 3, get c() {return item;}};
+
+      App.reverseExtend(sub,sup);
+
+      item = 6;
+
+      assert.same(sub.a,1);
+      assert.same(sub.b,2);
+      assert.same(sub.c,6);
+
+    },
+
     "test withDateNow": function () {
       var date = new Date("2013-06-09T23:10:36.855Z");
       var result = App.withDateNow(date, function () {

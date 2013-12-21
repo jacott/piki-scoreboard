@@ -13,6 +13,4 @@
       {{> /SignIn}}
     </nav>
   </header>
-  <section id="main">
-  </section>
 </template>

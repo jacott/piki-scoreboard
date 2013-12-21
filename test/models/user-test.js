@@ -9,6 +9,15 @@
       v = null;
     },
 
+    "test isSuperUser": function () {
+      var user = TH.Factory.buildUser('su');
+
+      assert.isTrue(user.isSuperUser());
+
+      user.role = 'x';
+      assert.isFalse(user.isSuperUser());
+    },
+
     "test emailWithName": function () {
       var user = TH.Factory.buildUser();
       assert.same(user.emailWithName(), 'fn user 1 <email-user.1@test.co>');

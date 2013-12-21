@@ -1,0 +1,7 @@
+<template name="Dialog">
+  <div id="Dialog">
+    <div>
+      {{content}}
+    </div>
+  </div>
+</template>

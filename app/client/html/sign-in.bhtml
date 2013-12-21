@@ -1,3 +1,33 @@
 <template name="SignIn">
-  <button class="link" type="button" name="signIn">Sign in / register</button>
+  <span id="SignIn">
+    <template name="SignInLink">
+      <button class="link" type="button" name="signIn">Sign in / register</button>
+    </template>
+    <template name="Profile">
+      <button class="link" type="button" name="profile">{{name}}</button>
+    </template>
+    {{item}}
+  </span>
+
+  <template name="Dialog">
+    <form id="SignInDialog">
+      <fieldset>
+        <label>
+          <span>Email</span>
+          <input type="text" name="email">
+        </label>
+        <label>
+          <span>Password</span>
+          <input type="password" name="password">
+        </label>
+      </fieldset>
+      <fieldset class="actions">
+        <button type="submit">Sign in</button>
+      </fieldset>
+      <template name="Progress">
+        <span id="SignInProgress" class="{{state}}">{{message}}</span>
+      </template>
+      {{> Progress}}
+    </form>
+  </template>
 </template>

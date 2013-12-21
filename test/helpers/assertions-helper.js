@@ -319,6 +319,10 @@
       return result;
     }
 
+    function text(elm) {
+      return elm.length ? elm[0].textContent.trim() : '';
+    }
+
     function select(elm, options, body /* arguments */) {
       var msg, old = selectNode, orig = elm;
       try {
@@ -356,10 +360,11 @@
               this.htmlClue = "count:" + options.count + " == "+  elm.length +" for '" + this.htmlClue;
               return false;
             }
+            if (elm.length === 0) return false;
             if (options.value != null) {
               var ef = filter(elm, function (i) {return options.value === i.value});
               if (ef.length === 0) {
-                this.htmlClue = 'value: "' + options.value + '" == "' + elm[0].value + '" for ' + this.htmlClue;
+                this.htmlClue = 'value: "' + options.value + '" == "' + (elm.length ? elm[0].value : '') + '" for ' + this.htmlClue;
                 return false;
               } else {
                 selectNode = elm = ef;
@@ -368,7 +373,7 @@
             if(typeof options.text === 'string') {
               var ef = filter(elm, function (i) {return options.text === i.textContent.trim()});
               if (ef.length === 0) {
-                this.htmlClue = 'text: "' + options.text + '" == "' + elm[0].textContent.trim() + '" for ' + this.htmlClue;
+                this.htmlClue = 'text: "' + options.text + '" == "' + text(elm) + '" for ' + this.htmlClue;
                 return false;
               } else {
                 selectNode = elm = ef;
@@ -377,7 +382,7 @@
             if(typeof options.text === 'object') {
               var ef = filter(elm, function (i) {return options.text.test(i.textContent.trim())});
               if (ef.length === 0) {
-                this.htmlClue = 'text does not match "' + elm[0].textContent.trim() + '" for ' + this.htmlClue;
+                this.htmlClue = 'text does not match "' + text(elm) + '" for ' + this.htmlClue;
                 return false;
               } else {
                 selectNode = elm = ef;
@@ -385,9 +390,10 @@
             }
             break;
           case "string":
+            if (elm.length === 0) return false;
             var ef = filter(elm, function (i) {return options === i.textContent.trim()});
             if (ef.length === 0) {
-              this.htmlClue = '"' + options + '" == "' + elm[0].textContent.trim() + '" for ' + this.htmlClue;
+              this.htmlClue = '"' + options + '"; found "' + text(elm) + '" for ' + this.htmlClue;
               return false;
             } else {
               selectNode = elm = ef;

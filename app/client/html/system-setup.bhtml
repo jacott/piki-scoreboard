@@ -1,0 +1,4 @@
+<template name="SystemSetup">
+  <section id="SystemSetup">
+  </section>
+</template>

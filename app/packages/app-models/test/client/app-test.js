@@ -34,10 +34,10 @@
 
       App.globalErrorCatch.reset();
 
-      v.options.onReady('xyz');
+      v.options.onReady('foo');
 
       refute.called(App.globalErrorCatch);
-      assert.same(v.arg, 'xyz');
+      assert.same(v.arg, 'foo');
     },
   });
 })();

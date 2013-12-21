@@ -1,22 +1,34 @@
+var ROLE = {
+  superUser: 's',
+  spectator: 'p',
+  climber: 'c',
+  judge: 'j',
+}
 var model = AppModel.Base.defineSubclass('User',{
   emailWithName: function () {
     return this.name.replace('/<>/','')+" <"+this.email+">";
   },
 
+  isSuperUser: function () {
+    return this.role === ROLE.superUser;
+  },
+
 },{saveRpc: true});
+
+model.ROLE = ROLE;
 
 model.defineFields({
   name: {type:  'text', trim: true, required: true, maxLength: 200},
   email: {type:  'text', trim: true, required: true, maxLength: 200, inclusion: {allowBlank: true, matches: Apputil.EMAIL_RE },  normalize: 'downcase'},
   initials: {type: 'text', trim: true, required: true, maxLength: 3},
   org_id: 'belongs_to',
-
+  role: 'text',
 });
 
 
 App.extend(model, {
   me: function () {
-    return model.findOne(App.userId());
+    return App.userId() && model.findOne(App.userId());
   },
 });
 

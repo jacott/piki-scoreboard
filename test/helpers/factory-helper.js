@@ -35,6 +35,14 @@
   };
 
   var traits = {
+    User: {
+      su: function (options) {
+        App.reverseExtend(options, {
+          name: "Super User", initials: "SU",
+          email: "su@example.com", role: 's', org_id: null
+        });
+      },
+    },
   };
 
   /** Add a function for any action needed to happen after doc created */
@@ -51,10 +59,17 @@
   var defaultAfter = JSON.stringify({name: 'new name'});
 
   var defines = {
+    Org: function (options) {
+      return new Builder('Org', options).genName()
+        .addField('shortName', 'shortName' in options || generateName('SN'));
+    },
+
     User: function (options) {
       var username = 'username' in options || generateName('user');
 
       return new Builder('User', options)
+        .addRef('org')
+        .addField('role', 'p')
         .addField('name', 'name' in options || 'fn '+username)
         .addField('email', 'email' in options || ('email-'+username.replace(/\s+/g,'.')+'@test.co').toLowerCase())
         .addField('initials', 'initials' in options || 'u'+username.substring(4))
