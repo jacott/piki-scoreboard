@@ -1,4 +1,7 @@
 <template name="SystemSetup">
   <section id="SystemSetup">
+    <nav class="menu">
+      <button type="button" name="addOrg">Add new organization</button>
+    </nav>
   </section>
 </template>

@@ -9,8 +9,14 @@
       v = null;
     },
 
-    "//test onEntry": function () {
+    "test onEntry": function () {
+      Bart.SystemSetup.onEntry();
 
+      assert.select('#SystemSetup', function () {
+        assert.select('.menu', function () {
+          assert.select('[name=addOrg]');
+        });
+      });
     },
   });
 })();
