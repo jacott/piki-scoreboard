@@ -11,10 +11,35 @@ App.require('makeSubject', function (makeSubject) {
       return defaultPage;
     },
 
-    addRoute: function (path, page) {
-      if (path in routes) throw new Error('Path already exists! ', path);
-      routes[path] = page;
+    addTemplate: function (template, options) {
+      this.addRoute(template.PATHNAME = name(template), template);
+
+      if ('onEntry' in template) return;
+
+      template.onEntry = onEntryFunc(template, options);
+      template.onExit = onExitFunc(template);
+
+      function name(template) {
+        if ('parent' in template)
+          return name(template.parent) + templatePath(template);
+
+        return templatePath(template);
+      }
     },
+
+    get routes() {
+      return routes;
+    },
+
+    addRoute: function (path, template) {
+      if (path in routes) throw new Error('Path already exists! ', path);
+      routes[path] = template;
+    },
+
+    setByTemplate: function (template) {
+      return this.setByLocation(template.PATHNAME);
+    },
+
     setByLocation: function (location, nodefault) {
       if (typeof location === 'string') {
         var page = routes[location];
@@ -43,3 +68,26 @@ App.require('makeSubject', function (makeSubject) {
     },
   });
 });
+
+function templatePath(template) {
+  return '/'+Apputil.dasherize(template.name);
+}
+
+function onEntryFunc(template, options) {
+  return function () {
+    if (options) {
+      if (typeof options.data ==='function') {
+        var data = options.data.call(template);
+      } else {
+        var data = options.data;
+      }
+    }
+    document.body.appendChild(template.$autoRender(data||{}));
+  };
+}
+
+function onExitFunc(template) {
+  return function () {
+    Bart.remove(document.getElementById(template.name));
+  };
+}

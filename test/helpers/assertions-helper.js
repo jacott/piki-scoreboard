@@ -270,15 +270,15 @@
 
     ga.add('selectParent', {
       assert:  function(elm, options, body /* arguments */) {
-        var func = arguments[arguments.length - 1];
-        if (typeof func !== 'function')
-          throw new Error('function must be supplied as last argument');
-        var args = Apputil.slice(arguments, 0, -1);
-        args.push(function () {
-          selectNode = selectNode[0].parentNode;
-          return func.apply(selectNode[0], arguments);
-        });
-        return select.apply(this, args);
+        if (! selectNode)
+          throw new Error('must be inside a select assertion');
+        var old = selectNode;
+        try {
+          selectNode = [selectNode[0].parentNode];
+          return select.apply(this, arguments);
+        } finally {
+          selectNode = old;
+        }
       },
 
       assertMessage: "Expected select to find {$htmlClue}",

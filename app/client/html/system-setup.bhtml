@@ -4,4 +4,17 @@
       <button type="button" name="addOrg">Add new organization</button>
     </nav>
   </section>
+  <template name="AddOrg">
+    <form id="AddOrg">
+      <fieldset class="fields">
+        {{labelField "name"}}
+        {{labelField "initials"}}
+        {{labelField "email"}}
+      </fieldset>
+      <fieldset class="actions">
+        <button type="submit" name="create">Create</button>
+        <button type="button" name="cancel">Cancel</button>
+      </fieldset>
+    </form>
+  </template>
 </template>

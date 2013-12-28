@@ -1,0 +1,14 @@
+@import "global.lessimport";
+
+.errorMsg {
+  display: none;
+  color: @colorErrorText;
+}
+
+.error+.errorMsg {
+  display: inherit;
+}
+
+.error {
+  background-color: @colorInputErrorBG;
+}

@@ -12,6 +12,7 @@ var vendorTransform = vendorStylePrefix ? vendorStylePrefix + 'Transform' : 'tra
 
 var matches = document.documentElement[vendorFuncPrefix+'MatchesSelector'] || document.documentElement.matchesSelector;
 
+var COMMENT_NODE = document.COMMENT_NODE;
 var TEXT_NODE = document.TEXT_NODE;
 var DOCUMENT_FRAGMENT_NODE = document.DOCUMENT_FRAGMENT_NODE;
 
@@ -26,6 +27,21 @@ Bart = {
     var elm = document.createElement('div');
     elm.innerHTML = html;
     return elm.firstChild;
+  },
+
+  hasClass: function (elm, name) {
+    var classList = elm && elm.classList;
+    return classList && classList.contains(name);
+  },
+
+  addClass: function (elm, name) {
+    var classList = elm && elm.classList;
+    classList && classList.add(name);
+  },
+
+  removeClass: function (elm, name) {
+    var classList = elm && elm.classList;
+    classList && classList.remove(name);
   },
 
   parentOf: function (parent, elm) {
@@ -244,10 +260,10 @@ function addTemplates(parent, options) {
     var names = options.name.split('.');
     options.name = names.pop();
     names.forEach(function (name) {
-      parent = parent[name] || (parent[name] =  new BartTemplate());
+      parent = parent[name] || (parent[name] =  new BartTemplate(parent));
     });
   }
-  parent[options.name] = parent = (parent[options.name] || new BartTemplate()).$initOptions(options);
+  parent[options.name] = parent = (parent[options.name] || new BartTemplate(parent)).$initOptions(options);
   var nested = options.nested;
 
   if (! options.nested) return;
@@ -275,14 +291,20 @@ BartCtx.prototype = {
   },
 
   _updateNode: function (node, data) {
-    this.element = node[0];
+    var element = this.element = node[0];
     this.node = node;
 
     var value = getValue(data, node[1], node[2]);
 
-    if (value !== node[0]) {
+    if (value === undefined)
+      return;
+
+    if (value !== element) {
       if (value == null)  {
-        value = document.createComment('empty');
+        if (element.nodeType === COMMENT_NODE)
+          value = element;
+        else
+          value = document.createComment('empty');
 
       } else if (typeof value === 'object' && value.nodeType === DOCUMENT_FRAGMENT_NODE) {
 
@@ -294,16 +316,16 @@ BartCtx.prototype = {
       } else if (typeof value !== 'object' || ! ('nodeType' in value)) {
 
         // ***  Text output ***
-        if (node[0].nodeType === TEXT_NODE) {
-          node[0].textContent = value.toString();
-          value = node[0];
+        if (element.nodeType === TEXT_NODE) {
+          element.textContent = value.toString();
+          value = element;
         } else {
           value = document.createTextNode(value.toString());
         }
       } // else *** User created node
 
-      if (node[0] !== value) {
-        Bart.replaceElement(value, node[0]);
+      if (element !== value) {
+        Bart.replaceElement(value, element);
       }
     }
     node[0] = value;
@@ -428,7 +450,9 @@ function evalArgs(data, args) {
   return output;
 }
 
-function BartTemplate() {
+function BartTemplate(parent) {
+  if (parent !== Bart)
+    this.parent = parent;
 }
 
 BartTemplate.prototype = {

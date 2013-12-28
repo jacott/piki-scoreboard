@@ -1,0 +1,11 @@
+<template name="Form">
+  <template name="LabelField">
+    <label>
+      <span class="name">{{label}}</span>
+      {{value}}
+    </label>
+  </template>
+  <template name="TextInput">
+    <input name="{{name}}" value="{{value}}" {{htmlOptions}}>
+  </template>
+</template>

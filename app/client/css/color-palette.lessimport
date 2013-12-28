@@ -3,3 +3,6 @@
 
 @colorHeaderBackground: #000;
 @colorHeaderText: #fff;
+
+@colorInputErrorBG: #fea;
+@colorErrorText: #974;

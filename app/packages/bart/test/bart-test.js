@@ -81,6 +81,27 @@ Meteor.isClient && (function (test, v) {
       });
     },
 
+    "test classList": function () {
+      var elm = document.createElement('div');
+
+      refute(Bart.hasClass(null, 'foo'));
+      refute(Bart.hasClass(elm, 'foo'));
+
+      Bart.addClass(elm, 'foo');
+      assert(Bart.hasClass(elm, 'foo'));
+
+      Bart.addClass(null, 'foo');
+      Bart.addClass(elm, 'foo');
+      Bart.addClass(elm, 'bar');
+      assert(Bart.hasClass(elm, 'foo'));
+      assert(Bart.hasClass(elm, 'bar'));
+
+      Bart.removeClass(null, 'bar');
+      Bart.removeClass(elm, 'bar');
+      assert(Bart.hasClass(elm, 'foo'));
+      refute(Bart.hasClass(elm, 'bar'));
+    },
+
     "test parentOf": function () {
       var elm = Bart.html('<div id="top"><div class="foo"><div class="bar"><button type="button" id="sp">Hello</button></div></div></div>');
 
@@ -269,6 +290,19 @@ Meteor.isClient && (function (test, v) {
 
           assert.same(this.getAttribute('draggable'), 'true');
         });
+      },
+
+      "test parent": function () {
+        Bart.newTemplate({
+          name: "Foo.Bar",
+          nested: [{
+            name: "Baz",
+          }],
+        });
+
+        assert.same(undefined, Bart.Foo.parent);
+        assert.same(Bart.Foo, Bart.Foo.Bar.parent);
+        assert.same(Bart.Foo.Bar, Bart.Foo.Bar.Baz.parent);
       },
 
       "test body": function () {
