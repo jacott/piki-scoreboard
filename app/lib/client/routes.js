@@ -36,11 +36,13 @@ App.require('makeSubject', function (makeSubject) {
       routes[path] = template;
     },
 
-    setByTemplate: function (template) {
-      return this.setByLocation(template.PATHNAME);
+    gotoPage: function (page, params) {
+      current && current.onExit && current.onExit(page, params);
+      current = page;
+      page.onEntry(params);
     },
 
-    setByLocation: function (location, nodefault) {
+    gotoPath: function (location, nodefault) {
       if (typeof location === 'string') {
         var page = routes[location];
         location = {pathname: location};
@@ -62,9 +64,8 @@ App.require('makeSubject', function (makeSubject) {
           params[keyValue[0]]=keyValue[1];
         });
       }
-      current && current.onExit && current.onExit(location, params);
-      current = page;
-      page.onEntry(location, params);
+
+      this.gotoPage(page, params);
     },
   });
 });

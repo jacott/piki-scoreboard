@@ -16,7 +16,7 @@
 
       var ready = TH.stubReady();
 
-      AppRoute.setByLocation('/');
+      AppRoute.gotoPath('/');
 
       refute.select('#SystemSetup');
 
@@ -34,7 +34,7 @@
       var ready = TH.stubReady();
 
       ready.onReady.yields();
-      AppRoute.setByLocation('/');
+      AppRoute.gotoPath('/');
 
       assert.select('#SystemSetup');
     },

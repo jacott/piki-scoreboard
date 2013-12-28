@@ -23,7 +23,7 @@
     },
 
     "test addOrg": function () {
-      AppRoute.setByTemplate(Bart.SystemSetup);
+      AppRoute.gotoPage(Bart.SystemSetup);
 
       assert.select('#SystemSetup', function () {
         TH.click('[name=addOrg]');

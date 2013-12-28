@@ -6,7 +6,7 @@ App.isReady = false;
 
 App._startup = function () {
   document.body.appendChild(Tpl.$render({}));
-  AppRoute.setByLocation();
+  AppRoute.gotoPath();
   Deps.autorun(function () {
     if (Accounts.loginServicesConfigured() && Meteor.status().connected) {
       Meteor.userId();

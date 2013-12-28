@@ -10,7 +10,7 @@ AppRoute.addTemplate(Tpl.AddOrg, {
 Tpl.$events({
   'click [name=addOrg]': function (event) {
     event.$actioned = true;
-    AppRoute.setByTemplate(Tpl.AddOrg);
+    AppRoute.gotoPage(Tpl.AddOrg);
   },
 });
 
@@ -23,7 +23,7 @@ Tpl.AddOrg.$events({
     var doc = ctx.data;
 
     if (Bart.Form.saveDoc(doc, elm.querySelector('.fields'))) {
-      AppRoute.setByTemplate(Tpl);
+      AppRoute.gotoPage(Tpl);
     }
   },
 });

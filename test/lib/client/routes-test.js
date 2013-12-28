@@ -45,14 +45,14 @@
       refute.select('#Baz');
     },
 
-    "test default setByLocation": function () {
+    "test default gotoPath": function () {
       AppRoute.addRoute('/context.html', v.FooBar);
 
-      AppRoute.setByLocation();
-      assert.calledWith(v.FooBar.onEntry, document.location);
+      AppRoute.gotoPath();
+      assert.called(v.FooBar.onEntry);
     },
 
-    "test addRoute setByLocation": function () {
+    "test addRoute gotoPath": function () {
       var Bar = {
         onEntry: test.stub(),
       };
@@ -63,15 +63,15 @@
 
       AppRoute.addRoute('/bar', Bar);
 
-      AppRoute.setByLocation(v.loc = {pathname: '/foo-bar', search: '?abc=123&def=456'});
+      AppRoute.gotoPath(v.loc = {pathname: '/foo-bar', search: '?abc=123&def=456'});
 
-      assert.calledWith(v.FooBar.onEntry, v.loc, {abc: '123', def: '456'});
+      assert.calledWith(v.FooBar.onEntry, {abc: '123', def: '456'});
 
       v.loc = {pathname: '/bar'};
-      AppRoute.setByLocation(v.loc.pathname);
+      AppRoute.gotoPath(v.loc.pathname);
 
-      assert.calledWith(v.FooBar.onExit, v.loc, undefined);
-      assert.calledWith(Bar.onEntry, v.loc, undefined);
+      assert.calledWith(v.FooBar.onExit, Bar, undefined);
+      assert.calledWith(Bar.onEntry, undefined);
     },
 
     "test default": function () {
@@ -83,9 +83,9 @@
       AppRoute.setDefault(v.FooBar);
       assert.same(AppRoute.getDefault(), v.FooBar);
 
-      AppRoute.setByLocation(v.loc = {pathname: '/anything', search: '?abc=123&def=456'});
+      AppRoute.gotoPath(v.loc = {pathname: '/anything', search: '?abc=123&def=456'});
 
-      assert.calledWith(v.FooBar.onEntry, v.loc, {abc: '123', def: '456'});
+      assert.calledWith(v.FooBar.onEntry, {abc: '123', def: '456'});
     },
   });
 })();

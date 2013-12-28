@@ -3,7 +3,7 @@
     setUp: function () {
       test = this;
       v = {};
-      test.stub(AppRoute, 'setByLocation');
+      test.stub(AppRoute, 'gotoPath');
       test.stub(Meteor, 'status').returns({connected: true});
     },
 
@@ -37,7 +37,7 @@
       var sub = test.stub(App, 'subscribe');
       App._startup();
 
-      assert.calledWithExactly(AppRoute.setByLocation);
+      assert.calledWithExactly(AppRoute.gotoPath);
       assert.calledOnce(v.arSpy);
       assert.calledOnceWith(sub, 'Session');
 
