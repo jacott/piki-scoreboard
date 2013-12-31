@@ -1,9 +1,17 @@
 <template name="SystemSetup">
   <section id="SystemSetup">
     <nav class="menu">
-      <button type="button" name="addOrg">Add new organization</button>
     </nav>
+    <section class="body">
+    </section>
   </section>
+  <template name="Index">
+    <div>
+      <nav class="menu">
+        <button type="button" name="addOrg">Add new organization</button>
+      </nav>
+    </div>
+  </template>
   <template name="AddOrg">
     <form id="AddOrg">
       <fieldset class="fields">

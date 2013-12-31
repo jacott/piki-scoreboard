@@ -14,4 +14,4 @@ var defaultPage = {
   },
 };
 
-AppRoute.setDefault(defaultPage);
+AppRoute.root.defaultPage = defaultPage;

@@ -6,11 +6,12 @@
     },
 
     tearDown: function () {
+      AppRoute.gotoPage();
       v = null;
     },
 
     "test onEntry onExit": function () {
-      Bart.SystemSetup.onEntry();
+      AppRoute.gotoPage(Bart.SystemSetup);
 
       assert.select('#SystemSetup', function () {
         assert.select('.menu', function () {
@@ -18,7 +19,7 @@
         });
       });
 
-      Bart.SystemSetup.onExit();
+      Bart.SystemSetup.onBaseExit();
       refute.select('#SystemSetup');
     },
 

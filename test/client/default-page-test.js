@@ -6,8 +6,9 @@
     },
 
     tearDown: function () {
-      v = null;
+      AppRoute.gotoPage();
       App.isReady = false;
+      v = null;
     },
 
     "test listens for ready": function () {

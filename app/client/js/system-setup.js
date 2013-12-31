@@ -1,10 +1,22 @@
 var Tpl = Bart.SystemSetup;
 
-AppRoute.addTemplate(Tpl);
-AppRoute.addTemplate(Tpl.AddOrg, {
+var base = AppRoute.root.addBase(Tpl);
+base.addTemplate(Tpl.Index, {defaultPage: true});
+base.addTemplate(Tpl.AddOrg, {
   data: function () {
     return new AppModel.Org();
   }
+});
+
+
+App.extend(Tpl, {
+  onBaseEntry: function () {
+    document.body.appendChild(Tpl.$autoRender({}));
+  },
+
+  onBaseExit: function () {
+    Bart.remove(document.getElementById('SystemSetup'));
+  },
 });
 
 Tpl.$events({
@@ -15,6 +27,10 @@ Tpl.$events({
 });
 
 Tpl.AddOrg.$events({
+  'click [name=cancel]': function (event) {
+    event.$actioned = true;
+    AppRoute.gotoPage(Tpl);
+  },
   'click [type=submit]': function (event) {
     event.$actioned = true;
 

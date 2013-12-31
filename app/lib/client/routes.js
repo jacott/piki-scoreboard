@@ -1,60 +1,106 @@
 App.require('makeSubject', function (makeSubject) {
-  var routes = {};
-  var defaultPage;
-  var current = null;
-  AppRoute = makeSubject({
-    setDefault: function (page) {
-      defaultPage = page;
-    },
+  AppRoute = function (path, template, parent) {
+    this.path = path || '';
+    this.template = template;
+    this.parent = parent;
+    this.routes = {};
+  };
 
-    getDefault: function () {
-      return defaultPage;
-    },
+  AppRoute.prototype = {
+    constructor: AppRoute,
 
     addTemplate: function (template, options) {
-      this.addRoute(template.PATHNAME = name(template), template);
+      options = options || {};
+      var path = options.path || templatePath(template);
+      if (path in this.routes) throw new Error('Path already exists! ', path + " for template " + this.path);
+      this.routes[path] = template;
+      template.route = this;
+      template.subPath = path;
 
-      if ('onEntry' in template) return;
+      if (options.defaultPage)
+        this.defaultPage = true;
 
-      template.onEntry = onEntryFunc(template, options);
-      template.onExit = onExitFunc(template);
+      if (! ('onEntry' in template))
+        template.onEntry = onEntryFunc(template, options);
 
-      function name(template) {
-        if ('parent' in template)
-          return name(template.parent) + templatePath(template);
-
-        return templatePath(template);
-      }
+      if (! ('onExit' in template))
+        template.onExit = onExitFunc(template);
     },
 
-    get routes() {
-      return routes;
+    addBase: function (template) {
+      if ('route' in template) throw new Error(template.name + ' is already a route base');
+      var path = templatePath(template);
+      if (path in this.routes) throw new Error('Path already exists! ', path + " for template " + this.path);
+
+      template.subPath = path;
+      return template.route = this.routes[path] = new AppRoute(path, template, this);
     },
 
-    addRoute: function (path, template) {
-      if (path in routes) throw new Error('Path already exists! ', path);
-      routes[path] = template;
+    onBaseExit: function() {
+      var template = this.template;
+      var onBaseExit = template && template.onBaseExit;
+      onBaseExit && onBaseExit.call(template);
     },
+
+    onBaseEntry: function() {
+      var template = this.template;
+      var onBaseEntry = template && template.onBaseEntry;
+      onBaseEntry && onBaseEntry.call(template);
+    },
+  };
+
+  var current = null;
+  App.extend(AppRoute, {
+    root: new AppRoute(),
 
     gotoPage: function (page, params) {
-      current && current.onExit && current.onExit(page, params);
-      current = page;
-      page.onEntry(params);
+      if (current) {
+        current.onExit && current.onExit(page, params);
+
+        exitEntry(toPath(current.route), toPath(page && page.route));
+      } else {
+        exitEntry([], toPath(page && page.route));
+      }
+
+      if (! page) {
+        current = null;
+      } else {
+        page = page.Index || page;
+        current = page;
+        page.onEntry(params);
+      }
     },
 
     gotoPath: function (location, nodefault) {
       if (typeof location === 'string') {
-        var page = routes[location];
+        var page = location;
         location = {pathname: location};
       } else {
         if (location == null)
           location = document.location;
-        var page = routes[location.pathname];
+        var page = location.pathname;
       }
-      if (! page) {
-        if (! nodefault) page = defaultPage;
-        if (! page) throw new Error('Page not found');
+
+      var parts = page.split('/');
+      var root = this.root;
+      var page = root;
+      var newPage = root.defaultPage;
+      for(var i = 0; i < parts.length; ++i) {
+        var part = parts[i];
+        if (! part) continue;
+        newPage = page.routes[part] || page.defaultPage;
+        if (! newPage) {
+          break;
+        }
+        page = newPage;
       }
+
+      if (newPage === root.defaultPage)
+        page = newPage;
+
+      if (page === root)
+        throw new Error('Page not found');
+
       var search = location.search;
 
       if (search) {
@@ -70,8 +116,37 @@ App.require('makeSubject', function (makeSubject) {
   });
 });
 
+function exitEntry(exit, entry) {
+  var entryLen = entry.length;
+  var diff = exit.length - entryLen;
+  var index = 0;
+
+  for(;index < diff; ++index) {
+    exit[index].onBaseExit();
+  }
+
+  for(;index - diff < entryLen; ++index) {
+    var exitItem = exit[index];
+    if (exitItem === entry[index - diff]) break;
+    exitItem.onBaseExit();
+  }
+
+  for(index = index - diff - 1 ; index >= 0; --index) {
+    entry[index].onBaseEntry();
+  }
+}
+
+function toPath(route) {
+  var path = [];
+  while(route) {
+    path.push(route);
+    route = route.parent;
+  }
+  return path;
+}
+
 function templatePath(template) {
-  return '/'+Apputil.dasherize(template.name);
+  return Apputil.dasherize(template.name);
 }
 
 function onEntryFunc(template, options) {
@@ -83,12 +158,20 @@ function onEntryFunc(template, options) {
         var data = options.data;
       }
     }
-    document.body.appendChild(template.$autoRender(data||{}));
+    var route = template.route;
+
+
+    if (route && route.template) {
+      var parent = document.getElementById(route.template.name);
+      if (parent)
+        parent = parent.querySelector('.body') || parent;
+    }
+    (parent || document.body).appendChild(template._renderedPage = template.$autoRender(data||{}));
   };
 }
 
 function onExitFunc(template) {
   return function () {
-    Bart.remove(document.getElementById(template.name));
+    Bart.remove(template._renderedPage, document.getElementById(template.name));
   };
 }
