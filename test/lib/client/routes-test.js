@@ -58,7 +58,7 @@
       Fnord.route.addTemplate(v.FooBar);
       Baz.route.addTemplate(BazBar);
 
-      assert.same(Fnord.subPath, 'fnord');
+      assert.same(Fnord.route.path, 'fnord');
       assert.same(Fnord.route.parent, Baz.route);
 
       AppRoute.gotoPath('baz//fnord/foo-bar');
@@ -82,15 +82,17 @@
 
       AppRoute.gotoPage(v.FooBar);
 
-      assert.called(BazBar.onExit);
-      assert.called(v.FooBar.onEntry);
+      var loc = {pathname: "/baz/fnord/foo-bar"};
 
-      assert.called(Fnord.onBaseEntry);
+      assert.calledWith(BazBar.onExit, v.FooBar, loc);
+      assert.calledWith(v.FooBar.onEntry, loc);
+
+      assert.calledWith(Fnord.onBaseEntry, loc);
       refute.called(Baz.onBaseExit);
 
       AppRoute.gotoPage(RootBar);
 
-      assert.called(Baz.onBaseExit);
+      assert.calledWith(Baz.onBaseExit, { pathname: "/root-bar" });
     },
 
     "test addTemplate": function () {
@@ -139,15 +141,15 @@
 
       AppRoute.root.addTemplate(Bar);
 
-      AppRoute.gotoPath(v.loc = {pathname: '/foo-bar', search: '?abc=123&def=456'});
+      AppRoute.gotoPath(v.loc = {pathname: '/foo-bar'});
 
-      assert.calledWith(v.FooBar.onEntry, {abc: '123', def: '456'});
+      assert.calledWith(v.FooBar.onEntry, v.loc);
 
       v.loc = {pathname: '/bar'};
       AppRoute.gotoPath(v.loc.pathname);
 
-      assert.calledWith(v.FooBar.onExit, Bar, undefined);
-      assert.calledWith(Bar.onEntry, undefined);
+      assert.calledWith(v.FooBar.onExit, Bar, v.loc);
+      assert.calledWith(Bar.onEntry, v.loc);
     },
 
     "test default": function () {
@@ -155,7 +157,7 @@
 
       AppRoute.gotoPath(v.loc = {pathname: '/anything', search: '?abc=123&def=456'});
 
-      assert.calledWith(v.FooBar.onEntry, {abc: '123', def: '456'});
+      assert.calledWith(v.FooBar.onEntry, v.loc);
     },
   });
 })();
