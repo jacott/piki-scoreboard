@@ -11,7 +11,9 @@ base.addTemplate(Tpl.AddOrg, {
 
 App.extend(Tpl, {
   onBaseEntry: function () {
-    document.body.appendChild(Tpl.$autoRender({}));
+    var elm = elm = Tpl.$autoRender({});
+    document.body.appendChild(elm);
+    Bart.getCtx(elm).onDestroy(App.subscribe('AllOrgs'));
   },
 
   onBaseExit: function () {

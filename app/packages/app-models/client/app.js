@@ -8,6 +8,9 @@ App.extend(App, {
   },
 
   subscribe: function () {
+    if (typeof arguments[arguments.length - 1] !== 'function')
+      return Meteor.subscribe.apply(Meteor, arguments);
+
     var args = Apputil.slice(arguments, 0);
     var callback = args.pop();
 
