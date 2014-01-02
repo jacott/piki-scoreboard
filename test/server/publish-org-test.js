@@ -1,12 +1,12 @@
 (function (test, v) {
-  buster.testCase('server/publish-all-orgs:', {
+  buster.testCase('server/publish-org:', {
     setUp: function () {
       test = this;
       v = {};
       v.user = TH.Factory.createUser('su');
       v.org = TH.Factory.createOrg();
       v.sub = TH.subStub(v.user._id);
-      v.pub = TH.getPublish('AllOrgs');
+      v.pub = TH.getPublish('Org');
       v.tsub = TH.subStub(v.user._id, v.sub);
 
       TH.loginAs(v.user);
@@ -31,15 +31,16 @@
       },
 
       "test observes org": function () {
-        var spyOrg = test.spy(AppModel.Org, 'observeAny');
-        v.pub.call(v.tsub);
+        var spyOrg = test.spy(AppModel.Org, 'observeId');
+        test.spy(global, 'check');
+        v.pub.call(v.tsub, v.org.shortName);
 
+        assert.calledWith(check, v.org.shortName, String);
         assert.called(spyOrg);
-        assert.calledWith(v.sess.addObserver, 'AllOrgs', spyOrg.returnValues[0]);
+        assert.calledWith(v.sess.addObserver, 'Org', spyOrg.returnValues[0]);
 
         assert.called(v.tsub.ready);
         assert(v.tsub.stopFunc);
-
 
         assert.calledWith(v.sub.aSpy, 'Org', v.org._id);
 
@@ -48,14 +49,18 @@
         assert.calledWith(v.sub.rSpy, 'Org', v.org._id);
       },
 
-      "test org already observed": function () {
-        v.sess.orgId = (v.org._id);
+      "test allOrgs subscribed": function () {
+        v.sess.observers.AllOrgs = {stop: function () {}};
+
         v.sub.aSpy.reset();
 
-        v.pub.call(v.tsub);
+        v.pub.call(v.tsub, v.org.shortName);
+
+        assert.same(v.sess.orgId, v.org._id);
+
         refute.called(v.sub.aSpy);
 
-         v.tsub.stopFunc();
+        v.tsub.stopFunc();
 
         refute.called(v.sub.rSpy);
       },

@@ -61,7 +61,7 @@
   var defines = {
     Org: function (options) {
       return new Builder('Org', options).genName()
-        .addField('shortName', 'shortName' in options || generateName('SN'));
+        .addField('shortName', 'shortName' in options || generateName('SN').replace(/\s+/g, ''));
     },
 
     User: function (options) {

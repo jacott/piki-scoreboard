@@ -4,6 +4,10 @@ Meteor.publish("Session", function () {new Session(this)});
 
 Session = function (sub) {
   var sess = this;
+  if (sub._session.id  in sessions) {
+    sessions[sub._session.id].sub.stop();
+  }
+
   sess.sub = sub;
   var user = sub.userId ? AppModel.User.attrFind(sub.userId) : AppModel.User.guestUser();
   if (! user) {
@@ -13,9 +17,6 @@ Session = function (sub) {
 
   sess.user = user;
   var _models = sess._models = {};
-  sess.docs = function (name) {
-    return _models[name] || (_models[name] = {});
-  };
   sess.userId = user._id;
   sess.observers = {};
   sub.onStop(sess.stop.bind(sess));
@@ -92,6 +93,11 @@ App.extend(Session, {
 Session.prototype = {
   constructor: Session,
 
+  docs: function (name) {
+    var _models= this._models;
+    return _models[name] || (_models[name] = {});
+  },
+
   doc: function (name, id) {
     return this.docs(name)[id];
   },
@@ -119,6 +125,7 @@ Session.prototype = {
     }
 
     var _models = this._models;
+    this._models = {};
     var conn = this.conn;
     for(var name in _models) {
       var docs = _models[name];
