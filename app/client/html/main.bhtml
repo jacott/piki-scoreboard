@@ -7,7 +7,7 @@
 
   <header id="header">
     <nav class="left">
-      <button class="link" type="button" name="connect">Climbing NZ</button>
+      <button class="link" type="button" name="connect">Piki</button>
     </nav>
     <nav class="right">
       {{> /SignIn}}

@@ -1,4 +1,5 @@
 var Tpl = Bart.SystemSetup;
+var elm;
 
 var base = AppRoute.root.addBase(Tpl);
 base.addTemplate(Tpl.Index, {defaultPage: true});
@@ -11,13 +12,13 @@ base.addTemplate(Tpl.AddOrg, {
 
 App.extend(Tpl, {
   onBaseEntry: function () {
-    var elm = elm = Tpl.$autoRender({});
+    elm = Tpl.$autoRender({});
     document.body.appendChild(elm);
     Bart.getCtx(elm).onDestroy(App.subscribe('AllOrgs'));
   },
 
   onBaseExit: function () {
-    Bart.remove(document.getElementById('SystemSetup'));
+    Bart.remove(elm);
   },
 });
 

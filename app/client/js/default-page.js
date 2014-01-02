@@ -1,5 +1,5 @@
 var defaultPage = {
-  onEntry: function (params) {
+  onEntry: function (location) {
     var handle = App.Ready.onReady(whenReady);
 
     function whenReady() {
@@ -7,7 +7,9 @@ var defaultPage = {
 
       var user = AppModel.User.me();
       if (user && user.isSuperUser())
-        AppRoute.gotoPage(Bart.SystemSetup, 'nodefault');
+        AppRoute.gotoPage(Bart.SystemSetup, location);
+      else
+        AppRoute.gotoPage(Bart.Org, location);
 
       return false;
     }
