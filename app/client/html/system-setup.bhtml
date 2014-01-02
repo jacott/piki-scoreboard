@@ -16,7 +16,7 @@
     <form id="AddOrg">
       <fieldset class="fields">
         {{labelField "name"}}
-        {{labelField "initials"}}
+        {{labelField "shortName"}}
         {{labelField "email"}}
       </fieldset>
       <fieldset class="actions">

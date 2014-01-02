@@ -39,7 +39,7 @@
         assert.selectParent('label', 'Name', function () {
           TH.input('[name=name]', 'Foo Bar');
         });
-        TH.input('[name=initials]', 'FB');
+        TH.input('[name=shortName]', 'FB');
         TH.input('[name=email]', 'FB@foo.com');
         TH.click('[type=submit]');
       });

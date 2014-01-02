@@ -12,7 +12,7 @@ App.extend(Tpl, {
     elm = Tpl.$autoRender({});
     document.body.appendChild(elm);
     Bart.getCtx(elm).onDestroy(App.subscribe('Org', shortName, function () {
-      var doc = AppModel.Org.findOne({initials: shortName});
+      var doc = AppModel.Org.findOne({shortName: shortName});
       Tpl.id = doc._id;
       document.querySelector('#header [name=connect]').textContent = doc.name;
     }));

@@ -3,7 +3,7 @@
     setUp: function () {
       test = this;
       v = {};
-      v.org = TH.Factory.createOrg({initials: 'FOO'});
+      v.org = TH.Factory.createOrg({shortName: 'FOO'});
       v.subStub = test.stub(App, 'subscribe').withArgs('Org').returns({stop: v.stopStub = test.stub()});
       TH.stubReady().onReady.yields();
       document.body.appendChild(Bart.Main.$render({}));
