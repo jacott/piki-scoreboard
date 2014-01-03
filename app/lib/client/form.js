@@ -85,12 +85,6 @@ Tpl.LabelField.$helpers({
 
 helpers('TextInput', {});
 
-Bart.registerHelpers({
-  labelField: function (name, options) {
-    return Tpl.LabelField.$autoRender({name: name, value: field(this, name, options)});
-  },
-});
-
 function helpers(name, funcs) {
   Tpl[name].$helpers(App.reverseExtend(funcs, DEFAULT_HELPERS));
 }
@@ -104,3 +98,13 @@ function field(doc, name, options) {
   }
 
 }
+
+Bart.registerHelpers({
+  pageLink: function (options) {
+    return Tpl.PageLink.$autoRender(options);
+  },
+
+  labelField: function (name, options) {
+    return Tpl.LabelField.$autoRender({name: name, value: field(this, name, options)});
+  },
+});

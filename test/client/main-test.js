@@ -18,6 +18,9 @@
       });
       assert.select('body', function () {
         assert.select('body>header', function () {
+          assert.select('button#OrgHomeLink', "Choose Organization", function () {
+             assert.same(Bart.getCtx(this).data.link, '/org/choose');
+          });
           assert.select('button[name=signIn]');
         });
       });
@@ -39,7 +42,18 @@
       v.subStub.yield();
 
       assert.same(Bart.Main.id, v.org._id);
-      assert.select('#Header [name=connect]', v.org.name);
+      assert.select('#OrgHomeLink', v.org.name, function () {
+        assert.same(Bart.getCtx(this).data.link, '/FOO');
+      });
+
+      assert.same(AppRoute._onGotoPath('/xxFOO/bar'), '/xxFOO/bar');
+
+      assert.called(v.stopStub);
+
+      assert.same(Bart.Main.id, null);
+      assert.select('#OrgHomeLink', "Choose Organization", function () {
+        assert.same(Bart.getCtx(this).data.link, '/org/choose');
+      });
     },
 
     "test whenReady": function () {

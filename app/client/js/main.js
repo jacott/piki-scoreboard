@@ -60,12 +60,19 @@ function subscribeOrg(path) {
     orgSub = App.subscribe('Org', orgShortName, function () {
       var doc = AppModel.Org.findOne({shortName: orgShortName});
       Tpl.id = doc._id;
-      document.querySelector('#Header [name=connect]').textContent = doc.name;
+      var orgLink = document.getElementById('OrgHomeLink');
+      orgLink.textContent = doc.name;
+      Bart.getCtx(orgLink).data.link = '/'+orgShortName;
     });
     return path;
   } else {
     orgSub && orgSub.stop();
     orgSub = orgShortName = Tpl.id = null;
+    var orgLink = document.getElementById('OrgHomeLink');
+    if (orgLink) {
+      orgLink.textContent = "Choose Organization";
+      Bart.getCtx(orgLink).data.link = '/org/choose';
+    }
     return path;
   }
 }
