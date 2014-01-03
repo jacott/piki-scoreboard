@@ -45,6 +45,7 @@
       assert.select('#OrgHomeLink', v.org.name, function () {
         assert.same(Bart.getCtx(this).data.link, '/FOO');
       });
+      assert.className(document.body, 'inOrg');
 
       assert.same(AppRoute._onGotoPath('/xxFOO/bar'), '/xxFOO/bar');
 
@@ -54,6 +55,7 @@
       assert.select('#OrgHomeLink', "Choose Organization", function () {
         assert.same(Bart.getCtx(this).data.link, '/org/choose');
       });
+      refute.className(document.body, 'inOrg');
     },
 
     "test whenReady": function () {

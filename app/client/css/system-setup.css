@@ -1,0 +1,6 @@
+@import "global.lessimport";
+
+
+body:not(.inOrg) #SystemSetup .menu>[name=addUser] {
+  display: none;
+}

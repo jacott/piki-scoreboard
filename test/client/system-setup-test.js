@@ -48,9 +48,17 @@
 
       refute.select('#AddOrg');
       assert.select('#SystemSetup');
+
+      var org = AppModel.Org.findOne();
+
+      assert(org);
+
+      assert.attributesEqual(org, {name: 'Foo Bar', shortName: 'FB', email: 'fb@foo.com'}, ['_id']);
     },
 
     "test addUser": function () {
+      v.org = TH.Factory.createOrg();
+      Bart.Main.id = v.org._id;
       AppRoute.gotoPage(Bart.SystemSetup);
 
       assert.select('#SystemSetup', function () {
@@ -67,6 +75,12 @@
 
       refute.select('#AddUser');
       assert.select('#SystemSetup');
+
+      var user = AppModel.User.findOne({name: 'Foo Bar'});
+
+      assert(user);
+
+      assert.attributesEqual(user, {org_id: v.org._id, name: 'Foo Bar', initials: 'FB', email: 'fb@foo.com'}, ['_id']);
     },
   });
 })();
