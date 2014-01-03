@@ -3,7 +3,9 @@
     setUp: function () {
       test = this;
       v = {};
-      v.subStub = test.stub(App, 'subscribe').withArgs('AllOrgs').returns({stop: v.stopStub = test.stub()});
+      v.subStub = test.stub(App, 'subscribe');
+      v.allOrgsStub = v.subStub.withArgs('AllOrgs').returns({stop: v.stopAllOrgsStub = test.stub()});
+      v.allUsersStub = v.subStub.withArgs('AllUsers').returns({stop: v.stopAllUsersStub = test.stub()});
     },
 
     tearDown: function () {
@@ -14,7 +16,7 @@
     "test onEntry onExit": function () {
       AppRoute.gotoPage(Bart.SystemSetup);
 
-      assert.called(v.subStub);
+      assert.called(v.allOrgsStub);
 
       assert.select('#SystemSetup', function () {
         assert.select('.menu', function () {
@@ -26,7 +28,7 @@
       Bart.SystemSetup.onBaseExit();
 
       refute.select('#SystemSetup');
-      assert.called(v.stopStub);
+      assert.called(v.stopAllOrgsStub);
     },
 
     "test addOrg": function () {
@@ -45,6 +47,25 @@
       });
 
       refute.select('#AddOrg');
+      assert.select('#SystemSetup');
+    },
+
+    "test addUser": function () {
+      AppRoute.gotoPage(Bart.SystemSetup);
+
+      assert.select('#SystemSetup', function () {
+        TH.click('[name=addUser]');
+      });
+      assert.select('#AddUser', function () {
+        assert.selectParent('label', 'Name', function () {
+          TH.input('[name=name]', 'Foo Bar');
+        });
+        TH.input('[name=initials]', 'FB');
+        TH.input('[name=email]', 'FB@foo.com');
+        TH.click('[type=submit]');
+      });
+
+      refute.select('#AddUser');
       assert.select('#SystemSetup');
     },
   });

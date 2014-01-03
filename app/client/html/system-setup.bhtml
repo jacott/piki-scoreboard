@@ -9,6 +9,7 @@
     <div>
       <nav class="menu">
         <button type="button" name="addOrg">Add new organization</button>
+        <button type="button" name="addUser">Add new user</button>
       </nav>
     </div>
   </template>
@@ -17,6 +18,19 @@
       <fieldset class="fields">
         {{labelField "name"}}
         {{labelField "shortName"}}
+        {{labelField "email"}}
+      </fieldset>
+      <fieldset class="actions">
+        <button type="submit" name="create">Create</button>
+        <button type="button" name="cancel">Cancel</button>
+      </fieldset>
+    </form>
+  </template>
+  <template name="AddUser">
+    <form id="AddUser">
+      <fieldset class="fields">
+        {{labelField "name"}}
+        {{labelField "initials"}}
         {{labelField "email"}}
       </fieldset>
       <fieldset class="actions">
