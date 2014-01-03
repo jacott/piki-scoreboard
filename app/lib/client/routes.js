@@ -18,7 +18,7 @@ App.require('makeSubject', function (makeSubject) {
       template.subPath = path;
 
       if (options.defaultPage)
-        this.defaultPage = true;
+        this.defaultPage = template;
 
       if (! ('onEntry' in template))
         template.onEntry = onEntryFunc(template, options);
@@ -52,7 +52,17 @@ App.require('makeSubject', function (makeSubject) {
   App.extend(AppRoute, {
     root: new AppRoute(),
 
+    onGotoPath: function (func) {
+      this._onGotoPath = func;
+    },
+
     gotoPage: function (page, location) {
+      if (page && ! ('onEntry' in page)) {
+        if ('route' in page)
+          page = page.route.defaultPage;
+        else
+          page = page.defaultPage;
+      }
       if (! location)
         location = {pathname: pathname(page)};
 
@@ -82,6 +92,9 @@ App.require('makeSubject', function (makeSubject) {
           location = document.location;
         var page = location.pathname;
       }
+
+      if (this._onGotoPath)
+        page = this._onGotoPath(page);
 
       var parts = page.split('/');
       var root = this.root;

@@ -29,15 +29,44 @@
       assert.same(queue[0], App._startup);
     },
 
+    "test subscribing to Org": function () {
+      document.body.appendChild(Bart.Main.Header.$render({}));
+      v.org = TH.Factory.createOrg({shortName: 'FOO'});
+      v.subStub = test.stub(App, 'subscribe').withArgs('Org').returns({stop: v.stopStub = test.stub()});
+
+      assert.same(AppRoute._onGotoPath('/FOO/bar'), 'bar');
+
+      v.subStub.yield();
+
+      assert.same(Bart.Main.id, v.org._id);
+      assert.select('#Header [name=connect]', v.org.name);
+    },
+
+    "test whenReady": function () {
+      var ready = TH.stubReady();
+      ready.onReady.returns({stop: v.stopStub = test.stub()});
+
+      App._startup();
+
+      assert.calledTwice(ready.onReady);
+
+      assert.isFalse(ready.onReady.args[0][0]());
+
+      assert.calledWith(AppRoute.gotoPath, document.location);
+      assert.called(v.stopStub);
+    },
+
     "test autorun": function () {
       var ready = TH.stubReady();
 
       v.arSpy = test.spy(Deps,'autorun');
       var userId = test.stub(App, 'userId').returns(null);
       var sub = test.stub(App, 'subscribe');
+
+
       App._startup();
 
-      assert.calledWithExactly(AppRoute.gotoPath);
+
       assert.calledOnce(v.arSpy);
       assert.calledOnceWith(sub, 'Session');
 

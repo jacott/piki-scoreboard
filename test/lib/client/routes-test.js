@@ -4,6 +4,7 @@
       test = this;
       v = {
         root: AppRoute.root,
+        onGotoPath: AppRoute._onGotoPath,
       };
       v.FooBar = {
         name: 'FooBar',
@@ -12,16 +13,33 @@
         onExit: test.stub(),
       };
       AppRoute.root = new AppRoute();
+      AppRoute._onGotoPath = null;
     },
 
     tearDown: function () {
       AppRoute.root = v.root;
+      AppRoute._onGotoPath = v.onGotoPath;
       AppRoute.gotoPage();
       v = null;
     },
 
     "test root": function () {
       assert.same(v.root.constructor, AppRoute);
+    },
+
+    "test onGotoPath": function () {
+      AppRoute.root.addTemplate(v.FooBar);
+      AppRoute.onGotoPath(function (path) {
+        v.path = path;
+        return '/foo-bar';
+      });
+
+      AppRoute.gotoPath('/testing');
+
+      assert.same(v.path, '/testing');
+
+
+      assert.calledWith(v.FooBar.onEntry, {pathname: '/testing'});
     },
 
     "test addBase": function () {

@@ -5,12 +5,14 @@
     <meta name="viewport" content="initial-scale=1, user-scalable=no, maximum-scale=1">
   </template>
 
-  <header id="header">
-    <nav class="left">
-      <button class="link" type="button" name="connect">Piki</button>
-    </nav>
-    <nav class="right">
-      {{> /SignIn}}
-    </nav>
-  </header>
+  <template name="Header">
+    <header id="Header">
+      <nav class="left">
+        <button class="link" type="button" name="connect">Piki</button>
+      </nav>
+      <nav class="right">
+        {{> /SignIn}}
+      </nav>
+    </header>
+  </template>
 </template>
