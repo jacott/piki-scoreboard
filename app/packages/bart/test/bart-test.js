@@ -138,6 +138,8 @@ Meteor.isClient && (function (test, v) {
 
         var tpl = Bart.Foo.Bar;
         assert.same(tpl.name, undefined);
+        assert.same(Bart.lookupTemplate("Foo.Bar"), tpl);
+
 
         assert.same(tpl.Baz.name, 'Baz');
 

@@ -85,7 +85,7 @@
       assert.called(Baz.onBaseEntry);
       assert.called(Fnord.onBaseEntry);
 
-      AppRoute.gotoPage(BazBar);
+      AppRoute.gotoPath(BazBar);
 
       assert.called(v.FooBar.onExit);
       assert.called(BazBar.onEntry);

@@ -8,7 +8,7 @@
   <template name="Header">
     <header id="Header">
       <nav class="left">
-        {{pageLink id="OrgHomeLink" name="Choose Organization" link="/org/choose"}}
+        {{pageLink id="OrgHomeLink" name="Choose Organization" template="Main"}}
       </nav>
       <nav class="right">
         {{> /SignIn}}

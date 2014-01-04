@@ -100,10 +100,6 @@ function field(doc, name, options) {
 }
 
 Bart.registerHelpers({
-  pageLink: function (options) {
-    return Tpl.PageLink.$autoRender(options);
-  },
-
   labelField: function (name, options) {
     return Tpl.LabelField.$autoRender({name: name, value: field(this, name, options)});
   },

@@ -62,6 +62,16 @@ Bart = {
     return this;
   },
 
+  lookupTemplate: function (name) {
+    var names = name.split('.');
+    var node = this;
+    names.forEach(function (name) {
+      node = node[name];
+    });
+
+    return node;
+  },
+
   destroyData: function (elm) {
     var ctx = elm && elm._bart;
     if (ctx) {

@@ -60,6 +60,7 @@ var orgSub, orgShortName;
 
 function subscribeOrg(shortName) {
   orgSub && orgSub.stop();
+  var orgLink = document.getElementById('OrgHomeLink');
   if (shortName) {
     orgShortName = shortName;
     Tpl.id = null;
@@ -67,17 +68,11 @@ function subscribeOrg(shortName) {
       var doc = AppModel.Org.findOne({shortName: orgShortName});
       Tpl.id = doc._id;
       Bart.addClass(document.body, 'inOrg');
-      var orgLink = document.getElementById('OrgHomeLink');
-      orgLink.textContent = doc.name;
-      Bart.getCtx(orgLink).data.link = '/'+orgShortName;
+      if (orgLink) orgLink.textContent = doc.name;
     });
   } else {
     orgSub = orgShortName = Tpl.id = null;
     Bart.removeClass(document.body, 'inOrg');
-    var orgLink = document.getElementById('OrgHomeLink');
-    if (orgLink) {
-      orgLink.textContent = "Choose Organization";
-      Bart.getCtx(orgLink).data.link = '/org/choose';
-    }
+    if (orgLink) orgLink.textContent = "Choose Organization";
   }
 }

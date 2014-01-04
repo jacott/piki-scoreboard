@@ -7,6 +7,7 @@
 
     tearDown: function () {
       v = null;
+      delete Bart.Foo;
     },
 
     "test pageLink": function () {
@@ -14,12 +15,23 @@
       document.body.appendChild(Bart._helpers.pageLink({id: "foo", name: "foo bar", link: "/foo/bar"}));
 
       assert.select(document.body, function () {
-        assert.select('button#foo', 'foo bar', function () {
+        assert.select('button#foo.link', 'foo bar', function () {
           TH.click(this);
         });
       });
 
       assert.calledWith(AppRoute.gotoPath, '/foo/bar');
+    },
+
+    "test template pageLink": function () {
+      Bart.newTemplate({name: "Foo.Bar"});
+
+      test.stub(AppRoute, 'gotoPage');
+      document.body.appendChild(Bart._helpers.pageLink({id: "foo", name: "foo bar", template: "Foo.Bar"}));
+
+      TH.click('#foo');
+
+      assert.calledWith(AppRoute.gotoPage, Bart.Foo.Bar);
     },
   });
 })();

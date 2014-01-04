@@ -19,7 +19,7 @@
       assert.select('body', function () {
         assert.select('body>header', function () {
           assert.select('button#OrgHomeLink', "Choose Organization", function () {
-             assert.same(Bart.getCtx(this).data.link, '/org/choose');
+             assert.same(Bart.getCtx(this).data.link, Bart.Main);
           });
           assert.select('button[name=signIn]');
         });
@@ -42,9 +42,7 @@
       v.subStub.yield();
 
       assert.same(Bart.Main.id, v.org._id);
-      assert.select('#OrgHomeLink', v.org.name, function () {
-        assert.same(Bart.getCtx(this).data.link, '/FOO');
-      });
+      assert.select('#OrgHomeLink', v.org.name);
       assert.className(document.body, 'inOrg');
 
       assert.same(AppRoute._onGotoPath('/xxFOO/bar'), '/xxFOO/bar');
@@ -52,9 +50,7 @@
       assert.called(v.stopStub);
 
       assert.same(Bart.Main.id, null);
-      assert.select('#OrgHomeLink', "Choose Organization", function () {
-        assert.same(Bart.getCtx(this).data.link, '/org/choose');
-      });
+      assert.select('#OrgHomeLink', "Choose Organization");
       refute.className(document.body, 'inOrg');
     },
 

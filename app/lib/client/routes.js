@@ -88,8 +88,11 @@ App.require('makeSubject', function (makeSubject) {
         var page = location;
         location = {pathname: location};
       } else {
-        if (location == null)
+        if (location == null) {
           location = document.location;
+        } else if (! ('pathname' in location)) {
+          return this.gotoPage(location);
+        }
         var page = location.pathname;
       }
 
