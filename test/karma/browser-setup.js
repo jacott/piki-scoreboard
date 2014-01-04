@@ -33,6 +33,7 @@ __meteor_runtime_config__ = { ROOT_URL: "http://test.local:1234", serverId: "tes
     while(lc = body.lastChild) {
       body.removeChild(lc);
     }
+    Bart.Main.id = null;
   }
 
   function loginServicesConfiguredStub() {

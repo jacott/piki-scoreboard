@@ -26,14 +26,18 @@ Meteor.publish('Org', function (shortName) {
 
 
 function addOrg (sess, org) {
+  if (sess.orgId === org._id) return;
   sess.orgId = org._id;
+  sess.notifyOrgChange(sess.orgId);
   if ('AllOrgs' in sess.observers) return;
   sess.added('Org', org._id, org);
 }
 
 function removeOrg (sess, orgId) {
-  if (! sess.observers) return;
+  sess.removeObserver('Org');
+  if (sess.orgId === null || ! sess.observers) return;
   sess.orgId = null;
+  sess.notifyOrgChange(null);
   if ('AllOrgs' in sess.observers) return;
   sess.removed('Org', orgId);
 }

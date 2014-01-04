@@ -15,6 +15,8 @@ Session = function (sub) {
     return;
   }
 
+  App.makeSubject(sess, 'onOrgChange', 'notifyOrgChange');
+
   sess.user = user;
   var _models = sess._models = {};
   sess.userId = user._id;
@@ -110,6 +112,17 @@ Session.prototype = {
     var old = this.observers[name];
     if (old) old.stop();
     this.observers[name] = handle;
+  },
+
+  removeObserver: function () {
+    if (! this.observers) return;
+    var observers = this.observers;
+    for(var i = 0; i < arguments.length; ++i) {
+      var name = arguments[i];
+      var ob = observers[name];
+      delete observers[name];
+      ob && ob.stop();
+    }
   },
 
   stop: function () {

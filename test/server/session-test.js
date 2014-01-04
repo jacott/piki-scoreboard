@@ -33,6 +33,9 @@
 
       var sess = Session.get(v.sub);
 
+      assert('onOrgChange' in sess);
+      assert('notifyOrgChange' in sess);
+
       assert.calledOnceWith(v.userSpy, v.user._id);
       assert.calledWith(v.sub.aSpy, 'User', v.user._id, v.user.attributes);
       assert.attributesEqual(sess.user, v.user);

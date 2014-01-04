@@ -27,6 +27,7 @@
     "with Session": {
       setUp: function () {
         v.sess = new Session(v.sub);
+        v.sess.onOrgChange(v.orgChange = test.stub());
         test.spy(v.sess, 'addObserver');
       },
 
@@ -37,16 +38,26 @@
 
         assert.calledWith(check, v.org.shortName, String);
         assert.called(spyOrg);
-        assert.calledWith(v.sess.addObserver, 'Org', spyOrg.returnValues[0]);
+        var orgStopHandle = spyOrg.returnValues[0];
+        assert.calledWith(v.sess.addObserver, 'Org', orgStopHandle);
 
         assert.called(v.tsub.ready);
         assert(v.tsub.stopFunc);
 
+        assert.calledWith(v.orgChange, v.org._id);
+
         assert.calledWith(v.sub.aSpy, 'Org', v.org._id);
+
+
+        test.spy(orgStopHandle, 'stop');
 
         v.tsub.stopFunc();
 
+        assert.called(orgStopHandle.stop);
+
         assert.calledWith(v.sub.rSpy, 'Org', v.org._id);
+
+        assert.calledWith(v.orgChange, null);
       },
 
       "test allOrgs subscribed": function () {

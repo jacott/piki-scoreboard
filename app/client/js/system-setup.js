@@ -19,7 +19,8 @@ App.extend(Tpl, {
   onBaseEntry: function () {
     elm = Tpl.$autoRender({});
     document.body.appendChild(elm);
-    Bart.getCtx(elm).onDestroy(App.subscribe('AllOrgs'));
+    var ctx = Bart.getCtx(elm);
+    ctx.onDestroy(App.subscribe('SU'));
   },
 
   onBaseExit: function () {

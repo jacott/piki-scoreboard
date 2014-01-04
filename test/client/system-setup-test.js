@@ -4,8 +4,7 @@
       test = this;
       v = {};
       v.subStub = test.stub(App, 'subscribe');
-      v.allOrgsStub = v.subStub.withArgs('AllOrgs').returns({stop: v.stopAllOrgsStub = test.stub()});
-      v.allUsersStub = v.subStub.withArgs('AllUsers').returns({stop: v.stopAllUsersStub = test.stub()});
+      v.allOrgsStub = v.subStub.withArgs('SU').returns({stop: v.stopAllOrgsStub = test.stub()});
     },
 
     tearDown: function () {

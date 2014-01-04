@@ -19,4 +19,12 @@ App.require('AppModel.User', function (model) {
       return new AppModel.User(model.attrFind(guestUserId));
     },
   });
+
+  App.extend(model.prototype, {
+    authorize: function (userId) {
+      AppVal.allowAccessIf(AppModel.User.exists({_id: userId, role: AppModel.User.ROLE.superUser}));
+    },
+  });
+
+  model.registerObserveField('org_id');
 });

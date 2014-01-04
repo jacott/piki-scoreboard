@@ -10,6 +10,21 @@
       v = null;
     },
 
+    "test authorize": function () {
+      var subject = TH.Factory.createUser();
+      var user = TH.Factory.createUser('su');
+
+      refute.accessDenied(function () {
+        subject.authorize(user._id);
+      });
+
+      user = TH.Factory.createUser();
+
+      assert.accessDenied(function () {
+        subject.authorize(user._id);
+      });
+    },
+
     "test guestUserId": function () {
       var org = TH.Factory.createOrg();
       var user = AppModel.User.guestUser();
