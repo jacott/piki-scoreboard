@@ -15,8 +15,6 @@ Session = function (sub) {
     return;
   }
 
-  App.makeSubject(sess, 'onOrgChange', 'notifyOrgChange');
-
   sess.user = user;
   var _models = sess._models = {};
   sess.userId = user._id;
@@ -28,6 +26,7 @@ Session = function (sub) {
   sess.added('User', sess.userId, user);
   sess.user = user = new AppModel.User(user);
 
+  Session.notify({"on.start": true}, sess);
   Session.notify(user.attributes, sess);
 
   sess.addObserver('User', AppModel.User.observeId(sess.userId, {
@@ -139,6 +138,7 @@ Session.prototype = {
 
     var _models = this._models;
     this._models = {};
+
     var conn = this.conn;
     for(var name in _models) {
       var docs = _models[name];
@@ -151,19 +151,21 @@ Session.prototype = {
   },
 
   added: function(name, id, fields) {
-    if (! fields) return;
+    if (! (this.observers && fields)) return;
     var docs = this.docs(name);
     var doc = docs[id];
     if (doc) {
       this.conn.sendChanged(name, id, fields);
     } else {
       docs[id] = fields;
+
       AppModel[name].addMemDoc(fields);
       this.conn.sendAdded(name, id, fields);
     }
   },
 
   changed: function(name, id, fields) {
+    if (! this.observers) return;
     var docs = this.docs(name);
     var doc = docs[id];
     if (doc) {
@@ -187,6 +189,7 @@ Session.prototype = {
   },
 
   removed: function(name, id) {
+    if (! this.observers) return;
     var docs = this.docs(name);
     var doc = docs[id];
     if (doc) {

@@ -2,9 +2,12 @@
   buster.testCase('server/publish-org:', {
     setUp: function () {
       test = this;
+
+      TH.stubOplog();
       v = {};
-      v.user = TH.Factory.createUser('su');
       v.org = TH.Factory.createOrg();
+      v.user = TH.Factory.createUser('su', {org_id: v.org._id});
+      v.otherUser = TH.Factory.createUser({org_id: v.org._id});
       v.sub = TH.subStub(v.user._id);
       v.pub = TH.getPublish('Org');
       v.tsub = TH.subStub(v.user._id, v.sub);
@@ -27,53 +30,37 @@
     "with Session": {
       setUp: function () {
         v.sess = new Session(v.sub);
-        v.sess.onOrgChange(v.orgChange = test.stub());
         test.spy(v.sess, 'addObserver');
+        test.spy(v.sess, 'removeObserver');
+        v.sub.aSpy.reset();
       },
 
       "test observes org": function () {
-        var spyOrg = test.spy(AppModel.Org, 'observeId');
+        var spyUsers = test.spy(AppModel.User, 'observeOrg_id');
         test.spy(global, 'check');
+
         v.pub.call(v.tsub, v.org.shortName);
 
         assert.calledWith(check, v.org.shortName, String);
-        assert.called(spyOrg);
-        var orgStopHandle = spyOrg.returnValues[0];
-        assert.calledWith(v.sess.addObserver, 'Org', orgStopHandle);
+
+        assert.calledWith(spyUsers, v.org._id);
+        var usersStopHandle = spyUsers.returnValues[0];
+        assert.called(v.sess.addObserver, 'OrgUsers', usersStopHandle);
 
         assert.called(v.tsub.ready);
         assert(v.tsub.stopFunc);
 
-        assert.calledWith(v.orgChange, v.org._id);
+        assert.calledWith(v.sub.aSpy, 'User', v.otherUser._id);
+        refute.calledWith(v.sub.aSpy, 'User', v.user._id);
 
-        assert.calledWith(v.sub.aSpy, 'Org', v.org._id);
-
-
-        test.spy(orgStopHandle, 'stop');
+        test.spy(usersStopHandle, 'stop');
 
         v.tsub.stopFunc();
 
-        assert.called(orgStopHandle.stop);
+        assert.called(usersStopHandle.stop);
 
-        assert.calledWith(v.sub.rSpy, 'Org', v.org._id);
-
-        assert.calledWith(v.orgChange, null);
-      },
-
-      "test allOrgs subscribed": function () {
-        v.sess.observers.AllOrgs = {stop: function () {}};
-
-        v.sub.aSpy.reset();
-
-        v.pub.call(v.tsub, v.org.shortName);
-
-        assert.same(v.sess.orgId, v.org._id);
-
-        refute.called(v.sub.aSpy);
-
-        v.tsub.stopFunc();
-
-        refute.called(v.sub.rSpy);
+        assert.calledWith(v.sub.rSpy, 'User', v.otherUser._id);
+        refute.calledWith(v.sub.rSpy, 'User', v.user._id);
       },
     },
   });

@@ -20,7 +20,6 @@ App.extend(Tpl, {
     elm = Tpl.$autoRender({});
     document.body.appendChild(elm);
     var ctx = Bart.getCtx(elm);
-    ctx.onDestroy(App.subscribe('SU'));
   },
 
   onBaseExit: function () {

@@ -3,8 +3,6 @@
     setUp: function () {
       test = this;
       v = {};
-      v.subStub = test.stub(App, 'subscribe');
-      v.allOrgsStub = v.subStub.withArgs('SU').returns({stop: v.stopAllOrgsStub = test.stub()});
     },
 
     tearDown: function () {
@@ -14,8 +12,6 @@
 
     "test onEntry onExit": function () {
       AppRoute.gotoPage(Bart.SystemSetup);
-
-      assert.called(v.allOrgsStub);
 
       assert.select('#SystemSetup', function () {
         assert.select('.menu', function () {
@@ -27,7 +23,6 @@
       Bart.SystemSetup.onBaseExit();
 
       refute.select('#SystemSetup');
-      assert.called(v.stopAllOrgsStub);
     },
 
     "test addOrg": function () {

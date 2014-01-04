@@ -4,40 +4,27 @@ Meteor.publish('Org', function (shortName) {
 
   check(shortName, String);
 
-  var org = AppModel.Org.findOne({shortName: shortName});
+  var org = AppModel.Org.findOne({shortName: shortName}, {fields: {_id: 1}});
   if (! org) return this.error(new Meteor.Error(404, 'org not found'));
 
-  addOrg(sess, org.attributes);
-
-  var orgId = org._id;
+  sess.orgId = org._id;
   org = null;
 
-  sess.addObserver('Org', AppModel.Org.observeId(orgId, {
-    changed: function (id, fields) {
-      sess.changed('Org', id, fields);
+  sess.addObserver('OrgUsers', AppModel.User.observeOrg_id(sess.orgId, sess.buildUpdater('User', {
+    addedQuery: {_id: {$ne: sess.userId}},
+
+    stopped: function () {
+      var docs = sess.docs('User');
+      var userId = sess.userId;
+      for(var id in docs) {
+        if (id !== userId)
+          sess.removed('User', id);
+      }
     }
-  }));
+  })));
 
   this.onStop(function () {
-    removeOrg(sess, orgId);
+    sess.removeObserver('OrgUsers');
   });
   this.ready();
 });
-
-
-function addOrg (sess, org) {
-  if (sess.orgId === org._id) return;
-  sess.orgId = org._id;
-  sess.notifyOrgChange(sess.orgId);
-  if ('AllOrgs' in sess.observers) return;
-  sess.added('Org', org._id, org);
-}
-
-function removeOrg (sess, orgId) {
-  sess.removeObserver('Org');
-  if (sess.orgId === null || ! sess.observers) return;
-  sess.orgId = null;
-  sess.notifyOrgChange(null);
-  if ('AllOrgs' in sess.observers) return;
-  sess.removed('Org', orgId);
-}
