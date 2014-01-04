@@ -1,5 +1,5 @@
 (function (test, v) {
-  buster.testCase('server/publish-su:', {
+  buster.testCase('server/publish-all-orgs:', {
     setUp: function () {
       test = this;
       v = {};
