@@ -72,7 +72,36 @@
       assert.called(v.stopStub);
     },
 
-    "test autorun": function () {
+    "test autorun with org": function () {
+      var org = TH.Factory.createOrg({shortName: 'FOO'});
+      var subStub = test.stub(App, 'subscribe');
+      var sessSub = subStub.withArgs('Session');
+      var orgSub = subStub.withArgs('Org').returns({stop: v.stopStub = test.stub()});
+      var ready = TH.stubReady();
+
+      v.arSpy = test.spy(Deps,'autorun');
+      var userId = test.stub(App, 'userId').returns(null);
+
+
+      AppRoute._onGotoPath('/FOO');
+      orgSub.reset();
+
+      App._startup();
+
+      assert.calledOnce(sessSub);
+      refute.called(orgSub);
+
+      assert.isFunction(v.callback = sessSub.args[0][1]);
+
+      v.callback();
+
+      assert.calledOnce(ready.notifyReady);
+
+      assert.called(Meteor.status);
+      assert.calledWith(orgSub, 'Org', 'FOO');
+    },
+
+    "test autorun no org": function () {
       var ready = TH.stubReady();
 
       v.arSpy = test.spy(Deps,'autorun');
