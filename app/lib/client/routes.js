@@ -6,12 +6,15 @@ App.require('makeSubject', function (makeSubject) {
     this.routes = {};
   };
 
+  AppRoute.history = window.history;
+
   AppRoute.prototype = {
     constructor: AppRoute,
 
     addTemplate: function (template, options) {
       options = options || {};
-      var path = options.path || templatePath(template);
+      var path = options.path;
+      if (path == null) path = templatePath(template);
       if (path in this.routes) throw new Error('Path already exists! ', path + " for template " + this.path);
       this.routes[path] = template;
       template.route = this;
@@ -49,6 +52,7 @@ App.require('makeSubject', function (makeSubject) {
   };
 
   var current = null;
+  var replacePath = null;
   App.extend(AppRoute, {
     root: new AppRoute(),
 
@@ -80,7 +84,17 @@ App.require('makeSubject', function (makeSubject) {
         page = page.Index || page;
         current = page;
         page.onEntry(location);
+        if (replacePath)
+          AppRoute.history.replaceState(null, AppRoute.title, location.pathname);
+        else
+          AppRoute.history.pushState(null, AppRoute.title, location.pathname);
       }
+      replacePath = null;
+    },
+
+    replacePath: function (location) {
+      replacePath = true;
+      return this.gotoPath(location);
     },
 
     gotoPath: function (location) {
@@ -133,7 +147,7 @@ function pathname(template) {
 }
 
 function routePath(route) {
-  if (! route || ! route.parent) return '';
+  if (! route || ! route.parent) return AppRoute.pathPrefix || '';
   return routePath(route.parent)+'/'+route.path;
 }
 

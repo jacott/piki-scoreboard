@@ -1,0 +1,4 @@
+<template name="Home">
+  <div id="Home">
+  </div>
+</template>

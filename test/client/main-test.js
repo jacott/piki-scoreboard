@@ -19,7 +19,7 @@
       assert.select('body', function () {
         assert.select('body>header', function () {
           assert.select('button#OrgHomeLink', "Choose Organization", function () {
-             assert.same(Bart.getCtx(this).data.link, Bart.Main);
+             assert.same(Bart.getCtx(this).data.link, Bart.Home);
           });
           assert.select('button[name=signIn]');
         });
@@ -32,6 +32,18 @@
       assert.same(queue[0], App._startup);
     },
 
+    "test popstate": function () {
+      test.stub(window, 'addEventListener');
+      test.stub(AppRoute, 'replacePath');
+
+      App._startup();
+
+      assert.calledOnceWith(window.addEventListener, 'popstate');
+      window.addEventListener.getCall(0).yield();
+
+      assert.calledWithExactly(AppRoute.replacePath);
+    },
+
     "test subscribing to Org": function () {
       document.body.appendChild(Bart.Main.Header.$render({}));
       v.org = TH.Factory.createOrg({shortName: 'FOO'});
@@ -42,6 +54,8 @@
       v.subStub.yield();
 
       assert.same(Bart.Main.id, v.org._id);
+      assert.same(AppRoute.pathPrefix, '/FOO');
+
       assert.select('#OrgHomeLink', v.org.name);
       assert.className(document.body, 'inOrg');
 
@@ -50,6 +64,7 @@
       assert.called(v.stopStub);
 
       assert.same(Bart.Main.id, null);
+      assert.same(AppRoute.pathPrefix, null);
       assert.select('#OrgHomeLink', "Choose Organization");
       refute.className(document.body, 'inOrg');
     },

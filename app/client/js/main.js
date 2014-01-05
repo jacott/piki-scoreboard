@@ -22,6 +22,10 @@ App._startup = function () {
       Deps.nonreactive(function () {stateChange()});
     }
   });
+
+  window.addEventListener('popstate', function (event) {
+    AppRoute.replacePath();
+  });
 };
 
 Meteor.startup(App._startup);
@@ -62,6 +66,7 @@ function subscribeOrg(shortName) {
   orgSub && orgSub.stop();
   var orgLink = document.getElementById('OrgHomeLink');
   if (shortName) {
+    AppRoute.pathPrefix = '/' + shortName;
     orgShortName = shortName;
     Tpl.id = null;
     orgSub = App.subscribe('Org', orgShortName, function () {
@@ -71,6 +76,7 @@ function subscribeOrg(shortName) {
       if (orgLink) orgLink.textContent = doc.name;
     });
   } else {
+    AppRoute.pathPrefix = null;
     orgSub = orgShortName = Tpl.id = null;
     Bart.removeClass(document.body, 'inOrg');
     if (orgLink) orgLink.textContent = "Choose Organization";

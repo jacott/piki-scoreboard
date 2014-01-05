@@ -14,13 +14,37 @@
       };
       AppRoute.root = new AppRoute();
       AppRoute._onGotoPath = null;
+      test.stub(AppRoute.history, 'pushState');
+      test.stub(AppRoute.history, 'replaceState');
     },
 
     tearDown: function () {
       AppRoute.root = v.root;
       AppRoute._onGotoPath = v.onGotoPath;
       AppRoute.gotoPage();
+      AppRoute.title = null;
       v = null;
+    },
+
+    "test push history": function () {
+      assert.same(AppRoute._orig_history, window.history);
+
+      AppRoute.root.addTemplate(v.FooBar);
+      v.FooBar.onEntry = function () {
+        AppRoute.title = "foo title";
+      };
+
+      AppRoute.gotoPage(v.FooBar);
+
+      assert.calledWith(AppRoute.history.pushState, null, "foo title", '/foo-bar');
+    },
+
+    "test replace history": function () {
+      AppRoute.title = "baz bar";
+      AppRoute.root.addTemplate(v.FooBar);
+      AppRoute.replacePath(v.FooBar);
+
+      assert.calledWith(AppRoute.history.replaceState, null, "baz bar", '/foo-bar');
     },
 
     "test root": function () {

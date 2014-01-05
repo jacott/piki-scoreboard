@@ -13,6 +13,11 @@ __meteor_runtime_config__ = { ROOT_URL: "http://test.local:1234", serverId: "tes
     App.log.reset();
     if(firstTime) {
       firstTime = false;
+      AppRoute._orig_history = AppRoute.history;
+      AppRoute.history = {
+        pushState: function () {},
+        replaceState: function () {},
+      };
       Accounts.loginServicesConfigured = loginServicesConfiguredStub;
       Meteor.setTimeout = timeoutStub;
     } else {
