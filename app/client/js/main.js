@@ -24,7 +24,7 @@ App._startup = function () {
   });
 
   window.addEventListener('popstate', function (event) {
-    AppRoute.replacePath();
+    App.Ready.isReady && AppRoute.pageChanged();
   });
 };
 
@@ -55,8 +55,8 @@ function stateChange(opts) {
   orgSub && orgSub.stop(); orgSub = null;
   sessionSub = App.subscribe('Session', function (err) {
     if (err) return;
-    subscribeOrg(orgShortName);
     App.Ready.notifyReady();
+    subscribeOrg(orgShortName);
   });
 }
 
@@ -69,6 +69,9 @@ function subscribeOrg(shortName) {
     AppRoute.pathPrefix = '/' + shortName;
     orgShortName = shortName;
     Tpl.id = null;
+
+    if (! App.Ready.isReady) return;
+
     orgSub = App.subscribe('Org', orgShortName, function () {
       var doc = AppModel.Org.findOne({shortName: orgShortName});
       Tpl.id = doc._id;

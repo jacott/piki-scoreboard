@@ -90,12 +90,12 @@ App.require('makeSubject', function (makeSubject) {
           current = null;
         } else {
           page = page.Index || page;
-          current = page;
           var href = page.onEntry(page, location) || location.href || location.pathname;
           var  title = document.title = page.title || AppRoute.title;
-          if (pageState && ! ('noPageHistory' in page)) {
+          if (pageState && current !== page && ! ('noPageHistory' in page)) {
             AppRoute.history[pageState](null, title, href);
           }
+          current = page;
         }
       }
       catch(ex) {

@@ -36,14 +36,15 @@
 
     "test popstate": function () {
       test.stub(window, 'addEventListener');
-      test.stub(AppRoute, 'replacePath');
+      test.stub(AppRoute, 'pageChanged');
 
       App._startup();
 
       assert.calledOnceWith(window.addEventListener, 'popstate');
+      App.Ready.isReady = true;
       window.addEventListener.getCall(0).yield();
 
-      assert.calledWithExactly(AppRoute.replacePath);
+      assert.calledWithExactly(AppRoute.pageChanged);
     },
 
     "test subscribing to Org": function () {
@@ -105,6 +106,8 @@
       refute.called(orgSub);
 
       assert.isFunction(v.callback = sessSub.args[0][1]);
+
+      App.Ready.isReady = true;
 
       v.callback();
 
