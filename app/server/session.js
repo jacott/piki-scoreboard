@@ -15,7 +15,6 @@ Session = function (sub) {
     return;
   }
 
-  sess.user = user;
   var _models = sess._models = {};
   sess.userId = user._id;
   sess.observers = {};
@@ -158,7 +157,6 @@ Session.prototype = {
       this.conn.sendChanged(name, id, fields);
     } else {
       docs[id] = fields;
-
       AppModel[name].addMemDoc(fields);
       this.conn.sendAdded(name, id, fields);
     }

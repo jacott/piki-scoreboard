@@ -23,7 +23,7 @@
       document.body.appendChild(Bart.SignIn.$autoRender({}));
       TH.click('[name=signIn]');
 
-      assert.select('#Dialog #SignInDialog', function () {
+      assert.select('.Dialog #SignInDialog', function () {
         assert.select('form>fieldset:first-child', function () {
           assert.select('label:first-child', function () {
             assert.select('span', 'Email');
@@ -51,7 +51,7 @@
         v.loginCallback();
       });
 
-      refute.select('#Dialog');
+      refute.select('.Dialog');
     },
   });
 })();

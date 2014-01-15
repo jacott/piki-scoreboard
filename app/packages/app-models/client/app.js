@@ -3,10 +3,6 @@ App.extend(App, {
     return Meteor.userId();
   },
 
-  formatSafe: function () {
-    return new Handlebars.SafeString(App.format.apply(App.format, arguments));
-  },
-
   subscribe: function () {
     if (typeof arguments[arguments.length - 1] !== 'function')
       return Meteor.subscribe.apply(Meteor, arguments);

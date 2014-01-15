@@ -2,8 +2,6 @@ var Tpl = Bart.Main;
 
 document.head.appendChild(Tpl.Head.$render({}));
 
-App.isReady = false;
-
 App._startup = function () {
   var handle = App.Ready.onReady(whenReady);
   document.body.insertBefore(Tpl.Header.$render({}), document.body.firstChild);

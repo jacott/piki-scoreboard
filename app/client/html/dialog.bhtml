@@ -1,5 +1,5 @@
 <template name="Dialog">
-  <div id="Dialog">
+  <div class="Dialog">
     <div>
       {{content}}
     </div>

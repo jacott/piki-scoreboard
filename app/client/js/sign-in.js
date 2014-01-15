@@ -20,9 +20,6 @@ Tpl.SignInLink.$events({
 
 App.extend(Tpl, {
   $created: function (ctx, elm) {
-    AppModel.User.Index.observe(function (doc, old) {
-
-    });
     ctx.onDestroy(App.Ready.onReady(whenReady));
 
     function whenReady(isReady) {
@@ -43,9 +40,10 @@ Dialog.$events({
     setState(form, 'submit');
 
     Meteor.loginWithPassword(email,password,function (error) {
-      if (error) setState(form, 'error');
+      if (error)
+        setState(form, 'error');
       else
-        Bart.remove(document.getElementById('Dialog'));
+        Bart.remove(document.getElementsByClassName('Dialog')[0]);
     });
   },
 });
