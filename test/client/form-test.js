@@ -42,9 +42,9 @@
       var form = Bart.html('<form><input class="error input" name="foo" value="fooVal"><textarea class="error" name="bar">bar val</textarea></form>');
 
       Bart.Form.clearErrors(form);
-      assert.select(form, function () {
-        assert.select('input.input:not(.error)');
-        assert.select('textarea:not(.error)');
+      assert.dom(form, function () {
+        assert.dom('input.input:not(.error)');
+        assert.dom('textarea:not(.error)');
       });
     },
 
@@ -59,9 +59,9 @@
 
       assert.calledWith(Bart.Form.clearErrors, form);
 
-      assert.select(form, function () {
-        assert.select('.error[name=foo]+.errorMsg', "can't be blank");
-        assert.select('.error[name=bar]+.errorMsg', "not valid");
+      assert.dom(form, function () {
+        assert.dom('.error[name=foo]+.errorMsg', "can't be blank");
+        assert.dom('.error[name=bar]+.errorMsg', "not valid");
       });
     },
 
@@ -71,10 +71,10 @@
 
       var labelField = Bart._helpers.labelField.call(doc, 'foo');
 
-      assert.select(labelField, function () {
+      assert.dom(labelField, function () {
         assert.same(this.tagName, 'LABEL');
-        assert.select('span.name', 'Foo');
-        assert.select('input[name=foo]', {value: 'bar'});
+        assert.dom('span.name', 'Foo');
+        assert.dom('input[name=foo]', {value: 'bar'});
       });
     },
 
@@ -83,7 +83,7 @@
       var options = {};
       var textInput = Bart.Form.TextInput.$autoRender({name: 'foo', doc: doc, options: options});
 
-      assert.select(textInput, {value: 'bar'}, function () {
+      assert.dom(textInput, {value: 'bar'}, function () {
         assert.same(this.tagName, 'INPUT');
         assert.same(this.getAttribute('name'), 'foo');
       });

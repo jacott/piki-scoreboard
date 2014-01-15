@@ -13,26 +13,26 @@
     "test onEntry onExit": function () {
       AppRoute.gotoPage(Bart.SystemSetup);
 
-      assert.select('#SystemSetup', function () {
-        assert.select('.menu', function () {
-          assert.select('[name=addOrg]');
+      assert.dom('#SystemSetup', function () {
+        assert.dom('.menu', function () {
+          assert.dom('[name=addOrg]');
         });
       });
 
 
       Bart.SystemSetup.onBaseExit();
 
-      refute.select('#SystemSetup');
+      refute.dom('#SystemSetup');
     },
 
     "test addOrg": function () {
       AppRoute.gotoPage(Bart.SystemSetup);
 
-      assert.select('#SystemSetup', function () {
+      assert.dom('#SystemSetup', function () {
         TH.click('[name=addOrg]');
       });
-      assert.select('#AddOrg', function () {
-        assert.selectParent('label', 'Name', function () {
+      assert.dom('#AddOrg', function () {
+        assert.domParent('label', 'Name', function () {
           TH.input('[name=name]', 'Foo Bar');
         });
         TH.input('[name=shortName]', 'FB');
@@ -40,8 +40,8 @@
         TH.click('[type=submit]');
       });
 
-      refute.select('#AddOrg');
-      assert.select('#SystemSetup');
+      refute.dom('#AddOrg');
+      assert.dom('#SystemSetup');
 
       var org = AppModel.Org.findOne();
 
@@ -55,11 +55,11 @@
       Bart.Main.id = v.org._id;
       AppRoute.gotoPage(Bart.SystemSetup);
 
-      assert.select('#SystemSetup', function () {
+      assert.dom('#SystemSetup', function () {
         TH.click('[name=addUser]');
       });
-      assert.select('#AddUser', function () {
-        assert.selectParent('label', 'Name', function () {
+      assert.dom('#AddUser', function () {
+        assert.domParent('label', 'Name', function () {
           TH.input('[name=name]', 'Foo Bar');
         });
         TH.input('[name=initials]', 'FB');
@@ -67,8 +67,8 @@
         TH.click('[type=submit]');
       });
 
-      refute.select('#AddUser');
-      assert.select('#SystemSetup');
+      refute.dom('#AddUser');
+      assert.dom('#SystemSetup');
 
       var user = AppModel.User.findOne({name: 'Foo Bar'});
 

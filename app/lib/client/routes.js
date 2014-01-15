@@ -38,23 +38,30 @@ App.require('makeSubject', function (makeSubject) {
       return template.route = this.routes[path] = new AppRoute(path, template, this);
     },
 
-    onBaseExit: function(location) {
+    onBaseExit: function(page, location) {
       var template = this.template;
       var onBaseExit = template && template.onBaseExit;
-      onBaseExit && onBaseExit.call(template, location);
+      onBaseExit && onBaseExit.call(template, page, location);
     },
 
-    onBaseEntry: function(location) {
+    onBaseEntry: function(page, location) {
       var template = this.template;
       var onBaseEntry = template && template.onBaseEntry;
-      onBaseEntry && onBaseEntry.call(template, location);
+      onBaseEntry && onBaseEntry.call(template, page, location);
     },
   };
 
   var current = null;
-  var replacePath = null;
+  var pageState = 'pushState';
   App.extend(AppRoute, {
     root: new AppRoute(),
+
+    abortPage: function (location) {
+      var error = new Error('abortPage');
+      error.location = location;
+      error.abortPage = true;
+      throw error;
+    },
 
     onGotoPath: function (func) {
       this._onGotoPath = func;
@@ -70,30 +77,47 @@ App.require('makeSubject', function (makeSubject) {
       if (! location)
         location = {pathname: pathname(page)};
 
-      if (current) {
-        current.onExit && current.onExit(page, location);
+      try {
+        if (current) {
+          current.onExit && current.onExit(page, location);
 
-        exitEntry(toPath(current.route), toPath(page && page.route), location);
-      } else {
-        exitEntry([], toPath(page && page.route), location);
-      }
+          exitEntry(toPath(current.route), toPath(page && page.route), page, location);
+        } else {
+          exitEntry([], toPath(page && page.route), page, location);
+        }
 
-      if (! page) {
-        current = null;
-      } else {
-        page = page.Index || page;
-        current = page;
-        page.onEntry(location);
-        if (replacePath)
-          AppRoute.history.replaceState(null, AppRoute.title, location.pathname);
-        else
-          AppRoute.history.pushState(null, AppRoute.title, location.pathname);
+        if (! page) {
+          current = null;
+        } else {
+          page = page.Index || page;
+          current = page;
+          var href = page.onEntry(page, location) || location.href || location.pathname;
+          var  title = document.title = page.title || AppRoute.title;
+          if (pageState && ! ('noPageHistory' in page)) {
+            AppRoute.history[pageState](null, title, href);
+          }
+        }
       }
-      replacePath = null;
+      catch(ex) {
+        if (ex.abortPage) return this.gotoPath(ex.location);
+        throw ex;
+      }
+      finally {
+        pageState = 'pushState';
+      }
+    },
+
+    get currentPage() {
+      return current;
+    },
+
+    pageChanged: function () {
+      pageState = null;
+      return this.gotoPath();
     },
 
     replacePath: function (location) {
-      replacePath = true;
+      pageState = 'replaceState';
       return this.gotoPath(location);
     },
 
@@ -120,14 +144,14 @@ App.require('makeSubject', function (makeSubject) {
       for(var i = 0; i < parts.length; ++i) {
         var part = parts[i];
         if (! part) continue;
-        newPage = page.routes[part] || page.defaultPage;
+        newPage = (('routes' in page) && page.routes[part]) || page.defaultPage;
         if (! newPage) {
           break;
         }
         page = newPage;
       }
 
-      if (newPage === root.defaultPage)
+      if (newPage && newPage === root.defaultPage)
         page = newPage;
 
       if (page === root)
@@ -151,23 +175,23 @@ function routePath(route) {
   return routePath(route.parent)+'/'+route.path;
 }
 
-function exitEntry(exit, entry, location) {
+function exitEntry(exit, entry, page, location) {
   var entryLen = entry.length;
   var diff = exit.length - entryLen;
   var index = 0;
 
   for(;index < diff; ++index) {
-    exit[index].onBaseExit(location);
+    exit[index].onBaseExit(page, location);
   }
 
   for(;index - diff < entryLen; ++index) {
     var exitItem = exit[index];
     if (exitItem === entry[index - diff]) break;
-    exitItem.onBaseExit(location);
+    exitItem.onBaseExit(page, location);
   }
 
   for(index = index - diff - 1 ; index >= 0; --index) {
-    entry[index].onBaseEntry(location);
+    entry[index].onBaseEntry(page, location);
   }
 }
 
@@ -187,6 +211,10 @@ function templatePath(template) {
 function onEntryFunc(template, options) {
   return function () {
     if (options) {
+      if (! App.userId() && options.privatePage) {
+        AppRoute.gotoPage(AppRoute.SignPage);
+        return false;
+      }
       if (typeof options.data ==='function') {
         var data = options.data.call(template);
       } else {
@@ -207,6 +235,6 @@ function onEntryFunc(template, options) {
 
 function onExitFunc(template) {
   return function () {
-    Bart.remove(template._renderedPage, document.getElementById(template.name));
+    Bart.remove(template._renderedPage || document.getElementById(template.name));
   };
 }

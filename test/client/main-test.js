@@ -13,15 +13,17 @@
 
     "test rendering": function () {
       App._startup();
-      assert.select('head', function () {
-        assert.select('title', 'Piki');
+      assert.same(AppRoute.title, 'Piki');
+
+      assert.dom('head', function () {
+        assert.dom('title', 'Piki');
       });
-      assert.select('body', function () {
-        assert.select('body>header', function () {
-          assert.select('button#OrgHomeLink', "Choose Organization", function () {
+      assert.dom('body', function () {
+        assert.dom('body>header', function () {
+          assert.dom('button#OrgHomeLink', "Choose Organization", function () {
              assert.same(Bart.getCtx(this).data.link, Bart.Home);
           });
-          assert.select('button[name=signIn]');
+          assert.dom('button[name=signIn]');
         });
       });
     },
@@ -56,7 +58,7 @@
       assert.same(Bart.Main.id, v.org._id);
       assert.same(AppRoute.pathPrefix, '/FOO');
 
-      assert.select('#OrgHomeLink', v.org.name);
+      assert.dom('#OrgHomeLink', v.org.name);
       assert.className(document.body, 'inOrg');
 
       assert.same(AppRoute._onGotoPath('/xxFOO/bar'), '/xxFOO/bar');
@@ -65,7 +67,7 @@
 
       assert.same(Bart.Main.id, null);
       assert.same(AppRoute.pathPrefix, null);
-      assert.select('#OrgHomeLink', "Choose Organization");
+      assert.dom('#OrgHomeLink', "Choose Organization");
       refute.className(document.body, 'inOrg');
     },
 

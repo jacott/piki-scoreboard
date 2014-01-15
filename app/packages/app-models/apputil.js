@@ -10,7 +10,7 @@ Apputil = {
   },
 
   niceFilename: function (name) {
-    return name.toLowerCase().replace(/[^a-zA-Z0-9-]+/g,'-');
+    return name && name.toLowerCase().replace(/[^a-zA-Z0-9-]+/g,'-');
   },
 
   intersectp: function (list1, list2) {

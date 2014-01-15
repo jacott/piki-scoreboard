@@ -14,8 +14,8 @@
       test.stub(AppRoute, 'gotoPath');
       document.body.appendChild(Bart._helpers.pageLink({id: "foo", name: "foo bar", link: "/foo/bar"}));
 
-      assert.select(document.body, function () {
-        assert.select('button#foo.link', 'foo bar', function () {
+      assert.dom(document.body, function () {
+        assert.dom('button#foo.link', 'foo bar', function () {
           TH.click(this);
         });
       });

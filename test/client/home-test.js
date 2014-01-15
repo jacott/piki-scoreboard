@@ -14,7 +14,7 @@
 
       AppRoute.gotoPage(Bart.Home);
 
-      assert.select('#Home');
+      assert.dom('#Home');
     },
   });
 })();

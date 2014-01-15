@@ -1,5 +1,10 @@
 <template name="Test">
   <template name="TOne">
     {{field "name" type="simple" count=2}}
+    {{> /Multi.Part foo-id=bar}}
+  </template>
+  <template name="Attrs">
+    <div id="{{id}}" {{fnord.bar}} {{foo bar="ba{z}"}}>
+    </div>
   </template>
 </template>

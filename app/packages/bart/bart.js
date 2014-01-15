@@ -18,7 +18,12 @@ var DOCUMENT_FRAGMENT_NODE = document.DOCUMENT_FRAGMENT_NODE;
 
 var bartEvent = null;
 
+var current = {};
+var currentCtx, currentElement;
+
 Bart = {
+  current: current,
+
   INPUT_SELECTOR: 'input,textarea',
 
   _helpers: {},
@@ -42,6 +47,10 @@ Bart = {
   removeClass: function (elm, name) {
     var classList = elm && elm.classList;
     classList && classList.remove(name);
+  },
+
+  setClass: function (name, isAdd, elm) {
+    (isAdd ? Bart.addClass : Bart.removeClass)(elm || currentElement, name);
   },
 
   parentOf: function (parent, elm) {
@@ -92,6 +101,10 @@ Bart = {
       elm._bart = null;
     }
     Bart.destroyChildren(elm);
+  },
+
+  removeId: function (id) {
+    this.remove(document.getElementById(id));
   },
 
   remove: function (elm) {
@@ -202,18 +215,6 @@ Bart = {
     return ctx;
   },
 
-  updateElement: function (elm, data) {
-    var prevCtx = Bart.$ctx;
-    var ctx = Bart.$ctx = Bart.getCtx(elm.parentNode);
-    try {
-      ctx._updateNode(elm._node, data || ctx.data);
-    } finally {
-      this.element = this.node = null;
-      Bart.$ctx = prevCtx;
-    }
-    return this;
-  },
-
   // TODO import by performing a binary search. Also allow passing a
   // hint of the best place to start searching. It might be the upper
   // or lower bound or the point of insertion or not even in the list
@@ -239,6 +240,23 @@ Bart = {
   hasPointerEvents: true,
 };
 
+if (! document.head.classList) {
+  Bart.hasClass = function (elm, name) {
+    return elm && new RegExp("\\b" + name + "\\b").test(elm.className);
+  };
+  Bart.addClass = function (elm, name) {
+    if (! elm || elm.nodeType !== 1) return;
+    var className = " " + elm.className + " ";
+    elm.className = (className.replace(" " + name + " ", " ") + name).trim();
+  };
+  Bart.removeClass = function (elm, name) {
+    if (! elm || elm.nodeType !== 1) return;
+    var className = " " + elm.className + " ";
+    elm.className = (className.replace(" " + name + " ", " ")).trim();
+  };
+}
+
+
 if (vendorStylePrefix === 'ms') {
   (function () {
     var m = /\bMSIE (\d+)/.exec(navigator.userAgent);
@@ -257,7 +275,7 @@ _private = {
   evalArgs: evalArgs,
 };
 
-function extend(obj,properties) {
+function extend(obj, properties) {
   for(var prop in properties) {
     Object.defineProperty(obj,prop,Object.getOwnPropertyDescriptor(properties,prop));
   }
@@ -300,51 +318,10 @@ BartCtx.prototype = {
     return this;
   },
 
-  _updateNode: function (node, data) {
-    var element = this.element = node[0];
-    this.node = node;
-
-    var value = getValue(data, node[1], node[2]);
-
-    if (value === undefined)
-      return;
-
-    if (value !== element) {
-      if (value == null)  {
-        if (element.nodeType === COMMENT_NODE)
-          value = element;
-        else
-          value = document.createComment('empty');
-
-      } else if (typeof value === 'object' && value.nodeType === DOCUMENT_FRAGMENT_NODE) {
-
-        // *** Document fragment ***
-        if (value.firstChild == null) value.appendChild(document.createComment('empty'));
-        // FIXME what about multiple child nodes?
-        value = value.firstChild;
-
-      } else if (typeof value !== 'object' || ! ('nodeType' in value)) {
-
-        // ***  Text output ***
-        if (element.nodeType === TEXT_NODE) {
-          element.textContent = value.toString();
-          value = element;
-        } else {
-          value = document.createTextNode(value.toString());
-        }
-      } // else *** User created node
-
-      if (element !== value) {
-        Bart.replaceElement(value, element);
-      }
-    }
-    node[0] = value;
-    value._node = node;
-  },
-
   updateAllTags: function (data) {
-    var prevCtx = Bart.$ctx;
-    Bart.$ctx = this;
+    var prevCtx = currentCtx;
+    var prevElm = currentElement;
+    current.ctx = currentCtx = this;
     if (data === undefined)
       data = this.data;
     else
@@ -353,7 +330,7 @@ BartCtx.prototype = {
       var evals = this.attrEvals;
       for(var i=0; i < evals.length; ++i) {
         var node = evals[i];
-        this.element = node[0];
+        current.element = currentElement = node[0];
         var value = (getValue(data, node[2], node[3])||'').toString();
         if (node[1] && node[0].getAttribute(node[1]) !== value)
           node[0].setAttribute(node[1], value);
@@ -361,14 +338,55 @@ BartCtx.prototype = {
       evals = this.evals;
 
       for(var i=0; i < evals.length; ++i) {
-        this._updateNode(evals[i], data);
+        updateNode(evals[i], data);
       }
     } finally {
-      this.element = this.node = null;
-      Bart.$ctx = prevCtx;
+      current.element = currentElement = prevElm;
+      current.ctx = currentCtx = prevCtx;
     }
   },
 };
+
+function updateNode (node, data) {
+  current.element = currentElement = node[0];
+
+  var value = getValue(data, node[1], node[2]);
+
+  if (value === undefined)
+    return;
+
+  if (value !== currentElement) {
+    if (value == null)  {
+      if (currentElement.nodeType === COMMENT_NODE)
+        value = currentElement;
+      else
+        value = document.createComment('empty');
+
+    } else if (typeof value === 'object' && value.nodeType === DOCUMENT_FRAGMENT_NODE) {
+
+      // *** Document fragment ***
+      if (value.firstChild == null) value.appendChild(document.createComment('empty'));
+      // FIXME what about multiple child nodes?
+      value = value.firstChild;
+
+    } else if (typeof value !== 'object' || ! ('nodeType' in value)) {
+
+      // ***  Text output ***
+      if (currentElement.nodeType === TEXT_NODE) {
+        currentElement.textContent = value.toString();
+        value = currentElement;
+      } else {
+        value = document.createTextNode(value.toString());
+      }
+    } // else *** User created node
+
+    if (currentElement !== value) {
+      Bart.replaceElement(value, currentElement);
+    }
+  }
+  node[0] = value;
+  value._node = node;
+}
 
 function getValue(data, func, args) {
   if (! args) {
@@ -404,7 +422,7 @@ function getValue(data, func, args) {
     if (func === 'this') return data;
     var value = data[func];
     if (value === undefined) {
-      value = Bart.$ctx.template._helpers[func] || Bart._helpers[func];
+      value = currentCtx.template._helpers[func] || Bart._helpers[func];
     }
     if (value !== undefined) {
       if (typeof value === 'function')
@@ -416,21 +434,26 @@ function getValue(data, func, args) {
     return func;
   case 'object':
     if ('$autoRender' in func) {
-      return evalPartial.call(data, func, args, Bart.$ctx);
+      return evalPartial.call(data, func, args);
     }
   default:
     throw new Error('Unexpected type: '+ (typeof func));
   }
 }
 
-function evalPartial(func, args, ctx) {
-  args = evalArgs(this, args);
-  if (args.length === 1)
-    args = args[0];
-  var elm = ctx.element;
-  if (ctx = elm._bart) {
-    return ctx.updateAllTags(args);
+function evalPartial(func, args) {
+  if (args.length === 0) {
+    args = this;
+  } else {
+    args = evalArgs(this, args);
+    if (args.length === 1) args = args[0];
   }
+
+  if (currentElement._bart) {
+    return currentCtx.updateAllTags(args);
+  }
+
+
 
   if ('$autoRender' in func)
     return func.$autoRender(args);
@@ -487,35 +510,33 @@ BartTemplate.prototype = {
   },
 
   $render: function (data) {
-    var parentCtx = Bart.$ctx;
-    var ctx = Bart.$ctx = new BartCtx(this, parentCtx, data);
+    var parentCtx = currentCtx;
+    current.ctx = currentCtx = new BartCtx(this, parentCtx, data);
     try {
       var frag = document.createDocumentFragment();
       this.nodes && addNodes.call(this, frag, this.nodes);
       if (frag.firstChild) {
         if (frag.lastChild === frag.firstChild) {
           frag = frag.firstChild;
-          frag._bart = ctx;
+          frag._bart = currentCtx;
         } else {
           var nodes = frag.childNodes;
           for(var i = 0; i < nodes.length; ++i) {
-            nodes[i]._bart = ctx;
+            nodes[i]._bart = currentCtx;
           }
         }
       }
-      this.$created && this.$created(ctx, frag);
-      data === undefined || ctx.updateAllTags(data);
+      this.$created && this.$created(currentCtx, frag);
+      currentCtx.data === undefined || currentCtx.updateAllTags(data);
       return frag;
     } finally {
-      Bart.$ctx = parentCtx;
+      current.ctx = currentCtx = parentCtx;
     }
   },
 
   $helpers: function (properties) {
-    var obj = this._helpers;
-    for(var prop in properties) {
-      Object.defineProperty(obj,prop,Object.getOwnPropertyDescriptor(properties,prop));
-    }
+    extend(this._helpers, properties);
+    return this;
   },
 
   $events: function (events) {
@@ -525,6 +546,23 @@ BartTemplate.prototype = {
       if (! m) throw new Error("invalid event spec: " + key);
       this._events.push([m[1], m[2].trim(), events[key]]);
     }
+    return this;
+  },
+
+  $actions: function (actions) {
+    var events = {};
+    for(var key in actions) {
+      events['click [name='+key+']'] = actionFunc(actions[key]);
+    }
+    return this.$events(events);
+
+    function actionFunc(func) {
+      return func;
+    }
+  },
+
+  $extend: function (properties) {
+    return extend(this, properties);
   },
 
   $attachEvents: function (parent, selector) {
@@ -559,8 +597,8 @@ function nativeOn(parent, eventType, selector, func) {
 }
 
 function onEvent(event) {
-  var ctx = event.currentTarget._bart;
-  var eventTypes = ctx._events[event.type];
+  current.ctx = currentCtx = event.currentTarget._bart;
+  var eventTypes = currentCtx._events[event.type];
 
   var later = {};
   var elm = event.target;
@@ -603,6 +641,8 @@ function onEvent(event) {
       else
         throw ex;
     }
+  } finally {
+    current.ctx = currentCtx = null;
   }
 }
 
@@ -666,7 +706,7 @@ function parseNode(template, node, result) {
 
   if (m) {
     var name = m[1];
-    node = {dotted: m[2].split('.'), opts: node.slice(1)};
+    node = {dotted: m[2].split('.'), opts: node.slice(m ? 2 : 1)};
   } else {
     var name = node[1];
     node = node.slice(2);
@@ -674,7 +714,7 @@ function parseNode(template, node, result) {
 
   if (partial) {
     result.push(fetchTemplate(template, name, m && node.dotted));
-    result.push(m ? node.opts: node);
+    result.push(m ? node.opts : node);
   } else {
     result.push(template._helpers[name] || name);
     result.push(node);
@@ -708,12 +748,12 @@ function addNodeEval(template, node, parent) {
     var elm = document.createComment('empty');
   }
 
-  Bart.$ctx.evals.push(parseNode(template, node, [elm]));
+  currentCtx.evals.push(parseNode(template, node, [elm]));
   return elm;
 }
 
 function addAttrEval(template, id, node, elm) {
-  Bart.$ctx.attrEvals.push(parseNode(template, node, [elm, id]));
+  currentCtx.attrEvals.push(parseNode(template, node, [elm, id]));
 }
 
 function setAttrs(elm, attrs) {

@@ -1,11 +1,11 @@
+var $ = Bart.current;
 var Tpl = Bart.Form.PageLink;
 var IGNORE = {name: true, link: true, template: true};
 
 Tpl.$helpers({
   attrs: function () {
-    var ctx = Bart.$ctx;
-    var elm = ctx.element;
-    var data = ctx.data;
+    var elm = $.element;
+    var data = $.ctx.data;
 
     var template = data.template;
     if (template) {

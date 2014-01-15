@@ -16,6 +16,7 @@
       AppRoute._onGotoPath = null;
       test.stub(AppRoute.history, 'pushState');
       test.stub(AppRoute.history, 'replaceState');
+      test.stub(App, 'userId').returns("123");
     },
 
     tearDown: function () {
@@ -24,6 +25,33 @@
       AppRoute.gotoPage();
       AppRoute.title = null;
       v = null;
+    },
+
+    "test abort page change": function () {
+      var Baz = {
+        name: 'Baz',
+        onBaseEntry: function () {
+          AppRoute.abortPage(RootBar);
+        },
+        onBaseExit: test.stub(),
+      };
+
+      var RootBar = {
+        name: 'RootBar',
+        $autoRender: test.stub(),
+        onEntry: test.stub(),
+        onExit: test.stub(),
+      };
+
+      AppRoute.root.addTemplate(RootBar);
+      AppRoute.root.addBase(Baz);
+      Baz.route.addTemplate(v.FooBar);
+
+
+      AppRoute.gotoPage(v.FooBar);
+
+      refute.called(v.FooBar.onEntry);
+      assert.called(RootBar.onEntry);
     },
 
     "test push history": function () {
@@ -47,6 +75,20 @@
       assert.calledWith(AppRoute.history.replaceState, null, "baz bar", '/foo-bar');
     },
 
+    "test pageChanged": function () {
+      test.stub(AppRoute, 'gotoPath');
+      AppRoute.root.addTemplate(v.FooBar);
+      AppRoute.pageChanged();
+
+      assert.calledWithExactly(AppRoute.gotoPath);
+
+      AppRoute.gotoPath.restore();
+      AppRoute.gotoPath('/foo-bar');
+
+      refute.called(AppRoute.history.pushState);
+      refute.called(AppRoute.history.replaceState);
+    },
+
     "test root": function () {
       assert.same(v.root.constructor, AppRoute);
     },
@@ -63,7 +105,7 @@
       assert.same(v.path, '/testing');
 
 
-      assert.calledWith(v.FooBar.onEntry, {pathname: '/testing'});
+      assert.calledWith(v.FooBar.onEntry, v.FooBar, {pathname: '/testing'});
     },
 
     "test addBase": function () {
@@ -122,19 +164,22 @@
       Fnord.onBaseEntry.reset();
       Fnord.onBaseExit.reset();
 
+      Fnord.onBaseEntry.reset();
+
+
       AppRoute.gotoPage(v.FooBar);
 
       var loc = {pathname: "/baz/fnord/foo-bar"};
 
       assert.calledWith(BazBar.onExit, v.FooBar, loc);
-      assert.calledWith(v.FooBar.onEntry, loc);
+      assert.calledWith(v.FooBar.onEntry, v.FooBar, loc);
 
-      assert.calledWith(Fnord.onBaseEntry, loc);
+      assert.calledWith(Fnord.onBaseEntry, v.FooBar, loc);
       refute.called(Baz.onBaseExit);
 
       AppRoute.gotoPage(RootBar);
 
-      assert.calledWith(Baz.onBaseExit, { pathname: "/root-bar" });
+      assert.calledWith(Baz.onBaseExit, RootBar, { pathname: "/root-bar" });
     },
 
     "test addTemplate": function () {
@@ -154,17 +199,17 @@
 
       Baz.onEntry();
 
-      assert.select('#Baz', 'fooData');
+      assert.dom('#Baz', 'fooData');
 
       Baz.onExit();
 
-      refute.select('#Baz');
+      refute.dom('#Baz');
     },
 
     "test gotoPath default": function () {
       AppRoute.root.addTemplate(v.FooBar);
       // tests are run from /context.html so need to fudge the route;
-      AppRoute.root.routes['context.html'] = AppRoute.root.routes['foo-bar'];
+      AppRoute.root.routes[document.location.pathname.split('/')[1]] = AppRoute.root.routes['foo-bar'];
 
       AppRoute.gotoPath();
       assert.called(v.FooBar.onEntry);
@@ -185,13 +230,13 @@
 
       AppRoute.gotoPath(v.loc = {pathname: '/foo-bar'});
 
-      assert.calledWith(v.FooBar.onEntry, v.loc);
+      assert.calledWith(v.FooBar.onEntry, v.FooBar, v.loc);
 
       v.loc = {pathname: '/bar'};
       AppRoute.gotoPath(v.loc.pathname);
 
       assert.calledWith(v.FooBar.onExit, Bar, v.loc);
-      assert.calledWith(Bar.onEntry, v.loc);
+      assert.calledWith(Bar.onEntry, Bar, v.loc);
     },
 
     "test default": function () {
@@ -199,7 +244,7 @@
 
       AppRoute.gotoPath(v.loc = {pathname: '/anything', search: '?abc=123&def=456'});
 
-      assert.calledWith(v.FooBar.onEntry, v.loc);
+      assert.calledWith(v.FooBar.onEntry, v.FooBar, v.loc);
     },
   });
 })();

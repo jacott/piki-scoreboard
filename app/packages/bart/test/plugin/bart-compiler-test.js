@@ -1,5 +1,5 @@
 (function (test, v) {
-  buster.testCase('packages/bart/plugin/bart-compiler:', {
+  buster.testCase('packages/bart/test/plugin/bart-compiler:', {
     setUp: function () {
       test = this;
       v = {};
@@ -23,6 +23,14 @@
       v = null;
     },
 
+    "test attrs": function () {
+      if (Meteor.isServer) return assert(true);
+
+      var attrs = v.template.Attrs.nodes[0].attrs;
+
+      assert.equals(attrs, [['=', 'id', ['', 'id']], ['', 'fnord.bar'], ['', 'foo', ['=', 'bar', '"ba{z}']]]);
+    },
+
     "test compile hash": function () {
       if (Meteor.isClient) {
         var t0 = v.template.TOne;
@@ -31,6 +39,8 @@
       }
       assert.equals(t0.nodes[1].slice(0,2), ['', 'field']);
       assert.equals(t0.nodes[1].slice(2), ['"name', ['=', 'type', '"simple'], ['=', 'count', 2]]);
+      assert.equals(t0.nodes[2],['>', '/Multi.Part', ['=', 'foo-id', 'bar']]);
+
     },
   });
 })();

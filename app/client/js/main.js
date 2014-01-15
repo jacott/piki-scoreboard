@@ -1,5 +1,7 @@
 var Tpl = Bart.Main;
 
+AppRoute.title = 'Piki';
+
 document.head.appendChild(Tpl.Head.$render({}));
 
 App._startup = function () {

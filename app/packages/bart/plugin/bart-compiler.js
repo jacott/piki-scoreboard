@@ -16,8 +16,8 @@ BartCompiler = {
             name = attrs.name;
             if (! name)
               throw new BartCompiler.Error("Template name is missing", parser.startIndex);
-            if (! name.match(/^[A-Z]\w*/))
-              throw new BartCompiler.Error("Template name must start match the format: /^[A-Z]\w*/  " + name, parser.startIndex);
+            if (! name.match(/^([A-Z]\w*\.?)+$/))
+              throw new BartCompiler.Error("Template name must match the format: Foo(.Bar)*  " + name, parser.startIndex);
             template = new Template(template, attrs.name);
 
           } else {
@@ -164,6 +164,7 @@ function extractAttrs(attrs) {
   var tokens = [];
   var result = [];
   tokenizeWithQuotes(attrs, tokens);
+
   tokens.forEach(function (token) {
     if (typeof token === 'string') {
       result.push(justOne(extractBraces(token[0] === '"' ? token.slice(1) : token)));
@@ -186,55 +187,35 @@ function justOne(nodes) {
   }
 }
 
-
 function tokenizeWithQuotes(bexpr, result) {
-  // split by quoted strings
+  // split by tokens
   while(bexpr !== '') {
-    var m = /^([^'"]*)(.*)$/.exec(bexpr);
+    bexpr = bexpr.trim();
+    if (bexpr.length === 0) return;
+
+    var m = /^((?:"[^"]*"|'[^']*')|{{(?:[^}]+}}|(?:[^}]+}[^}])+[^}]*}})|[-\w]+=(?:"[^"]*"|'[^']*'|[-\w]+))(.*)$/.exec(bexpr) || /([-\w\/\.]+)(.*)$/.exec(bexpr);
+
     if (m) {
-      tokenizeSansQuotes(m[1], result);
+      addToken(m[1], result);
       bexpr = m[2];
-      if (m[2].length === 0) break;
-      var res = '"';
-      if (bexpr[0] === '"') {
-        var re = /^"([^\\"]*)(.)(.)?/;
-      } else {
-        var re = /^'([^\\']*)(.)(.)?/;
-      }
-
-      while(m=re.exec(bexpr)) {
-        res += m[1];
-        bexpr = bexpr.slice(m[0].length);
-        if (m[3]) {
-          if (m[2] !== '\\') {
-            bexpr = bexpr+m[3];
-            break;
-          } else {
-            res += m[3];
-          }
-        }
-      }
-      if (typeof result[result.length-1] !== 'string')
-        result[result.length-1][2] = res;
-      else
-        result.push(res);
-    } else
-      return tokenizeSansQuotes(bexpr, result);
-  }
-}
-
-function tokenizeSansQuotes(bexpr, result) {
-  bexpr = bexpr.split(/[\s]+/);
-  for(var i=0; i < bexpr.length; ++i) {
-    bexpr[i].length > 0 && addToken(bexpr[i], result);
+    } else {
+      return addToken(bexpr, result);
+    }
   }
 }
 
 function addToken(token, result) {
-  var m = /^([^=]+)=(.*)$/.exec(token);
+  var m = /^([-\w]+)=(.*)$/.exec(token);
   if (m) {
-    result.push(['=', m[1], m[2]]);
+    result.push(['=', m[1], quotenorm(m[2])]);
   } else {
-    result.push(token);
+    result.push(quotenorm(token));
   }
+}
+
+function quotenorm(token) {
+  if (token.match(/^(['"]).*\1$/))
+    return '"' + token.slice(1,-1);
+  else
+    return token;
 }

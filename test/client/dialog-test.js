@@ -11,8 +11,8 @@
 
     "test open": function () {
       Bart.Dialog.open(Bart.html('<form id="Foo"></form>'));
-      assert.select('.Dialog>div', function () {
-        assert.select('form#Foo');
+      assert.dom('.Dialog>div', function () {
+        assert.dom('form#Foo');
       });
     },
   });

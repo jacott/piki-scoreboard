@@ -50,6 +50,18 @@ Meteor.isClient && (function (test, v) {
         delete Bart.Bar;
       },
 
+      "test default arg is data": function () {
+        Bart.Bar.$created = test.stub();
+
+        var data = {arg: 'me'};
+        Bart.Foo.$render(data);
+
+        assert.calledWith(Bart.Bar.$created, sinon.match(function (ctx) {
+          assert.same(ctx.data, data);
+          return true;
+        }));
+      },
+
       "test scoping": function () {
         var initials = 'BJ';
         Bart.Bar.$helpers({
@@ -59,8 +71,8 @@ Meteor.isClient && (function (test, v) {
         });
         var result = Bart.Foo.$render({});
 
-        assert.select(result, function () {
-          assert.select('>div>i', 'BJ');
+        assert.dom(result, function () {
+          assert.dom('>div>i', 'BJ');
         });
       },
     },
@@ -72,11 +84,11 @@ Meteor.isClient && (function (test, v) {
 
       document.body.appendChild(elm);
 
-      assert.select('#top', function () {
+      assert.dom('#top', function () {
         assert.same(elm, this);
 
-        assert.select('>.foo', function () { // doubles as a test for assert.select directChild
-          assert.select('>.bar>button#sp', 'Hello');
+        assert.dom('>.foo', function () { // doubles as a test for assert.dom directChild
+          assert.dom('>.bar>button#sp', 'Hello');
         });
       });
     },
@@ -120,6 +132,26 @@ Meteor.isClient && (function (test, v) {
 
       assert.same(Bart.getClosest(button, '.foo>.bar'), foobar);
       assert.same(Bart.getClosestCtx(button, '.foo>.bar'), 'the ctx');
+    },
+
+    "test $actions": function () {
+      Bart.newTemplate({name: "Foo"});
+      Bart.Foo.$actions({
+        one: v.one = test.stub(),
+        two: test.stub(),
+      });
+
+      assert.same(Bart.Foo._events.length, 2);
+      assert.same(Bart.Foo._events[0][0], 'click');
+      assert.same(Bart.Foo._events[0][1], '[name=one]');
+
+      var event = {};
+
+      Bart.Foo._events[0][2](event);
+
+      assert.calledWithExactly(v.one, event);
+
+
     },
 
     "newTemplate": {
@@ -173,7 +205,7 @@ Meteor.isClient && (function (test, v) {
         Bart.newTemplate({name: 'Foo.Baz', nodes: [{name: 'h1'}]});
 
         var dStub = Bart.Foo.Bar.$destroyed = function () {
-          v.args = arguments;
+          if (v) v.args = arguments;
         };
 
         var bar = Bart.Foo.Bar.$render();
@@ -181,16 +213,16 @@ Meteor.isClient && (function (test, v) {
 
         v.foo.appendChild(bar);
 
-        assert.select('#foo', function () {
-          assert.select('>span', function () {
+        assert.dom('#foo', function () {
+          assert.dom('>span', function () {
             v.barCtx = this._bart;
           });
           Bart.replaceElement(baz, bar);
           var ctx = this._bart;
-          assert.select('>h1', function () {
+          assert.dom('>h1', function () {
             assert.same(ctx, this._bart.parentCtx);
           });
-          refute.select('>span');
+          refute.dom('>span');
           assert.same(v.args[0], v.barCtx);
           assert.isNull(bar._bart);
 
@@ -198,10 +230,10 @@ Meteor.isClient && (function (test, v) {
 
           Bart.replaceElement(bar, baz, 'noRemove');
 
-          assert.select('>span', function () {
+          assert.dom('>span', function () {
             assert.same(ctx, this._bart.parentCtx);
           });
-          refute.select('>h1');
+          refute.dom('>h1');
           assert.same(v.args[0], v.barCtx);
           refute.isNull(baz._bart);
         });
@@ -281,11 +313,11 @@ Meteor.isClient && (function (test, v) {
           },
 
           draggable: function () {
-            Bart.$ctx.element.setAttribute('draggable', 'true');
+            Bart.current.element.setAttribute('draggable', 'true');
           },
         });
 
-        assert.select(Bart.Foo.$render({id: 'foo', user: {_id: '123'}}), function () {
+        assert.dom(Bart.Foo.$render({id: 'foo', user: {_id: '123'}}), function () {
           assert.same(this.getAttribute('id'), 'foo');
           assert.same(this.getAttribute('class'), 'the classes');
           assert.same(this.getAttribute('data-id'), '123');
@@ -316,7 +348,7 @@ Meteor.isClient && (function (test, v) {
           }],
         });
 
-        assert.select(Bart.Foo.$render({user: {initials: 'fb'}}), 'fb');
+        assert.dom(Bart.Foo.$render({user: {initials: 'fb'}}), 'fb');
       },
     },
   });

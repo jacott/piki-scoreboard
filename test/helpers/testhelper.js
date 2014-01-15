@@ -80,7 +80,7 @@ TH = (function () {
       TH.click(node);
       assert(document.getElementById('ColorPicker'));
       Bart.ColorPicker._cp.setHex(value);
-      assert.select(document.getElementById('confirmDialog'), function () {
+      assert.dom(document.getElementById('confirmDialog'), function () {
         TH.click('[name=apply]');
       });
     },
@@ -92,7 +92,7 @@ TH = (function () {
         args[args.length -1 ] = function () {
           TH.input(this, value);
         };
-        assert.select.apply(assert, args);
+        assert.dom.apply(assert, args);
       } else {
         (node.nodeType ? node : node[0]).value = value;
         this.trigger(node, 'input');
@@ -106,7 +106,7 @@ TH = (function () {
         args[args.length -1 ] = function () {
           TH.change(this, value);
         };
-        assert.select.apply(assert, args);
+        assert.dom.apply(assert, args);
       } else {
         node.val(value);
         this.trigger(node, 'change');
@@ -121,7 +121,7 @@ TH = (function () {
 
     trigger: function (node, event, args) {
       if (typeof node === 'string') {
-        assert.select(node, function () {
+        assert.dom(node, function () {
           TH.trigger(this, event, args);
         });
       } else {
@@ -169,7 +169,7 @@ TH = (function () {
         args.push(function () {
           TH.click(this);
         });
-        assert.select.apply(assert, args);
+        assert.dom.apply(assert, args);
       } else {
         TH.trigger(node, 'click');
       }
