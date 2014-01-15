@@ -27,8 +27,8 @@ AppVal = {
     return true;
   },
 
-  allowAccessIf: function (truthy) {
-    return truthy || accessDenied();
+  allowAccessIf: function (truthy, message) {
+    return truthy || accessDenied(message);
   },
 
   inspectErrors: function (doc) {
@@ -149,8 +149,10 @@ AppVal = {
 };
 
 function accessDenied(details) {
-  // console.log('Info accessDenied: ',details);
-  throw new Meteor.Error(403, "Access denied", details);
+  var error = new Meteor.Error(403, "Access denied", details);
+
+  App.log('Info accessDenied: ',details, error.stack);
+  throw error;
 }
 
 function convertPermitSpec(input) {

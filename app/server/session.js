@@ -84,7 +84,7 @@ Session._private = {};
 App.extend(Session, {
   get: function (sub) {
     var result = sessions[sub._session.id];
-    AppVal.allowAccessIf(result);
+    AppVal.allowAccessIf(result, 'No session');
     return result;
   },
 });
