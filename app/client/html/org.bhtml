@@ -1,9 +1,0 @@
-<template name="Org">
-  <div id="Org">
-  </div>
-  <template name="Index">
-    <div>
-      Hello Index
-    </div>
-  </template>
-</template>

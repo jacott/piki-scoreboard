@@ -30,6 +30,10 @@ App.extend(Tpl, {
 
 
 Dialog.$events({
+  'click [name=cancel]': function (event) {
+    event.$actioned = true;
+    Bart.Dialog.close();
+  },
   'click [type=submit]': function (event) {
     event.$actioned = true;
     var button = this;
@@ -43,7 +47,7 @@ Dialog.$events({
       if (error)
         setState(form, 'error');
       else
-        Bart.remove(document.getElementsByClassName('Dialog')[0]);
+        Bart.Dialog.close();
     });
   },
 });

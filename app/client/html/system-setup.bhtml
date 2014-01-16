@@ -1,9 +1,11 @@
 <template name="SystemSetup">
   <section id="SystemSetup">
-    <nav class="menu">
-    </nav>
-    <section class="body">
-    </section>
+    <div>
+      <nav class="menu">
+      </nav>
+      <section class="body">
+      </section>
+    </div>
   </section>
   <template name="Index">
     <div>

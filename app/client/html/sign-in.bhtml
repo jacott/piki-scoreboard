@@ -1,10 +1,10 @@
 <template name="SignIn">
   <span id="SignIn">
     <template name="SignInLink">
-      <button class="link" type="button" name="signIn">Sign in / register</button>
+      <button class="link" name="signIn">Sign in / register</button>
     </template>
     <template name="Profile">
-      <button class="link" type="button" name="profile">{{name}}</button>
+      <button class="link" name="profile">{{name}}</button>
     </template>
     {{item}}
   </span>
@@ -23,6 +23,7 @@
       </fieldset>
       <fieldset class="actions">
         <button type="submit">Sign in</button>
+        <button type="button" name="cancel">Cancel</button>
       </fieldset>
       <template name="Progress">
         <span id="SignInProgress" class="{{state}}">{{message}}</span>

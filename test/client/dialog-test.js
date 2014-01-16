@@ -9,11 +9,15 @@
       v = null;
     },
 
-    "test open": function () {
+    "test open and close": function () {
       Bart.Dialog.open(Bart.html('<form id="Foo"></form>'));
       assert.dom('.Dialog>div', function () {
         assert.dom('form#Foo');
       });
+
+      Bart.Dialog.close();
+
+      refute.dom('.Dialog');
     },
   });
 })();

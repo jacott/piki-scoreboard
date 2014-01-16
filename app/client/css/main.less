@@ -1,12 +1,15 @@
 @import "global.lessimport";
 
 html,body {
+  height: 100%;
   overflow: hidden;
   overflow-x: auto;
   margin: 0;
   padding: 0;
   min-width: 800px;
   min-height: 300px;
+  font-family: Arial,Helvetica,sans-serif;
+  font-size: @defaultFontSize;
   background-color: @colorBackground;
   color: @colorText;
   -webkit-font-smoothing: antialiased;
@@ -18,17 +21,6 @@ html,body {
   box-sizing: border-box;
 }
 
-
-body {
-  font-family: Arial,Helvetica,sans-serif;
-  font-size: @defaultFontSize;
-  background-color: fade(#0f0, 20%);
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
 
 #Header {
   width: 100%;
@@ -50,9 +42,18 @@ body {
     }
   }
   &+section {
-    margin: auto;
-    max-width: 800px;
-    background-color: #fff;
+    position: absolute;
+    top: @headerHeight;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    > div {
+      background-color: #fff;
+      height: 100%;
+      overflow: auto;
+      margin: auto;
+      max-width: 800px;
+    }
   }
 }
 

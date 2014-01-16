@@ -1,5 +1,9 @@
 <template name="Club">
   <section id="Club">
+    <div>
+      <section class="body">
+      </section>
+    </div>
   </section>
   <template name="Index">
     <div>

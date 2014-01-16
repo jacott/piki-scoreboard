@@ -19,6 +19,13 @@
       assert.dom('[name=profile]');
     },
 
+    "test cancel": function () {
+      Bart.Dialog.open(Bart.SignIn.Dialog.$autoRender({}));
+      TH.click('[name=cancel]');
+
+      refute.dom('.Dialog');
+    },
+
     "test signing in": function () {
       document.body.appendChild(Bart.SignIn.$autoRender({}));
       TH.click('[name=signIn]');
