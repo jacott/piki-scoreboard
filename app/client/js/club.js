@@ -3,15 +3,11 @@ var elm;
 
 Tpl.$extend({
   onBaseEntry: function () {
-    elm = Tpl.$autoRender({});
-
-    document.body.appendChild(elm);
-    var ctx = Bart.getCtx(elm);
+    document.body.appendChild(Tpl.$autoRender({}));
   },
 
   onBaseExit: function () {
-    Bart.remove(elm);
-    elm = null;
+    Bart.removeId('Club');
   },
 });
 

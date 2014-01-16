@@ -7,3 +7,5 @@ model.defineFields({
   org_id: 'belongs_to',
   contact_id: {type: 'belongs_to', modelName: 'User'}
 });
+
+App.loaded('AppModel.Club', model);

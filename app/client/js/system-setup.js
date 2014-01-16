@@ -1,5 +1,4 @@
 var Tpl = Bart.SystemSetup;
-var elm;
 
 var base = AppRoute.root.addBase(Tpl);
 base.addTemplate(Tpl.Index, {defaultPage: true});
@@ -15,16 +14,13 @@ base.addTemplate(Tpl.AddUser, {
 });
 
 
-App.extend(Tpl, {
+Tpl.$extend({
   onBaseEntry: function () {
-    elm = Tpl.$autoRender({});
-    document.body.appendChild(elm);
-    var ctx = Bart.getCtx(elm);
+    document.body.appendChild(Tpl.$autoRender({}));
   },
 
   onBaseExit: function () {
-    Bart.remove(elm);
-    elm = null;
+    Bart.removeId('SystemSetup');
   },
 });
 

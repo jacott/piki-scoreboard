@@ -64,6 +64,12 @@
         .addField('shortName', 'shortName' in options || generateName('SN').replace(/\s+/g, ''));
     },
 
+    Club: function (options) {
+      return new Builder('Club', options).genName()
+        .addRef('org')
+        .addField('shortName', 'shortName' in options || generateName('SN').replace(/\s+/g, ''));
+    },
+
     User: function (options) {
       var username = 'username' in options || generateName('user');
 

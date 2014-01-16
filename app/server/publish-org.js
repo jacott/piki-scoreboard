@@ -23,8 +23,20 @@ Meteor.publish('Org', function (shortName) {
     }
   })));
 
+  sess.addObserver('OrgClubs', AppModel.Club.observeOrg_id(sess.orgId, sess.buildUpdater('Club', {
+    addedQuery: {},
+
+    stopped: function () {
+      var docs = sess.docs('Club');
+      for(var id in docs) {
+        sess.removed('Club', id);
+      }
+    }
+  })));
+
   this.onStop(function () {
     sess.removeObserver('OrgUsers');
+    sess.removeObserver('OrgClubs');
   });
   this.ready();
 });
