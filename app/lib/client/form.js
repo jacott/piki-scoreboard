@@ -6,7 +6,21 @@ var DEFAULT_HELPERS = {
   },
 };
 
-App.extend(Tpl, {
+Tpl.$extend({
+  submitFunc: function(elmId, successPage) {
+    return function (event) {
+      event.$actioned = true;
+
+      var elm = document.getElementById(elmId);
+      var ctx = Bart.getCtx(elm);
+      var doc = ctx.data;
+
+      if (Bart.Form.saveDoc(doc, elm.querySelector('.fields'))) {
+        successPage && AppRoute.gotoPage(successPage);
+      }
+    };
+  },
+
   saveDoc: function (doc, form) {
     this.fillDoc(doc, form);
     if (doc.$save()) {

@@ -3,14 +3,16 @@ var ROLE = {
   spectator: 'p',
   climber: 'c',
   judge: 'j',
-}
+  admin: 'a',
+};
+
 var model = AppModel.Base.defineSubclass('User',{
   emailWithName: function () {
     return this.name.replace('/<>/','')+" <"+this.email+">";
   },
 
   isSuperUser: function () {
-    return this.role === ROLE.superUser;
+    return this.role.indexOf(ROLE.superUser) !== -1;
   },
 
 },{saveRpc: true});

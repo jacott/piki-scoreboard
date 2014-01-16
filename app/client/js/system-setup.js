@@ -45,24 +45,9 @@ Tpl.$events({
 });
 
 Tpl.AddOrg.$events({
-  'click [type=submit]': subFunc('AddOrg'),
+  'click [type=submit]': Bart.Form.submitFunc('AddOrg', Tpl),
 });
 
 Tpl.AddUser.$events({
-  'click [type=submit]': subFunc('AddUser'),
+  'click [type=submit]': Bart.Form.submitFunc('AddUser', Tpl),
 });
-
-
-function subFunc(elmId) {
-  return function (event) {
-    event.$actioned = true;
-
-    var elm = document.getElementById(elmId);
-    var ctx = Bart.getCtx(elm);
-    var doc = ctx.data;
-
-    if (Bart.Form.saveDoc(doc, elm.querySelector('.fields'))) {
-      AppRoute.gotoPage(Tpl);
-    }
-  };
-}

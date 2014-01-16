@@ -1,6 +1,6 @@
 @import "global.lessimport";
 
-html,body {
+body {
   height: 100%;
   overflow: hidden;
   overflow-x: auto;
@@ -10,10 +10,11 @@ html,body {
   min-height: 300px;
   font-family: Arial,Helvetica,sans-serif;
   font-size: @defaultFontSize;
-  background-color: @colorBackground;
   color: @colorText;
   -webkit-font-smoothing: antialiased;
   font-smoothing: antialiased;
+  background: @colorBackground url(/images/jj.svg) no-repeat -1px @headerHeight - 1;
+  background-size: 25%;
 }
 
 *, :after, :before {

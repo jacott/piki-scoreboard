@@ -20,6 +20,10 @@ var base = AppRoute.root.addBase(Tpl);
 base.addTemplate(Tpl.Index, {defaultPage: true});
 base.addTemplate(Tpl.Add, {
   data: function () {
-    return new AppModel.Club();
+    return new AppModel.Club({org_id: App.orgId});
   }
+});
+
+Tpl.Add.$events({
+  'click [type=submit]': Bart.Form.submitFunc('AddClub', Tpl),
 });

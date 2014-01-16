@@ -11,7 +11,15 @@
     </div>
   </template>
   <template name="Add">
-    <div id="AddClub">
-    </div>
+    <form id="AddClub">
+      <fieldset class="fields">
+        {{labelField "name"}}
+        {{labelField "shortName"}}
+      </fieldset>
+      <fieldset class="actions">
+        <button type="submit" name="create">Create</button>
+        <button type="button" name="cancel">Cancel</button>
+      </fieldset>
+    </form>
   </template>
 </template>
