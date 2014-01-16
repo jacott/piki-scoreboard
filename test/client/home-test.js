@@ -14,7 +14,13 @@
 
       AppRoute.gotoPage(Bart.Home);
 
-      assert.dom('#Home');
+      assert.dom('#Home', function () {
+        assert.dom('button.link', 'Clubs', function () {
+          TH.click(this);
+        });
+      });
+
+      assert.dom('#Club');
     },
   });
 })();

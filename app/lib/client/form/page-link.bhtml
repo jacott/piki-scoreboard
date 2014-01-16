@@ -1,3 +1,3 @@
 <template name="Form.PageLink">
-  <button type="button" {{attrs}}>{{name}}</button>
+  <button {{attrs}}>{{value}}</button>
 </template>

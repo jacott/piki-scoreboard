@@ -10,7 +10,7 @@ base.addTemplate(Tpl.AddOrg, {
 });
 base.addTemplate(Tpl.AddUser, {
   data: function () {
-    return new AppModel.User({org_id: Bart.Main.id});
+    return new AppModel.User({org_id: App.orgId});
   }
 });
 
@@ -24,6 +24,7 @@ App.extend(Tpl, {
 
   onBaseExit: function () {
     Bart.remove(elm);
+    elm = null;
   },
 });
 

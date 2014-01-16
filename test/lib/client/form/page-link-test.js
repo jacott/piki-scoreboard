@@ -12,10 +12,10 @@
 
     "test pageLink": function () {
       test.stub(AppRoute, 'gotoPath');
-      document.body.appendChild(Bart._helpers.pageLink({id: "foo", name: "foo bar", link: "/foo/bar"}));
+      document.body.appendChild(Bart._helpers.pageLink({id: "foo", name: 'baz', value: "foo bar", link: "/foo/bar"}));
 
       assert.dom(document.body, function () {
-        assert.dom('button#foo.link', 'foo bar', function () {
+        assert.dom('button#foo.link[name=baz]', 'foo bar', function () {
           TH.click(this);
         });
       });
@@ -27,7 +27,7 @@
       Bart.newTemplate({name: "Foo.Bar"});
 
       test.stub(AppRoute, 'gotoPage');
-      document.body.appendChild(Bart._helpers.pageLink({id: "foo", name: "foo bar", template: "Foo.Bar"}));
+      document.body.appendChild(Bart._helpers.pageLink({id: "foo", value: "foo bar", template: "Foo.Bar"}));
 
       TH.click('#foo');
 

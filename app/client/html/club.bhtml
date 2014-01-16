@@ -1,0 +1,13 @@
+<template name="Club">
+  <section id="Club">
+  </section>
+  <template name="Index">
+    <div>
+      {{pageLink name="addClub" value="Add new club" template="Club.Add"}}
+    </div>
+  </template>
+  <template name="Add">
+    <div id="AddClub">
+    </div>
+  </template>
+</template>

@@ -48,6 +48,7 @@
     },
 
     "test subscribing to Org": function () {
+      App.Ready.isReady = true;
       document.body.appendChild(Bart.Main.Header.$render({}));
       v.org = TH.Factory.createOrg({shortName: 'FOO'});
       v.subStub = test.stub(App, 'subscribe').withArgs('Org').returns({stop: v.stopStub = test.stub()});
@@ -56,7 +57,8 @@
 
       v.subStub.yield();
 
-      assert.same(Bart.Main.id, v.org._id);
+      assert.same(App.orgId, v.org._id);
+      assert.equals(App.org().attributes, v.org.attributes);
       assert.same(AppRoute.pathPrefix, '/FOO');
 
       assert.dom('#OrgHomeLink', v.org.name);
@@ -66,10 +68,12 @@
 
       assert.called(v.stopStub);
 
-      assert.same(Bart.Main.id, null);
+      assert.same(App.orgId, null);
       assert.same(AppRoute.pathPrefix, null);
       assert.dom('#OrgHomeLink', "Choose Organization");
       refute.className(document.body, 'inOrg');
+
+
     },
 
     "test whenReady": function () {

@@ -1,6 +1,9 @@
 var Tpl = Bart.Main;
 
 AppRoute.title = 'Piki';
+App.org = function () {
+  return AppModel.Org.findOne(App.orgId);
+};
 
 document.head.appendChild(Tpl.Head.$render({}));
 
@@ -68,19 +71,19 @@ function subscribeOrg(shortName) {
   if (shortName) {
     AppRoute.pathPrefix = '/' + shortName;
     orgShortName = shortName;
-    Tpl.id = null;
+    App.orgId = null;
 
     if (! App.Ready.isReady) return;
 
     orgSub = App.subscribe('Org', orgShortName, function () {
       var doc = AppModel.Org.findOne({shortName: orgShortName});
-      Tpl.id = doc._id;
+      App.orgId = doc._id;
       Bart.addClass(document.body, 'inOrg');
       if (orgLink) orgLink.textContent = doc.name;
     });
   } else {
     AppRoute.pathPrefix = null;
-    orgSub = orgShortName = Tpl.id = null;
+    orgSub = orgShortName = App.orgId = null;
     Bart.removeClass(document.body, 'inOrg');
     if (orgLink) orgLink.textContent = "Choose Organization";
   }

@@ -1,6 +1,6 @@
 var $ = Bart.current;
 var Tpl = Bart.Form.PageLink;
-var IGNORE = {name: true, link: true, template: true};
+var IGNORE = {value: true, link: true, template: true};
 
 Tpl.$helpers({
   attrs: function () {

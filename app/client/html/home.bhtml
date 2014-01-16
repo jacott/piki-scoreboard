@@ -1,4 +1,5 @@
 <template name="Home">
-  <div id="Home">
-  </div>
+  <section id="Home">
+    {{pageLink value="Clubs" template="Club"}}
+  </section>
 </template>

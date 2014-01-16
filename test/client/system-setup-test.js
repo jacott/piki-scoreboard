@@ -52,7 +52,7 @@
 
     "test addUser": function () {
       v.org = TH.Factory.createOrg();
-      Bart.Main.id = v.org._id;
+      App.orgId = v.org._id;
       AppRoute.gotoPage(Bart.SystemSetup);
 
       assert.dom('#SystemSetup', function () {

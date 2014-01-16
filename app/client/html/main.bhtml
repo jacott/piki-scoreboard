@@ -7,12 +7,14 @@
 
   <template name="Header">
     <header id="Header">
-      <nav class="left">
-        {{pageLink id="OrgHomeLink" name="Choose Organization" template="Home"}}
-      </nav>
-      <nav class="right">
-        {{> /SignIn}}
-      </nav>
+      <div>
+        <nav class="left">
+          {{pageLink id="OrgHomeLink" value="Choose Organization" template="Home"}}
+        </nav>
+        <nav class="right">
+          {{> /SignIn}}
+        </nav>
+      </div>
     </header>
   </template>
 </template>

@@ -18,28 +18,44 @@ html,body {
   box-sizing: border-box;
 }
 
+
+body {
+  font-family: Arial,Helvetica,sans-serif;
+  font-size: @defaultFontSize;
+  background-color: fade(#0f0, 20%);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
 #Header {
   width: 100%;
-  background-color: @colorHeaderBackground;
-  color: @colorHeaderText;
-  height: @headerHeight;
-  line-height: @headerHeight;
-  font-size: 1.2em;
+  background-color: #444;
+  >div {
+    margin: auto;
+    max-width: 800px;
+    background-color: @colorHeaderBackground;
+    color: @colorHeaderText;
+    height: @headerHeight;
+    line-height: @headerHeight;
+    font-size: 1.2em;
 
-  nav.left {
-    float: left;
+    nav.left {
+      float: left;
+    }
+    nav.right {
+      float: right;
+    }
   }
-  nav.right {
-    float: right;
+  &+section {
+    margin: auto;
+    max-width: 800px;
+    background-color: #fff;
   }
 }
 
 #Main {
   width: 100%;
-}
-
-
-body {
-  font-family: Arial,Helvetica,sans-serif;
-  font-size: @defaultFontSize;
 }
