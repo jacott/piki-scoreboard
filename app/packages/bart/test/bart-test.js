@@ -199,6 +199,23 @@ Meteor.isClient && (function (test, v) {
         document.body.appendChild(v.foo);
       },
 
+      "test focus": function () {
+        document.body.appendChild(Bart.html('<form><button name="bt"><input type="text" name="inp"><button name="b2"></form>'));
+        assert.dom('form', function () {
+          assert.dom('[name=b2]', function () {
+            this.focus();
+            assert.same(document.activeElement, this);
+          });
+          Bart.focus(this);
+          assert.dom('[name=inp]', function () {
+            assert.same(document.activeElement, this);
+          });
+          Bart.focus(this, '[name=bt]');
+          assert.dom('[name=bt]', function () {
+            assert.same(document.activeElement, this);
+          });
+        });
+      },
 
       "test replace element": function () {
         Bart.newTemplate({name: 'Foo.Bar', nodes: [{name: 'span'}]});

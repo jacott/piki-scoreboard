@@ -15,4 +15,18 @@
 
 fieldset {
   border: none;
+  label {
+    display: block;
+    >.name {
+      display: block;
+      font-size: 0.8em;
+      color: #444;
+    }
+    margin-top: 0.5em;
+  }
+  &.actions {
+    >button  {
+      margin-right: 1em;
+    }
+  }
 }

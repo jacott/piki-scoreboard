@@ -7,11 +7,30 @@
   </section>
   <template name="Index">
     <div>
-      {{pageLink name="addClub" value="Add new club" template="Club.Add"}}
+      <nav>
+        {{pageLink name="addClub" value="Add new club" template="Club.Add"}}
+      </nav>
+      <section class="clubs">
+        <h1>Clubs</h1>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th><th>Short name</th>
+            </tr>
+          </thead>
+          {{clubs}}
+          <template name="Row">
+            <tr>
+              <td>{{name}}</td><td>{{shortName}}</td>
+            </tr>
+          </template>
+        </table>
+      </section>
     </div>
   </template>
   <template name="Add">
     <form id="AddClub">
+      <h1>Add new club</h1>
       <fieldset class="fields">
         {{labelField "name"}}
         {{labelField "shortName"}}

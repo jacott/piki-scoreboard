@@ -230,6 +230,9 @@ function onEntryFunc(template, options) {
         parent = parent.querySelector('.body') || parent;
     }
     (parent || document.body).appendChild(template._renderedPage = template.$autoRender(data||{}));
+    if (options.focus) {
+      Bart.focus(template._renderedPage, options.focus);
+    }
   };
 }
 

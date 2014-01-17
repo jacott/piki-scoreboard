@@ -32,7 +32,7 @@
         TH.click('[name=addOrg]');
       });
       assert.dom('#AddOrg', function () {
-        assert.domParent('label', 'Name', function () {
+        assert.dom('label', 'Name', function () {
           TH.input('[name=name]', 'Foo Bar');
         });
         TH.input('[name=shortName]', 'FB');
@@ -59,7 +59,7 @@
         TH.click('[name=addUser]');
       });
       assert.dom('#AddUser', function () {
-        assert.domParent('label', 'Name', function () {
+        assert.dom('label', 'Name', function () {
           TH.input('[name=name]', 'Foo Bar');
         });
         TH.input('[name=initials]', 'FB');

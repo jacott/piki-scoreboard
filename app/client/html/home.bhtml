@@ -1,5 +1,5 @@
 <template name="Home">
-  <section id="Home">
+  <section id="Home" class="body">
     <div>
       <nav class="menu">
         {{pageLink name="clubs" value="Clubs" template="Club"}}

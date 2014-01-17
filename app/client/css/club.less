@@ -1,0 +1,39 @@
+@import "global.lessimport";
+
+#Club {
+  table {
+    width: 100%;
+    thead {
+      border-bottom: 1px solid #000;
+      th {
+        text-align: left;
+      }
+      th:first-child {
+        width: 80%;
+      }
+    }
+    tr:nth-child(even) {
+      background-color: #eee;
+    }
+    table-layout:fixed;
+    th, td {
+      padding: 2px;
+    }
+  }
+
+  #AddClub {
+    margin: 10px;
+
+    font-size: 1.2em;
+    >h1 {
+      font-size: 1.4em;
+    }
+
+    [name=name] {
+      width: 50ex;
+    }
+    [name=shortName] {
+      width: 6ex;
+    }
+  }
+}

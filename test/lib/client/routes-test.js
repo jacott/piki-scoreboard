@@ -27,6 +27,25 @@
       v = null;
     },
 
+    "test focus": function () {
+      var RootBar = {
+        name: 'RootBar',
+        $autoRender: function () {
+          return Bart.html('<div id="RootBar">x</div>');
+        },
+      };
+
+      AppRoute.root.addTemplate(RootBar, {focus: '[name=foo]'});
+
+      test.stub(Bart, 'focus');
+
+      AppRoute.gotoPage(RootBar);
+
+      assert.dom('#RootBar', function () {
+        assert.calledWith(Bart.focus, this, '[name=foo]');
+      });
+    },
+
     "test abort page change": function () {
       var Baz = {
         name: 'Baz',

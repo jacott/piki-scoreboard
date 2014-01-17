@@ -6,7 +6,6 @@
         org: TH.Factory.createOrg(),
       };
       App.orgId = v.org._id;
-      AppRoute.gotoPage(Bart.Club.Index);
     },
 
     tearDown: function () {
@@ -14,12 +13,27 @@
     },
 
     "test rendering": function () {
+      var clubs = TH.Factory.createList(2, 'createClub', function (index, options) {
+        options.org_id = v.org._id;
+      });
+      AppRoute.gotoPage(Bart.Club.Index);
+
       assert.dom('#Club', function () {
-        assert.dom('[name=addClub]', 'Add new club');
+        assert.dom('.clubs', function () {
+          assert.dom('h1', 'Clubs');
+          assert.dom('h1+table', function () {
+            assert.dom('tr>td', clubs[0].name, function () {
+              assert.domParent('td', clubs[0].shortName);
+            });
+          });
+        });
+        assert.dom('nav [name=addClub]', 'Add new club');
       });
     },
 
     "test adding new club": function () {
+      AppRoute.gotoPage(Bart.Club.Index);
+
       assert.dom('#Club', function () {
         TH.click('[name=addClub]');
         assert.dom('#AddClub', function () {

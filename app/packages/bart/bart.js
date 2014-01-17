@@ -53,6 +53,13 @@ Bart = {
     (isAdd ? Bart.addClass : Bart.removeClass)(elm || currentElement, name);
   },
 
+  focus: function (elm, selector) {
+    if (!elm) return;
+    if (typeof selector !== 'string') selector = "input,textarea";
+    var focus = elm.querySelector(selector);
+    focus && focus.focus();
+  },
+
   parentOf: function (parent, elm) {
     while(elm && elm.nodeType !== 9) {
       if (parent === elm) return parent;
@@ -363,11 +370,7 @@ function updateNode (node, data) {
         value = document.createComment('empty');
 
     } else if (typeof value === 'object' && value.nodeType === DOCUMENT_FRAGMENT_NODE) {
-
-      // *** Document fragment ***
-      if (value.firstChild == null) value.appendChild(document.createComment('empty'));
-      // FIXME what about multiple child nodes?
-      value = value.firstChild;
+      throw new Error("can't handle DOCUMENT_FRAGMENT_NODE");
 
     } else if (typeof value !== 'object' || ! ('nodeType' in value)) {
 
