@@ -8,4 +8,6 @@ model.defineFields({
   contact_id: {type: 'belongs_to', modelName: 'User'}
 });
 
+model.addRemoveRpc();
+
 App.loaded('AppModel.Club', model);

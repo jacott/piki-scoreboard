@@ -37,6 +37,26 @@ function save(doc) {
   return doc.$reload();
 }
 
+AppModel._support.setupExtras.push(function (model) {
+  model.addRemoveRpc = function () {
+    var origRemove = model.prototype.$remove;
+    model.prototype.$remove = removeFunc(model.modelName+".remove");
+
+    model.remote({
+      remove: function (id) {
+        var doc = model.findOne(id);
+        return origRemove.call(doc);
+      },
+    });
+  };
+});
+
+function removeFunc(method) {
+  return function () {
+    Meteor.call(method, this._id);
+  };
+}
+
 App.extend(_support, {
   attrFind: function (id) {
     return this.docs.find().collection.docs[id];

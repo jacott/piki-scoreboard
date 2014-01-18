@@ -1,5 +1,5 @@
 (function (test, v) {
-  buster.testCase('packages/app-models/client/base-model:', {
+  buster.testCase('packages/app-models/test/client/base-model:', {
     setUp: function () {
       test = this;
       v = {};
@@ -10,6 +10,26 @@
       TH.destroyModel('TestSubClass');
       v = null;
     },
+
+    "test $remove": function () {
+      var TestSubClass = AppModel.Base.defineSubclass('TestSubClass').defineFields({name: 'text'});
+
+      TestSubClass.addRemoveRpc();
+
+      TestSubClass.afterRemove(v.afterRemove = test.stub());
+
+      var doc = TestSubClass.create({name: 'foo'});
+      var spy = test.spy(Meteor,'call');
+
+      doc.$remove();
+
+      assert.calledWith(spy, 'TestSubClass.remove', doc._id);
+
+      refute(TestSubClass.exists(doc._id));
+
+      assert.called(v.afterRemove);
+    },
+
 
     "test Index observer setup": function () {
       var TestSubClass = AppModel.Base.defineSubclass('TestSubClass').defineFields({name: 'text'});

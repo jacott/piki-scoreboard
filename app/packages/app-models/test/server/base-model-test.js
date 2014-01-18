@@ -1,9 +1,9 @@
-(function (test) {
+(function (test, v) {
   var match = sinon.match;
 
-  var TestSubClass, doc, v;
+  var TestSubClass;
 
-  buster.testCase('packages/app-models/server/base-model:', {
+  buster.testCase('packages/app-models/test/server/base-model:', {
     setUp: function () {
       test = this;
       v = {};
@@ -11,7 +11,26 @@
 
     tearDown: function () {
       TH.destroyModel('TestSubClass');
-      v = null;
+      TestSubClass = v = null;
+    },
+
+    'test removeRpc': function () {
+      TestSubClass = AppModel.Base.defineSubclass('TestSubClass', {
+        authorize: v.auth = test.stub()
+      })
+        .defineFields({name: 'text'});
+
+      TestSubClass.addRemoveRpc();
+      TestSubClass.afterRemove(v.afterRemove = test.stub());
+
+      v.doc = TestSubClass.create({name: 'foo'});
+
+      TH.call("TestSubClass.remove", v.doc._id);
+
+      refute(TestSubClass.exists(v.doc._id));
+
+      assert.called(v.afterRemove);
+      assert.calledWith(v.auth, TH.userId(), {remove: true});
     },
 
     '$push $pull': {

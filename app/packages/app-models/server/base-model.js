@@ -26,6 +26,20 @@ BaseModel.prototype.$save = function() {
   return doc;
 };
 
+AppModel._support.setupExtras.push(function (model) {
+  model.addRemoveRpc = function () {
+    model.remote({
+      remove: function (id) {
+        check(id, String);
+        var doc = model.findOne(id);
+        doc.authorize(this.userId, {remove: true});
+        doc.$remove(id);
+      },
+    });
+  };
+});
+
+
 BaseModel.prototype.$$save = function() {
   this.$assertValid();
   return this.$save();
