@@ -32,4 +32,31 @@ fieldset {
       margin-right: 1em;
     }
   }
+
+  [name=delete] {
+    color: #fff;
+    .linear-gradient(#a00, #800);
+  }
+
+}
+
+table.select {
+  width: 100%;
+  cursor: pointer;
+  thead {
+    border-bottom: 1px solid #000;
+    th {
+      text-align: left;
+    }
+  }
+  tr:nth-child(even) {
+    background-color: fade(#000, 10%);
+  }
+  table-layout:fixed;
+  th, td {
+    padding: 2px;
+  }
+  tbody tr:hover {
+    background-color: #0ff;
+  }
 }

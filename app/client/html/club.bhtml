@@ -12,7 +12,7 @@
       </nav>
       <section class="clubs">
         <h1>Clubs</h1>
-        <table>
+        <table class="select">
           <thead>
             <tr>
               <th>Name</th><th>Short name</th>
