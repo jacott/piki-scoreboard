@@ -30,7 +30,7 @@ Index.$events({
     event.$actioned = true;
 
     var data = $.data(this);
-    AppRoute.gotoPage(Tpl.Edit, {pathname: '/club/edit/'+data._id});
+    AppRoute.gotoPage(Tpl.Edit, {append: data._id});
   },
 });
 

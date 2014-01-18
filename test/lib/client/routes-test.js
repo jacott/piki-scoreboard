@@ -23,7 +23,6 @@
       AppRoute.root = v.root;
       AppRoute._onGotoPath = v.onGotoPath;
       AppRoute.gotoPage();
-      AppRoute.title = null;
       v = null;
     },
 
@@ -44,6 +43,20 @@
       assert.dom('#RootBar', function () {
         assert.calledWith(Bart.focus, this, '[name=foo]');
       });
+    },
+
+    "test append": function () {
+      var RootBar = {
+        name: 'RootBar',
+        $autoRender: function () {
+          return Bart.html('<div id="RootBar">x</div>');
+        },
+      };
+
+      AppRoute.root.addTemplate(RootBar);
+      AppRoute.gotoPage(RootBar, {append: "an-id"});
+
+      assert.calledWith(AppRoute.history.pushState, null, 'Piki', '/root-bar/an-id');
     },
 
     "test abort page change": function () {

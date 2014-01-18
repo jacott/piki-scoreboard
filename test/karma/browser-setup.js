@@ -1,8 +1,7 @@
 __meteor_runtime_config__ = { ROOT_URL: "http://test.local:1234", serverId: "testing"};
 
 (function (geddon) {
-  var _savedMethodHandlers,
-      timeoutCount,
+  var _savedMethodHandlers, pageTitle, timeoutCount,
       firstTime = true;
 
   geddon.onTestStart(setUp);
@@ -13,6 +12,7 @@ __meteor_runtime_config__ = { ROOT_URL: "http://test.local:1234", serverId: "tes
     App.log.reset();
     if(firstTime) {
       firstTime = false;
+      pageTitle = AppRoute.title;
       AppRoute._orig_history = AppRoute.history;
       AppRoute.history = {
         pushState: function () {},
@@ -40,6 +40,7 @@ __meteor_runtime_config__ = { ROOT_URL: "http://test.local:1234", serverId: "tes
       body.removeChild(lc);
     }
     App.orgId = null;
+    AppRoute.title = pageTitle;
   }
 
   function loginServicesConfiguredStub() {

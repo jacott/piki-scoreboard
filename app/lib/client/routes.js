@@ -78,6 +78,9 @@ App.require('makeSubject', function (makeSubject) {
       }
       if (! location)
         location = {pathname: pathname(page)};
+      else if (location.append) {
+        location = {pathname: pathname(page) + "/" + location.append};
+      }
 
       try {
         if (current) {
