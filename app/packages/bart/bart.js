@@ -18,7 +18,15 @@ var DOCUMENT_FRAGMENT_NODE = document.DOCUMENT_FRAGMENT_NODE;
 
 var bartEvent = null;
 
-var current = {};
+var current = {
+  data: function (elm) {
+    if (elm)
+      return Bart.getCtx(elm).data;
+
+    return this.ctx.data;
+  },
+};
+
 var currentCtx, currentElement;
 
 Bart = {

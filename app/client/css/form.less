@@ -6,6 +6,9 @@
 }
 
 .error+.errorMsg {
+  &:first-letter {
+    text-transform:uppercase;
+  }
   display: inherit;
 }
 
@@ -20,7 +23,7 @@ fieldset {
     >.name {
       display: block;
       font-size: 0.8em;
-      color: #444;
+      color: @colorText;
     }
     margin-top: 0.5em;
   }

@@ -67,6 +67,8 @@ App.require('makeSubject', function (makeSubject) {
       this._onGotoPath = func;
     },
 
+    pathname: pathname,
+
     gotoPage: function (page, location) {
       if (page && ! ('onEntry' in page)) {
         if ('route' in page)
@@ -209,14 +211,14 @@ function templatePath(template) {
 }
 
 function onEntryFunc(template, options) {
-  return function () {
+  return function (page, location) {
     if (options) {
       if (! App.userId() && options.privatePage) {
         AppRoute.gotoPage(AppRoute.SignPage);
         return false;
       }
       if (typeof options.data ==='function') {
-        var data = options.data.call(template);
+        var data = options.data.apply(template, arguments);
       } else {
         var data = options.data;
       }

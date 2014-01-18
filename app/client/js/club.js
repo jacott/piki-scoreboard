@@ -1,3 +1,4 @@
+var $ = Bart.current;
 var Tpl = Bart.Club;
 var Index = Tpl.Index;
 
@@ -24,6 +25,15 @@ Index.$helpers({
   },
 });
 
+Index.$events({
+  'click .clubs tr': function (event) {
+    event.$actioned = true;
+
+    var data = $.data(this);
+    AppRoute.gotoPage(Tpl.Edit, {pathname: '/club/edit/'+data._id});
+  },
+});
+
 Index.$extend({
   $created: function (ctx, elm) {
     Bart.updateOnCallback(ctx, AppModel.Club.Index.observe);
@@ -39,12 +49,48 @@ base.addTemplate(Tpl.Add, {
   }
 });
 
+base.addTemplate(Tpl.Edit, {
+  focus: true,
+  data: function (page, location) {
+    var m = /([^/]*)$/.exec(location.pathname);
+    var doc = AppModel.Club.findOne(m[1]);
+
+    if (!doc) AppRoute.abortPage(Tpl);
+
+    return doc;
+  }
+});
+
 Tpl.Add.$events({
-  'click [name=cancel]': function (event) {
-    event.$actioned = true;
-    AppRoute.gotoPage(Tpl);
-  },
+  'click [name=cancel]': cancel,
   'click [type=submit]': Bart.Form.submitFunc('AddClub', Tpl),
 });
 
-Tpl.Add.$extend({});
+
+Tpl.Edit.$events({
+  'click [name=cancel]': cancel,
+  'click [name=delete]': function (event) {
+    var doc = $.data();
+
+    event.$actioned = true;
+    Bart.Dialog.confirm({
+      data: doc,
+      classes: 'small warn',
+      okay: 'Delete',
+      content: Tpl.ConfirmDelete,
+      callback: function(confirmed) {
+        if (confirmed) {
+          doc.$remove();
+          AppRoute.gotoPage(Tpl);
+        }
+      },
+    });
+
+  },
+  'click [type=submit]': Bart.Form.submitFunc('EditClub', Tpl),
+});
+
+function cancel(event) {
+  event.$actioned = true;
+  AppRoute.gotoPage(Tpl);
+}

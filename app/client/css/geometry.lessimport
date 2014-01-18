@@ -1,5 +1,6 @@
 @defaultFontSize: 13px;
 
+@bodyWidth: 800px;
 @headerHeight: 60px;
 
 @iconWidth: 16px;

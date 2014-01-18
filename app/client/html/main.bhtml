@@ -1,8 +1,7 @@
 <template name="Main">
   <template name="Head">
     <title>Piki</title>
-    <!-- <meta name="viewport" content="width=device-width initial-scale=1, user-scalable=no, maximum-scale=1"> -->
-    <meta name="viewport" content="initial-scale=1, user-scalable=no, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, user-scalable=yes, maximum-scale=2">
   </template>
 
   <template name="Header">

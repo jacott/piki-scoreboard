@@ -1,5 +1,5 @@
 (function () {
-  buster.testCase('packages/app-models/validators/text-validators:', {
+  buster.testCase('packages/app-models/test/validators/text-validators:', {
     setUp: function () {
     },
 
@@ -21,6 +21,22 @@
         refute(doc._errors);
 
         assert.equals(doc, {name: 'mixedcase'});
+      },
+
+      "test upcase": function () {
+        var doc = {name: 'mixedCase'};
+
+        AppVal.validators('normalize')(doc,'name', 'upcase');
+
+        refute(doc._errors);
+
+        assert.same(doc.name, 'MIXEDCASE');
+
+        AppVal.validators('normalize')(doc,'noName', 'upcase');
+
+        refute(doc._errors);
+
+        assert.equals(doc, {name: 'MIXEDCASE'});
       },
     },
 

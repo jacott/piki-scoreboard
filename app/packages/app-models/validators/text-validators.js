@@ -1,10 +1,14 @@
 var colorRe = /^#[0-9a-f]{3}([0-9a-f]{3})?$/;
 
 AppVal.register('normalize', function (doc,field, options) {
+  var val = doc[field];
+  if (! val) return;
+
   if (options === 'downcase') {
-    var val = doc[field];
-    if (val)
       doc[field] = val.toLowerCase();
+
+  } else if (options === 'upcase') {
+      doc[field] = val.toUpperCase();
   }
 });
 

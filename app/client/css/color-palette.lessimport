@@ -1,4 +1,4 @@
-@colorBackground: #bf8;
+@colorBackground: #fff;
 @colorText: #444;
 
 @colorHeaderBackground: #000;

@@ -1,19 +1,24 @@
 @import "global.lessimport";
 
+html {
+  .linear-gradient(#0ff, #eff);
+  height: 100%;
+}
+
 body {
   height: 100%;
   overflow: hidden;
   overflow-x: auto;
   margin: 0;
   padding: 0;
-  min-width: 800px;
+  min-width: @bodyWidth;
   min-height: 300px;
   font-family: Arial,Helvetica,sans-serif;
   font-size: @defaultFontSize;
   color: @colorText;
   -webkit-font-smoothing: antialiased;
   font-smoothing: antialiased;
-  background: @colorBackground url(/images/jj.svg) no-repeat -1px @headerHeight - 1;
+  background: rgba(0,0,0,0) url(/images/jj.svg) no-repeat -1px @headerHeight - 1;
   background-size: 25%;
 }
 
@@ -24,11 +29,10 @@ body {
 
 
 #Header {
-  width: 100%;
-  background-color: #444;
+  background-color: fade(@colorHeaderBackground, 60%);
   >div {
     margin: auto;
-    max-width: 800px;
+    width: @bodyWidth;
     background-color: @colorHeaderBackground;
     color: @colorHeaderText;
     height: @headerHeight;
@@ -53,7 +57,7 @@ body {
       height: 100%;
       overflow: auto;
       margin: auto;
-      max-width: 800px;
+      width: @bodyWidth;
     }
   }
 }

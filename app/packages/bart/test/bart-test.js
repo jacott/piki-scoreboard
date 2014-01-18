@@ -77,6 +77,11 @@ Meteor.isClient && (function (test, v) {
       },
     },
 
+    "//Bart.current": {
+      "test data": function () {
+
+      },
+    },
 
 
     "test html": function () {
