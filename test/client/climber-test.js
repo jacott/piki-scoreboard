@@ -33,21 +33,33 @@
       });
     },
 
-    "//test adding new climber": function () {
+    "test adding new climber": function () {
       var club = TH.Factory.createClub();
       AppRoute.gotoPage(Bart.Climber.Index);
 
       assert.dom('#Climber', function () {
         TH.click('[name=addClimber]');
         assert.dom('#AddClimber', function () {
-          TH.input('[name=name]', 'Dynomites Wellington');
-          TH.change('[name=club]', club._id);
+          TH.input('[name=name]', 'Magnus Midtbø');
+          TH.input('[name=dateOfBirth]', '1988-09-18');
+          assert.dom('[name=club_id]', function () {
+            TH.change(this, club._id);
+            assert.domParent('.name', 'Club');
+          });
+
+          TH.change('[name=gender]', 'm');
           TH.click('[type=submit]');
         });
         refute.dom('#AddClimber');
       });
 
-      assert(AppModel.User.exists({org_id: v.org._id, role: 'c', name: 'Dynomites Wellington', shortName: 'WGTN'}));
+      var climber = AppModel.Climber.findOne({org_id: v.org._id, name: 'Magnus Midtbø', dateOfBirth: '1988-09-18'});
+
+      assert(climber);
+
+      assert.same(climber.club_id, club._id);
+      assert.same(climber.gender, "m");
+
 
       assert.dom('#Climber [name=addClimber]');
     },
@@ -62,7 +74,7 @@
         TH.click('td', v.climber.name);
       },
 
-      "//test change name": function () {
+      "test change name": function () {
         assert.dom('#EditClimber', function () {
           assert.dom('h1', 'Edit ' + v.climber.name);
           TH.input('[name=name]', {value: v.climber.name}, 'new name');
@@ -72,7 +84,7 @@
         assert.dom('#Climber td', 'new name');
       },
 
-      "//test delete": function () {
+      "test delete": function () {
         assert.dom('#EditClimber', function () {
           TH.click('[name=delete]');
         });
@@ -84,7 +96,7 @@
 
         refute.dom('.Dialog');
 
-        assert(AppModel.User.exists(v.climber._id));
+        assert(AppModel.Climber.exists(v.climber._id));
 
         TH.click('#EditClimber [name=delete]');
 
@@ -94,7 +106,7 @@
 
         refute.dom('#EditClimber');
 
-        refute(AppModel.User.exists(v.climber._id));
+        refute(AppModel.Climber.exists(v.climber._id));
       },
     },
   });

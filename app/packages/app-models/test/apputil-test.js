@@ -1,5 +1,5 @@
 (function () {
-  buster.testCase('packages/app-models/apputil:', {
+  buster.testCase('packages/app-models/test/apputil:', {
     setUp: function () {
     },
 
@@ -105,7 +105,7 @@
     },
 
     "test humanize": function () {
-      assert.same(Apputil.humanize('camelCaseCamel'), "camel case camel");
+      assert.same(Apputil.humanize('camelCaseCamel_id'), "camel case camel");
       assert.same(Apputil.humanize('Hyphens-and_underscores'), "hyphens and underscores");
 
     },

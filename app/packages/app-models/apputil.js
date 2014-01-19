@@ -79,7 +79,7 @@ Apputil = {
 
   humanize: function (name) {
     name = this.uncapitalize(name);
-    return name.replace(/[_-]/g,' ').replace(/([A-Z])/g, function (_, m1) {
+    return name.replace(/_id$/,'').replace(/[_-]/g,' ').replace(/([A-Z])/g, function (_, m1) {
       return ' '+m1.toLowerCase();
     });
   },

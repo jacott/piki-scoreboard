@@ -71,7 +71,11 @@
     },
 
     Climber: function (options) {
-      return defines.User(App.extend(options, {role: 'c'}));
+      return new Builder('Climber', options).genName()
+        .addRef('org')
+        .addRef('club')
+        .addField('gender', 'm')
+        .addField('dateOfBirth', '2000/01/01');
     },
 
     User: function (options) {

@@ -77,9 +77,35 @@ Meteor.isClient && (function (test, v) {
       },
     },
 
-    "//Bart.current": {
+    "Bart.current": {
       "test data": function () {
+        Bart.newTemplate({
+          name: "Foo",
+          nodes:[{
+            name:"section",
+            children:[['', "testMe"]],
+          }],
+        });
+        Bart.Foo.$helpers({
+          testMe: function () {
+            assert.same(this, Bart.current.data());
+            assert.same(this, v.x);
+            assert.same(Bart.current.ctx, Bart.getCtx(Bart.current.element));
 
+            v.data = Bart.current.data(v.elm);
+
+            return v.elm;
+          },
+        });
+
+        var data = {me: true};
+
+        v.elm = Bart.html('<div></div>');
+        v.elm._bart = {data: data};
+
+        var foo = Bart.Foo.$render(v.x = {x: 1});
+
+        assert.same(v.data, data);
       },
     },
 

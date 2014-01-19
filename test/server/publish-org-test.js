@@ -6,9 +6,10 @@
       TH.stubOplog();
       v = {};
       v.org = TH.Factory.createOrg();
-      v.user = TH.Factory.createUser('su', {org_id: v.org._id});
-      v.otherUser = TH.Factory.createUser({org_id: v.org._id});
-      v.club = TH.Factory.createClub({org_id: v.org._id});
+      v.user = TH.Factory.createUser('su');
+      v.otherUser = TH.Factory.createUser();
+      v.club = TH.Factory.createClub();
+      v.climber = TH.Factory.createClimber();
       v.sub = TH.subStub(v.user._id);
       v.pub = TH.getPublish('Org');
       v.tsub = TH.subStub(v.user._id, v.sub);
@@ -39,6 +40,7 @@
       "test observes org": function () {
         var spyUsers = test.spy(AppModel.User, 'observeOrg_id');
         var spyClubs = test.spy(AppModel.Club, 'observeOrg_id');
+        var spyClimbers = test.spy(AppModel.Climber, 'observeOrg_id');
         test.spy(global, 'check');
 
         v.pub.call(v.tsub, v.org.shortName);
@@ -57,6 +59,7 @@
 
 
         assert.calledWith(v.sub.aSpy, 'Club', v.club._id);
+        assert.calledWith(v.sub.aSpy, 'Climber', v.climber._id);
 
         test.spy(usersStopHandle, 'stop');
 
@@ -68,6 +71,7 @@
         refute.calledWith(v.sub.rSpy, 'User', v.user._id);
 
         assert.calledWith(v.sub.rSpy, 'Club', v.club._id);
+        assert.calledWith(v.sub.rSpy, 'Climber', v.climber._id);
       },
     },
   });

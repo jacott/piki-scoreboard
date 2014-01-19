@@ -1,5 +1,5 @@
 (function (test, v) {
-  buster.testCase('models/server/club:', {
+  buster.testCase('models/server/climber:', {
     setUp: function () {
       test = this;
       v = {};

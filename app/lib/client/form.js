@@ -151,4 +151,8 @@ Bart.registerHelpers({
   labelField: function (name, options) {
     return Tpl.LabelField.$autoRender({name: name, value: field(this, name, options)});
   },
+
+  genderList: function () {
+    return [["m", "Male"], ["f", "Female"]];
+  },
 });

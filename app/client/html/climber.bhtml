@@ -61,7 +61,9 @@
   <template name="Form">
     <fieldset class="fields">
       {{labelField "name"}}
-      {{labelField "club" selectList=clubList}}
+      {{labelField "dateOfBirth"}}
+      {{labelField "gender" selectList=genderList}}
+      {{labelField "club_id" selectList=clubList}}
     </fieldset>
   </template>
 </template>

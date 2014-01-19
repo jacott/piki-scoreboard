@@ -19,13 +19,14 @@
       });
 
       var doc = {
-        foo: "2",
+        foo_id: "2",
       };
 
       document.body.appendChild(v.selectList.$autoRender(doc));
 
       assert.dom("label", function () {
-        assert.dom('select#fooId[name=foo]', function () {
+        assert.dom('select#fooId[name=foo_id]', function () {
+          assert.domParent('.name', 'Foo');
           assert.dom('option', {value: "1", text: "item 1"});
           assert.dom('option[selected=selected]', {value: "2", text: "item 2"});
         });

@@ -1,5 +1,5 @@
 (function (test, v) {
-  buster.testCase('models/club:', {
+  buster.testCase('models/climber:', {
     setUp: function () {
       test = this;
       v = {};
@@ -10,22 +10,22 @@
     },
 
     'test creation': function () {
-      var club=TH.Factory.createClub();
+      var climber=TH.Factory.createClimber();
 
-      assert(AppModel.Club.exists(club._id));
+      assert(AppModel.Climber.exists(climber._id));
 
-      assert(club.org);
+      assert(climber.club);
+      assert(climber.org);
     },
 
     'test standard validators': function () {
-      var validators = AppModel.Club._fieldValidators;
+      var validators = AppModel.Climber._fieldValidators;
 
       assert.validators(validators.name, {maxLength: [200], required: [true], trim: [true]});
-      assert.validators(validators.shortName, {maxLength: [4], required: [true], trim: [true], normalize: ['upcase']});
     },
 
     "test removeRpc": function () {
-      TH.assertRemoveRpc(AppModel.Club);
+      TH.assertRemoveRpc(AppModel.Climber);
     },
   });
 })();

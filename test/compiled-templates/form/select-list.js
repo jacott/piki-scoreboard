@@ -1,0 +1,2 @@
+_BartTest_form_select_list = function(Bart) {Bart.newTemplate({"name":"Test.Form.List","nested":[{"name":"List","nodes":[{"name":"div","attrs":[["=","id","TestList"]],"children":[{"name":"ul","attrs":[],"children":[{"name":"li","attrs":[],"children":["line 1"]},{"name":"li","attrs":[["=","class","disabled"]],"children":["line 2"]}]}]}]}],"nodes":[{"name":"button","attrs":[["=","id","TestButton"],["=","type","button"],["=","name","mode"]],"children":["Test button"]}]});
+};

@@ -1,3 +1,5 @@
+var observers = ['Club', 'Climber'];
+
 Meteor.publish('Org', function (shortName) {
   var sess = Session.get(this);
   var user = sess.user;
@@ -23,20 +25,28 @@ Meteor.publish('Org', function (shortName) {
     }
   })));
 
-  sess.addObserver('OrgClubs', AppModel.Club.observeOrg_id(sess.orgId, sess.buildUpdater('Club', {
-    addedQuery: {},
+  observers.forEach(function (modelName) {
+    sess.addObserver(obName(modelName), AppModel[modelName].observeOrg_id(sess.orgId, sess.buildUpdater(modelName, {
+      addedQuery: {},
 
-    stopped: function () {
-      var docs = sess.docs('Club');
-      for(var id in docs) {
-        sess.removed('Club', id);
+      stopped: function () {
+        var docs = sess.docs(modelName);
+        for(var id in docs) {
+          sess.removed(modelName, id);
+        }
       }
-    }
-  })));
+    })));
+  });
 
   this.onStop(function () {
     sess.removeObserver('OrgUsers');
-    sess.removeObserver('OrgClubs');
+    observers.forEach(function (modelName) {
+      sess.removeObserver(obName(modelName));
+    });
   });
   this.ready();
 });
+
+function obName(modelName) {
+  return 'Org' + modelName + 's';
+}

@@ -1,4 +1,4 @@
-App.require('AppModel.Club', function (model) {
+App.require('AppModel.Climber', function (model) {
   App.extend(model.prototype, {
     authorize: function (userId) {
       var user = AppModel.User.findOne(userId);
