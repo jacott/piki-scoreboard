@@ -29,5 +29,12 @@
 
       assert.dom('#Climber');
     },
+
+    "test events link": function () {
+      AppRoute.gotoPage(Bart.Home);
+      TH.click('button.link', 'Events');
+
+      assert.dom('#Event');
+    },
   });
 })();

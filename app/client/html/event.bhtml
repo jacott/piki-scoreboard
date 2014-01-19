@@ -1,0 +1,67 @@
+<template name="Event">
+  <section id="Event">
+    <div>
+      <section class="body">
+      </section>
+    </div>
+  </section>
+  <template name="Index">
+    <div>
+      <nav>
+        {{pageLink name="addEvent" value="Add new event" template="Event.Add"}}
+      </nav>
+      <section class="events">
+        <h1>Events</h1>
+        <table class="select">
+          <thead>
+            <tr>
+              <th>Name</th><th>Start Date</th>
+            </tr>
+          </thead>
+          {{events}}
+          <template name="Row">
+            <tr>
+              <td>{{name}}</td><td>{{date}}</td>
+            </tr>
+          </template>
+        </table>
+      </section>
+    </div>
+  </template>
+  <template name="Add">
+    <form id="AddEvent">
+      <h1>Add new event</h1>
+      {{> /Event.Form}}
+      <fieldset class="actions">
+        <button type="submit" name="create">Create</button>
+        <button type="button" name="cancel">Cancel</button>
+      </fieldset>
+    </form>
+  </template>
+
+  <template name="Edit">
+    <form id="EditEvent">
+      <h1>Edit {{name}}</h1>
+      {{> /Event.Form}}
+      <fieldset class="actions">
+        <button type="submit" name="update">Save</button>
+        <button type="button" name="delete">Delete</button>
+        <button type="button" name="cancel">Cancel</button>
+      </fieldset>
+    </form>
+  </template>
+
+  <template name="ConfirmDelete">
+    <div>
+      <h1>Delete {{name}}?</h1>
+      <span>Are you sure you want to delete this event?</span>
+    </div>
+  </template>
+
+  <template name="Form">
+    <fieldset class="fields">
+      {{labelField "name"}}
+      {{labelField "date"}}
+    </fieldset>
+  </template>
+</template>

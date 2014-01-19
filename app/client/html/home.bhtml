@@ -4,6 +4,7 @@
       <nav class="menu">
         {{pageLink value="Clubs" template="Club"}}
         {{pageLink value="Climbers" template="Climber"}}
+        {{pageLink value="Events" template="Event"}}
       </nav>
       <section class="body">
       </section>
