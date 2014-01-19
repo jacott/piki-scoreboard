@@ -78,6 +78,12 @@
         .addField('dateOfBirth', '2000/01/01');
     },
 
+    Event: function (options) {
+      return new Builder('Event', options).genName()
+        .addRef('org')
+        .addField('date', '20014/04/01');
+    },
+
     User: function (options) {
       var username = 'username' in options || generateName('user');
 

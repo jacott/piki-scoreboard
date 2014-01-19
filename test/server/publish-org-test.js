@@ -10,6 +10,7 @@
       v.otherUser = TH.Factory.createUser();
       v.club = TH.Factory.createClub();
       v.climber = TH.Factory.createClimber();
+      v.event = TH.Factory.createEvent();
       v.sub = TH.subStub(v.user._id);
       v.pub = TH.getPublish('Org');
       v.tsub = TH.subStub(v.user._id, v.sub);
@@ -41,6 +42,7 @@
         var spyUsers = test.spy(AppModel.User, 'observeOrg_id');
         var spyClubs = test.spy(AppModel.Club, 'observeOrg_id');
         var spyClimbers = test.spy(AppModel.Climber, 'observeOrg_id');
+        var spyEvents = test.spy(AppModel.Event, 'observeOrg_id');
         test.spy(global, 'check');
 
         v.pub.call(v.tsub, v.org.shortName);
@@ -48,6 +50,9 @@
         assert.calledWith(check, v.org.shortName, String);
 
         assert.calledWith(spyUsers, v.org._id);
+        assert.calledWith(spyClubs, v.org._id);
+        assert.calledWith(spyClimbers, v.org._id);
+        assert.calledWith(spyEvents, v.org._id);
         var usersStopHandle = spyUsers.returnValues[0];
         assert.called(v.sess.addObserver, 'OrgUsers', usersStopHandle);
 
@@ -60,6 +65,7 @@
 
         assert.calledWith(v.sub.aSpy, 'Club', v.club._id);
         assert.calledWith(v.sub.aSpy, 'Climber', v.climber._id);
+        assert.calledWith(v.sub.aSpy, 'Event', v.event._id);
 
         test.spy(usersStopHandle, 'stop');
 
@@ -72,6 +78,7 @@
 
         assert.calledWith(v.sub.rSpy, 'Club', v.club._id);
         assert.calledWith(v.sub.rSpy, 'Climber', v.climber._id);
+        assert.calledWith(v.sub.rSpy, 'Event', v.event._id);
       },
     },
   });
