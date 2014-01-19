@@ -1,0 +1,2 @@
+_BartTest_form_form_test = function(Bart) {Bart.newTemplate({"name":"Test.Form","nested":[{"name":"TestSelect","nodes":[{"name":"div","attrs":[["=","id","TestSelect"]],"children":[" ",["","labelField","\"foo",["=","id","\"fooId"],["=","selectList","fooList"]]," "]}]}],"nodes":[{"name":"div","attrs":[["=","id","TestForm"]]}]});
+};

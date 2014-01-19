@@ -70,6 +70,10 @@
         .addField('shortName', 'shortName' in options || generateName('SN').replace(/\s+/g, ''));
     },
 
+    Climber: function (options) {
+      return defines.User(App.extend(options, {role: 'c'}));
+    },
+
     User: function (options) {
       var username = 'username' in options || generateName('user');
 

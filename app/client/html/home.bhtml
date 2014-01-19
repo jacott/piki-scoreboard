@@ -2,7 +2,8 @@
   <section id="Home" class="body">
     <div>
       <nav class="menu">
-        {{pageLink name="clubs" value="Clubs" template="Club"}}
+        {{pageLink value="Clubs" template="Club"}}
+        {{pageLink value="Climbers" template="Climber"}}
       </nav>
       <section class="body">
       </section>

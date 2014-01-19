@@ -8,4 +8,9 @@
   <template name="TextInput">
     <input name="{{name}}" value="{{value}}" {{htmlOptions}}>
   </template>
+
+  <template name="Select">
+    <select name="{{name}}" {{htmlOptions}}>
+    </select>
+  </template>
 </template>

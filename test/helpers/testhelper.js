@@ -108,7 +108,7 @@ TH = (function () {
         };
         assert.dom.apply(assert, args);
       } else {
-        node.val(value);
+        node.value = value;
         this.trigger(node, 'change');
       }
     },

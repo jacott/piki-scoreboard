@@ -1,8 +1,21 @@
+var $ = Bart.current;
 var Tpl = Bart.Form;
+
+var IGNORE = {selectList: true, value: true};
 
 var DEFAULT_HELPERS = {
   value: function () {
     return this.doc[this.name];
+  },
+
+  htmlOptions: function () {
+    var elm = $.element;
+    var options = this.options;
+
+    for(var attr in options) {
+      if (! (attr in IGNORE))
+        elm.setAttribute(attr, options[attr]);
+    }
   },
 };
 
@@ -98,13 +111,34 @@ Tpl.LabelField.$helpers({
 });
 
 helpers('TextInput', {});
+helpers('Select', {});
+
+Tpl.Select.$extend({
+  $created: function (ctx, elm) {
+    var data = ctx.data;
+    var value = data.doc[data.name];
+    data.options.selectList.forEach(function (row) {
+      var option = document.createElement('option');
+      option.value = row[0];
+      option.textContent = row[1];
+      if (row[0] == value)
+        option.setAttribute('selected', 'selected');
+      elm.appendChild(option);
+    });
+  },
+});
 
 function helpers(name, funcs) {
   Tpl[name].$helpers(App.reverseExtend(funcs, DEFAULT_HELPERS));
 }
 
 function field(doc, name, options) {
-  switch(options ? options.type : 'text') {
+  options = options || {};
+  if ('selectList' in options) {
+    return Tpl.Select.$autoRender({name: name, doc: doc, options: options});
+  }
+
+  switch(options.type || 'text') {
   case 'text':
     return Tpl.TextInput.$autoRender({name: name, doc: doc, options: options});
   default:

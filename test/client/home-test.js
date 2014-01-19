@@ -22,5 +22,12 @@
 
       assert.dom('#Club');
     },
+
+    "test climbers link": function () {
+      AppRoute.gotoPage(Bart.Home);
+      TH.click('button.link', 'Climbers');
+
+      assert.dom('#Climber');
+    },
   });
 })();
