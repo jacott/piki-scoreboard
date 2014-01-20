@@ -8,7 +8,7 @@
   <template name="Index">
     <div>
       <nav>
-        {{pageLink name="addEvent" value="Add new event" template="Event.Add"}}
+        {{pageLink name="add" value="Add new event" template="Event.Add"}}
       </nav>
       <section class="events">
         <h1>Events</h1>
@@ -27,6 +27,30 @@
         </table>
       </section>
     </div>
+  </template>
+  <template name="Show">
+    <section id="ShowEvent">
+      <nav class="menu">
+        {{pageLink name="register" value="Registrations" template="Event.Register" append=_id}}
+        {{pageLink name="edit" value="Edit" template="Event.Edit" append=_id}}
+      </nav>
+      <div>
+        <h1>{{name}}</h1>
+      </div>
+    </section>
+  </template>
+  <template name="Register">
+    <Section id="Register">
+      <form>
+      </form>
+      <div id="registrations">
+        <h1>{{name}}</h1>
+        <form>
+          <fieldset>
+          </fieldset>
+        </form>
+      </div>
+    </Section>
   </template>
   <template name="Add">
     <form id="AddEvent">

@@ -31,7 +31,7 @@
             });
           });
         });
-        assert.dom('nav [name=addEvent]', 'Add new event');
+        assert.dom('nav [name=add]', 'Add new event');
       });
     },
 
@@ -39,7 +39,7 @@
       AppRoute.gotoPage(Bart.Event.Index);
 
       assert.dom('#Event', function () {
-        TH.click('[name=addEvent]');
+        TH.click('[name=add]');
         assert.dom('#AddEvent', function () {
           TH.input('[name=name]', 'National Cup 1 - Auckland');
           TH.input('[name=date]', '2014/03/14');
@@ -50,10 +50,10 @@
 
       assert(AppModel.Event.exists({org_id: v.org._id, name: 'National Cup 1 - Auckland', date: '2014/03/14'}));
 
-      assert.dom('#Event [name=addEvent]');
+      assert.dom('#Event [name=add]');
     },
 
-    "edit": {
+    "select": {
       setUp: function () {
         v.event = TH.Factory.createEvent();
         v.event2 = TH.Factory.createEvent();
@@ -63,7 +63,29 @@
         TH.click('td', v.event.name);
       },
 
+      "test rendering": function () {
+        assert.dom('#Event #ShowEvent', function () {
+          assert.dom('.link[name=register]');
+          assert.dom('.link[name=edit]');
+          assert.dom('h1', v.event.name);
+        });
+      },
+
+      "//test registration rendering": function () {
+        TH.click('[name=register]');
+
+        assert.dom('#Event #Register #registrations', function () {
+          assert.dom('h1', v.event.name);
+          assert.dom('fieldset', function () {
+            assert.dom('label .name', {text: 'Name', parent: function () {
+              assert.dom('[name=name]');
+            }});
+          });
+        });
+      },
+
       "test change name": function () {
+        TH.click('[name=edit]');
         assert.dom('#EditEvent', function () {
           assert.dom('h1', 'Edit ' + v.event.name);
           TH.input('[name=name]', {value: v.event.name}, 'new name');
@@ -74,6 +96,7 @@
       },
 
       "test delete": function () {
+        TH.click('[name=edit]');
         assert.dom('#EditEvent', function () {
           TH.click('[name=delete]');
         });

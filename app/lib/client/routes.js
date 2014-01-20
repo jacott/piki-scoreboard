@@ -134,7 +134,7 @@ App.require('makeSubject', function (makeSubject) {
         if (location == null) {
           location = document.location;
         } else if (! ('pathname' in location)) {
-          return this.gotoPage(location);
+          return this.gotoPage.apply(this, arguments);
         }
         var page = location.pathname;
       }

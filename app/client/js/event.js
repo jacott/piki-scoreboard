@@ -30,7 +30,7 @@ Index.$events({
     event.$actioned = true;
 
     var data = $.data(this);
-    AppRoute.gotoPage(Tpl.Edit, {append: data._id});
+    AppRoute.gotoPage(Tpl.Show, {append: data._id});
   },
 });
 
@@ -49,7 +49,7 @@ base.addTemplate(Tpl.Add, {
   }
 });
 
-base.addTemplate(Tpl.Edit, {
+var selectedEvent = {
   focus: true,
   data: function (page, location) {
     var m = /([^/]*)$/.exec(location.pathname);
@@ -59,7 +59,13 @@ base.addTemplate(Tpl.Edit, {
 
     return doc;
   }
+};
+
+['Show', 'Edit', 'Register'].forEach(function (name) {
+  base.addTemplate(Tpl[name], selectedEvent);
 });
+
+selectedEvent = null;
 
 Tpl.Add.$events({
   'click [name=cancel]': cancel,

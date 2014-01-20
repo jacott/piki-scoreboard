@@ -24,7 +24,12 @@ Tpl.$helpers({
 Tpl.$events({
   'click': function (event) {
     event.$actioned = true;
-    AppRoute.gotoPath(Bart.getCtx(this).data.link);
+    var data = $.data();
+
+    if (data.append) {
+      var location = {append: data.append};
+    }
+    AppRoute.gotoPath(data.link, location);
   },
 });
 

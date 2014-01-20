@@ -10,7 +10,7 @@
       delete Bart.Foo;
     },
 
-    "test pageLink": function () {
+    "test rendering": function () {
       test.stub(AppRoute, 'gotoPath');
       document.body.appendChild(Bart._helpers.pageLink({id: "foo", name: 'baz', value: "foo bar", link: "/foo/bar"}));
 
@@ -23,7 +23,18 @@
       assert.calledWith(AppRoute.gotoPath, '/foo/bar');
     },
 
-    "test template pageLink": function () {
+    "test append": function () {
+      Bart.newTemplate({name: "Foo.Bar"});
+
+      test.stub(AppRoute, 'gotoPage');
+      document.body.appendChild(Bart._helpers.pageLink({id: "foo", value: "foo bar", template: "Foo.Bar", append: "1234"}));
+
+      TH.click('#foo');
+
+      assert.calledWith(AppRoute.gotoPage, Bart.Foo.Bar, {append: "1234"});
+    },
+
+    "test template": function () {
       Bart.newTemplate({name: "Foo.Bar"});
 
       test.stub(AppRoute, 'gotoPage');
