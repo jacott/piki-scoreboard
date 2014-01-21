@@ -18,19 +18,21 @@ var DOCUMENT_FRAGMENT_NODE = document.DOCUMENT_FRAGMENT_NODE;
 
 var bartEvent = null;
 
-var current = {
-  data: function (elm) {
-    if (elm)
-      return Bart.getCtx(elm).data;
-
-    return this.ctx.data;
-  },
-};
-
 var currentCtx, currentElement;
 
 Bart = {
-  current: current,
+  current: {
+    data: function (elm) {
+      if (elm)
+        return Bart.getCtx(elm).data;
+
+      return currentCtx.data;
+    },
+
+    get template() {return currentCtx.template},
+    get ctx() {return currentCtx},
+    get element() {return currentElement},
+  },
 
   INPUT_SELECTOR: 'input,textarea',
 
@@ -336,7 +338,7 @@ BartCtx.prototype = {
   updateAllTags: function (data) {
     var prevCtx = currentCtx;
     var prevElm = currentElement;
-    current.ctx = currentCtx = this;
+    currentCtx = this;
     if (data === undefined)
       data = this.data;
     else
@@ -345,7 +347,7 @@ BartCtx.prototype = {
       var evals = this.attrEvals;
       for(var i=0; i < evals.length; ++i) {
         var node = evals[i];
-        current.element = currentElement = node[0];
+        currentElement = node[0];
         var value = (getValue(data, node[2], node[3])||'').toString();
         if (node[1] && node[0].getAttribute(node[1]) !== value)
           node[0].setAttribute(node[1], value);
@@ -356,14 +358,14 @@ BartCtx.prototype = {
         updateNode(evals[i], data);
       }
     } finally {
-      current.element = currentElement = prevElm;
-      current.ctx = currentCtx = prevCtx;
+      currentElement = prevElm;
+      currentCtx = prevCtx;
     }
   },
 };
 
 function updateNode (node, data) {
-  current.element = currentElement = node[0];
+  currentElement = node[0];
 
   var value = getValue(data, node[1], node[2]);
 
@@ -513,16 +515,18 @@ BartTemplate.prototype = {
   $autoRender: function (data) {
     var tpl = this;
     var elm = tpl.$render(data);
-    tpl.$attachEvents(elm);
-    Bart.getCtx(elm).onDestroy(function () {
-      tpl.$detachEvents(elm);
-    });
+    if (tpl._events.length > 0) {
+      tpl.$attachEvents(elm);
+      Bart.getCtx(elm).onDestroy(function () {
+        tpl.$detachEvents(elm);
+      });
+    }
     return elm;
   },
 
   $render: function (data) {
     var parentCtx = currentCtx;
-    current.ctx = currentCtx = new BartCtx(this, parentCtx, data);
+    currentCtx = new BartCtx(this, parentCtx, data);
     try {
       var frag = document.createDocumentFragment();
       this.nodes && addNodes.call(this, frag, this.nodes);
@@ -541,7 +545,7 @@ BartTemplate.prototype = {
       currentCtx.data === undefined || currentCtx.updateAllTags(data);
       return frag;
     } finally {
-      current.ctx = currentCtx = parentCtx;
+      currentCtx = parentCtx;
     }
   },
 
@@ -608,7 +612,7 @@ function nativeOn(parent, eventType, selector, func) {
 }
 
 function onEvent(event) {
-  current.ctx = currentCtx = event.currentTarget._bart;
+  currentCtx = event.currentTarget._bart;
   var eventTypes = currentCtx._events[event.type];
 
   var later = {};
@@ -653,7 +657,7 @@ function onEvent(event) {
         throw ex;
     }
   } finally {
-    current.ctx = currentCtx = null;
+    currentCtx = null;
   }
 }
 
