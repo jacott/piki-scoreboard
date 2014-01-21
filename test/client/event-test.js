@@ -5,7 +5,8 @@
       v = {
         org: TH.Factory.createOrg(),
       };
-      App.orgId = v.org._id;
+      App.Ready.isReady = true;
+      test.stub(App, 'subscribe').yields();
     },
 
     tearDown: function () {
@@ -17,7 +18,7 @@
         options.date = "2014/01/0"+(8-index);
       });
 
-      AppRoute.gotoPage(Bart.Event.Index);
+      AppRoute.gotoPage(Bart.Event.Index, {orgSN: v.org.shortName});
 
       assert.dom('#Event', function () {
         assert.dom('.events', function () {
@@ -36,7 +37,7 @@
     },
 
     "test adding new event": function () {
-      AppRoute.gotoPage(Bart.Event.Index);
+      AppRoute.gotoPage(Bart.Event.Index, {orgSN: v.org.shortName});
 
       assert.dom('#Event', function () {
         TH.click('[name=add]');
@@ -58,7 +59,7 @@
         v.event = TH.Factory.createEvent();
         v.event2 = TH.Factory.createEvent();
 
-        AppRoute.gotoPage(Bart.Event.Index);
+        AppRoute.gotoPage(Bart.Event.Index, {orgSN: v.org.shortName});
 
         TH.click('td', v.event.name);
       },

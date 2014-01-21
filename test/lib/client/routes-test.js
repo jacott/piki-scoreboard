@@ -13,7 +13,6 @@
         onExit: test.stub(),
       };
       AppRoute.root = new AppRoute();
-      AppRoute._onGotoPath = null;
       test.stub(AppRoute.history, 'pushState');
       test.stub(AppRoute.history, 'replaceState');
       test.stub(App, 'userId').returns("123");
@@ -45,6 +44,94 @@
       });
     },
 
+    "with routeVar": {
+      setUp: function () {
+        v.Baz = {
+          name: 'Baz',
+          path: 'baz',
+          onBaseEntry: test.stub(),
+          onBaseExit: test.stub(),
+        };
+
+        v.RootBar = {
+          name: 'RootBar',
+          $autoRender: function () {
+            return Bart.html('<div id="RootBar">x</div>');
+          },
+          onEntry: test.stub(),
+          onExit: test.stub(),
+        };
+
+        AppRoute.root.addBase(v.Baz, 'bazId');
+        v.Baz.route.addTemplate(v.RootBar);
+      },
+
+
+      "test default root": function () {
+        AppRoute.root.routeVar = 'fooId';
+        test.stub(AppRoute, 'gotoPage');
+        AppRoute.root.defaultPage = v.RootBar;
+
+        AppRoute.gotoPath('/xyz');
+
+        assert.calledWith(AppRoute.gotoPage, v.RootBar, {fooId: "xyz", pathname: "/xyz"});
+      },
+
+      "test root pageRoute": function () {
+        AppRoute.root.routeVar = 'fooId';
+        AppRoute.root.onBaseEntry = test.stub();
+
+        // test no pageRoute set
+        AppRoute.gotoPath('/baz/root-bar');
+        assert.calledWith(AppRoute.root.onBaseEntry, v.RootBar, {pathname: "/baz/root-bar"});
+
+
+        // test baz routeVar changed (but not root routeVar)
+        AppRoute.root.onBaseEntry.reset();
+        v.Baz.onBaseEntry.reset();
+
+        AppRoute.gotoPath('/baz/an-id/root-bar');
+        refute.called(AppRoute.root.onBaseEntry);
+        assert.calledWith(v.Baz.onBaseExit, v.RootBar, {bazId: "an-id", pathname: "/baz/an-id/root-bar"});
+        assert.calledWith(v.Baz.onBaseEntry, v.RootBar, {bazId: "an-id", pathname: "/baz/an-id/root-bar"});
+
+        // test root routeVar changed
+        AppRoute.root.onBaseEntry.reset();
+
+        AppRoute.gotoPath('/xyz/baz/an-id/root-bar');
+        assert.calledWith(AppRoute.root.onBaseEntry, v.RootBar, {bazId: "an-id", fooId: "xyz", pathname: "/xyz/baz/an-id/root-bar"});
+
+        // test no pageRoute passed to gotoPage
+        AppRoute.root.onBaseEntry.reset();
+        v.Baz.onBaseEntry.reset();
+
+        AppRoute.gotoPage(v.RootBar);
+        refute.called(AppRoute.root.onBaseEntry);
+        refute.called(v.Baz.onBaseEntry);
+        assert.calledWith(v.RootBar.onEntry, v.RootBar, {bazId: "an-id", fooId: "xyz", pathname: "/xyz/baz/an-id/root-bar"});
+      },
+
+      "test gotoPath": function () {
+        test.stub(AppRoute, 'gotoPage');
+
+        AppRoute.gotoPath('/baz/an-id/root-bar');
+        assert.calledWith(AppRoute.gotoPage, v.RootBar, {bazId: "an-id", pathname: '/baz/an-id/root-bar'});
+
+        AppRoute.gotoPath('/baz/diff-id/root-bar');
+        assert.calledWith(AppRoute.gotoPage, v.RootBar, {bazId: "diff-id", pathname: '/baz/diff-id/root-bar'});
+      },
+
+      "test gotoPage": function () {
+        AppRoute.gotoPage(v.RootBar, {bazId: "an-id", append: 'one/two'});
+        assert.calledWith(AppRoute.history.pushState, null, 'Piki', '/baz/an-id/root-bar/one/two');
+
+        AppRoute.gotoPage(v.RootBar, {bazId: "diff-id"});
+        assert.calledWith(AppRoute.history.pushState, null, 'Piki', '/baz/diff-id/root-bar');
+
+        assert.calledTwice(v.Baz.onBaseEntry);
+      },
+    },
+
     "test append": function () {
       var RootBar = {
         name: 'RootBar',
@@ -54,9 +141,9 @@
       };
 
       AppRoute.root.addTemplate(RootBar);
-      AppRoute.gotoPage(RootBar, {append: "an-id"});
+      AppRoute.gotoPage(RootBar, {append: "ap/this"});
 
-      assert.calledWith(AppRoute.history.pushState, null, 'Piki', '/root-bar/an-id');
+      assert.calledWith(AppRoute.history.pushState, null, 'Piki', '/root-bar/ap/this');
     },
 
     "test abort page change": function () {
@@ -123,21 +210,6 @@
 
     "test root": function () {
       assert.same(v.root.constructor, AppRoute);
-    },
-
-    "test onGotoPath": function () {
-      AppRoute.root.addTemplate(v.FooBar);
-      AppRoute.onGotoPath(function (path) {
-        v.path = path;
-        return '/foo-bar';
-      });
-
-      AppRoute.gotoPath('/testing');
-
-      assert.same(v.path, '/testing');
-
-
-      assert.calledWith(v.FooBar.onEntry, v.FooBar, {pathname: '/testing'});
     },
 
     "test addBase": function () {
@@ -274,9 +346,11 @@
     "test default": function () {
       AppRoute.root.defaultPage = v.FooBar;
 
-      AppRoute.gotoPath(v.loc = {pathname: '/anything', search: '?abc=123&def=456'});
+      AppRoute.gotoPath({pathname: '/anything', search: '?abc=123&def=456'});
 
-      assert.calledWith(v.FooBar.onEntry, v.FooBar, v.loc);
+      assert.calledWith(v.FooBar.onEntry, v.FooBar, {pathname: '', search: '?abc=123&def=456'});
+
+      AppRoute.gotoPage();
     },
   });
 })();

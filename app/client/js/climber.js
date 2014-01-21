@@ -34,7 +34,7 @@ Index.$events({
     event.$actioned = true;
 
     var data = $.data(this);
-    AppRoute.gotoPage(Tpl.Edit, {append: data._id});
+    AppRoute.gotoPage(Tpl.Edit, {climberId: data._id});
   },
 });
 
@@ -74,8 +74,8 @@ Tpl.Edit.$events({
   'click [type=submit]': Bart.Form.submitFunc('EditClimber', Tpl),
 });
 
-var base = AppRoute.root.addBase(Tpl);
-base.addTemplate(Index, {defaultPage: true});
+var base = AppRoute.root.addBase(Tpl, 'climberId');
+base.addTemplate(Index, {defaultPage: true, path: ''});
 base.addTemplate(Tpl.Add, {
   focus: true,
   data: function () {
@@ -85,11 +85,10 @@ base.addTemplate(Tpl.Add, {
 
 base.addTemplate(Tpl.Edit, {
   focus: true,
-  data: function (page, location) {
-    var m = /([^/]*)$/.exec(location.pathname);
-    var doc = AppModel.Climber.findOne(m[1]);
+  data: function (page, pageRoute) {
+    var doc = AppModel.Climber.findOne(pageRoute.climberId);
 
-    if (!doc) AppRoute.abortPage(Tpl);
+    if (!doc) AppRoute.abortPage();
 
     return doc;
   }

@@ -27,16 +27,16 @@
     'test reverseExtend': function () {
       var item = 5,
           sub={a: 1, b: 2},
-          sup = {b: 3, get c() {return item;}};
+          sup = {d: 'd', b: 3, get c() {return item;}};
 
-      App.reverseExtend(sub,sup);
+      App.reverseExtend(sub,sup, {d: 1});
 
       item = 6;
 
       assert.same(sub.a,1);
       assert.same(sub.b,2);
       assert.same(sub.c,6);
-
+      refute('d' in sub);
     },
 
     "test withDateNow": function () {

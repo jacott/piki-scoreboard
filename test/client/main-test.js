@@ -53,23 +53,24 @@
       v.org = TH.Factory.createOrg({shortName: 'FOO'});
       v.subStub = test.stub(App, 'subscribe').withArgs('Org').returns({stop: v.stopStub = test.stub()});
 
-      assert.same(AppRoute._onGotoPath('/FOO/bar'), 'bar');
 
+      assert.same(AppRoute.root.routeVar, 'orgSN');
+      AppRoute.root.onBaseEntry(null, {orgSN: 'FOO'});
+
+      assert.called(v.subStub);
       v.subStub.yield();
 
       assert.same(App.orgId, v.org._id);
       assert.equals(App.org().attributes, v.org.attributes);
-      assert.same(AppRoute.pathPrefix, '/FOO');
 
       assert.dom('#OrgHomeLink', v.org.name);
       assert.className(document.body, 'inOrg');
 
-      assert.same(AppRoute._onGotoPath('/xxFOO/bar'), '/xxFOO/bar');
+      AppRoute.root.onBaseEntry(null, {});
 
       assert.called(v.stopStub);
 
       assert.same(App.orgId, null);
-      assert.same(AppRoute.pathPrefix, null);
       assert.dom('#OrgHomeLink', "Choose Organization");
       refute.className(document.body, 'inOrg');
 
@@ -101,7 +102,7 @@
       var userId = test.stub(App, 'userId').returns(null);
 
 
-      AppRoute._onGotoPath('/FOO');
+      AppRoute.root.onBaseEntry(null, {orgSN: 'FOO'});
       orgSub.reset();
 
       App._startup();

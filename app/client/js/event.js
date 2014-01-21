@@ -1,15 +1,16 @@
 var $ = Bart.current;
 var Tpl = Bart.Event;
 var Index = Tpl.Index;
-
-var elm;
+var eventId, elm;
 
 Tpl.$extend({
-  onBaseEntry: function () {
+  onBaseEntry: function (page, pageRoute) {
+    eventId = pageRoute.eventId;
     document.body.appendChild(Tpl.$autoRender({}));
   },
 
-  onBaseExit: function () {
+  onBaseExit: function (page, pageRoute) {
+    eventId = null;
     Bart.removeId('Event');
   },
 });
@@ -34,11 +35,12 @@ Index.$events({
     event.$actioned = true;
 
     var data = $.data(this);
-    AppRoute.gotoPage(Tpl.Show, {append: data._id});
+    AppRoute.gotoPage(Tpl.Show, {eventId: data._id});
   },
 });
 
-var base = AppRoute.root.addBase(Tpl);
+var base = AppRoute.root.addBase(Tpl, 'eventId');
+
 base.addTemplate(Index, {defaultPage: true});
 base.addTemplate(Tpl.Add, {
   focus: true,
@@ -49,11 +51,10 @@ base.addTemplate(Tpl.Add, {
 
 var selectedEvent = {
   focus: true,
-  data: function (page, location) {
-    var m = /([^/]*)$/.exec(location.pathname);
-    var doc = AppModel.Event.findOne(m[1]);
+  data: function (page, pageRoute) {
+    var doc = AppModel.Event.findOne(eventId);
 
-    if (!doc) AppRoute.abortPage(Tpl);
+    if (!doc) AppRoute.abortPage();
 
     return doc;
   }

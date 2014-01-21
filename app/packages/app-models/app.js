@@ -20,8 +20,9 @@ App = {
     return obj;
   },
 
-  reverseExtend: function (obj,properties) {
+  reverseExtend: function (obj, properties, exclude) {
     for(var prop in properties) {
+      if (exclude && prop in exclude) continue;
       if (! (prop in obj))
         Object.defineProperty(obj,prop,Object.getOwnPropertyDescriptor(properties,prop));
     }

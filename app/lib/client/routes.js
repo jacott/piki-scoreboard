@@ -1,9 +1,10 @@
 App.require('makeSubject', function (makeSubject) {
-  AppRoute = function (path, template, parent) {
+  AppRoute = function (path, template, parent, routeVar) {
     this.path = path || '';
     this.template = template;
     this.parent = parent;
     this.routes = {};
+    this.routeVar = routeVar;
   };
 
   AppRoute.history = window.history;
@@ -30,12 +31,12 @@ App.require('makeSubject', function (makeSubject) {
         template.onExit = onExitFunc(template);
     },
 
-    addBase: function (template) {
+    addBase: function (template, routeVar) {
       if ('route' in template) throw new Error(template.name + ' is already a route base');
       var path = templatePath(template);
       if (path in this.routes) throw new Error('Path already exists! ', path + " for template " + this.path);
 
-      return template.route = this.routes[path] = new AppRoute(path, template, this);
+      return template.route = this.routes[path] = new AppRoute(path, template, this, routeVar);
     },
 
     onBaseExit: function(page, location) {
@@ -51,8 +52,10 @@ App.require('makeSubject', function (makeSubject) {
     },
   };
 
-  var current = null;
+  var currentPage = null;
+  var currentPageRoute = {};
   var pageState = 'pushState';
+  var excludes = {append: 1, href: 1, hash: 1};
   App.extend(AppRoute, {
     root: new AppRoute(),
 
@@ -63,52 +66,51 @@ App.require('makeSubject', function (makeSubject) {
       throw error;
     },
 
-    onGotoPath: function (func) {
-      this._onGotoPath = func;
-    },
-
     pathname: pathname,
 
-    gotoPage: function (page, location) {
+    gotoPage: function (page, pageRoute) {
       if (page && ! ('onEntry' in page)) {
         if ('route' in page)
           page = page.route.defaultPage;
         else
           page = page.defaultPage;
       }
-      if (! location)
-        location = {pathname: pathname(page)};
-      else if (location.append) {
-        location = {pathname: pathname(page) + "/" + location.append};
-      }
+
+      pageRoute = App.reverseExtend(pageRoute || {},  currentPageRoute, excludes);
+      pageRoute.pathname = pathname(page, pageRoute || {});
 
       try {
-        if (current) {
-          current.onExit && current.onExit(page, location);
+        if (currentPage) {
+          currentPage.onExit && currentPage.onExit(page, pageRoute);
 
-          exitEntry(toPath(current.route), toPath(page && page.route), page, location);
+          exitEntry(toPath(currentPage.$autoRender ? currentPage.route : currentPage), currentPageRoute, toPath(page && page.route), pageRoute, page);
         } else {
-          exitEntry([], toPath(page && page.route), page, location);
+          exitEntry([], {}, toPath(page && page.route), pageRoute, page);
         }
 
         if (! page) {
-          current = null;
+          currentPage = null;
+          pageRoute = {};
         } else {
           page = page.Index || page;
-          var href = page.onEntry(page, location) || location.href || location.pathname;
+          var href = page.onEntry(page, pageRoute) || pageRoute.pathname;
           var  title = document.title = page.title || AppRoute.title;
-          if (pageState && current !== page && ! ('noPageHistory' in page)) {
+          if (pageState && currentPageRoute.pathname !== pageRoute.pathname && ! ('noPageHistory' in page)) {
             AppRoute.history[pageState](null, title, href);
           }
-          current = page;
+          currentPage = page;
         }
       }
       catch(ex) {
-        if (ex.abortPage) return this.gotoPath(ex.location);
+        if (ex.abortPage) {
+          ex.location && this.gotoPath(ex.location);
+          return;
+        }
         throw ex;
       }
       finally {
         pageState = 'pushState';
+        currentPageRoute = pageRoute;
       }
     },
 
@@ -126,30 +128,45 @@ App.require('makeSubject', function (makeSubject) {
       return this.gotoPath(location);
     },
 
-    gotoPath: function (location) {
-      if (typeof location === 'string') {
-        var page = location;
-        location = {pathname: location};
+    gotoPath: function (page) {
+      var pageRoute = {};
+      if (typeof page === 'string') {
+        pageRoute.pathname = page;
       } else {
-        if (location == null) {
-          location = document.location;
-        } else if (! ('pathname' in location)) {
+        if (page == null)
+          page = document.location;
+        else if (! ('pathname' in page))
           return this.gotoPage.apply(this, arguments);
-        }
-        var page = location.pathname;
-      }
 
-      if (this._onGotoPath)
-        page = this._onGotoPath(page);
+        if ('search' in page)
+          pageRoute.search = page.search;
+
+        pageRoute.pathname = page = page.pathname;
+      }
 
       var parts = page.split('/');
       var root = this.root;
-      var page = root;
+      page = root;
+
       var newPage = root.defaultPage;
       for(var i = 0; i < parts.length; ++i) {
         var part = parts[i];
         if (! part) continue;
-        newPage = (('routes' in page) && page.routes[part]) || page.defaultPage;
+        newPage = (('routes' in page) && page.routes[part]);
+        if (! newPage) {
+          newPage = page.defaultPage;
+
+          if (page.routeVar) {
+            if (page.routeVar in pageRoute) {
+              pageRoute.append = parts.slice(i).join('/');
+              break;
+            }
+            pageRoute[page.routeVar] = part;
+            continue;
+          }
+
+        }
+
         if (! newPage) {
           break;
         }
@@ -162,42 +179,63 @@ App.require('makeSubject', function (makeSubject) {
       if (page === root)
         throw new Error('Page not found');
 
-      this.gotoPage(page, location);
+      this.gotoPage(page, pageRoute);
     },
   });
+
+  function exitEntry(exit, oldSymbols, entry, pageRoute, page) {
+    var entryLen = entry.length;
+    var exitLen = exit.length;
+    var diff = exitLen - entryLen;
+    var index, sym, item;
+
+    for(--exitLen; exitLen >= 0; --exitLen) {
+      item = exit[exitLen];
+      if (item !== entry[exitLen - diff] ||
+          ((sym = item.routeVar) && oldSymbols[sym] !== pageRoute[sym]))
+        break;
+    }
+
+    for(index = 0;index < diff; ++index) {
+      exit[index].onBaseExit(page, pageRoute);
+    }
+
+    for(;index <= exitLen; ++index) {
+      exit[index].onBaseExit(page, pageRoute);
+    }
+
+    currentPage = exit[index];
+
+    for(index = index - diff - 1 ; index >= 0; --index) {
+      item = entry[index];
+      item.onBaseEntry(page, pageRoute);
+      currentPage = item;
+    }
+  }
 });
 
-function pathname(template) {
+function pathname(template, pageRoute) {
   if (template && ('route' in template)) {
-    return routePath(template.route)+'/'+template.subPath;
-  }
+    var path = routePath(template.route, pageRoute)+'/'+template.subPath;
+  } else
+    var path = '';
 
-  return '';
+  if ('append' in pageRoute)
+    return path + '/' + pageRoute.append;
+
+  return path;
 }
 
-function routePath(route) {
-  if (! route || ! route.parent) return AppRoute.pathPrefix || '';
-  return routePath(route.parent)+'/'+route.path;
-}
+function routePath(route, pageRoute) {
+  if (! route) return '';
 
-function exitEntry(exit, entry, page, location) {
-  var entryLen = entry.length;
-  var diff = exit.length - entryLen;
-  var index = 0;
+  var path = route.path;
+  var sym = route.routeVar;
+  if (sym && (sym in pageRoute))
+    path += '/' + pageRoute[sym];
 
-  for(;index < diff; ++index) {
-    exit[index].onBaseExit(page, location);
-  }
-
-  for(;index - diff < entryLen; ++index) {
-    var exitItem = exit[index];
-    if (exitItem === entry[index - diff]) break;
-    exitItem.onBaseExit(page, location);
-  }
-
-  for(index = index - diff - 1 ; index >= 0; --index) {
-    entry[index].onBaseEntry(page, location);
-  }
+  if (! route.parent) return path;
+  return routePath(route.parent, pageRoute)+'/'+path;
 }
 
 function toPath(route) {

@@ -8,6 +8,7 @@ App.org = function () {
 document.head.appendChild(Tpl.Head.$render({}));
 
 App._startup = function () {
+  pathname = document.location;
   var handle = App.Ready.onReady(whenReady);
   document.body.insertBefore(Tpl.Header.$render({}), document.body.firstChild);
 
@@ -15,7 +16,7 @@ App._startup = function () {
     handle && handle.stop();
     handle = null;
 
-    AppRoute.gotoPath(document.location);
+    AppRoute.gotoPath(pathname || document.location);
     return false;
   }
 
@@ -33,18 +34,21 @@ App._startup = function () {
 
 Meteor.startup(App._startup);
 
-AppRoute.onGotoPath(function (path) {
-  var m = /^\/([A-Z][A-Z0-9]{1,3})(?:\/(.*)|)$/.exec(path);
-
-  if (m) {
-    path = m[2] || '';
-    if (m[1] === orgShortName) return path;
-    subscribeOrg(m[1]);
-  } else {
-    subscribeOrg(null);
+AppRoute.root.routeVar = 'orgSN';
+AppRoute.root.onBaseEntry = function (page, pageRoute) {
+  if (pageRoute.orgSN !== orgShortName) {
+    subscribeOrg(pageRoute.orgSN);
+    if (pageRoute.orgSN) {
+      pathname = pageRoute.pathname;
+    }
+  } else if (orgSub) {
+    pathname = pageRoute.pathname;
   }
-  return path;
-});
+};
+
+AppRoute.root.onBaseExit = function () {
+  subscribeOrg(null);
+};
 
 var sessionSub;
 
@@ -63,27 +67,32 @@ function stateChange(opts) {
   });
 }
 
-var orgSub, orgShortName;
+var orgSub, orgShortName, pathname;
 
 function subscribeOrg(shortName) {
   orgSub && orgSub.stop();
   var orgLink = document.getElementById('OrgHomeLink');
   if (shortName) {
-    AppRoute.pathPrefix = '/' + shortName;
     orgShortName = shortName;
     App.orgId = null;
 
     if (! App.Ready.isReady) return;
 
     orgSub = App.subscribe('Org', orgShortName, function () {
+
+
       var doc = AppModel.Org.findOne({shortName: orgShortName});
       App.orgId = doc._id;
       Bart.addClass(document.body, 'inOrg');
       if (orgLink) orgLink.textContent = doc.name;
+      if (pathname) {
+        var pn = pathname;
+        pathname = null;
+        AppRoute.replacePath(pn);
+      }
     });
   } else {
-    AppRoute.pathPrefix = null;
-    orgSub = orgShortName = App.orgId = null;
+    orgSub = orgShortName = App.orgId = pathname = null;
     Bart.removeClass(document.body, 'inOrg');
     if (orgLink) orgLink.textContent = "Choose Organization";
   }
