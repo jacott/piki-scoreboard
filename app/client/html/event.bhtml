@@ -18,7 +18,9 @@
               <th>Name</th><th>Start Date</th>
             </tr>
           </thead>
-          {{events}}
+          <tbody>
+            {{each "events" template="Row"}}
+          </tbody>
           <template name="Row">
             <tr>
               <td>{{name}}</td><td>{{date}}</td>

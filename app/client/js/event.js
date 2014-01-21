@@ -15,15 +15,19 @@ Tpl.$extend({
 });
 
 Index.$helpers({
-  events: function () {
-    var row = Index.Row;
-    var elm = document.createElement('tbody');
-    AppModel.Event.find({org_id: App.orgId}, {sort: {date: 1}}).forEach(function (doc) {
-      elm.appendChild(row.$render(doc));
+  events: function (callback) {
+    AppModel.Event.find({}, {sort: {date: 1}})
+      .forEach(function (doc) {callback(doc)});
+
+    return AppModel.Event.Index.observe(function (doc, old) {
+      callback(doc, old, sortByDate);
     });
-    return elm;
   },
 });
+
+function sortByDate(a, b) {
+  return a.date === b.date ? 0 : a.date < b.date ? -1 : 1;
+}
 
 Index.$events({
   'click .events tr': function (event) {
@@ -31,12 +35,6 @@ Index.$events({
 
     var data = $.data(this);
     AppRoute.gotoPage(Tpl.Show, {append: data._id});
-  },
-});
-
-Index.$extend({
-  $created: function (ctx, elm) {
-    Bart.updateOnCallback(ctx, AppModel.Event.Index.observe);
   },
 });
 

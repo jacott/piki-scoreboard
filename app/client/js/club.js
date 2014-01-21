@@ -15,15 +15,19 @@ Tpl.$extend({
 });
 
 Index.$helpers({
-  clubs: function () {
-    var row = Index.Row;
-    var elm = document.createElement('tbody');
-    AppModel.Club.find({org_id: App.orgId}, {sort: {name: 1}}).forEach(function (doc) {
-      elm.appendChild(row.$render(doc));
+  clubs: function (callback) {
+    AppModel.Club.find({}, {sort: {name: 1}})
+      .forEach(function (doc) {callback(doc)});
+
+    return AppModel.Club.Index.observe(function (doc, old) {
+      callback(doc, old, sortByName);
     });
-    return elm;
   },
 });
+
+function sortByName(a, b) {
+  return a.name === b.name ? 0 : a.name < b.name ? -1 : 1;
+}
 
 Index.$events({
   'click .clubs tr': function (event) {
@@ -31,12 +35,6 @@ Index.$events({
 
     var data = $.data(this);
     AppRoute.gotoPage(Tpl.Edit, {append: data._id});
-  },
-});
-
-Index.$extend({
-  $created: function (ctx, elm) {
-    Bart.updateOnCallback(ctx, AppModel.Club.Index.observe);
   },
 });
 

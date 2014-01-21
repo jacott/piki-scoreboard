@@ -15,15 +15,19 @@ Tpl.$extend({
 });
 
 Index.$helpers({
-  climbers: function () {
-    var row = Index.Row;
-    var elm = document.createElement('tbody');
-    AppModel.Climber.find({org_id: App.orgId}, {sort: {name: 1}}).forEach(function (doc) {
-      elm.appendChild(row.$render(doc));
+  climbers: function (callback) {
+    AppModel.Climber.find({}, {sort: {name: 1}})
+      .forEach(function (doc) {callback(doc)});
+
+    return AppModel.Climber.Index.observe(function (doc, old) {
+      callback(doc, old, sortByName);
     });
-    return elm;
   },
 });
+
+function sortByName(a, b) {
+  return a.name === b.name ? 0 : a.name < b.name ? -1 : 1;
+}
 
 Index.$events({
   'click .climbers tr': function (event) {
@@ -31,12 +35,6 @@ Index.$events({
 
     var data = $.data(this);
     AppRoute.gotoPage(Tpl.Edit, {append: data._id});
-  },
-});
-
-Index.$extend({
-  $created: function (ctx, elm) {
-    Bart.updateOnCallback(ctx, AppModel.Climber.Index.observe);
   },
 });
 

@@ -18,7 +18,9 @@
               <th>Name</th><th>Club</th>
             </tr>
           </thead>
-          {{climbers}}
+          <tbody>
+            {{each "climbers" template="Row"}}
+          </tbody>
           <template name="Row">
             <tr>
               <td>{{name}}</td><td>{{club.name}}</td>
