@@ -84,6 +84,22 @@
         .addField('dateOfBirth', '2000/01/01');
     },
 
+    Competitor: function (options) {
+      if (options.climber_id === undefined) {
+        var climber = Factory.createClimber();
+        options.climber_id = climber._id;
+      }
+
+
+      if (options.category_ids === undefined) {
+        var category = last.category || Factory.createCategory();
+        options.category_ids = [category._id];
+      }
+
+      return new Builder('Competitor', options)
+        .addRef('event');
+    },
+
     Event: function (options) {
       return new Builder('Event', options).genName()
         .addRef('org')
