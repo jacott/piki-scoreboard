@@ -70,6 +70,12 @@
         .addField('shortName', 'shortName' in options || generateName('SN').replace(/\s+/g, ''));
     },
 
+    Category: function (options) {
+      return new Builder('Category', options).genName()
+        .addRef('org')
+        .addField('shortName', 'shortName' in options || generateName('SN').replace(/\s+/g, ''));
+    },
+
     Climber: function (options) {
       return new Builder('Climber', options).genName()
         .addRef('org')

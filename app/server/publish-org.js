@@ -1,4 +1,4 @@
-var observers = ['Club', 'Climber', 'Event'];
+var observers = ['Category', 'Club', 'Climber', 'Event'];
 
 Meteor.publish('Org', function (shortName) {
   var sess = Session.get(this);
