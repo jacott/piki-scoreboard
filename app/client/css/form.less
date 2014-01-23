@@ -60,3 +60,21 @@ table.select {
     background-color: #0ff;
   }
 }
+
+.autoComplete {
+  position: relative;
+  &+ul.complete {
+    position: absolute;
+    margin: 0;
+    border: 1px solid fade(#000, 80%);
+    .box-shadow(0 0 4px fade(#000, 60%));
+    border-bottom-right-radius: 4px;
+    background-color: #fff;
+    color: #444;
+    padding: 4px;
+    >li:hover, >li.selected {
+      color: #000;
+      background: #0ff;
+    }
+  }
+}

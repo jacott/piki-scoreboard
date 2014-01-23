@@ -7,7 +7,7 @@
       <form>
         <fieldset>
           <h1>Add competetor</h1>
-          {{labelField "name"}}
+          {{labelField "name" class="autoComplete" autocomplete="off"}}
         </fieldset>
       </form>
     </div>

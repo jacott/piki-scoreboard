@@ -11,21 +11,49 @@
       v = null;
     },
 
-    "test typing": function () {
-      v.List.$events({
-        'input [name=name]': function (event) {
-
-
-        },
-      });
+    "test rendering": function () {
       assert.dom(v.List.$autoRender({}), function () {
         assert.dom('[name=name]', function () {
           Bart.Form.completeList(this, [{name: 'abc'}, {name: 'def'}]);
         });
         assert.dom('[name=name]+ul.complete', function () {
           assert.dom('li', 'abc');
+          assert.dom('li', 'def');
         });
+        assert.dom('[name=name]', function () {
+          Bart.Form.completeList(this, [{name: 'foo'}]);
+        });
+        refute.dom('li', 'abc');
+        assert.dom('[name=name]+ul.complete', function () {
+          assert.dom('li', 'foo');
+        });
+
+        assert.dom('[name=name]', function () {
+          Bart.Form.completeList(this);
+        });
+        refute.dom('.complete');
       });
+    },
+
+    "test selecting": function () {
+      document.body.appendChild(v.List.$autoRender({}));
+      assert.dom('[name=name]', function () {
+        Bart.Form.completeList(this, [{name: 'abc'}, {name: 'def'}]);
+      });
+      assert.dom('li', 'abc', function () {
+        TH.trigger(this, 'mousedown');
+      });
+      assert.dom('[name=name]', {value: 'abc'});
+      refute.dom('.complete');
+    },
+
+    "test blur": function () {
+      document.body.appendChild(v.List.$autoRender({}));
+      assert.dom('[name=name]', function () {
+        Bart.Form.completeList(this, [{name: 'abc'}, {name: 'def'}]);
+        TH.trigger(this, 'blur');
+      });
+      refute.dom('ul');
     },
   });
 })();
