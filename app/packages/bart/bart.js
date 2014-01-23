@@ -653,8 +653,8 @@ function onEvent(event) {
     if (! (Bart.globalErrorCatch && Bart.globalErrorCatch(ex))) {
       if('stack' in ex)
         console.log(ex.stack);
-      else
-        throw ex;
+
+      throw ex;
     }
   } finally {
     currentCtx = null;

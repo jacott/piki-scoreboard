@@ -7,3 +7,4 @@ tmp
 app/.meteor/local-sym-link
 app/private/restart.txt
 /app/packages/bart/test/plugin/template-test.js
+test/compiled-templates

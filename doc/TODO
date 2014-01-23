@@ -1,0 +1,18 @@
+Example to change content on focused input box
+
+  // 'webkitspeechchange input[name=speech], speechchange input[name=speech]': function (event,templ) {
+  //   var ta = templ.find('textarea'),
+  //       speech = event.target.value;
+  //   if ('selectionStart' in ta) {
+  //     var startPos = ta.selectionStart,
+  //         endPos = ta.selectionEnd,
+  //         space = ta.value.substring(endPos, endPos+1) === ' ' ? '': ' ';
+  //     ta.value = ta.value.substring(0, startPos)
+  //       + speech + space + ta.value.substring(endPos);
+  //     ta.selectionStart = ta.selectionEnd = startPos + speech.length+1;
+  //   } else {
+  //     ta.value = ta.value + event.target.value + ' ';
+  //   }
+
+  //   ta.focus();
+  // },
