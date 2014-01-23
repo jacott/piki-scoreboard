@@ -42,6 +42,7 @@
         assert.dom('#AddCategory', function () {
           TH.input('[name=name]', 'Dynomites Wellington');
           TH.input('[name=shortName]', 'Wgtn');
+          TH.input('[name=group]', 'A');
           TH.click('[type=submit]');
         });
         refute.dom('#AddCategory');

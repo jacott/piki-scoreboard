@@ -21,7 +21,9 @@
       var validators = AppModel.Category._fieldValidators;
 
       assert.validators(validators.name, {maxLength: [200], required: [true], trim: [true]});
-      assert.validators(validators.shortName, {maxLength: [4], required: [true], trim: [true], normalize: ['upcase']});
+      assert.validators(validators.group, {maxLength: [30], required: [true], trim: [true]});
+      assert.validators(validators.shortName, {maxLength: [4], required: [true], trim: [true],
+                                               normalize: ['upcase']});
     },
 
     "test removeRpc": function () {
