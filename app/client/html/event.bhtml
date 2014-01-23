@@ -41,19 +41,6 @@
       </div>
     </section>
   </template>
-  <template name="Register">
-    <Section id="Register">
-      <form>
-      </form>
-      <div id="registrations">
-        <h1>{{name}}</h1>
-        <form>
-          <fieldset>
-          </fieldset>
-        </form>
-      </div>
-    </Section>
-  </template>
   <template name="Add">
     <form id="AddEvent">
       <h1>Add new event</h1>

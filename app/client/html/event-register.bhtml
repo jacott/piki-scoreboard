@@ -1,0 +1,15 @@
+<template name="Event.Register">
+  <Section id="Register">
+    <form>
+    </form>
+    <div id="registrations">
+      <h1>{{name}}</h1>
+      <form>
+        <fieldset>
+          <h1>Add competetor</h1>
+          {{labelField "name"}}
+        </fieldset>
+      </form>
+    </div>
+  </Section>
+</template>

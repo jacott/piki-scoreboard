@@ -72,17 +72,10 @@
         });
       },
 
-      "//test registration rendering": function () {
+      "test registration link": function () {
         TH.click('[name=register]');
 
-        assert.dom('#Event #Register #registrations', function () {
-          assert.dom('h1', v.event.name);
-          assert.dom('fieldset', function () {
-            assert.dom('label .name', {text: 'Name', parent: function () {
-              assert.dom('[name=name]');
-            }});
-          });
-        });
+        assert.dom('#Event #Register');
       },
 
       "test change name": function () {
