@@ -65,6 +65,7 @@
       {{labelField "name"}}
       {{labelField "shortName"}}
       {{labelField "group"}}
+      {{labelField "gender" selectList=genderList}}
     </fieldset>
   </template>
 </template>

@@ -41,14 +41,15 @@
         TH.click('[name=addCategory]');
         assert.dom('#AddCategory', function () {
           TH.input('[name=name]', 'Dynomites Wellington');
-          TH.input('[name=shortName]', 'Wgtn');
+          TH.input('[name=shortName]', 'YB M');
           TH.input('[name=group]', 'A');
+          TH.change('[name=gender]', 'm');
           TH.click('[type=submit]');
         });
         refute.dom('#AddCategory');
       });
 
-      assert(AppModel.Category.exists({org_id: v.org._id, name: 'Dynomites Wellington', shortName: 'WGTN'}));
+      assert(AppModel.Category.exists({org_id: v.org._id, name: 'Dynomites Wellington', shortName: 'YB M', gender: 'm', group: 'A'}));
 
       assert.dom('#Category [name=addCategory]');
     },

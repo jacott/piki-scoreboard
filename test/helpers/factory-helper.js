@@ -74,6 +74,7 @@
       return new Builder('Category', options).genName()
         .addRef('org')
         .addField('group', 'A male')
+        .addField('gender', 'm')
         .addField('shortName', 'shortName' in options || generateName('SN').replace(/\s+/g, ''));
     },
 

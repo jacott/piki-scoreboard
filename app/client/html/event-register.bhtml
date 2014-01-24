@@ -4,12 +4,16 @@
     </form>
     <div id="registrations">
       <h1>{{name}}</h1>
-      <form>
-        <fieldset>
-          <h1>Add competetor</h1>
-          {{labelField "name" class="autoComplete" autocomplete="off"}}
-        </fieldset>
-      </form>
+      {{> AddForm}}
+      <template name="AddForm">
+        <form>
+          {{debug}}
+          <fieldset>
+            <h1>Add competetor</h1>
+            {{labelField "name" class="autoComplete" autocomplete="off"}}
+          </fieldset>
+        </form>
+      </template>
     </div>
   </Section>
 </template>

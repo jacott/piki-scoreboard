@@ -153,6 +153,6 @@ Bart.registerHelpers({
   },
 
   genderList: function () {
-    return [["m", "Male"], ["f", "Female"]];
+    return [['', ''], ["m", "Male"], ["f", "Female"]];
   },
 });

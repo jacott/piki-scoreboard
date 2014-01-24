@@ -109,7 +109,6 @@ Meteor.isClient && (function (test, v) {
       },
     },
 
-
     "test html": function () {
       var elm = Bart.html('<div id="top"><div class="foo"><div class="bar"><button type="button" id="sp">Hello</button></div></div></div>');
 
@@ -218,73 +217,94 @@ Meteor.isClient && (function (test, v) {
       },
     },
 
-    "with rendered": {
+    "with template": {
       setUp: function () {
         Bart.newTemplate({
           name: "Foo",
-          nodes:[{name: "div", attrs:[["=","id",'foo']],}],
-        });
-
-        v.foo = Bart.Foo.$render();
-
-        document.body.appendChild(v.foo);
-      },
-
-      "test focus": function () {
-        document.body.appendChild(Bart.html('<form><button name="bt"><input type="text" name="inp"><button name="b2"></form>'));
-        assert.dom('form', function () {
-          assert.dom('[name=b2]', function () {
-            this.focus();
-            assert.same(document.activeElement, this);
-          });
-          Bart.focus(this);
-          assert.dom('[name=inp]', function () {
-            assert.same(document.activeElement, this);
-          });
-          Bart.focus(this, '[name=bt]');
-          assert.dom('[name=bt]', function () {
-            assert.same(document.activeElement, this);
-          });
+          nodes:[{name: "div", attrs:[["=","id",'foo'], ["", 'myHelper']],}],
         });
       },
 
-      "test replace element": function () {
-        Bart.newTemplate({name: 'Foo.Bar', nodes: [{name: 'span'}]});
-        Bart.newTemplate({name: 'Foo.Baz', nodes: [{name: 'h1'}]});
-
-        var dStub = Bart.Foo.Bar.$destroyed = function () {
-          if (v) v.args = arguments;
-        };
-
-        var bar = Bart.Foo.Bar.$render();
-        var baz = Bart.Foo.Baz.$render();
-
-        v.foo.appendChild(bar);
-
-        assert.dom('#foo', function () {
-          assert.dom('>span', function () {
-            v.barCtx = this._bart;
-          });
-          Bart.replaceElement(baz, bar);
-          var ctx = this._bart;
-          assert.dom('>h1', function () {
-            assert.same(ctx, this._bart.parentCtx);
-          });
-          refute.dom('>span');
-          assert.same(v.args[0], v.barCtx);
-          assert.isNull(bar._bart);
-
-          bar = Bart.Foo.Bar.$render();
-
-          Bart.replaceElement(bar, baz, 'noRemove');
-
-          assert.dom('>span', function () {
-            assert.same(ctx, this._bart.parentCtx);
-          });
-          refute.dom('>h1');
-          assert.same(v.args[0], v.barCtx);
-          refute.isNull(baz._bart);
+      "test $created": function () {
+        Bart.Foo.$extend({
+          $created: function (ctx, elm) {
+            v.ctx = ctx;
+            v.elm = elm;
+            ctx.data = {myHelper: v.myHelper = test.stub()};
+          },
         });
+
+        assert.dom(Bart.Foo.$render({}), function () {
+          assert.called(v.myHelper);
+          assert.same(v.elm, this);
+          assert.same(v.ctx, Bart.getCtx(this));
+        });
+      },
+
+      "with rendered": {
+        setUp: function () {
+
+          v.foo = Bart.Foo.$render();
+
+          document.body.appendChild(v.foo);
+        },
+
+        "test focus": function () {
+          document.body.appendChild(Bart.html('<form><button name="bt"><input type="text" name="inp"><button name="b2"></form>'));
+          assert.dom('form', function () {
+            assert.dom('[name=b2]', function () {
+              this.focus();
+              assert.same(document.activeElement, this);
+            });
+            Bart.focus(this);
+            assert.dom('[name=inp]', function () {
+              assert.same(document.activeElement, this);
+            });
+            Bart.focus(this, '[name=bt]');
+            assert.dom('[name=bt]', function () {
+              assert.same(document.activeElement, this);
+            });
+          });
+        },
+
+        "test replace element": function () {
+          Bart.newTemplate({name: 'Foo.Bar', nodes: [{name: 'span'}]});
+          Bart.newTemplate({name: 'Foo.Baz', nodes: [{name: 'h1'}]});
+
+          var dStub = Bart.Foo.Bar.$destroyed = function () {
+            if (v) v.args = arguments;
+          };
+
+          var bar = Bart.Foo.Bar.$render();
+          var baz = Bart.Foo.Baz.$render();
+
+          v.foo.appendChild(bar);
+
+          assert.dom('#foo', function () {
+            assert.dom('>span', function () {
+              v.barCtx = this._bart;
+            });
+            Bart.replaceElement(baz, bar);
+            var ctx = this._bart;
+            assert.dom('>h1', function () {
+              assert.same(ctx, this._bart.parentCtx);
+            });
+            refute.dom('>span');
+            assert.same(v.args[0], v.barCtx);
+            assert.isNull(bar._bart);
+
+            bar = Bart.Foo.Bar.$render();
+
+            Bart.replaceElement(bar, baz, 'noRemove');
+
+            assert.dom('>span', function () {
+              assert.same(ctx, this._bart.parentCtx);
+            });
+            refute.dom('>h1');
+            assert.same(v.args[0], v.barCtx);
+            refute.isNull(baz._bart);
+          });
+        },
       },
     },
 

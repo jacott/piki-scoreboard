@@ -17,16 +17,18 @@
       v = null;
     },
 
-    "test rendering": function () {
+    "test adding": function () {
       AppRoute.gotoPage(Bart.Event.Register, {orgSN: v.org.shortName, eventId: v.event._id});
 
       assert.dom('#Event #Register #registrations', function () {
         assert.dom('h1', v.event.name);
         assert.dom('fieldset', function () {
           assert.dom('label .name', {text: 'Name', parent: function () {
-            TH.input('[name=name]', 'bo');
+            TH.input('[name=name]', {value: ''}, 'bo');
             assert.dom('ul>li', 'Bob');
             assert.dom('ul>li', 'bobby');
+            TH.input('[name=name]', '');
+            refute.dom('ul');
           }});
         });
       });

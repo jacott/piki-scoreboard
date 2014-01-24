@@ -542,7 +542,7 @@ BartTemplate.prototype = {
         }
       }
       this.$created && this.$created(currentCtx, frag);
-      currentCtx.data === undefined || currentCtx.updateAllTags(data);
+      currentCtx.data === undefined || currentCtx.updateAllTags(currentCtx.data);
       return frag;
     } finally {
       currentCtx = parentCtx;
