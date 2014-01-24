@@ -11,7 +11,7 @@ Tpl.$extend({
   },
   $destroyed: function () {
     v.input.removeEventListener('blur', close);
-    v.input.removeEventListener('keydown', keydown);
+    v.input.removeEventListener('keydown', keydown, true);
     v = null;
   },
 });
@@ -27,7 +27,7 @@ Bart.Form.$extend({
     };
     elm.parentNode.insertBefore(v.completeList, elm.nextSibling);
     elm.addEventListener('blur', close);
-    elm.addEventListener('keydown', keydown);
+    elm.addEventListener('keydown', keydown, true);
   },
 });
 
@@ -36,7 +36,9 @@ Tpl.$events({
 });
 
 function keydown(event) {
-  if (event.which = 13) {
+  if (event.which === 13) {
+    event.stopImmediatePropagation();
+    event.preventDefault();
     select(v.completeList.firstChild);
   }
 }

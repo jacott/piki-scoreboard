@@ -54,11 +54,25 @@
       },
 
       "test enter": function () {
-        TH.trigger('[name=name]', 'keydown', {whiich: 13});
-        assert.dom('[name=name]', {value: 'abc'});
+        var inp = document.querySelector('[name=name]');
+
+        TH.trigger(inp, 'keydown', {which: 65});
+        assert.dom('.complete');
+
+        var inpCallback = test.stub();
+        inp.addEventListener('keydown', inpCallback);
+        test.onEnd(function () {
+          inp.removeEventListener('keydown', inpCallback);
+        });
+
+        TH.trigger(inp, 'keydown', {which: 13});
+        assert.same(inp.value, 'abc');
+
         refute.dom('.complete');
 
         assert.calledWith(v.callback, v.result);
+
+        refute.called(inpCallback);
       },
     },
 
