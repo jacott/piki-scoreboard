@@ -1,8 +1,7 @@
 var $ = Bart.current;
 var Tpl = Bart.Form.CompleteList;
 var Row = Tpl.Row;
-var completeList;
-var input;
+var v;
 
 Tpl.$extend({
   $created: function (ctx, elm) {
@@ -11,32 +10,47 @@ Tpl.$extend({
     });
   },
   $destroyed: function () {
-    input && input.removeEventListener('blur', close, this);
-    completeList && completeList.removeEventListener('mousedown', click, this);
-    input = completeList = null;
+    v.input.removeEventListener('blur', close);
+    v.input.removeEventListener('keydown', keydown);
+    v = null;
   },
 });
 
 Bart.Form.$extend({
-  completeList: function (elm, list) {
+  completeList: function (elm, list, callback) {
     close();
     if (! list) return;
-    input = elm;
-    input.parentNode.insertBefore(completeList = Tpl.$autoRender(list), input.nextSibling);
-    input.addEventListener('blur', close, true);
-    completeList.addEventListener('mousedown', click, true);
+    v = {
+      input: elm,
+      completeList: Tpl.$autoRender(list),
+      callback: callback
+    };
+    elm.parentNode.insertBefore(v.completeList, elm.nextSibling);
+    elm.addEventListener('blur', close);
+    elm.addEventListener('keydown', keydown);
   },
 });
 
+Tpl.$events({
+  'mousedown li': function (event) {select(this)},
+});
 
-function click(event) {
-  var li = Bart.getClosest(event.target, 'li');
-  if (li) {
-    input.value = $.data(li).name;
-    close();
+function keydown(event) {
+  if (event.which = 13) {
+    select(v.completeList.firstChild);
   }
 }
 
+function select(li) {
+  if (li) {
+    var data = $.data(li);
+    v.input.value = data.name;
+    v.callback && v.callback(data);
+    close();
+  }
+
+}
+
 function close() {
-  Bart.remove(completeList);
+  Bart.remove(v && v.completeList);
 }

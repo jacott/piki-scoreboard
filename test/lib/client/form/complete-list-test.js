@@ -35,16 +35,31 @@
       });
     },
 
-    "test selecting": function () {
-      document.body.appendChild(v.List.$autoRender({}));
-      assert.dom('[name=name]', function () {
-        Bart.Form.completeList(this, [{name: 'abc'}, {name: 'def'}]);
-      });
-      assert.dom('li', 'abc', function () {
-        TH.trigger(this, 'mousedown');
-      });
-      assert.dom('[name=name]', {value: 'abc'});
-      refute.dom('.complete');
+    "callback": {
+      setUp: function () {
+        document.body.appendChild(v.List.$autoRender({}));
+        assert.dom('[name=name]', function () {
+          Bart.Form.completeList(this, [v.result = {name: 'abc'}, {name: 'def'}], v.callback = test.stub());
+        });
+      },
+
+      "test clicking": function () {
+        assert.dom('li', 'abc', function () {
+          TH.trigger(this, 'mousedown');
+        });
+        assert.dom('[name=name]', {value: 'abc'});
+        refute.dom('.complete');
+
+        assert.calledWith(v.callback, v.result);
+      },
+
+      "test enter": function () {
+        TH.trigger('[name=name]', 'keydown', {whiich: 13});
+        assert.dom('[name=name]', {value: 'abc'});
+        refute.dom('.complete');
+
+        assert.calledWith(v.callback, v.result);
+      },
     },
 
     "test blur": function () {
