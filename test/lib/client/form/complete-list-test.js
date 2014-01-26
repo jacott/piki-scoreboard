@@ -4,7 +4,7 @@
       test = this;
       v = {};
       _BartTest_form_complete_list_test(Bart);
-      v.List = Bart.Test.Form.CompleteList;
+      v.CompleteList = Bart.Test.Form.CompleteList;
     },
 
     tearDown: function () {
@@ -12,12 +12,12 @@
     },
 
     "test rendering": function () {
-      assert.dom(v.List.$autoRender({}), function () {
+      assert.dom(v.CompleteList.$autoRender({}), function () {
         assert.dom('[name=name]', function () {
           Bart.Form.completeList(this, [{name: 'abc'}, {name: 'def'}]);
         });
         assert.dom('[name=name]+ul.complete', function () {
-          assert.dom('li', 'abc');
+          assert.dom('li.selected', 'abc');
           assert.dom('li', 'def');
         });
         assert.dom('[name=name]', function () {
@@ -37,47 +37,70 @@
 
     "callback": {
       setUp: function () {
-        document.body.appendChild(v.List.$autoRender({}));
+        document.body.appendChild(v.CompleteList.$autoRender({}));
         assert.dom('[name=name]', function () {
-          Bart.Form.completeList(this, [v.result = {name: 'abc'}, {name: 'def'}], v.callback = test.stub());
+          Bart.Form.completeList(this, v.list = [{name: 'abc'}, {name: 'def'}], v.callback = test.stub());
         });
+
+        v.inp = document.querySelector('[name=name]');
       },
 
       "test clicking": function () {
         assert.dom('li', 'abc', function () {
           TH.trigger(this, 'mousedown');
         });
-        assert.dom('[name=name]', {value: 'abc'});
+
+        assert.same(v.inp.value, 'abc');
         refute.dom('.complete');
 
-        assert.calledWith(v.callback, v.result);
+        assert.calledWith(v.callback, v.list[0]);
       },
 
-      "test enter": function () {
-        var inp = document.querySelector('[name=name]');
-
-        TH.trigger(inp, 'keydown', {which: 65});
+      "test enter no select": function () {
+        TH.trigger(v.inp, 'keydown', {which: 65});
         assert.dom('.complete');
 
         var inpCallback = test.stub();
-        inp.addEventListener('keydown', inpCallback);
+        v.inp.addEventListener('keydown', inpCallback);
         test.onEnd(function () {
-          inp.removeEventListener('keydown', inpCallback);
+          v.inp.removeEventListener('keydown', inpCallback);
         });
 
-        TH.trigger(inp, 'keydown', {which: 13});
-        assert.same(inp.value, 'abc');
+        TH.trigger(v.inp, 'keydown', {which: 13});
+        assert.same(v.inp.value, 'abc');
 
         refute.dom('.complete');
 
-        assert.calledWith(v.callback, v.result);
+        assert.calledWith(v.callback, v.list[0]);
 
         refute.called(inpCallback);
+      },
+
+      "test enter after select": function () {
+        TH.trigger(v.inp, 'keydown', {which: 40}); // down
+        TH.trigger(v.inp, 'keydown', {which: 13});
+        assert.same(v.inp.value, 'def');
+
+        refute.dom('.complete');
+
+        assert.calledWith(v.callback, v.list[1]);
+      },
+
+      "test up/down arrow": function () {
+        assert.dom('.complete', function () {
+          assert.dom('li.selected', 'abc');
+          TH.trigger(v.inp, 'keydown', {which: 40}); // down
+          assert.dom('li.selected', 'def');
+
+          TH.trigger(v.inp, 'keydown', {which: 38}); // up
+          assert.dom('li.selected', 'abc');
+        });
+
       },
     },
 
     "test blur": function () {
-      document.body.appendChild(v.List.$autoRender({}));
+      document.body.appendChild(v.CompleteList.$autoRender({}));
       assert.dom('[name=name]', function () {
         Bart.Form.completeList(this, [{name: 'abc'}, {name: 'def'}]);
         TH.trigger(this, 'blur');

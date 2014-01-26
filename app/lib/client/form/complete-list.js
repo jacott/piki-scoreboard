@@ -8,6 +8,7 @@ Tpl.$extend({
     ctx.data.forEach(function (row) {
       elm.appendChild(Row.$render(row));
     });
+    Bart.addClass(elm.firstChild, 'selected');
   },
   $destroyed: function () {
     v.input.removeEventListener('blur', close);
@@ -36,11 +37,24 @@ Tpl.$events({
 });
 
 function keydown(event) {
-  if (event.which === 13) {
-    event.stopImmediatePropagation();
-    event.preventDefault();
-    select(v.completeList.firstChild);
+  var cur = v.completeList.querySelector('.complete>.selected');
+
+  switch (event.which) {
+  case 13: // enter
+    select(cur);
+    break;
+  case 38: // up
+    highlight(cur, cur.previousSibling || v.completeList.firstChild);
+    break;
+  case 40: // down
+    highlight(cur, cur.nextSibling || v.completeList.lastChild);
+    break;
+  default:
+    return;
   }
+
+  event.stopImmediatePropagation();
+  event.preventDefault();
 }
 
 function select(li) {
@@ -50,6 +64,11 @@ function select(li) {
     v.callback && v.callback(data);
     close();
   }
+}
+
+function highlight(curElm, newElm) {
+  Bart.removeClass(curElm, 'selected');
+  Bart.addClass(newElm, 'selected');
 
 }
 
