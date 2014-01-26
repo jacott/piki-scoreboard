@@ -21,11 +21,11 @@ AppVal.register('color', function (doc,field) {
 AppVal.register('number', function (doc,field, options) {
   var val = doc[field];
 
-  if (val == null) return;
+  if (! val) return doc[field] = null;
 
   if (options === true || options == null) options = {};
 
-  if (val != null && typeof val !== 'number') {
+  if (typeof val !== 'number') {
     if (typeof val === 'string' && +val === +val)
       val = +val;
     else

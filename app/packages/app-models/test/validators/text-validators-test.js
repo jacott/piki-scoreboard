@@ -170,6 +170,15 @@
         assert.same(doc.order,0xabc);
       },
 
+      "test empty": function () {
+         var doc = {order: ''};
+
+        AppVal.validators('number')(doc,'order');
+        refute(doc._errors);
+
+        assert.same(doc.order, null);
+      },
+
       'test invalid': function () {
         var doc = {order: 'abc'};
 
