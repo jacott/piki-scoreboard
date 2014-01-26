@@ -6,7 +6,7 @@ App.require('AppModel.Org', function () {
     name: {type:  'text', trim: true, required: true, maxLength: 200},
     group: {type:  'text', trim: true, required: true, maxLength: 30},
     shortName: {type: 'text', trim: true, required: true, maxLength: 4, normalize: 'upcase'},
-    gender: {type: 'text'},
+    gender: {type: 'text', inclusion: {allowBlank: true, matches: /^[mf]$/ }},
     org_id: 'belongs_to',
   });
 
