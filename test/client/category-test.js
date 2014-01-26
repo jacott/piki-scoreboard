@@ -44,12 +44,14 @@
           TH.input('[name=shortName]', 'YB M');
           TH.input('[name=group]', 'A');
           TH.change('[name=gender]', 'm');
+          TH.input('[name=minAge]', '14');
+          TH.change('[name=maxAge]', '15');
           TH.click('[type=submit]');
         });
         refute.dom('#AddCategory');
       });
 
-      assert(AppModel.Category.exists({org_id: v.org._id, name: 'Dynomites Wellington', shortName: 'YB M', gender: 'm', group: 'A'}));
+      assert(AppModel.Category.exists({org_id: v.org._id, name: 'Dynomites Wellington', shortName: 'YB M', gender: 'm', group: 'A', minAge: 14, maxAge: 15}));
 
       assert.dom('#Category [name=addCategory]');
     },
