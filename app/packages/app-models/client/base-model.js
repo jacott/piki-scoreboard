@@ -49,6 +49,10 @@ AppModel._support.setupExtras.push(function (model) {
       },
     });
   };
+
+  model.attrDocs = function () {
+    return model.docs._collection.docs;
+  };
 });
 
 function removeFunc(method) {
@@ -59,7 +63,7 @@ function removeFunc(method) {
 
 App.extend(_support, {
   attrFind: function (id) {
-    return this.docs.find().collection.docs[id];
+    return this.docs._collection.docs[id];
   },
 
   pushRpc: function(model, field) {
