@@ -117,11 +117,19 @@ Tpl.Select.$extend({
   $created: function (ctx, elm) {
     var data = ctx.data;
     var value = data.doc[data.name];
+    if (data.options.selectList.length === 0) return;
+    if ('_id' in data.options.selectList[0]) {
+      var getValue = function (row) {return row._id};
+      var getContent = function (row) {return row.name};
+    } else {
+      var getValue = function (row) {return row[0]};
+      var getContent = function (row) {return row[1]};
+    }
     data.options.selectList.forEach(function (row) {
       var option = document.createElement('option');
-      option.value = row[0];
-      option.textContent = row[1];
-      if (row[0] == value)
+      option.value = getValue(row);
+      option.textContent = getContent(row);
+      if (option.value == value)
         option.setAttribute('selected', 'selected');
       elm.appendChild(option);
     });
@@ -148,6 +156,10 @@ function field(doc, name, options) {
 }
 
 Bart.registerHelpers({
+  field: function (name, options) {
+    return field(this, name, options);
+  },
+
   labelField: function (name, options) {
     return Tpl.LabelField.$autoRender({name: name, value: field(this, name, options)});
   },
