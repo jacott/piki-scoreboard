@@ -1,9 +1,23 @@
-(function () {
+(function (test) {
   buster.testCase('packages/app-models/test/apputil:', {
     setUp: function () {
+      test = this;
     },
 
     tearDown: function () {
+    },
+
+    "test compareByName": function () {
+      var a = {name: "Bob"};
+      var b = {name: "Bob"};
+
+      assert.same(Apputil.compareByName(a,b), 0);
+
+      b.name = 'Cary';
+      assert.same(Apputil.compareByName(a,b), -1);
+
+      b.name = 'Arnold';
+      assert.same(Apputil.compareByName(a,b), 1);
     },
 
     "test TwoIndex": function () {

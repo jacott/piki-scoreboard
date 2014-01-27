@@ -17,11 +17,7 @@ App.require('AppModel.Climber', function (model) {
           throw ex;
       }
 
-      return results.sort(sortByName);
+      return results.sort(Apputil.compareByName);
     },
   });
 });
-
-function sortByName(a, b) {
-  return a.name === b.name ? 0 : a.name < b.name ? -1 : 1;
-}

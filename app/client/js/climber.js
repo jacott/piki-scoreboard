@@ -20,14 +20,10 @@ Index.$helpers({
       .forEach(function (doc) {callback(doc)});
 
     return AppModel.Climber.Index.observe(function (doc, old) {
-      callback(doc, old, sortByName);
+      callback(doc, old, Apputil.compareByName);
     });
   },
 });
-
-function sortByName(a, b) {
-  return a.name === b.name ? 0 : a.name < b.name ? -1 : 1;
-}
 
 Index.$events({
   'click .climbers tr': function (event) {

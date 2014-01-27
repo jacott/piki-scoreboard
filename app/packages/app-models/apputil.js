@@ -158,6 +158,10 @@ Apputil = {
     }
   },
 
+  compareByName: function (a, b) {
+    return a.name === b.name ? 0 : a.name < b.name ? -1 : 1;
+  },
+
   indexOf: function (list, value, fieldName) {
     if (!list) return;
     fieldName = fieldName || '_id';
