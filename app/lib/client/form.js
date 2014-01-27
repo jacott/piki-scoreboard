@@ -1,7 +1,7 @@
 var $ = Bart.current;
 var Tpl = Bart.Form;
 
-var IGNORE = {selectList: true, value: true};
+var IGNORE = {includeBlank: true, selectList: true, value: true};
 
 var DEFAULT_HELPERS = {
   value: function () {
@@ -117,7 +117,8 @@ Tpl.Select.$extend({
   $created: function (ctx, elm) {
     var data = ctx.data;
     var value = data.doc[data.name];
-    if (data.options.selectList.length === 0) return;
+    var options = data.options;
+    if (options.selectList.length === 0) return;
     if ('_id' in data.options.selectList[0]) {
       var getValue = function (row) {return row._id};
       var getContent = function (row) {return row.name};
@@ -125,7 +126,13 @@ Tpl.Select.$extend({
       var getValue = function (row) {return row[0]};
       var getContent = function (row) {return row[1]};
     }
-    data.options.selectList.forEach(function (row) {
+    if ('includeBlank' in options) {
+      var option = document.createElement('option');
+      option.value = '';
+      option.textContent = '';
+      elm.appendChild(option);
+    }
+    options.selectList.forEach(function (row) {
       var option = document.createElement('option');
       option.value = getValue(row);
       option.textContent = getContent(row);
@@ -143,6 +150,7 @@ function helpers(name, funcs) {
 function field(doc, name, options) {
   options = options || {};
   if ('selectList' in options) {
+
     return Tpl.Select.$autoRender({name: name, doc: doc, options: options});
   }
 
