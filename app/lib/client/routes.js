@@ -114,10 +114,6 @@ App.require('makeSubject', function (makeSubject) {
       }
     },
 
-    get currentPage() {
-      return current;
-    },
-
     pageChanged: function () {
       pageState = null;
       return this.gotoPath();

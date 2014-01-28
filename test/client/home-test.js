@@ -13,14 +13,21 @@
       assert.same(AppRoute.root.defaultPage, Bart.Home);
 
       AppRoute.gotoPage(Bart.Home);
+      test.stub(AppRoute, 'gotoPath');
 
       assert.dom('#Home', function () {
-        assert.dom('button.link', 'Clubs', function () {
-          TH.click(this);
-        });
-      });
+        TH.click('button.link', 'Clubs');
+        assert.calledWith(AppRoute.gotoPath, Bart.Club);
 
-      assert.dom('#Club');
+        TH.click('button.link', 'Climbers');
+        assert.calledWith(AppRoute.gotoPath, Bart.Climber);
+
+        TH.click('button.link', 'Events');
+        assert.calledWith(AppRoute.gotoPath, Bart.Event);
+
+        TH.click('button.link', 'Event categories');
+        assert.calledWith(AppRoute.gotoPath, Bart.Category);
+      });
     },
 
     "test climbers link": function () {
