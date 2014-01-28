@@ -126,8 +126,8 @@ Bart = {
 
   remove: function (elm) {
     if (elm) {
-      Bart.destroyData(elm);
       elm.parentNode && elm.parentNode.removeChild(elm);
+      Bart.destroyData(elm);
     }
   },
 
