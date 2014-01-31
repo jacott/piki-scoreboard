@@ -1,20 +1,60 @@
 var $ = Bart.current;
 var Tpl = Bart.Event.Register;
 var Form = Bart.Form;
-var Category = Tpl.AddForm.Category;
+var RegForm = Tpl.RegForm;
+var Category = RegForm.Category;
 
-Tpl.AddForm.$events({
+Tpl.$helpers({
+  newCompetitor: function () {
+    return new AppModel.Competitor({event_id: this._id});
+  },
+
+  competitors: function (callback) {
+    AppModel.Competitor.find({event_id: this._id})
+      .forEach(function (doc) {callback(doc)});
+
+    return AppModel.Competitor.Index.observe(function (doc, old) {
+      doc = doc && new AppModel.Competitor(doc);
+      old = old && new AppModel.Competitor(old);
+      callback(doc, old);
+    });
+  },
+});
+
+RegForm.$events({
+  'submit': function (event) {
+    event.$actioned = true;
+
+    var competitor = $.data();
+    var ids = [];
+    var form = event.currentTarget;
+
+    var groups = form.querySelector('.Groups select');
+    for(var i = 0; i < groups.length; ++i) {
+      var row = groups[i];
+      if (row.value) ids.push(row.value);
+    }
+
+    competitor.category_ids = ids;
+
+    if (Form.saveDoc(competitor, form)) {
+      Bart.remove(form.querySelector('.Groups'));
+    }
+  },
+
   'input [name=name]': function (event) {
     var value = this.value;
     if (value) value = value.trim();
-    var groupsElm = event.currentTarget.querySelector('.Groups');
+    var form = event.currentTarget;
+    var groupsElm = form.querySelector('.Groups');
+    var actionsElm = form.querySelector('.actions');
+    var competitor = $.data();
 
-    Bart.removeClass(groupsElm, 'active');
     Form.completeList(this, value && AppModel.Climber.search(value, 20), function (climber) {
-      Bart.destroyChildren(groupsElm, true);
-      Bart.addClass(groupsElm, 'active');
-      var count = 0;
-      groupsElm.appendChild(Tpl.AddForm.CatHead.$render(climber));
+      competitor.climber_id = climber._id;
+
+      Bart.remove(groupsElm);
+      groupsElm = RegForm.Groups.$render(climber);
       AppModel.Category.groupApplicable(climber, function (group, docs) {
         groupsElm.appendChild(Category.$autoRender({
           groupName: group,
@@ -22,13 +62,7 @@ Tpl.AddForm.$events({
           category_id: null,
         }));
       });
+      form.insertBefore(groupsElm, actionsElm);
     });
-  },
-});
-
-Tpl.AddForm.$extend({
-  $created: function (ctx, elm) {
-    var event = ctx.data;
-    ctx.data = {name: '', event_id: event._id};
   },
 });

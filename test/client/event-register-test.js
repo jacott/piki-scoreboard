@@ -21,13 +21,13 @@
     },
 
     "test adding": function () {
-      AppRoute.gotoPage(Bart.Event.Register,
-                        {orgSN: v.org.shortName, eventId: v.event._id});
+      AppRoute.gotoPage(Bart.Event.Register, {
+        orgSN: v.org.shortName, eventId: v.event._id});
 
       assert.dom('#Event #Register #registrations', function () {
         assert.dom('h1', v.event.name);
+        refute.dom('.Groups');
         assert.dom('fieldset', function () {
-          assert.dom('.Groups:not(.active)');
           assert.dom('label .name', {text: 'Name', parent: function () {
             TH.input('[name=name]', {value: ''}, 'bo');
             assert.dom('ul>li', 'Bob');
@@ -39,20 +39,28 @@
             TH.input('[name=name]', 'bre');
             TH.trigger('li', 'mousedown');
           }});
-          assert.dom('.Groups.active', function () {
-            assert.dom('h1', {count: 1});
-            assert.dom('label .name', {text: '1 Youth Lead', parent: function () {
-              assert.dom('select[name=category_id] option:first-child',
-                         {value: '', text: ''});
-              assert.dom('select[name=category_id] option:not([selected])',
-                         {value: v.u16._id, text: v.u16.name});
-              assert.dom('select[name=category_id] option:not([selected])',
-                         {value: v.u18._id, text: v.u18.name});
-            }});
-            assert.dom('select[name=category_id] option:not([selected])',
-                       {value: v.open._id, text: v.open.name});
-          });
         });
+        assert.dom('.Groups', function () {
+          assert.dom('h1', {count: 1});
+          assert.dom('label .name', {text: '1 Youth Lead', parent: function () {
+            assert.dom('select[name=category_id] option:first-child', {
+              value: '', text: ''});
+            assert.dom('select[name=category_id] option:not([selected])', {
+              value: v.u16._id, text: v.u16.name});
+            assert.dom('select[name=category_id] option:not([selected])', {
+                value: v.u18._id, text: v.u18.name, parent: function () {
+                  TH.change(this, v.u18._id);
+                }});
+          }});
+          assert.dom('select[name=category_id] option:not([selected])', {
+            value: v.open._id, text: v.open.name, parent: function () {
+              TH.change(this, v.open._id);
+            }});
+        });
+
+        TH.click('fieldset.actions [type=submit]');
+        assert.dom('table td', 'brendon');
+        refute.dom('.Groups');
       });
     },
   });

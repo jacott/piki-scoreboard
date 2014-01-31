@@ -28,7 +28,7 @@ Tpl.$extend({
       var ctx = Bart.getCtx(elm);
       var doc = ctx.data;
 
-      if (Bart.Form.saveDoc(doc, elm.querySelector('.fields'))) {
+      if (Tpl.saveDoc(doc, elm.querySelector('.fields'))) {
         successPage && AppRoute.gotoPage(successPage);
       }
     };

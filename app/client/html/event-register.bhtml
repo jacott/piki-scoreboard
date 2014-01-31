@@ -4,26 +4,41 @@
     </form>
     <div id="registrations">
       <h1>{{name}}</h1>
-      {{> AddForm}}
-      <template name="AddForm">
+      {{> RegForm newCompetitor}}
+      <template name="RegForm">
         <form>
+          <h1>Add competetor</h1>
           <fieldset>
-            <h1>Add competetor</h1>
             {{labelField "name" class="autoComplete" autocomplete="off"}}
+          </fieldset>
+          <template name="Groups">
             <div class="Groups">
-            </div>
-            <template name="CatHead">
               <h1>Choose Categories for {{name}} to compete in</h1>
-            </template>
-            <template name="Category">
-              <label>
-                <span class="name">{{groupName}}</span>
-                {{field "category_id" selectList=groupList includeBlank="true"}}
-              </label>
-            </template>
+            </div>
+          </template>
+          <template name="Category">
+            <label>
+              <span class="name">{{groupName}}</span>
+              {{field "category_id" selectList=groupList includeBlank="true"}}
+            </label>
+          </template>
+          <fieldset class="actions">
+            <button type="submit">Register</button>
           </fieldset>
         </form>
       </template>
+
+      <table>
+        <thead><tr>
+            <th>Competitor</th><th>Categories</th>
+        </tr></thead>
+        <tbody>
+          {{each "competitors" template="Row"}}
+          <template name="Row">
+            <tr><td>{{climber.name}}</td><td>{{categories}}</td></tr>
+          </template>
+        </tbody>
+      </table>
     </div>
   </Section>
 </template>
