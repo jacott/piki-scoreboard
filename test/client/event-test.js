@@ -6,11 +6,33 @@
         org: TH.Factory.createOrg(),
       };
       App.Ready.isReady = true;
-      test.stub(App, 'subscribe').yields();
+      test.stub(App, 'subscribe').yields().returns({stop: v.stop = test.stub()});
     },
 
     tearDown: function () {
       v = null;
+    },
+
+    "test event subscribing": function () {
+      var events = TH.Factory.createList(2, 'createEvent', function (index, options) {
+        options.date = "2014/01/0"+(8-index);
+      });
+
+      AppRoute.gotoPage(Bart.Event.Show, {orgSN: v.org.shortName, eventId: events[0]._id});
+
+      assert.calledWith(App.subscribe, 'Event', events[0]._id);
+
+      AppRoute.gotoPage(Bart.Event.Register);
+
+      refute.called(v.stop);
+
+      App.subscribe.reset();
+
+      AppRoute.gotoPage(Bart.Event.Register, {eventId: events[1]._id});
+
+      assert.called(v.stop);
+
+      assert.calledWith(App.subscribe, 'Event', events[1]._id);
     },
 
     "test rendering": function () {

@@ -1,16 +1,21 @@
 var $ = Bart.current;
 var Tpl = Bart.Event;
 var Index = Tpl.Index;
-var eventId, elm;
+var eventId, eventSub;
 
 Tpl.$extend({
   onBaseEntry: function (page, pageRoute) {
-    eventId = pageRoute.eventId;
+    if (eventId = pageRoute.eventId)
+      eventSub = App.subscribe('Event', eventId, function () {
+
+      });
+
     document.body.appendChild(Tpl.$autoRender({}));
   },
 
   onBaseExit: function (page, pageRoute) {
-    eventId = null;
+    eventSub && eventSub.stop();
+    eventId = eventSub = null;
     Bart.removeId('Event');
   },
 });
