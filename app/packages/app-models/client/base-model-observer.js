@@ -22,6 +22,32 @@ App.extend(AppModel, {
         if (attrs)
           return cache[attrs._id] = new model(attrs);
       },
+
+      addUniqueIndex: function () {
+        var fields = arguments;
+        var len = fields.length;
+        var leadLen = len - 1;
+        var idx = {};
+        index.observe(function (doc, old) {
+          var tidx = idx;
+          if (doc) {
+            for(var i = 0; i < leadLen; ++i) {
+              var value = doc[fields[i]];
+              tidx = tidx[value] || (tidx[value] = {});
+            }
+            tidx[doc[fields[leadLen]]] = doc._id;
+          }
+        });
+        return function (keys) {
+          var ret = idx;
+          for(var i = 0; ret && i < len; ++i) {
+            var key = keys[fields[i]];
+            if (! key) return ret;
+            ret = ret[key];
+          }
+          return ret;
+        };
+      },
     };
 
     function stopFunc(myKey) {
