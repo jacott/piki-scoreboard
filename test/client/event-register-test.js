@@ -54,13 +54,27 @@
           }});
           assert.dom('select[name=category_id] option:not([selected])', {
             value: v.open._id, text: v.open.name, parent: function () {
+              this.focus();
               TH.change(this, v.open._id);
             }});
         });
 
         TH.click('fieldset.actions [type=submit]');
-        assert.dom('table td', 'brendon');
+        var competitor = AppModel.Competitor.findOne({climber_id: v.climbers[1]._id});
+        assert.equals(competitor.category_ids, [v.u18._id, v.open._id]);
+
+        assert.dom('table td', 'brendon', {parent: function () {
+          assert.dom('td', [v.u18.shortName, v.open.shortName].join(', '));
+        }});
+
         refute.dom('.Groups');
+        assert.dom('form', function () {
+          assert.dom('[name=name]', {value: ''}, function () {
+            assert.same(document.activeElement, this);
+          });
+          assert.attributesEqual(Bart.getCtx(this).data.changes, {event_id: v.event._id});
+        });
+
       });
     },
   });

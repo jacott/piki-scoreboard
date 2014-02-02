@@ -1,7 +1,5 @@
 <template name="Event.Register">
   <Section id="Register">
-    <form>
-    </form>
     <div id="registrations">
       <h1>{{name}}</h1>
       {{> RegForm newCompetitor}}

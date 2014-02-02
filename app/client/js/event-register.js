@@ -29,7 +29,7 @@ RegForm.$events({
     var ids = [];
     var form = event.currentTarget;
 
-    var groups = form.querySelector('.Groups select');
+    var groups = form.querySelectorAll('.Groups select');
     for(var i = 0; i < groups.length; ++i) {
       var row = groups[i];
       if (row.value) ids.push(row.value);
@@ -39,6 +39,10 @@ RegForm.$events({
 
     if (Form.saveDoc(competitor, form)) {
       Bart.remove(form.querySelector('.Groups'));
+      var elm = form.querySelector('[name=name]');
+      elm.value = '';
+      elm.focus();
+      $.ctx.data = new AppModel.Competitor({event_id: competitor.event_id});
     }
   },
 
@@ -64,5 +68,14 @@ RegForm.$events({
       });
       form.insertBefore(groupsElm, actionsElm);
     });
+  },
+});
+
+Tpl.Row.$helpers({
+  categories: function () {
+    return this.category_ids.map(function (id) {
+      return AppModel.Category.quickFind(id).shortName;
+    }).join(', ');
+
   },
 });
