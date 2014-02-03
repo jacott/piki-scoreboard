@@ -42,6 +42,11 @@
 
         assert.same(idx({id1: '4', id2: '4'}), doc1._id);
         assert.same(idx({id1: '3', id2: '4'}), undefined);
+
+        doc2.$update({$set: {id2: '4'}});
+
+        assert.equals(idx({}), {'4': {'4': doc1._id, '2': doc2._id, '1': doc3._id}});
+
       },
     },
   });

@@ -29,13 +29,25 @@ App.extend(AppModel, {
         var leadLen = len - 1;
         var idx = {};
         index.observe(function (doc, old) {
-          var tidx = idx;
           if (doc) {
+            if (old) {
+              for(var i = 0; i < len; ++i) {
+                var field = fields[i];
+                if (doc[field] != old[field]) {
+                  deleteEntry(idx, old, 0);
+                  break;
+                }
+              }
+              if (i === len) return;
+            }
+            var tidx = idx;
             for(var i = 0; i < leadLen; ++i) {
               var value = doc[fields[i]];
               tidx = tidx[value] || (tidx[value] = {});
             }
             tidx[doc[fields[leadLen]]] = doc._id;
+          } else if (old) {
+            deleteEntry(idx, old, 0);
           }
         });
         return function (keys) {
@@ -47,6 +59,17 @@ App.extend(AppModel, {
           }
           return ret;
         };
+
+        function deleteEntry(tidx, doc, count) {
+          var value  = doc[fields[count]];
+          if (! tidx) return true;
+          if (count < leadLen && ! deleteEntry(tidx[value], doc, count+1)) {
+            return false;
+          }
+          delete tidx[value];
+          for(var noop in tidx) return false;
+          return true;
+        }
       },
     };
 
