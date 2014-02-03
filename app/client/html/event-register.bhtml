@@ -26,7 +26,7 @@
         </form>
       </template>
 
-      <table>
+      <table class="select">
         <thead><tr>
             <th>Competitor</th><th>Categories</th>
         </tr></thead>

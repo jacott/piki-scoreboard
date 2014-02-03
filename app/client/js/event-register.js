@@ -54,7 +54,10 @@ RegForm.$events({
     var actionsElm = form.querySelector('.actions');
     var competitor = $.data();
 
-    Form.completeList(this, value && AppModel.Climber.search(value, 20), function (climber) {
+    var competitors = AppModel.Competitor.eventIndex({event_id: competitor.event_id}) || {};
+    Form.completeList(this, value && AppModel.Climber.search(value, 20, function (doc) {
+      return ! (doc._id in competitors);
+    }), function (climber) {
       competitor.climber_id = climber._id;
 
       Bart.remove(groupsElm);

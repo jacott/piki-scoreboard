@@ -30,6 +30,11 @@
       assert.equals(Apputil.mapField(AppModel.Climber.search('b',2), 'name'),
                     ['Bob', 'brendon']);
 
+      assert.equals(
+        Apputil.mapField(AppModel.Climber.search('b',2, function (climber) {
+          return climber.name !== 'Bob';
+        }), 'name'),
+        ['bobby', 'brendon']);
     },
   });
 })();

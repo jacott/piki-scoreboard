@@ -77,5 +77,17 @@
 
       });
     },
+
+    "test can't add twice": function () {
+      var oComp = TH.Factory.createCompetitor({climber_id: v.climbers[1]._id});
+
+      AppRoute.gotoPage(Bart.Event.Register, {
+        orgSN: v.org.shortName, eventId: v.event._id});
+
+      assert.dom('#Event #Register', function () {
+        TH.input('[name=name]', v.climbers[1].name);
+        refute.dom('ul>li');
+      });
+    },
   });
 })();
