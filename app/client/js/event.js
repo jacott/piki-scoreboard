@@ -1,21 +1,19 @@
 var $ = Bart.current;
 var Tpl = Bart.Event;
 var Index = Tpl.Index;
-var eventId, eventSub;
+var eventSub;
 
 Tpl.$extend({
   onBaseEntry: function (page, pageRoute) {
-    if (eventId = pageRoute.eventId)
-      eventSub = App.subscribe('Event', eventId, function () {
-
-      });
+    if (Tpl.event =  AppModel.Event.findOne(pageRoute.eventId))
+      eventSub = App.subscribe('Event', pageRoute.eventId, function () {});
 
     document.body.appendChild(Tpl.$autoRender({}));
   },
 
   onBaseExit: function (page, pageRoute) {
     eventSub && eventSub.stop();
-    eventId = eventSub = null;
+    Tpl.event = eventSub = null;
     Bart.removeId('Event');
   },
 });
@@ -57,15 +55,13 @@ base.addTemplate(Tpl.Add, {
 var selectedEvent = {
   focus: true,
   data: function (page, pageRoute) {
-    var doc = AppModel.Event.findOne(eventId);
+    if (! Tpl.event) AppRoute.abortPage();
 
-    if (!doc) AppRoute.abortPage();
-
-    return doc;
+    return Tpl.event;
   }
 };
 
-['Show', 'Edit', 'Register'].forEach(function (name) {
+['Show', 'Edit'].forEach(function (name) {
   base.addTemplate(Tpl[name], selectedEvent);
 });
 
@@ -104,3 +100,5 @@ function cancel(event) {
   event.$actioned = true;
   AppRoute.gotoPage(Tpl);
 }
+
+App.loaded('Bart.Event', Bart.Event);

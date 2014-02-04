@@ -24,7 +24,7 @@
       AppRoute.gotoPage(Bart.Event.Register, {
         orgSN: v.org.shortName, eventId: v.event._id});
 
-      assert.dom('#Event #Register #registrations', function () {
+      assert.dom('#Event #Register', function () {
         assert.dom('h1', v.event.name);
         refute.dom('.Groups');
         assert.dom('fieldset', function () {
@@ -59,6 +59,7 @@
             }});
         });
 
+        console.log('DEBUG XXX');
         TH.click('fieldset.actions [type=submit]');
         var competitor = AppModel.Competitor.findOne({climber_id: v.climbers[1]._id});
         assert.equals(competitor.category_ids, [v.u18._id, v.open._id]);
@@ -72,6 +73,7 @@
           assert.dom('[name=name]', {value: ''}, function () {
             assert.same(document.activeElement, this);
           });
+
           assert.attributesEqual(Bart.getCtx(this).data.changes, {event_id: v.event._id});
         });
 
@@ -87,6 +89,25 @@
       assert.dom('#Event #Register', function () {
         TH.input('[name=name]', v.climbers[1].name);
         refute.dom('ul>li');
+      });
+    },
+
+    "test edit competitor": function () {
+      var oComp = TH.Factory.createCompetitor({climber_id: v.climbers[1]._id});
+
+      AppRoute.gotoPage(Bart.Event.Register, {
+        orgSN: v.org.shortName, eventId: v.event._id});
+
+      assert.dom('#Event #Register', function () {
+        assert.dom('td', {text: v.climbers[1].name, parent: function () {
+          TH.click(this);
+        }});
+        assert.dom('form.edit', function () {
+          assert.dom('.Groups', function () {
+            assert.dom('select[name=category_id] option[selected]', {
+              value: oComp.category_ids[0]});
+          });
+        });
       });
     },
   });

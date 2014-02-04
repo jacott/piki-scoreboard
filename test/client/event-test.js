@@ -22,13 +22,13 @@
 
       assert.calledWith(App.subscribe, 'Event', events[0]._id);
 
-      AppRoute.gotoPage(Bart.Event.Register);
+      AppRoute.gotoPage(Bart.Event.Edit);
 
       refute.called(v.stop);
 
       App.subscribe.reset();
 
-      AppRoute.gotoPage(Bart.Event.Register, {eventId: events[1]._id});
+      AppRoute.gotoPage(Bart.Event.Edit, {eventId: events[1]._id});
 
       assert.called(v.stop);
 

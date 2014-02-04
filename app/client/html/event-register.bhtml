@@ -1,42 +1,52 @@
 <template name="Event.Register">
   <Section id="Register">
-    <div id="registrations">
-      <h1>{{name}}</h1>
-      {{> RegForm newCompetitor}}
-      <template name="RegForm">
-        <form>
-          <h1>Add competetor</h1>
-          <fieldset>
-            {{labelField "name" class="autoComplete" autocomplete="off"}}
-          </fieldset>
-          <template name="Groups">
-            <div class="Groups">
-              <h1>Choose Categories for {{name}} to compete in</h1>
-            </div>
-          </template>
-          <template name="Category">
-            <label>
-              <span class="name">{{groupName}}</span>
-              {{field "category_id" selectList=groupList includeBlank="true"}}
-            </label>
-          </template>
-          <fieldset class="actions">
-            <button type="submit">Register</button>
-          </fieldset>
-        </form>
-      </template>
+    <h1>{{name}}</h1>
 
-      <table class="select">
-        <thead><tr>
-            <th>Competitor</th><th>Categories</th>
-        </tr></thead>
-        <tbody>
-          {{each "competitors" template="Row"}}
-          <template name="Row">
-            <tr><td>{{climber.name}}</td><td>{{categories}}</td></tr>
-          </template>
-        </tbody>
-      </table>
-    </div>
+    <section class="body">
+    </section>
+
+    <template name="Add">
+      <form class="add">
+        <h1>Add competetor</h1>
+        <fieldset>
+          {{labelField "name" class="autoComplete" autocomplete="off"}}
+        </fieldset>
+        <fieldset class="actions">
+          <button type="submit">Register</button>
+        </fieldset>
+      </form>
+    </template>
+
+    <template name="Edit">
+      <form class="edit">
+        <fieldset class="actions">
+          <button type="submit">Change Categories</button>
+        </fieldset>
+      </form>
+    </template>
+
+    <template name="Groups">
+      <div class="Groups">
+        <h1>Choose Categories for {{climber.name}} to compete in</h1>
+      </div>
+    </template>
+    <template name="Category">
+      <label>
+        <span class="name">{{groupName}}</span>
+        {{field "category_id" selectList=groupList includeBlank="true"}}
+      </label>
+    </template>
+
+    <table class="select">
+      <thead><tr>
+          <th>Competitor</th><th>Categories</th>
+      </tr></thead>
+      <tbody>
+        {{each "competitors" template="Row"}}
+        <template name="Row">
+          <tr><td>{{climber.name}}</td><td>{{categories}}</td></tr>
+        </template>
+      </tbody>
+    </table>
   </Section>
 </template>

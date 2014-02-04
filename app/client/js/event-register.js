@@ -1,84 +1,133 @@
 var $ = Bart.current;
-var Tpl = Bart.Event.Register;
 var Form = Bart.Form;
-var RegForm = Tpl.RegForm;
-var Category = RegForm.Category;
+App.require('Bart.Event', function (Event) {
+  var Tpl = Event.Register;
+  var Add = Tpl.Add;
+  var Category = Tpl.Category;
+  var Groups = Tpl.Groups;
+  var competitor;
 
-Tpl.$helpers({
-  newCompetitor: function () {
-    return new AppModel.Competitor({event_id: this._id});
-  },
 
-  competitors: function (callback) {
-    AppModel.Competitor.find({event_id: this._id})
-      .forEach(function (doc) {callback(doc)});
-
-    return AppModel.Competitor.Index.observe(function (doc, old) {
-      doc = doc && new AppModel.Competitor(doc);
-      old = old && new AppModel.Competitor(old);
-      callback(doc, old);
-    });
-  },
-});
-
-RegForm.$events({
-  'submit': function (event) {
-    event.$actioned = true;
-
-    var competitor = $.data();
-    var ids = [];
-    var form = event.currentTarget;
-
-    var groups = form.querySelectorAll('.Groups select');
-    for(var i = 0; i < groups.length; ++i) {
-      var row = groups[i];
-      if (row.value) ids.push(row.value);
+  var base = Event.route.addBase(Tpl);
+  base.addTemplate(Tpl.Add, {
+    focus: true,
+    defaultPage: true,
+  });
+  base.addTemplate(Tpl.Edit, {
+    focus: true,
+    data: function (page, pageRoute) {
+      return AppModel.Competitor.findOne(pageRoute.append);
     }
+  });
 
-    competitor.category_ids = ids;
 
-    if (Form.saveDoc(competitor, form)) {
-      Bart.remove(form.querySelector('.Groups'));
-      var elm = form.querySelector('[name=name]');
-      elm.value = '';
-      elm.focus();
-      $.ctx.data = new AppModel.Competitor({event_id: competitor.event_id});
-    }
-  },
+  Tpl.$helpers({
+    competitors: function (callback) {
+      AppModel.Competitor.find({event_id: this._id})
+        .forEach(function (doc) {callback(doc)});
 
-  'input [name=name]': function (event) {
-    var value = this.value;
-    if (value) value = value.trim();
-    var form = event.currentTarget;
-    var groupsElm = form.querySelector('.Groups');
-    var actionsElm = form.querySelector('.actions');
-    var competitor = $.data();
-
-    var competitors = AppModel.Competitor.eventIndex({event_id: competitor.event_id}) || {};
-    Form.completeList(this, value && AppModel.Climber.search(value, 20, function (doc) {
-      return ! (doc._id in competitors);
-    }), function (climber) {
-      competitor.climber_id = climber._id;
-
-      Bart.remove(groupsElm);
-      groupsElm = RegForm.Groups.$render(climber);
-      AppModel.Category.groupApplicable(climber, function (group, docs) {
-        groupsElm.appendChild(Category.$autoRender({
-          groupName: group,
-          groupList: docs,
-          category_id: null,
-        }));
+      return AppModel.Competitor.Index.observe(function (doc, old) {
+        doc = doc && new AppModel.Competitor(doc);
+        old = old && new AppModel.Competitor(old);
+        callback(doc, old);
       });
-      form.insertBefore(groupsElm, actionsElm);
+    },
+  });
+
+  Tpl.$events({
+    'click tbody>tr': function (event) {
+      event.$actioned = true;
+      AppRoute.gotoPage(Tpl.Edit, {append: $.data(this)._id});
+    },
+  });
+
+  Tpl.$extend({
+    onBaseEntry: function (page, pageRoute) {
+      if (! Event.event) AppRoute.abortPage();
+      document.querySelector('#Event>div>.body').appendChild(Tpl.$autoRender(Event.event));
+    },
+
+    onBaseExit: function (page, pageRoute) {
+      Bart.removeId('Register');
+    },
+
+    $destroyed: function (ctx, elm) {
+      competitor = null;
+    },
+  });
+
+  Tpl.Edit.$extend({
+    $created: function (ctx, elm) {
+      addGroups(elm, ctx.data);
+    },
+  });
+
+  Add.$extend({
+    $created: function (ctx) {
+      ctx.data = new AppModel.Competitor({event_id: Event.event._id});
+    },
+  });
+
+  Add.$events({
+    'submit': function (event) {
+      event.$actioned = true;
+
+      var competitor = $.data();
+      var ids = [];
+      var form = event.currentTarget;
+
+      var groups = form.querySelectorAll('.Groups select');
+      for(var i = 0; i < groups.length; ++i) {
+        var row = groups[i];
+        if (row.value) ids.push(row.value);
+      }
+
+      competitor.category_ids = ids;
+
+      if (Form.saveDoc(competitor, form)) {
+        AppRoute.gotoPage(Add);
+      }
+    },
+
+    'input [name=name]': function (event) {
+      var value = this.value;
+      if (value) value = value.trim();
+      var form = event.currentTarget;
+      var competitor = $.data();
+
+      var competitors = AppModel.Competitor.eventIndex({event_id: competitor.event_id}) || {};
+      Form.completeList(this, value && AppModel.Climber.search(value, 20, function (doc) {
+        return ! (doc._id in competitors);
+      }), function (climber) {
+        competitor.climber_id = climber._id;
+
+        addGroups(form, competitor);
+      });
+    },
+  });
+
+  Tpl.Row.$helpers({
+    categories: function () {
+      return this.category_ids.map(function (id) {
+        return AppModel.Category.quickFind(id).shortName;
+      }).join(', ');
+
+    },
+  });
+
+  function addGroups(form, competitor) {
+    var climber = competitor.climber;
+    var groupsElm = form.querySelector('.Groups');
+
+    Bart.remove(groupsElm);
+    groupsElm = Groups.$render(competitor);
+    AppModel.Category.groupApplicable(climber, function (group, docs) {
+      groupsElm.appendChild(Category.$autoRender({
+        groupName: group,
+        groupList: docs,
+        category_id: competitor.categoryIdForGroup(group),
+      }));
     });
-  },
-});
-
-Tpl.Row.$helpers({
-  categories: function () {
-    return this.category_ids.map(function (id) {
-      return AppModel.Category.quickFind(id).shortName;
-    }).join(', ');
-
-  },
+    form.insertBefore(groupsElm, form.querySelector('.actions'));
+  }
 });
