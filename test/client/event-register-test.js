@@ -105,10 +105,48 @@
         assert.dom('form.edit', function () {
           assert.dom('.Groups', function () {
             assert.dom('select[name=category_id] option[selected]', {
-              value: oComp.category_ids[0]});
+              value: oComp.category_ids[0]}, function () {
+                TH.change(this, '');
+              });
           });
+          TH.click('[type=submit]');
+        });
+        assert.dom('form.add');
+      });
+    },
+
+    "test delete competitor": function () {
+      var oComp = TH.Factory.createCompetitor({climber_id: v.climbers[1]._id});
+
+      AppRoute.gotoPage(Bart.Event.Register, {
+        orgSN: v.org.shortName, eventId: v.event._id});
+
+      assert.dom('#Event #Register', function () {
+        assert.dom('td', {text: v.climbers[1].name, parent: function () {
+          TH.click(this);
+        }});
+        assert.dom('form.edit', function () {
+          TH.click('[name=delete]');
         });
       });
+
+      assert.dom('.Dialog.Confirm', function () {
+        assert.dom('h1', 'Deregister ' + v.climbers[1].name + '?');
+        TH.click('[name=cancel');
+      });
+
+      refute.dom('.Dialog');
+
+      TH.click('form.edit [name=delete]');
+
+      assert.dom('.Dialog', function () {
+        TH.click('[name=okay]', 'Deregister');
+      });
+
+      assert.dom('form.add');
+
+      refute.dom('td', v.climbers[1].name);
+
     },
   });
 })();

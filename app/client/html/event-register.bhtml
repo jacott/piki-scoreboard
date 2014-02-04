@@ -21,6 +21,7 @@
       <form class="edit">
         <fieldset class="actions">
           <button type="submit">Change Categories</button>
+          <button name="delete">Deregister</button>
         </fieldset>
       </form>
     </template>
@@ -49,4 +50,11 @@
       </tbody>
     </table>
   </Section>
+
+  <template name="ConfirmDelete">
+    <div>
+      <h1>Deregister {{climber.name}}?</h1>
+      <span>Are you sure you want to remove this climber from the event?</span>
+    </div>
+  </template>
 </template>

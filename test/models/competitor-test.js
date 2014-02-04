@@ -18,5 +18,9 @@
       assert(competitor.climber);
       assert(AppModel.Category.exists({org_id: competitor.event.org_id, _id: competitor.category_ids[0]}));
     },
+
+    "test removeRpc": function () {
+      TH.assertRemoveRpc(AppModel.Competitor);
+    },
   });
 })();
