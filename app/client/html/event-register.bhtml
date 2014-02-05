@@ -13,6 +13,7 @@
         </fieldset>
         <fieldset class="actions">
           <button type="submit">Register</button>
+          <button name="cancel">Cancel</button>
         </fieldset>
       </form>
     </template>
@@ -22,6 +23,7 @@
         <fieldset class="actions">
           <button type="submit">Change Categories</button>
           <button name="delete">Deregister</button>
+          <button name="cancel">Cancel</button>
         </fieldset>
       </form>
     </template>

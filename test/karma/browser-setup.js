@@ -17,6 +17,7 @@ __meteor_runtime_config__ = { ROOT_URL: "http://test.local:1234", serverId: "tes
       AppRoute.history = {
         pushState: function () {},
         replaceState: function () {},
+        back: function () {},
       };
       Accounts.loginServicesConfigured = loginServicesConfiguredStub;
       Meteor.setTimeout = timeoutStub;

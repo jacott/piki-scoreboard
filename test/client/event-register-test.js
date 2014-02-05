@@ -23,10 +23,7 @@
     },
 
     "test adding": function () {
-      AppRoute.gotoPage(Bart.Event.Register, {
-        orgSN: v.org.shortName, eventId: v.event._id});
-      v.orgSub.yield();
-      v.eventSub.yield();
+      gotoPage();
 
       assert.dom('#Event #Register', function () {
         assert.dom('h1', v.event.name);
@@ -86,10 +83,7 @@
     "test can't add twice": function () {
       var oComp = TH.Factory.createCompetitor({climber_id: v.climbers[1]._id});
 
-      AppRoute.gotoPage(Bart.Event.Register, {
-        orgSN: v.org.shortName, eventId: v.event._id});
-      v.orgSub.yield();
-      v.eventSub.yield();
+      gotoPage();
 
       assert.dom('#Event #Register', function () {
         TH.input('[name=name]', v.climbers[1].name);
@@ -97,65 +91,84 @@
       });
     },
 
-    "test edit competitor": function () {
-      var oComp = TH.Factory.createCompetitor({climber_id: v.climbers[1]._id});
-
-      AppRoute.gotoPage(Bart.Event.Register, {
-        orgSN: v.org.shortName, eventId: v.event._id});
-      v.orgSub.yield();
-      v.eventSub.yield();
+    "test cancel add": function () {
+      gotoPage();
 
       assert.dom('#Event #Register', function () {
-        assert.dom('td', {text: v.climbers[1].name, parent: function () {
+        TH.input('[name=name]', v.climbers[1].name);
+        TH.click('ul>li');
+
+        test.stub(AppRoute, 'replacePath');
+
+        TH.click('[name=cancel]');
+
+        assert.calledWith(AppRoute.replacePath, Bart.Event.Register);
+      });
+    },
+
+    "edit": {
+      setUp: function () {
+        v.oComp = TH.Factory.createCompetitor({climber_id: v.climbers[1]._id});
+
+        gotoPage();
+
+        assert.dom('#Register td', {text: v.climbers[1].name, parent: function () {
           TH.click(this);
         }});
-        assert.dom('form.edit', function () {
+
+      },
+
+
+      "test change category": function () {
+        assert.dom('#Register form.edit', function () {
           assert.dom('.Groups', function () {
             assert.dom('select[name=category_id] option[selected]', {
-              value: oComp.category_ids[0]}, function () {
+              value: v.oComp.category_ids[0]}, function () {
                 TH.change(this, '');
               });
           });
           TH.click('[type=submit]');
         });
         assert.dom('form.add');
-      });
-    },
+      },
 
-    "test delete competitor": function () {
-      var oComp = TH.Factory.createCompetitor({climber_id: v.climbers[1]._id});
+      "test cancel": function () {
+        test.stub(AppRoute.history, 'back');
 
-      AppRoute.gotoPage(Bart.Event.Register, {
-        orgSN: v.org.shortName, eventId: v.event._id});
-      v.orgSub.yield();
-      v.eventSub.yield();
+        TH.click('#Register form [name=cancel]');
 
-      assert.dom('#Event #Register', function () {
-        assert.dom('td', {text: v.climbers[1].name, parent: function () {
-          TH.click(this);
-        }});
-        assert.dom('form.edit', function () {
+        assert.called(AppRoute.history.back);
+      },
+
+      "test delete competitor": function () {
+        assert.dom('#Register form.edit', function () {
           TH.click('[name=delete]');
         });
-      });
 
-      assert.dom('.Dialog.Confirm', function () {
-        assert.dom('h1', 'Deregister ' + v.climbers[1].name + '?');
-        TH.click('[name=cancel');
-      });
+        assert.dom('.Dialog.Confirm', function () {
+          assert.dom('h1', 'Deregister ' + v.climbers[1].name + '?');
+          TH.click('[name=cancel');
+        });
 
-      refute.dom('.Dialog');
+        refute.dom('.Dialog');
 
-      TH.click('form.edit [name=delete]');
+        TH.click('#Register form.edit [name=delete]');
 
-      assert.dom('.Dialog', function () {
-        TH.click('[name=okay]', 'Deregister');
-      });
+        assert.dom('.Dialog', function () {
+          TH.click('[name=okay]', 'Deregister');
+        });
 
-      assert.dom('form.add');
+        assert.dom('form.add');
 
-      refute.dom('td', v.climbers[1].name);
-
+        refute.dom('td', v.climbers[1].name);
+      },
     },
   });
+
+  function gotoPage() {
+    AppRoute.gotoPage(Bart.Event.Register, {
+      orgSN: v.org.shortName, eventId: v.event._id});
+    v.orgSub.yield();
+    v.eventSub.yield();
+  }
 })();

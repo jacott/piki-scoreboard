@@ -40,6 +40,11 @@ App.require('Bart.Event', function (Event) {
       event.$actioned = true;
       AppRoute.gotoPage(Edit, {append: $.data(this)._id});
     },
+
+    'click [name=cancel]': function (event) {
+      event.$actioned = true;
+      AppRoute.history.back();
+    },
   });
 
   Tpl.$extend({
@@ -94,6 +99,10 @@ App.require('Bart.Event', function (Event) {
   });
 
   Add.$events({
+    'click [name=cancel]': function (event) {
+      event.$actioned = true;
+      AppRoute.replacePath(Tpl);
+    },
     'submit': submit,
 
     'input [name=name]': function (event) {
