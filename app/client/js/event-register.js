@@ -17,7 +17,7 @@ App.require('Bart.Event', function (Event) {
   base.addTemplate(Edit, {
     focus: true,
     data: function (page, pageRoute) {
-      return AppModel.Competitor.findOne(pageRoute.append);
+      return AppModel.Competitor.findOne(pageRoute.append) || AppRoute.abortPage();
     }
   });
 

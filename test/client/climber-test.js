@@ -6,7 +6,7 @@
         org: TH.Factory.createOrg(),
       };
       App.Ready.isReady = true;
-      test.stub(App, 'subscribe').yields();
+      v.orgSub = test.stub(App, 'subscribe').withArgs('Org');
     },
 
     tearDown: function () {
@@ -17,6 +17,7 @@
       var climbers = TH.Factory.createList(2, 'createClimber');
 
       AppRoute.gotoPage(Bart.Climber.Index, {orgSN: v.org.shortName});
+      v.orgSub.yield();
 
       assert.dom('#Climber', function () {
         assert.dom('.climbers', function () {
@@ -38,6 +39,7 @@
       var club = TH.Factory.createClub();
 
       AppRoute.gotoPage(Bart.Climber.Index, {orgSN: v.org.shortName});
+      v.orgSub.yield();
 
       assert.dom('#Climber', function () {
         TH.click('[name=addClimber]');
@@ -72,6 +74,7 @@
         v.climber2 = TH.Factory.createClimber();
 
         AppRoute.gotoPage(Bart.Climber.Index, {orgSN: v.org.shortName});
+        v.orgSub.yield();
 
         TH.click('td', v.climber.name);
       },

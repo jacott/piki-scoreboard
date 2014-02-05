@@ -53,8 +53,9 @@
     "test addUser": function () {
       v.org = TH.Factory.createOrg();
       App.Ready.isReady = true;
-      test.stub(App, 'subscribe').yields();
+      v.orgSub = test.stub(App, 'subscribe').withArgs('Org');
       AppRoute.gotoPage(Bart.SystemSetup, {orgSN: v.org.shortName});
+      v.orgSub.yield();
 
       assert.dom('#SystemSetup', function () {
         TH.click('[name=addUser]');

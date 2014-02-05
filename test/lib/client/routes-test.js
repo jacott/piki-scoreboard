@@ -130,6 +130,31 @@
 
         assert.calledTwice(v.Baz.onBaseEntry);
       },
+
+      "test loadingArgs": function () {
+        v.RootBar.onEntry = function () {
+          v.loadingArgs = AppRoute.loadingArgs;
+
+        };
+
+        AppRoute.gotoPage(v.RootBar, {bazId: '123'});
+
+        assert.equals(v.loadingArgs[0], v.RootBar);
+        assert.equals(v.loadingArgs[1], {pathname: '/baz/123/root-bar', bazId: '123'});
+
+        assert.same(AppRoute.loadingArgs, null);
+
+      },
+
+      "test path append on template": function () {
+        v.RootBar.onEntry = function (page, pageRoute) {
+          v.append = pageRoute.append;
+        };
+
+        AppRoute.gotoPath('/baz/123/root-bar/stuff/at/end');
+
+        assert.same(v.append, 'stuff/at/end');
+      },
     },
 
     "test append": function () {

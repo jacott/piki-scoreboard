@@ -13,7 +13,9 @@
       v.u18 = TH.Factory.createCategory({group: '1 Youth Lead'});
       v.open = TH.Factory.createCategory({group: '2 Open Lead'});
       App.Ready.isReady = true;
-      test.stub(App, 'subscribe').yields();
+
+      v.orgSub = test.stub(App, 'subscribe').withArgs('Org');
+      v.eventSub = App.subscribe.withArgs('Event').returns({stop: test.stub()});
     },
 
     tearDown: function () {
@@ -23,6 +25,8 @@
     "test adding": function () {
       AppRoute.gotoPage(Bart.Event.Register, {
         orgSN: v.org.shortName, eventId: v.event._id});
+      v.orgSub.yield();
+      v.eventSub.yield();
 
       assert.dom('#Event #Register', function () {
         assert.dom('h1', v.event.name);
@@ -59,7 +63,6 @@
             }});
         });
 
-        console.log('DEBUG XXX');
         TH.click('fieldset.actions [type=submit]');
         var competitor = AppModel.Competitor.findOne({climber_id: v.climbers[1]._id});
         assert.equals(competitor.category_ids, [v.u18._id, v.open._id]);
@@ -85,6 +88,8 @@
 
       AppRoute.gotoPage(Bart.Event.Register, {
         orgSN: v.org.shortName, eventId: v.event._id});
+      v.orgSub.yield();
+      v.eventSub.yield();
 
       assert.dom('#Event #Register', function () {
         TH.input('[name=name]', v.climbers[1].name);
@@ -97,6 +102,8 @@
 
       AppRoute.gotoPage(Bart.Event.Register, {
         orgSN: v.org.shortName, eventId: v.event._id});
+      v.orgSub.yield();
+      v.eventSub.yield();
 
       assert.dom('#Event #Register', function () {
         assert.dom('td', {text: v.climbers[1].name, parent: function () {
@@ -120,6 +127,8 @@
 
       AppRoute.gotoPage(Bart.Event.Register, {
         orgSN: v.org.shortName, eventId: v.event._id});
+      v.orgSub.yield();
+      v.eventSub.yield();
 
       assert.dom('#Event #Register', function () {
         assert.dom('td', {text: v.climbers[1].name, parent: function () {

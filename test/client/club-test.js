@@ -6,7 +6,7 @@
         org: TH.Factory.createOrg(),
       };
       App.Ready.isReady = true;
-      test.stub(App, 'subscribe').yields();
+      v.orgSub = test.stub(App, 'subscribe').withArgs('Org');
     },
 
     tearDown: function () {
@@ -17,6 +17,7 @@
       var clubs = TH.Factory.createList(2, 'createClub');
 
       AppRoute.gotoPage(Bart.Club.Index, {orgSN: v.org.shortName});
+      v.orgSub.yield();
 
       assert.dom('#Club', function () {
         assert.dom('.clubs', function () {
@@ -36,6 +37,7 @@
 
     "test adding new club": function () {
       AppRoute.gotoPage(Bart.Club.Index, {orgSN: v.org.shortName});
+      v.orgSub.yield();
 
       assert.dom('#Club', function () {
         TH.click('[name=addClub]');
@@ -58,6 +60,7 @@
         v.club2 = TH.Factory.createClub();
 
         AppRoute.gotoPage(Bart.Club.Index, {orgSN: v.org.shortName});
+        v.orgSub.yield();
 
         TH.click('td', v.club.name);
       },

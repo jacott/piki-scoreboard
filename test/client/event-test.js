@@ -6,7 +6,8 @@
         org: TH.Factory.createOrg(),
       };
       App.Ready.isReady = true;
-      test.stub(App, 'subscribe').yields().returns({stop: v.stop = test.stub()});
+      v.orgSub = test.stub(App, 'subscribe').withArgs('Org');
+      v.eventSub = App.subscribe.withArgs('Event').returns({stop: v.stop = test.stub()});
     },
 
     tearDown: function () {
@@ -19,6 +20,8 @@
       });
 
       AppRoute.gotoPage(Bart.Event.Show, {orgSN: v.org.shortName, eventId: events[0]._id});
+      v.orgSub.yield();
+      v.eventSub.yield();
 
       assert.calledWith(App.subscribe, 'Event', events[0]._id);
 
@@ -41,6 +44,7 @@
       });
 
       AppRoute.gotoPage(Bart.Event.Index, {orgSN: v.org.shortName});
+      v.orgSub.yield();
 
       assert.dom('#Event', function () {
         assert.dom('.events', function () {
@@ -60,6 +64,7 @@
 
     "test adding new event": function () {
       AppRoute.gotoPage(Bart.Event.Index, {orgSN: v.org.shortName});
+      v.orgSub.yield();
 
       assert.dom('#Event', function () {
         TH.click('[name=add]');
@@ -82,8 +87,10 @@
         v.event2 = TH.Factory.createEvent();
 
         AppRoute.gotoPage(Bart.Event.Index, {orgSN: v.org.shortName});
+        v.orgSub.yield();
 
         TH.click('td', v.event.name);
+        v.eventSub.yield();
       },
 
       "test rendering": function () {

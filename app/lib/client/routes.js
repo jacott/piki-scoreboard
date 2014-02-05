@@ -79,6 +79,8 @@ App.require('makeSubject', function (makeSubject) {
       pageRoute = App.reverseExtend(pageRoute || {},  currentPageRoute, excludes);
       pageRoute.pathname = pathname(page, pageRoute || {});
 
+      AppRoute.loadingArgs = [page, pageRoute];
+
       try {
         if (currentPage) {
           currentPage.onExit && currentPage.onExit(page, pageRoute);
@@ -109,6 +111,7 @@ App.require('makeSubject', function (makeSubject) {
         throw ex;
       }
       finally {
+        AppRoute.loadingArgs = null;
         pageState = 'pushState';
         currentPageRoute = pageRoute;
       }
@@ -164,6 +167,7 @@ App.require('makeSubject', function (makeSubject) {
         }
 
         if (! newPage) {
+          pageRoute.append = parts.slice(i).join('/');
           break;
         }
         page = newPage;
@@ -204,8 +208,8 @@ App.require('makeSubject', function (makeSubject) {
 
     for(index = index - diff - 1 ; index >= 0; --index) {
       item = entry[index];
-      item.onBaseEntry(page, pageRoute);
       currentPage = item;
+      item.onBaseEntry(page, pageRoute);
     }
   }
 });

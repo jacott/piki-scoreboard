@@ -5,10 +5,19 @@ var eventSub;
 
 Tpl.$extend({
   onBaseEntry: function (page, pageRoute) {
-    if (Tpl.event =  AppModel.Event.findOne(pageRoute.eventId))
-      eventSub = App.subscribe('Event', pageRoute.eventId, function () {});
-
     document.body.appendChild(Tpl.$autoRender({}));
+
+    if (pageRoute.eventId) {
+      if (! Tpl.event || Tpl.event._id !== pageRoute.eventId) {
+        if (Tpl.event =  AppModel.Event.findOne(pageRoute.eventId)) {
+          eventSub = App.subscribe('Event', pageRoute.eventId, function () {
+            AppRoute.gotoPage.apply(AppRoute, loadingArgs);
+          });
+          var loadingArgs = AppRoute.loadingArgs;
+          AppRoute.abortPage();
+        }
+      }
+    }
   },
 
   onBaseExit: function (page, pageRoute) {

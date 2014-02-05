@@ -79,8 +79,6 @@ function subscribeOrg(shortName) {
     if (! App.Ready.isReady) return;
 
     orgSub = App.subscribe('Org', orgShortName, function () {
-
-
       var doc = AppModel.Org.findOne({shortName: orgShortName});
       App.orgId = doc._id;
       Bart.addClass(document.body, 'inOrg');
@@ -91,6 +89,12 @@ function subscribeOrg(shortName) {
         AppRoute.replacePath(pn);
       }
     });
+
+    if (AppRoute.loadingArgs) {
+      pathname = AppRoute.loadingArgs[1].pathname;
+      AppRoute.abortPage();
+    }
+
   } else {
     orgSub = orgShortName = App.orgId = pathname = null;
     Bart.removeClass(document.body, 'inOrg');
