@@ -3,6 +3,7 @@
     setUp: function () {
       test = this;
       v = {};
+      App.Ready.isReady = true;
     },
 
     tearDown: function () {
@@ -15,7 +16,7 @@
 
       assert.dom('#SystemSetup', function () {
         assert.dom('.menu', function () {
-          assert.dom('[name=addOrg]');
+          assert.dom('button.link', {count: 2});
         });
       });
 
@@ -23,6 +24,31 @@
       Bart.SystemSetup.onBaseExit();
 
       refute.dom('#SystemSetup');
+    },
+
+    "test renders orgs list": function () {
+      var orgs = TH.Factory.createList(2, 'createOrg');
+
+      AppRoute.gotoPage(Bart.SystemSetup);
+
+      assert.dom('table.orgs', function () {
+        assert.dom('td', orgs[0].name);
+      });
+    },
+
+    "test renders users list": function () {
+      v.org = TH.Factory.createOrg({name: 'org1'});
+
+      var users = TH.Factory.createList(2, 'createUser');
+
+      var orgSub = test.stub(App, 'subscribe').withArgs('Org');
+      AppRoute.gotoPage(Bart.SystemSetup, {orgSN: v.org.shortName});
+      orgSub.yield();
+
+      assert.dom('h1', 'org1 Users');
+      assert.dom('table.users', function () {
+        assert.dom('td', users[0].name);
+      });
     },
 
     "test addOrg": function () {

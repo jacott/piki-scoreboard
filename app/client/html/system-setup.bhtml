@@ -5,13 +5,48 @@
       </nav>
       <section class="body">
       </section>
+
+      <h1>Organizations</h1>
+      <table class="orgs select">
+        <thead>
+          <tr>
+            <th>Name</th><th>email</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{each "orgList" template="OrgRow"}}
+          <template name="OrgRow">
+            <tr>
+              <td>{{name}}</td><td>{{email}}</td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+
+      <h1>{{org.name}} Users</h1>
+      <table class="users select">
+        <thead>
+          <tr>
+            <th>Name</th><th>email</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{each "userList" template="UserRow"}}
+          <template name="UserRow">
+            <tr>
+              <td>{{name}}</td><td>{{email}}</td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+
     </div>
   </section>
   <template name="Index">
     <div>
       <nav class="menu">
-        <button type="button" name="addOrg">Add new organization</button>
-        <button type="button" name="addUser">Add new user</button>
+        {{pageLink name="addOrg" value="Add new organization" template="SystemSetup.AddOrg"}}
+        {{pageLink name="addUser" value="Add new user" template="SystemSetup.AddUser"}}
       </nav>
     </div>
   </template>
@@ -31,6 +66,7 @@
   <template name="AddUser">
     <form id="AddUser">
       <fieldset class="fields">
+        {{labelField "org_id" selectList=orgList}}
         {{labelField "name"}}
         {{labelField "initials"}}
         {{labelField "email"}}

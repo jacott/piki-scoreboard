@@ -24,24 +24,49 @@ Tpl.$extend({
   },
 });
 
-Tpl.$events({
-  'click [name=addOrg]': function (event) {
-    event.$actioned = true;
-    AppRoute.gotoPage(Tpl.AddOrg);
+Tpl.$helpers({
+  org: function () {
+    return App.org();
   },
 
-  'click [name=addUser]': function (event) {
-    event.$actioned = true;
-    AppRoute.gotoPage(Tpl.AddUser);
+  orgList: function (callback) {
+    AppModel.Org.find({}, {sort: {date: 1}})
+      .forEach(function (doc) {callback(doc)});
+
+    return AppModel.Org.Index.observe(function (doc, old) {
+      callback(doc, old, Apputil.compareByName);
+    });
   },
-  'click [name=cancel]': function (event) {
-    event.$actioned = true;
-    AppRoute.gotoPage(Tpl);
+
+  userList: function (callback) {
+    AppModel.User.find({}, {sort: {date: 1}})
+      .forEach(function (doc) {callback(doc)});
+
+    return AppModel.User.Index.observe(function (doc, old) {
+      callback(doc, old, Apputil.compareByName);
+    });
   },
 });
 
+
+
+Tpl.$events({
+  'click [name=cancel]': function (event) {
+    event.$actioned = true;
+    AppRoute.history.back();
+  },
+});
+
+
+
 Tpl.AddOrg.$events({
   'click [type=submit]': Bart.Form.submitFunc('AddOrg', Tpl),
+});
+
+Tpl.AddUser.$helpers({
+  orgList: function () {
+    return AppModel.Org.find({}, {sort: {name: 1}}).fetch();
+  },
 });
 
 Tpl.AddUser.$events({

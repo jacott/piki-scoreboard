@@ -1,4 +1,28 @@
-Example to change content on focused input box
+* Render org list
+
+* Render user list
+
+* Add user account and set password to "changeme"
+
+* Add change user password page
+
+* Add forgotten password page
+
+* Add/remove competitor to startlist when add/changing categories
+
+ - aftersave change EventCat with uniqiue random sortKey
+
+
+
+
+
+
+
+
+
+
+
+* Example to change content on focused input box
 
   // 'webkitspeechchange input[name=speech], speechchange input[name=speech]': function (event,templ) {
   //   var ta = templ.find('textarea'),
