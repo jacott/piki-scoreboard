@@ -1,0 +1,9 @@
+<template name="Profile">
+  <section id="Profile">
+    <div>
+      <section class="body">
+        {{name}}
+      </section>
+    </div>
+  </section>
+</template>

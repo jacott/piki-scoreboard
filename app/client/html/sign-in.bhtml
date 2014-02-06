@@ -3,8 +3,10 @@
     <template name="SignInLink">
       <button class="link" name="signIn">Sign in / register</button>
     </template>
-    <template name="Profile">
-      <button class="link" name="profile">{{name}}</button>
+    <template name="ProfileLink">
+      <span>
+        {{pageLink id="ProfileLink" value=name template="Profile"}}
+      </span>
     </template>
     {{item}}
   </span>

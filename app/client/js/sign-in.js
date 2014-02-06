@@ -5,7 +5,7 @@ Tpl.$helpers({
   item: function () {
     var me = AppModel.User.me();
     if (me)
-      return Tpl.Profile.$autoRender(me);
+      return Tpl.ProfileLink.$autoRender(me);
     else
       return Tpl.SignInLink.$autoRender({});
   },

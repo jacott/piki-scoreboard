@@ -16,7 +16,10 @@
 
       App.Ready.notifyReady();
       refute.dom('[name=signIn]');
-      assert.dom('[name=profile]');
+      test.stub(AppRoute, 'gotoPath');
+      TH.click('#ProfileLink');
+
+      assert.calledWith(AppRoute.gotoPath, Bart.Profile);
     },
 
     "test cancel": function () {

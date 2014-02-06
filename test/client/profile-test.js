@@ -9,5 +9,13 @@
     tearDown: function () {
       v = null;
     },
+
+    "test super user goes to system-setup": function () {
+      TH.login(v.su);
+
+      AppRoute.gotoPage(Bart.Profile);
+
+      assert.dom('#SystemSetup');
+    },
   });
 })();
