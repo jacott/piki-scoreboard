@@ -25,9 +25,13 @@
       var subject = TH.Factory.createUser();
       var user = TH.Factory.createUser('su');
 
+      subject.role = "bad";
       refute.accessDenied(function () {
         subject.authorize(user._id);
       });
+
+      assert.same(subject.role, "a");
+
 
       user = TH.Factory.createUser();
 

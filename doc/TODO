@@ -4,6 +4,8 @@ d* Render user list
 
 d* Add user account and set password to "changeme"
 
+d* Validate user
+
 * Add change user password page
 
 * Add forgotten password page
