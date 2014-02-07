@@ -5,8 +5,7 @@
       v = {
         org: TH.Factory.createOrg(),
       };
-      App.Ready.isReady = true;
-      v.orgSub = test.stub(App, 'subscribe').withArgs('Org');
+      TH.setOrg(v.org);
       v.eventSub = App.subscribe.withArgs('Event').returns({stop: v.stop = test.stub()});
     },
 
@@ -19,8 +18,7 @@
         options.date = "2014/01/0"+(8-index);
       });
 
-      AppRoute.gotoPage(Bart.Event.Show, {orgSN: v.org.shortName, eventId: events[0]._id});
-      v.orgSub.yield();
+      AppRoute.gotoPage(Bart.Event.Show, {eventId: events[0]._id});
       v.eventSub.yield();
 
       assert.calledWith(App.subscribe, 'Event', events[0]._id);
@@ -43,8 +41,7 @@
         options.date = "2014/01/0"+(8-index);
       });
 
-      AppRoute.gotoPage(Bart.Event.Index, {orgSN: v.org.shortName});
-      v.orgSub.yield();
+      AppRoute.gotoPage(Bart.Event.Index);
 
       assert.dom('#Event', function () {
         assert.dom('.events', function () {
@@ -63,8 +60,7 @@
     },
 
     "test adding new event": function () {
-      AppRoute.gotoPage(Bart.Event.Index, {orgSN: v.org.shortName});
-      v.orgSub.yield();
+      AppRoute.gotoPage(Bart.Event.Index);
 
       assert.dom('#Event', function () {
         TH.click('[name=add]');
@@ -86,8 +82,7 @@
         v.event = TH.Factory.createEvent();
         v.event2 = TH.Factory.createEvent();
 
-        AppRoute.gotoPage(Bart.Event.Index, {orgSN: v.org.shortName});
-        v.orgSub.yield();
+        AppRoute.gotoPage(Bart.Event.Index);
 
         TH.click('td', v.event.name);
         v.eventSub.yield();

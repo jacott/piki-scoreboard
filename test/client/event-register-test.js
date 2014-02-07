@@ -12,9 +12,8 @@
       v.u16 = TH.Factory.createCategory({group: '1 Youth Lead'});
       v.u18 = TH.Factory.createCategory({group: '1 Youth Lead'});
       v.open = TH.Factory.createCategory({group: '2 Open Lead'});
-      App.Ready.isReady = true;
 
-      v.orgSub = test.stub(App, 'subscribe').withArgs('Org');
+      TH.setOrg(v.org);
       v.eventSub = App.subscribe.withArgs('Event').returns({stop: test.stub()});
     },
 
@@ -168,7 +167,6 @@
   function gotoPage() {
     AppRoute.gotoPage(Bart.Event.Register, {
       orgSN: v.org.shortName, eventId: v.event._id});
-    v.orgSub.yield();
     v.eventSub.yield();
   }
 })();

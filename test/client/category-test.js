@@ -5,8 +5,7 @@
       v = {
         org: TH.Factory.createOrg(),
       };
-      App.Ready.isReady = true;
-      v.orgSub = test.stub(App, 'subscribe').withArgs('Org');
+      TH.setOrg(v.org);
     },
 
     tearDown: function () {
@@ -16,8 +15,7 @@
     "test rendering": function () {
       var categorys = TH.Factory.createList(2, 'createCategory');
 
-      AppRoute.gotoPage(Bart.Category.Index, {orgSN: v.org.shortName});
-      v.orgSub.yield();
+      AppRoute.gotoPage(Bart.Category.Index);
 
       assert.dom('#Category', function () {
         assert.dom('.categorys', function () {
@@ -36,8 +34,7 @@
     },
 
     "test adding new category": function () {
-      AppRoute.gotoPage(Bart.Category.Index, {orgSN: v.org.shortName});
-      v.orgSub.yield();
+      AppRoute.gotoPage(Bart.Category.Index);
 
       assert.dom('#Category', function () {
         TH.click('[name=addCategory]');
@@ -63,8 +60,7 @@
         v.category = TH.Factory.createCategory();
         v.category2 = TH.Factory.createCategory();
 
-        AppRoute.gotoPage(Bart.Category.Index, {orgSN: v.org.shortName});
-        v.orgSub.yield();
+        AppRoute.gotoPage(Bart.Category.Index);
 
         TH.click('td', v.category.name);
       },

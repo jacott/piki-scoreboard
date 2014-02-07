@@ -5,8 +5,7 @@
       v = {
         org: TH.Factory.createOrg(),
       };
-      App.Ready.isReady = true;
-      v.orgSub = test.stub(App, 'subscribe').withArgs('Org');
+      TH.setOrg(v.org);
     },
 
     tearDown: function () {
@@ -16,8 +15,7 @@
     "test rendering": function () {
       var climbers = TH.Factory.createList(2, 'createClimber');
 
-      AppRoute.gotoPage(Bart.Climber.Index, {orgSN: v.org.shortName});
-      v.orgSub.yield();
+      AppRoute.gotoPage(Bart.Climber.Index);
 
       assert.dom('#Climber', function () {
         assert.dom('.climbers', function () {
@@ -38,8 +36,7 @@
     "test adding new climber": function () {
       var club = TH.Factory.createClub();
 
-      AppRoute.gotoPage(Bart.Climber.Index, {orgSN: v.org.shortName});
-      v.orgSub.yield();
+      AppRoute.gotoPage(Bart.Climber.Index);
 
       assert.dom('#Climber', function () {
         TH.click('[name=addClimber]');
@@ -73,8 +70,7 @@
         v.climber = TH.Factory.createClimber();
         v.climber2 = TH.Factory.createClimber();
 
-        AppRoute.gotoPage(Bart.Climber.Index, {orgSN: v.org.shortName});
-        v.orgSub.yield();
+        AppRoute.gotoPage(Bart.Climber.Index);
 
         TH.click('td', v.climber.name);
       },
