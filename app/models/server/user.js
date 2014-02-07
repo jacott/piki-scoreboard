@@ -45,5 +45,25 @@ App.require('AppModel.User', function (model) {
 
   model.registerObserveField('org_id');
 
+  Meteor.methods({
+    "User.forgotPassword": function (email, challenge, response) {
+      check(email, String);
+      email = email.trim();
+      if (!email) {
+         return {email: 'is_required' };
+      }
+      email = Apputil.parseEmailAddresses(email);
+      if (! email || email.addresses.length !== 1 || email.remainder)
+        return {email: 'is_invalid' };
 
+      email = email.addresses[0].toLowerCase();
+
+      var user = model.findOne({email: email});
+      if (user) {
+        var accUser = Meteor.users.findOne(user._id);
+        accUser && Accounts.sendResetPasswordEmail(user._id);
+      }
+      return {success: true};
+    },
+  });
 });

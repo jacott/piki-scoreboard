@@ -1,5 +1,7 @@
 var Tpl = Bart.SignIn;
 var Dialog = Tpl.Dialog;
+var ForgotPassword = Tpl.ForgotPassword;
+var Form = Bart.Form;
 
 Tpl.$helpers({
   item: function () {
@@ -30,6 +32,14 @@ App.extend(Tpl, {
 
 
 Dialog.$events({
+  'click [name=forgot]': function (event) {
+    event.$actioned = true;
+    Bart.Dialog.close();
+
+    Bart.Dialog.open(ForgotPassword.$autoRender({
+      email: event.currentTarget.querySelector('[name=email]').value}));
+  },
+
   'click [name=cancel]': function (event) {
     event.$actioned = true;
     Bart.Dialog.close();
@@ -67,5 +77,31 @@ Dialog.Progress.$helpers({
     default:
       return '';
     }
+  },
+});
+
+ForgotPassword.$events({
+  'submit': function (event) {
+    event.$actioned = true;
+
+    AppModel.User.forgotPassword(document.getElementById('email').value, function (error, response) {
+      var form = document.getElementById('ForgotPassword');
+      Form.clearErrors(form);
+      if (error) {
+        Form.renderError(form, 'submit', 'An unexpected error occured. Please reload page.');
+        form.querySelector('[name=submit]').style.display = 'none';
+        App.log('ERROR: ', error.message);
+        return;
+      }
+      if (response.success) {
+        var submit = form.querySelector('[name=submit]');
+
+        submit.parentNode.replaceChild(ForgotPassword.EmailSent.$render(), submit);
+      } else if (response.email) {
+        Form.renderError(form, 'email', AppVal.Error.msgFor(response.email));
+      } else {
+        Form.renderError(form, 'submit', AppVal.Error.msgFor(response.reason));
+      }
+    });
   },
 });

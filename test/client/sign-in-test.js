@@ -29,6 +29,60 @@
       refute.dom('.Dialog');
     },
 
+    "test clicking forgot password": function () {
+      Bart.Dialog.open(Bart.SignIn.Dialog.$autoRender({}));
+      TH.input('[name=email]', 'email@address');
+      TH.click('[name=forgot]');
+
+      refute.dom('#SignInDialog');
+
+      assert.dom('.Dialog #ForgotPassword', function () {
+        assert.dom('[name=email]', {value: 'email@address'});
+      });
+    },
+
+    "forgot password": {
+      setUp: function () {
+        v.remoteCall = test.stub(AppModel.User, 'forgotPassword');
+
+        Bart.Dialog.open(Bart.SignIn.ForgotPassword.$autoRender({email: 'foo@bar.com'}));
+
+        TH.click('#ForgotPassword [name=submit]');
+
+        assert.calledWith(v.remoteCall, 'foo@bar.com', sinon.match(function (callback) {
+          v.callback = callback;
+          return true;
+        }));
+      },
+
+      "test bad email": function () {
+        v.callback(null, {email: 'is_invalid'});
+
+        assert.dom('#ForgotPassword', function () {
+          assert.dom('input.error[name=email]');
+          assert.dom('input.error[name=email]+.errorMsg', 'not valid');
+
+          v.callback(null, {success: true});
+
+          refute.dom('.error');
+        });
+      },
+
+      "test unexpected error": function () {
+        v.callback({message: 'foo'});
+
+        assert.dom('#ForgotPassword', function () {
+          assert.dom('[name=submit].error', function () {
+            assert.same(this.style.display, 'none');
+
+          });
+          assert.dom('[name=submit]+.errorMsg', 'An unexpected error occured. Please reload page.');
+        });
+
+        assert.calledOnceWith(App.log, 'ERROR: ', 'foo');
+      },
+    },
+
     "test signing in": function () {
       document.body.appendChild(Bart.SignIn.$autoRender({}));
       TH.click('[name=signIn]');
