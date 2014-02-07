@@ -6,7 +6,7 @@
     </label>
   </template>
   <template name="TextInput">
-    <input name="{{name}}" value="{{value}}" {{htmlOptions}}>
+    <input type="{{type}}" name="{{name}}" value="{{value}}" {{htmlOptions}}>
   </template>
 
   <template name="Select">

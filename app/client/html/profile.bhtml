@@ -1,9 +1,32 @@
 <template name="Profile">
   <section id="Profile">
+    <nav>
+      {{systemSetup}}
+    </nav>
     <div>
+      <h1>{{name}}</h1>
       <section class="body">
-        {{name}}
       </section>
     </div>
   </section>
+
+  <template name="Index">
+    <div>
+      {{pageLink value="Change password" template="Profile.ChangePassword"}}
+    </div>
+  </template>
+
+  <template name="ChangePassword">
+    <form id="ChangePassword">
+      <fieldset>
+        {{labelField "oldPassword" type="password"}}
+        {{labelField "newPassword" type="password"}}
+        {{labelField "confirm" type="password"}}
+      </fieldset>
+      <fieldset class="actions">
+        <button type="submit" disabled="disabled">Apply</button>
+        {{cancelButton}}
+      </fieldset>
+    </form>
+  </template>
 </template>

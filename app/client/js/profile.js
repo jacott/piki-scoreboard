@@ -1,16 +1,65 @@
+var $ = Bart.current;
 var Tpl = Bart.Profile;
+var Form = Bart.Form;
+var ChangePassword = Tpl.ChangePassword;
 
-AppRoute.root.addTemplate(Tpl, {
+var base = AppRoute.root.addBase(Tpl);
+base.addTemplate(Tpl.Index, {
   focus: true,
+  defaultPage: true,
+});
 
+base.addTemplate(Tpl.ChangePassword, {focus: true});
+
+Tpl.$helpers({
+  systemSetup: function () {
+    if ($.data().isSuperUser()) {
+      return Form.pageLink({value: "System setup", template: "SystemSetup"});
+    }
+  },
 });
 
 Tpl.$extend({
-  $created: function (ctx, elm) {
-    var me = AppModel.User.me();
+  onBaseEntry: function () {
+    document.body.appendChild(Tpl.$autoRender(AppModel.User.me()));
+  },
 
-    if (me.isSuperUser()) AppRoute.abortPage(Bart.SystemSetup);
+  onBaseExit: function () {
+    Bart.removeId('Profile');
+  },
+});
 
-    ctx.data = me;
+ChangePassword.$events({
+  'submit': function (event) {
+    event.$actioned = true;
+    var form = event.currentTarget;
+    var oldPassword = form.querySelector('[name=oldPassword]').value;
+    var newPassword = form.querySelector('[name=newPassword]');
+
+    Bart.addClass(form, 'submitting');
+
+    Accounts.changePassword(oldPassword, newPassword.value, function (error) {
+      if (error) {
+        Bart.removeClass(form, 'submitting');
+        Form.renderError(form, 'newPassword', 'Password did not match.');
+      } else {
+        AppRoute.history.back();
+      }
+    });
+
+  },
+
+  'input [name=newPassword],[name=confirm]': function (event) {
+    event.$actioned = true;
+
+    var form = event.currentTarget;
+    var newPassword = form.querySelector('[name=newPassword]').value;
+    var confirm = form.querySelector('[name=confirm]').value;
+    var submit = form.querySelector('[type=submit]');
+
+    if (newPassword.length >= 5 && newPassword === confirm)
+      submit.removeAttribute('disabled');
+    else
+      submit.setAttribute('disabled', 'disabled');
   },
 });

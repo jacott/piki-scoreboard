@@ -34,7 +34,7 @@ Tpl.$events({
 });
 
 Bart.registerHelpers({
-  pageLink: function (options) {
+  pageLink: Bart.Form.pageLink = function (options) {
     return Tpl.$autoRender(options);
   },
 });

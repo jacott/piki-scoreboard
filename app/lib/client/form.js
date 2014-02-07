@@ -156,7 +156,9 @@ function field(doc, name, options) {
 
   switch(options.type || 'text') {
   case 'text':
-    return Tpl.TextInput.$autoRender({name: name, doc: doc, options: options});
+  case 'hidden':
+  case 'password':
+    return Tpl.TextInput.$autoRender({type: options.type || 'text', name: name, doc: doc, options: options});
   default:
     throw new Error('unknown type: ' + options.type);
   }
