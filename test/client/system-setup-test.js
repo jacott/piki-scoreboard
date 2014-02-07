@@ -77,11 +77,8 @@
     },
 
     "test addUser": function () {
-      v.org = TH.Factory.createOrg();
-      App.Ready.isReady = true;
-      v.orgSub = test.stub(App, 'subscribe').withArgs('Org');
-      AppRoute.gotoPage(Bart.SystemSetup, {orgSN: v.org.shortName});
-      v.orgSub.yield();
+      TH.setOrg(v.org = TH.Factory.createOrg());
+      AppRoute.gotoPage(Bart.SystemSetup);
 
       assert.dom('#SystemSetup', function () {
         TH.click('[name=addUser]');
@@ -91,18 +88,20 @@
           TH.input('[name=name]', 'Foo Bar');
         });
         TH.input('[name=initials]', 'FB');
+        TH.change('[name=org_id]', v.org._id);
         TH.input('[name=email]', 'FB@foo.com');
         TH.click('[type=submit]');
       });
 
-      refute.dom('#AddUser');
-      assert.dom('#SystemSetup');
 
       var user = AppModel.User.findOne({name: 'Foo Bar'});
-
       assert(user);
+      assert.attributesEqual(user, {
+        org_id: v.org._id, name: 'Foo Bar', initials: 'FB', email: 'fb@foo.com'
+      }, ['_id']);
 
-      assert.attributesEqual(user, {org_id: v.org._id, name: 'Foo Bar', initials: 'FB', email: 'fb@foo.com'}, ['_id']);
+      refute.dom('#AddUser');
+      assert.dom('#SystemSetup');
     },
   });
 })();

@@ -293,6 +293,17 @@ TH = (function () {
       return this.loginAs(user || TH.Factory.last.user || TH.Factory.createUser(), func);
     },
 
+    setOrg: function (org) {
+      org = org || TH.Factory.createOrg();
+      App.Ready.isReady = true;
+      var subStub = ('restore' in App.subscribe) ?
+            App.subscribe : geddon.test.stub(App, 'subscribe');
+      var orgSub = subStub.withArgs('Org');
+      AppRoute.gotoPage(Bart.Home, {orgSN: org.shortName});
+      orgSub.yield();
+      return orgSub;
+    },
+
     printDimensions: function (elm) {
       var offset = elm.offset();
       return "offset: {top: "+offset.top+", left: "+offset.left+"}, width: "+elm.outerWidth()+", height: "+elm.outerHeight();

@@ -10,6 +10,17 @@
       v = null;
     },
 
+    "test createUser": function () {
+      var user = TH.Factory.buildUser();
+      user.$$save();
+
+      var mUser = Meteor.users.findOne(user._id);
+
+      assert(mUser);
+
+      assert.equals(mUser.emails, [{address: user.email, verified: false}]);
+    },
+
     "test authorize": function () {
       var subject = TH.Factory.createUser();
       var user = TH.Factory.createUser('su');

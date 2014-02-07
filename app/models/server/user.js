@@ -20,6 +20,22 @@ App.require('AppModel.User', function (model) {
     },
   });
 
+  Accounts.onCreateUser(function (options, user) {
+    if (App.SETUP) return user;
+
+    user._id = options.profile.id;
+    user.emails = [{address: options.email, verified: false}];
+    delete user.username;
+
+    if (Meteor.users.find(user._id).count() === 0) {
+      return user;
+    }
+  });
+
+  model.afterCreate(function (doc) {
+    Accounts.createUser({email: doc.email, password: "changeme", profile: {id: doc._id}});
+  });
+
   App.extend(model.prototype, {
     authorize: function (userId) {
       AppVal.allowAccessIf(AppModel.User.exists({_id: userId, role: AppModel.User.ROLE.superUser}));
@@ -27,4 +43,6 @@ App.require('AppModel.User', function (model) {
   });
 
   model.registerObserveField('org_id');
+
+
 });
