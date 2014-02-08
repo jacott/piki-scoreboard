@@ -10,18 +10,11 @@ d* Add change user password page
 
 d* Add forgotten password page
 
-* Add/remove competitor to startlist when add/changing categories
+d* Add/remove competitor to startlist when add/changing categories
 
- - aftersave change EventCat with uniqiue random sortKey
+ d- aftersave change EventCat with uniqiue random sortKey
 
-
-
-
-
-
-
-
-
+* Show startlists
 
 
 * Example to change content on focused input box
