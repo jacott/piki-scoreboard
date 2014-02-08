@@ -10,7 +10,7 @@
       <nav>
         {{pageLink name="addCategory" value="Add new category" template="Category.Add"}}
       </nav>
-      <section class="categorys">
+      <section class="categories">
         <h1>Categorys</h1>
         <table class="select">
           <thead>
@@ -19,7 +19,7 @@
             </tr>
           </thead>
           <tbody>
-            {{each "categorys" template="Row"}}
+            {{each "categories" template="Row"}}
           </tbody>
           <template name="Row">
             <tr>
@@ -65,6 +65,13 @@
       {{labelField "name"}}
       {{labelField "shortName"}}
       {{labelField "group"}}
+      <div class="heats">
+        <h1>Heats</h1>
+        <div class="names">
+          {{heats}}
+        </div>
+        <button name="addAnother">Add another heat</button>
+      </div>
       {{labelField "gender" selectList=genderList}}
       {{labelField "minAge"}}
       {{labelField "maxAge"}}

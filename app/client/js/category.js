@@ -15,7 +15,7 @@ Tpl.$extend({
 });
 
 Index.$helpers({
-  categorys: function (callback) {
+  categories: function (callback) {
     AppModel.Category.find({}, {sort: {name: 1}})
       .forEach(function (doc) {callback(doc)});
 
@@ -26,7 +26,7 @@ Index.$helpers({
 });
 
 Index.$events({
-  'click .categorys tr': function (event) {
+  'click .categories tr': function (event) {
     event.$actioned = true;
 
     var data = $.data(this);
@@ -54,10 +54,50 @@ base.addTemplate(Tpl.Edit, {
   }
 });
 
+Tpl.Form.$helpers({
+  heats: function () {
+    var elm = $.element;
+    if (this.heats && this.heats.length)
+      this.heats.forEach(function (heat) {
+        elm.parentNode.insertBefore(heatName(heat), elm);
+      });
+    else
+      return heatName();
+  },
+});
+
+Tpl.Form.$events({
+  'click [name=addAnother]': function (event) {
+    event.$actioned = true;
+    event.currentTarget.querySelector('.heats .names').appendChild(heatName());
+  },
+});
+
+function heatName(heat) {
+  heat = heat || {id: Random.id()};
+  return Bart.Form.TextInput.$render({
+    type: 'text', name: 'heatName',
+    options: {id: heat.id}, doc: {heatName: heat.name}
+  });
+}
+
 Tpl.Add.$events({
   'click [name=cancel]': cancel,
-  'click [type=submit]': Bart.Form.submitFunc('AddCategory', Tpl),
+  'click [type=submit]': Bart.Form.submitFunc('AddCategory', Tpl, heatExtract),
 });
+
+function heatExtract(doc, form) {
+  var heats = [];
+  var names = form.querySelectorAll('[name=heatName]');
+
+  for(var i = 0; i < names.length; ++i) {
+    var row = names[i];
+    var name = row.value;
+    name = name && name.trim();
+    name && heats.push({id: row.id, name: name});
+  }
+  doc.heats = heats;
+}
 
 
 Tpl.Edit.$events({
@@ -80,7 +120,7 @@ Tpl.Edit.$events({
     });
 
   },
-  'click [type=submit]': Bart.Form.submitFunc('EditCategory', Tpl),
+  'click [type=submit]': Bart.Form.submitFunc('EditCategory', Tpl, heatExtract),
 });
 
 function cancel(event) {

@@ -20,16 +20,22 @@ var DEFAULT_HELPERS = {
 };
 
 Tpl.$extend({
-  submitFunc: function(elmId, successPage) {
+  submitFunc: function(elmId, successPage, extraSetup) {
     return function (event) {
       event.$actioned = true;
 
       var elm = document.getElementById(elmId);
       var ctx = Bart.getCtx(elm);
       var doc = ctx.data;
+      var form = elm.querySelector('.fields');
 
-      if (Tpl.saveDoc(doc, elm.querySelector('.fields'))) {
+      Tpl.fillDoc(doc, form);
+      extraSetup && extraSetup(doc, elm);
+
+      if (doc.$save()) {
         successPage && AppRoute.gotoPage(successPage);
+      } else {
+        this.renderErrors(doc, form);
       }
     };
   },

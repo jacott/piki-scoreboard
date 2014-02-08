@@ -29,6 +29,60 @@
       assert.validators(validators.maxAge, {number: [{integer: true, $gt: 0, $lt: 100}]});
     },
 
+    "validate heats": {
+      setUp: function () {
+        v.cat = TH.Factory.buildCategory({heats: undefined});
+      },
+
+      "test bad format": function () {
+        v.cat.heats = [{id: '123', name: 'round 1', extra: 'hello'}];
+
+        refute(v.cat.$isValid());
+
+        assert.modelErrors(v.cat, {heats: 'is_invalid'});
+      },
+
+      "test id is not string": function () {
+        v.cat.heats = [{id: 123, name: 'round 1'}];
+
+        refute(v.cat.$isValid());
+
+        assert.modelErrors(v.cat, {heats: 'is_invalid'});
+      },
+
+      "test name is not string": function () {
+        v.cat.heats = [{id: "123", name: {}}];
+
+        refute(v.cat.$isValid());
+
+        assert.modelErrors(v.cat, {heats: 'is_invalid'});
+      },
+
+      "test name too long": function () {
+        v.cat.heats = [{id: "123", name: new Array(32).join('x')}];
+
+        refute(v.cat.$isValid());
+
+        assert.modelErrors(v.cat, {heats: 'is_invalid'});
+      },
+
+      "test id too long": function () {
+        v.cat.heats = [{id: new Array(32).join('x'), name: 'x'}];
+
+        refute(v.cat.$isValid());
+
+        assert.modelErrors(v.cat, {heats: 'is_invalid'});
+      },
+
+      "test success": function () {
+        v.cat.heats = [{id: '123', name: 'round 1'}];
+
+        assert(v.cat.$isValid(), TH.showErrors(v.cat));
+      },
+
+
+    },
+
     "test removeRpc": function () {
       TH.assertRemoveRpc(AppModel.Category);
     },

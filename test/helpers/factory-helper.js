@@ -73,6 +73,7 @@
     Category: function (options) {
       return new Builder('Category', options).genName()
         .addRef('org')
+        .addField('heats', [{id: '123', name: 'round 1'}])
         .addField('group', 'A male')
         .addField('gender', 'm')
         .addField('shortName', 'shortName' in options || generateName('SN').replace(/\s+/g, ''));
