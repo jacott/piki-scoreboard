@@ -109,8 +109,22 @@
     },
 
     Event: function (options) {
+      var category = last.category || Factory.createCategory();
+      if (! ('heats' in options)) {
+        options.heats = [category._id];
+      }
+
+      if ('forEach' in options.heats) {
+        var heats = {};
+        options.heats.forEach(function (heat) {
+          heats[heat] = AppModel.Category.attrFind(heat).heatFormat;
+        });
+        options.heats = heats;
+      }
+
       return new Builder('Event', options).genName()
         .addRef('org')
+        .addField('heats')
         .addField('date', '20014/04/01');
     },
 
