@@ -35,5 +35,15 @@
         });
       });
     },
+
+    "//test selecting climber": function () {
+      TH.click('td.climber', v.result.climber.name);
+
+      assert.dom('#Event #Category', function () {
+        assert.dom('.heat', function () {
+          assert.dom('h1', 'Qualification 1');
+        });
+      });
+    },
   });
 })();

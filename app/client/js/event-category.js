@@ -11,29 +11,16 @@ App.require('Bart.Event', function (Event) {
 
   Tpl.$helpers({
     results: function (callback) {
-      var Result = AppModel.Result;
-      var category = $.data();
-      var params = {event_id: Event.event._id, category_id: category._id};
-      var resultIndex = Result.eventCatIndex(params) || {};
-
-      var docs = Result.attrDocs();
-      var results = [];
-      for(var climber_id in resultIndex) {
-        results.push(docs[resultIndex[climber_id]]);
-      }
-
-      results.sort(compareResults)
-        .forEach(function (doc) {callback(new Result(doc))});
-
-      return AppModel.Result.Index.observe(function (doc, old) {
-        if (Apputil.includesAttributes(params, doc, old))
-            callback(doc && new Result(doc), old && new Result(old), compareResults);
+      callback.render({
+        model: AppModel.Result,
+        index: AppModel.Result.eventCatIndex,
+        params: {event_id: Event.event._id, category_id: $.data()._id},
+        sort:   function compareResults(a, b) {
+          var aScore = a.scores && a.scores[0];
+          var bScore = b.scores && b.scores[0];
+          return aScore === bScore ? 0 : aScore < bScore ? -1 : 1;
+        },
       });
-
     },
   });
-
-  function compareResults(a, b) {
-    return a.scores[0] === b.scores[0] ? 0 : a.scores[0] < b.scores[0] ? -1 : 1;
-  }
 });
