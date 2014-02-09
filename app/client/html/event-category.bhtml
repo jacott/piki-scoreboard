@@ -1,0 +1,20 @@
+<template name="Event.Category">
+  <div id="Category">
+    <h1>{{name}}</h1>
+    <table class="results select">
+      <thead>
+        <tr>
+          <th>Climber</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{each "results" template="Result"}}
+        <template name="Result">
+          <tr>
+            <td class="climber">{{climber.name}}</td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+  </div>
+</template>

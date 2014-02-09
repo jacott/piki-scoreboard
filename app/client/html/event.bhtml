@@ -38,6 +38,15 @@
       </nav>
       <div>
         <h1>{{name}}</h1>
+        <div class="categories">
+          <h1>Categories</h1>
+          {{each "categories" template="Cat"}}
+          <template name="Cat">
+            <div>
+              {{pageLink value=shortName template="Event.Category" append=_id}}
+            </div>
+          </template>
+        </div>
       </div>
     </section>
   </template>

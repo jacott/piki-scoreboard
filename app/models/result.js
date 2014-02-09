@@ -5,12 +5,10 @@ App.require('AppModel.Competitor', function (Competitor) {
 
   model.defineFields({
     event_id: 'belongs_to',
-    competitor_id: 'belongs_to',
+    climber_id: 'belongs_to',
     category_id: 'belongs_to',
-    heat_id: 'belongs_to',
-    order: {type: 'order', required: 'not_null', number: true},
     time: 'number',
-    score: 'number',
+    scores: 'number',
   });
 
   Competitor.afterCreate(function (doc) {
@@ -33,9 +31,9 @@ App.require('AppModel.Competitor', function (Competitor) {
     ids.forEach(function (catId) {
       var result = model.create({
         category_id: catId, event_id: doc.event_id,
-        competitor_id: doc._id,
-        heat_id: AppModel.Category.attrFind(catId).heats[0].id,
-        order: Math.random()});
+        climber_id: doc.climber_id,
+        scores: [Math.random()],
+      });
     });
   }
 

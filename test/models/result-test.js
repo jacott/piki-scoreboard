@@ -20,16 +20,23 @@
       v = null;
     },
 
+    "test associated": function () {
+      var result = TH.Factory.createResult();
+
+      assert(result.climber);
+      assert(result.category);
+      assert(result.event);
+    },
+
     "test created when competitor registered": function () {
       assert(v.r2 = AppModel.Result.findOne({category_id: v.categories[0]._id}));
       v.result = AppModel.Result.findOne({category_id: v.categories[1]._id});
       assert(v.result);
 
       assert.same(v.result.event_id, v.competitor.event_id);
-      assert.same(v.result.competitor_id, v.competitor._id);
-      assert.same(v.result.heat_id, '11');
-      assert.between(v.result.order, 0, 1);
-      refute.same(v.r2.order, v.result.order);
+      assert.same(v.result.climber_id, v.competitor.climber_id);
+      assert.between(v.result.scores[0], 0, 1);
+      refute.same(v.r2.scores[0], v.result.scores[0]);
     },
 
     "test deleted when competitor cat removed": function () {

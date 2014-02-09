@@ -80,6 +80,16 @@
     "select": {
       setUp: function () {
         v.event = TH.Factory.createEvent();
+
+        v.cats = TH.Factory.createList(3, 'createCategory', function (index, options) {
+          options.shortName = 'YA ' + index;
+          options.name = 'Youth A ' + index;
+        });
+        var c1 = TH.Factory.buildCompetitor({category_ids: [v.cats[0]._id]});
+        var c2 = TH.Factory.buildCompetitor({category_ids: [v.cats[1]._id]});
+        c1.$$save();
+        c2.$$save();
+
         v.event2 = TH.Factory.createEvent();
 
         AppRoute.gotoPage(Bart.Event.Index);
@@ -93,6 +103,19 @@
           assert.dom('.link[name=register]');
           assert.dom('.link[name=edit]');
           assert.dom('h1', v.event.name);
+          assert.dom('.categories', function () {
+            assert.dom('h1', 'Categories');
+            assert.dom('.link', v.cats[0].shortName);
+            assert.dom('.link', v.cats[1].shortName);
+          });
+        });
+      },
+
+      "test selecting category": function () {
+        TH.click('.categories .link', v.cats[0].shortName);
+
+        assert.dom('#Event #Category', function () {
+          assert.dom('h1', v.cats[0].name);
         });
       },
 

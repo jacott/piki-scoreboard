@@ -105,6 +105,24 @@ Tpl.Edit.$events({
   'click [type=submit]': Bart.Form.submitFunc('EditEvent', Tpl),
 });
 
+Tpl.Show.$helpers({
+  categories: function (callback) {
+    var cats = AppModel.Category.attrDocs();
+    var eventCats = Object.keys(AppModel.Result.eventCatIndex({event_id: Tpl.event._id})||{})
+          .map(function (cat_id) {
+            return cats[cat_id];
+          }).sort(Apputil.compareByName)
+          .forEach(function (doc) {callback(doc)});
+
+    return AppModel.Result.Index.observe(function (doc, old) {
+      if (doc && old) return;
+      doc = doc && cats[doc.category_id];
+      old = old && cats[old.category_id];
+      (doc || old) && callback(doc, old, Apputil.compareByName);
+    });
+  },
+});
+
 function cancel(event) {
   event.$actioned = true;
   AppRoute.gotoPage(Tpl);

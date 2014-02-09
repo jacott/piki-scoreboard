@@ -100,12 +100,12 @@
     },
 
     Result: function (options) {
+      last.competitor || Factory.createCompetitor();
       return new Builder('Result', options)
         .addRef('event')
-        .addRef('competitor')
+        .addRef('climber')
         .addRef('category')
-        .addField('heat_id', last.competitor.heats && last.competitor.heats[0].id)
-        .addField('order', 0.5);
+        .addField('scores', [options.scores || AppModel.Result.find({}).count()]);
     },
 
     Event: function (options) {
