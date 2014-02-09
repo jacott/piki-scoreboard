@@ -13,7 +13,7 @@
     },
 
     "test rendering": function () {
-      document.body.appendChild(v.menu.$autoRender());
+      document.body.appendChild(v.menu.$autoRender({}));
 
       assert.dom('#TestButtonMenu', function () {
         assert.dom('#FooMenu.buttonMenu', function () {
@@ -23,7 +23,7 @@
     },
 
     "test dropMenu": function () {
-      document.body.appendChild(v.menu.$autoRender());
+      document.body.appendChild(v.menu.$autoRender({}));
 
       assert.dom('#FooMenu.buttonMenu', function () {
         TH.trigger('[name=dropMenu]', 'click');

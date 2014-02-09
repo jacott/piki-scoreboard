@@ -320,7 +320,7 @@ function addTemplates(parent, options) {
 function BartCtx(template, parentCtx, data) {
   this.template = template;
   this.parentCtx = parentCtx;
-  this.data = data || {};
+  this.data = data;
   this.evals = [];
   this.attrEvals = [];
 }
