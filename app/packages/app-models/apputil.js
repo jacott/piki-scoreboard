@@ -162,6 +162,24 @@ Apputil = {
     return a.name === b.name ? 0 : a.name < b.name ? -1 : 1;
   },
 
+  includesAttributes: function (attrs /*, docs */) {
+    for(var i = 1; i < arguments.length; ++i) {
+      var doc = arguments[i];
+      if (doc) {
+        var match = true;
+        for(var key in attrs) {
+          if (doc[key] != attrs[key]) {
+            match = false;
+            break;
+          }
+        }
+        if (match) return true;
+      }
+    }
+
+    return false;
+  },
+
   indexOf: function (list, value, fieldName) {
     if (!list) return;
     fieldName = fieldName || '_id';

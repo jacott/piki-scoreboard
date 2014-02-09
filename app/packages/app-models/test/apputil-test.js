@@ -7,6 +7,17 @@
     tearDown: function () {
     },
 
+    "test includesAttributes": function () {
+      var doc = {a: '1', b: '2'};
+      var other = {a: '1', b: '3'};
+
+      assert.isTrue(Apputil.includesAttributes({a: 1}, doc, other, null));
+      assert.isFalse(Apputil.includesAttributes({a: 1, b: '4'}, doc, other, null));
+      assert.isTrue(Apputil.includesAttributes({a: 1, b: '3'}, doc, other, null));
+      assert.isTrue(Apputil.includesAttributes({a: 1, b: '2'}, doc, other, null));
+      assert.isFalse(Apputil.includesAttributes({a: 2, b: '2'}, doc, other, null));
+    },
+
     "test compareByName": function () {
       var a = {name: "Bob"};
       var b = {name: "Bob"};

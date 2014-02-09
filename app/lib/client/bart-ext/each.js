@@ -2,6 +2,7 @@ var $ = Bart.current;
 
 Bart.registerHelpers({
   each: function (func, options) {
+    callback.render = callbackRender;
     if ($.element._endEach) return;
     if (typeof func !== 'string') throw new Error("first argument must be name of helper method to call");
 
@@ -15,6 +16,7 @@ Bart.registerHelpers({
           Bart.lookupTemplate(options.template);
 
     $.ctx.onDestroy(ctpl._helpers[func].call(this, callback));
+
 
     return startEach;
 
@@ -54,3 +56,32 @@ Bart.registerHelpers({
     }
   },
 });
+
+function callbackRender(options) {
+  var callback = this;
+  var model = options.model;
+  var params = options.params || {};
+  var sortFunc = options.sort;
+  var resultIndex = options.index(params) || {};
+
+  var docs = model.attrDocs();
+  var results = [];
+  for(var key in resultIndex) {
+    results.push(docs[resultIndex[key]]);
+  }
+
+  results.sort(sortFunc)
+    .forEach(function (doc) {callback(new model(doc))});
+
+  return model.Index.observe(function (doc, old) {
+    if (! Apputil.includesAttributes(params, old))
+      old = null;
+
+    if (! Apputil.includesAttributes(params, doc))
+      doc = null;
+
+    if (doc || old) {
+      callback(doc && new model(doc), old && new model(old), sortFunc);
+    }
+  });
+}

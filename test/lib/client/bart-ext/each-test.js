@@ -16,6 +16,61 @@
       v = null;
     },
 
+    "test callback.render": function () {
+      test.onEnd(function () {
+        AppModel && TH.clearDB(); // remove old data (for AppModel building)
+        TH.destroyModel('TestSubClass');
+      });
+
+      var TestSubClass = AppModel.Base.defineSubclass('TestSubClass').defineFields({
+        id1: 'text',
+        id2: 'text',
+        name: 'text',
+        score: 'number',
+      });
+      var index = TestSubClass.Index.addUniqueIndex('id1', 'id2', 'name');
+
+      v.Each.$helpers({
+        fooList: function (callback) {
+          callback.render({
+            model: TestSubClass,
+            index: index,
+            params: {id1: Bart.current.data().major, id2: '2'},
+            sort: Apputil.compareByName,
+          });
+        }
+      });
+
+      var doc1 = TestSubClass.create({id1: '1', id2: '2', name: 'bob'});
+      var doc2 = TestSubClass.create({id1: '1', id2: '2', name: 'alice'});
+      var other = TestSubClass.create({id1: '2', id2: '3', name: 'henry'});
+
+      assert.dom(v.Each.$render({major: '1'}), function () {
+        assert.dom('li', {count: 2});
+        assert.dom('li:first-child', 'alice');
+        assert.dom('li:nth-child(2)', 'bob');
+
+        TestSubClass.create({id1: '1', id2: '2', name: 'barny'});
+        assert.dom('li', {count: 3});
+        assert.dom('li:nth-child(2)', 'barny');
+
+        doc1.$update({$set: {name: 'aalan'}});
+        assert.dom('li', {count: 3});
+        assert.dom('li:nth-child(1)', 'aalan');
+
+        doc1.$update({$set: {id2: '3'}});
+        assert.dom('li', {count: 2});
+        refute.dom('li', 'aalan');
+
+        doc1.$update({$set: {id2: '2'}});
+        assert.dom('li', {count: 3});
+        assert.dom('li', 'aalan');
+
+        other.$update({$set: {id2: '2'}});
+        assert.dom('li', {count: 3});
+      });
+    },
+
     "test simple adding and deleting": function () {
       assert.dom(v.Each.$render({}), function () {
         refute.dom('li');
