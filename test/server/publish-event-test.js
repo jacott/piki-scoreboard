@@ -1,5 +1,5 @@
 (function (test, v) {
-  var children = ['Competitor'];
+  var children = ['Competitor', 'Result'];
 
   buster.testCase('server/publish-event:', {
     setUp: function () {

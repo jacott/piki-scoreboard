@@ -88,19 +88,24 @@
     },
 
     Competitor: function (options) {
-      if (options.climber_id === undefined) {
-        var climber = Factory.createClimber();
-        options.climber_id = climber._id;
-      }
-
-
       if (options.category_ids === undefined) {
         var category = last.category || Factory.createCategory();
         options.category_ids = [category._id];
       }
 
       return new Builder('Competitor', options)
+        .addRef('climber')
         .addRef('event');
+
+    },
+
+    Result: function (options) {
+      return new Builder('Result', options)
+        .addRef('event')
+        .addRef('competitor')
+        .addRef('category')
+        .addField('heat_id', last.competitor.heats && last.competitor.heats[0].id)
+        .addField('order', 0.5);
     },
 
     Event: function (options) {

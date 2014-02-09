@@ -1,4 +1,4 @@
-var observers = ['Competitor'];
+var observers = ['Competitor', 'Result'];
 
 Meteor.publish('Event', function (eventId) {
   var sess = Session.get(this);
