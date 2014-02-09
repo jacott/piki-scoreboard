@@ -41,15 +41,7 @@
         assert.dom('#AddCategory', function () {
           TH.input('[name=name]', 'Dynomites Wellington');
           TH.input('[name=shortName]', 'YB M');
-          assert.dom('.heats', function () {
-            assert.dom('[name=heatName]', {count: 1}, function () {
-              v.r1Id = this.id;
-            });
-            TH.input('[name=heatName]', 'round 1');
-            TH.click('[name=addAnother]');
-            assert.dom('[name=heatName]', {count: 2});
-            TH.input('[name=heatName]:last-child', 'round 2');
-          });
+          TH.input('[name=heatFormat]', 'F8F26QQ');
           TH.input('[name=group]', 'A');
           TH.change('[name=gender]', 'm');
           TH.input('[name=minAge]', '14');
@@ -59,27 +51,16 @@
         refute.dom('#AddCategory');
       });
 
-      var cat = AppModel.Category.findOne({org_id: v.org._id, name: 'Dynomites Wellington', shortName: 'YB M', gender: 'm', group: 'A', minAge: 14, maxAge: 15});
+      var cat = AppModel.Category.findOne({org_id: v.org._id, name: 'Dynomites Wellington', shortName: 'YB M', gender: 'm', group: 'A', minAge: 14, maxAge: 15, heatFormat: 'F8F26QQ'});
 
       assert(cat);
-
-      assert.same(cat.heats.length, 2);
-
-      assert.same(cat.heats[0].id, v.r1Id);
-      assert.same(cat.heats[0].name, 'round 1');
-      assert.same(cat.heats[1].name, 'round 2');
-
-      refute.same(cat.heats[0].id, cat.heats[1].id);
 
       assert.dom('#Category [name=addCategory]');
     },
 
     "edit": {
       setUp: function () {
-        v.category = TH.Factory.createCategory({heats: [
-          {id: '1', name: 'r 1'},
-          {id: '2', name: 'r 2'},
-        ]});
+        v.category = TH.Factory.createCategory();
         v.category2 = TH.Factory.createCategory();
 
         AppRoute.gotoPage(Bart.Category.Index);
@@ -87,21 +68,13 @@
         TH.click('td', v.category.name);
       },
 
-      "test change heats": function () {
-        assert.dom('#EditCategory .heats', function () {
-          assert.dom('[name=heatName]', {value: 'r 1'}, function () {
-            assert.same(this.id, '1');
-          });
-          assert.dom('[name=heatName]', {value: 'r 2'}, function () {
-            assert.same(this.id, '2');
-            TH.input(this, 'round 2');
-          });
+      "test change heat format": function () {
+        assert.dom('#EditCategory', function () {
+          TH.input('[name=heatFormat]', 'F2QQ');
         });
         TH.click('#EditCategory [type=submit]');
 
-        var r2 = v.category.$reload().heats[1];
-        assert.same(r2.id, '2');
-        assert.same(r2.name, 'round 2');
+        assert.same(v.category.$reload().heatFormat, 'F2QQ');
       },
 
       "test change name": function () {

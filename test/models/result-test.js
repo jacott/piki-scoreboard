@@ -3,13 +3,7 @@
     setUp: function () {
       test = this;
       v = {};
-      v.categories = TH.Factory.
-            createList(3, 'createCategory', function (index, options) {
-              options.heats = [
-                {id: '1'+index, name: 'heat 1' + index},
-                {id: '2'+index, name: 'heat 2' + index},
-              ];
-            });
+      v.categories = TH.Factory.createList(3, 'createCategory');
       v.catIds = Apputil.mapField(v.categories);
 
       v.competitor = TH.Factory.buildCompetitor({category_ids: v.catIds});

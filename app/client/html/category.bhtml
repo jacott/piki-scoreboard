@@ -65,13 +65,7 @@
       {{labelField "name"}}
       {{labelField "shortName"}}
       {{labelField "group"}}
-      <div class="heats">
-        <h1>Heats</h1>
-        <div class="names">
-          {{heats}}
-        </div>
-        <button name="addAnother">Add another heat</button>
-      </div>
+      {{labelField "heatFormat"}}
       {{labelField "gender" selectList=genderList}}
       {{labelField "minAge"}}
       {{labelField "maxAge"}}
