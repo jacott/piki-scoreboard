@@ -19,5 +19,9 @@ Heat.prototype = {
     }
 
     return heatName;
-  }
+  },
+
+  scoreToNumber: function () {
+    return 12345;
+  },
 };

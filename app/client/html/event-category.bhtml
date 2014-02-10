@@ -1,6 +1,16 @@
 <template name="Event.Category">
   <div id="Category">
     <h1>{{name}}</h1>
+    <div class="heatUpdate">
+      <template name="Heat">
+        <form id="Heat">
+          <h1>{{heat.name}}</h1>
+          <label>
+            <span class="name">{{result.climber.name}}</span>
+          </label>
+        </form>
+      </template>
+    </div>
     <table class="results select">
       <thead>
         <tr>

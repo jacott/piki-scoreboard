@@ -1,5 +1,9 @@
 App.require('AppModel.Competitor', function (Competitor) {
   var model = AppModel.Base.defineSubclass('Result',{
+    unscoredHeat: function () {
+      return new AppModel.Heat(this.scores.length,
+                          this.event.heats[this.category_id]);
+    },
   },{saveRpc: true});
 
 
@@ -9,6 +13,30 @@ App.require('AppModel.Competitor', function (Competitor) {
     category_id: 'belongs_to',
     time: 'number',
     scores: 'number',
+  });
+
+  model.remote({
+    setScore: function (id, index, score) {
+      check([id, score], [String]);
+      check(index, Number);
+
+      var user = AppModel.User.findOne(this.userId);
+      var result = AppModel.Result.findOne(id);
+      var event = result.event;
+
+      AppVal.allowAccessIf(user.isSuperUser() || user.org_id === event.org_id);
+
+      var heat = new AppModel.Heat(index, event.heats[result.category_id]);
+
+      AppVal.allowAccessIf(index >=0 && index <= heat.format.length);
+
+
+      var changes = {};
+
+      changes['scores.' + index] = heat.scoreToNumber(score);
+
+      model.docs.update(id, {$set: changes});
+    },
   });
 
   Competitor.afterCreate(function (doc) {

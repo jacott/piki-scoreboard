@@ -37,11 +37,22 @@
     },
 
     "//test selecting climber": function () {
-      TH.click('td.climber', v.result.climber.name);
-
       assert.dom('#Event #Category', function () {
-        assert.dom('.heat', function () {
+        TH.click('td.climber', v.result.climber.name);
+
+        assert.dom('.heatUpdate>form#Heat', function () {
           assert.dom('h1', 'Qualification 1');
+
+          assert.dom('label .name', v.result.climber.name, {parent: function () {
+            TH.input('[name=score]', "23.5+");
+          }});
+
+          TH.trigger(this, 'submit');
+        });
+
+        assert.dom('tbody>tr:first-child', function () {
+          assert.dom('td.climber', v.result.climber.name);
+          assert.dom('td', '23.5+');
         });
       });
     },

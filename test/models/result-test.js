@@ -14,6 +14,72 @@
       v = null;
     },
 
+    "Result.setScore": {
+      setUp: function () {
+        v.category = TH.Factory.createCategory({heatFormat: "F8F26QQ"});
+        v.event = TH.Factory.createEvent({heats: [v.category._id]});
+        v.result = TH.Factory.createResult({scores: [1]});
+      },
+
+      "test authorized": function () {
+        if (Meteor.isClient) return assert(true);
+
+        v.otherOrg = TH.Factory.createOrg();
+        TH.loginAs(v.user = TH.Factory.createUser());
+
+        assert.accessDenied(function () {
+          TH.call("Result.setScore", v.result._id, 1, '23.5+');
+        });
+      },
+
+      "test index out of range": function () {
+        if (Meteor.isClient) return assert(true);
+
+        assert.accessDenied(function () {
+          TH.call("Result.setScore", v.result._id, -1, '23.5+');
+        });
+
+        assert.accessDenied(function () {
+          TH.call("Result.setScore", v.result._id, 5, '23.5+');
+        });
+      },
+
+      "test updates": function () {
+        test.spy(Meteor.isServer ? global : window, 'check');
+
+        TH.call("Result.setScore", v.result._id, 1, '23.5+');
+
+        assert.calledWith(check, 1, Number);
+        assert.calledWith(check, [v.result._id, '23.5+'], [String]);
+
+        assert.equals(v.result.$reload().scores, [1, 12345]);
+      },
+    },
+
+    "test unscoredHeat": function () {
+      var category = TH.Factory.createCategory({heatFormat: "F8F26QQ"});
+      var event = TH.Factory.createEvent({heats: [category._id]});
+      var result = TH.Factory.createResult();
+
+      assert.specificAttributesEqual(result.unscoredHeat(),
+                                     {number: 1, name: 'Qualification 1'});
+
+      result.scores.push(123);
+      assert.specificAttributesEqual(result.unscoredHeat(),
+                                     {number: 2, name: 'Qualification 2'});
+
+      result.scores.push(223);
+      assert.specificAttributesEqual(result.unscoredHeat(),
+                                     {number: 3, name: 'Semi Final'});
+
+      result.scores.push(223);
+      assert.specificAttributesEqual(result.unscoredHeat(),
+                                     {number: 4, name: 'Final'});
+
+      result.scores.push(1);
+      assert.equals(result.unscoredHeat().name, undefined);
+    },
+
     "test associated": function () {
       var result = TH.Factory.createResult();
 

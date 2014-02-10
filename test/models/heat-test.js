@@ -26,5 +26,8 @@
       heat.number = 5;
       assert.same(heat.name, 'Final');
     },
+
+    "//test scoreToNumber": function () {
+    },
   });
 })();

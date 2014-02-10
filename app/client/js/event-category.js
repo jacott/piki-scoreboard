@@ -1,6 +1,7 @@
 App.require('Bart.Event', function (Event) {
   var $ = Bart.current;
   var Tpl = Bart.Event.Category;
+  var Heat = Tpl.Heat;
 
   Event.route.addTemplate(Tpl, {
     focus: true,
@@ -23,4 +24,21 @@ App.require('Bart.Event', function (Event) {
       });
     },
   });
+
+  Tpl.$events({
+    'click td.climber': function (event) {
+      event.$actioned = true;
+
+      var heatElm = document.getElementById('Heat');
+      if (! heatElm) {
+        heatElm = Heat.$autoRender();
+        event.currentTarget.querySelector('.heatUpdate').appendChild(heatElm);
+      }
+
+      var result = $.data(this);
+
+      Bart.getCtx(heatElm).updateAllTags({result: result, heat: result.unscoredHeat()});
+    },
+  });
+
 });
