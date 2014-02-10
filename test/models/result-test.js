@@ -52,7 +52,7 @@
         assert.calledWith(check, 1, Number);
         assert.calledWith(check, [v.result._id, '23.5+'], [String]);
 
-        assert.equals(v.result.$reload().scores, [1, 12345]);
+        assert.equals(v.result.$reload().scores, [1, 235005]);
       },
     },
 

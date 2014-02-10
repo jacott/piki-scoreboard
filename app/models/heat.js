@@ -23,7 +23,15 @@ Heat.prototype = {
     return heatName;
   },
 
-  scoreToNumber: function () {
-    return 12345;
+  scoreToNumber: function (score) {
+    if (score.match(/^\s*t/i)) {
+      return 9999999;
+    }
+    var m = /^\s*(\d+)(?:\.(\d+))?(\+)?\s*$/.exec(score);
+    if (m) {
+      var extra = (m[2] || '000');
+      extra = extra + '000'.slice(extra.length);
+      return m[1]*10000 + extra*10 + (m[3] ? 5 : 0);
+    }
   },
 };

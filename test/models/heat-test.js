@@ -33,7 +33,14 @@
       assert.same(heat.name, 'Final');
     },
 
-    "//test scoreToNumber": function () {
+    "test scoreToNumber": function () {
+      var heat = new AppModel.Heat(1, 'LF8F26F26QQ');
+
+      assert.same(heat.scoreToNumber(' 23.5+'),    235005);
+      assert.same(heat.scoreToNumber('123.012+'), 1230125);
+      assert.same(heat.scoreToNumber('10 '),       100000);
+      assert.same(heat.scoreToNumber('top'),      9999999);
+      assert.same(heat.scoreToNumber(' ter '),    9999999);
     },
   });
 })();
