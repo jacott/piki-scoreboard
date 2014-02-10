@@ -22,6 +22,7 @@
 
       assert.validators(validators.name, {maxLength: [200], required: [true], trim: [true]});
       assert.validators(validators.group, {maxLength: [30], required: [true], trim: [true]});
+      assert.validators(validators.type, {inclusion: [{matches: /^[BL]$/ }]});
       assert.validators(validators.gender, {inclusion: [{allowBlank: true, matches: /^[mf]$/ }]});
       assert.validators(validators.shortName, {maxLength: [4], required: [true], trim: [true],
                                                normalize: ['upcase']});

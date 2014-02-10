@@ -9,8 +9,14 @@
       v = null;
     },
 
+    "test type": function () {
+      var heat = new AppModel.Heat(1, 'LF8F26F26QQ');
+
+      assert.same(heat.type, 'L');
+    },
+
     "test name": function () {
-      var heat = new AppModel.Heat(1, 'F8F26F26QQ');
+      var heat = new AppModel.Heat(1, 'LF8F26F26QQ');
 
       assert.same(heat.name, 'Qualification 1');
 

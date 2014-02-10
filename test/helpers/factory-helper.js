@@ -75,6 +75,7 @@
         .addRef('org')
         .addField('heatFormat', 'F8QQ')
         .addField('group', 'A male')
+        .addField('type', 'L')
         .addField('gender', 'm')
         .addField('shortName', 'shortName' in options || generateName('SN').replace(/\s+/g, ''));
     },
@@ -117,7 +118,8 @@
       if ('forEach' in options.heats) {
         var heats = {};
         options.heats.forEach(function (heat) {
-          heats[heat] = AppModel.Category.attrFind(heat).heatFormat;
+          var category = AppModel.Category.attrFind(heat);
+          heats[heat] = category.type + category.heatFormat;
         });
         options.heats = heats;
       }

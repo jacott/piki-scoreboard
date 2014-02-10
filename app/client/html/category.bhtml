@@ -65,6 +65,7 @@
       {{labelField "name"}}
       {{labelField "shortName"}}
       {{labelField "group"}}
+      {{labelField "type"}}
       {{labelField "heatFormat"}}
       {{labelField "gender" selectList=genderList}}
       {{labelField "minAge"}}

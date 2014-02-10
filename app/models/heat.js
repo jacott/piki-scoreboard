@@ -2,7 +2,9 @@ AppModel.Heat = Heat;
 
 function Heat(number, format) {
   this.number = number;
-  this.format = format.replace(/\d+/g,'');
+  format = format.replace(/\d+/g,'');
+  this.format = format.slice(1);
+  this.type = format[0];
 };
 
 var FINAL_NAMES = ['Final', 'Semi Final', 'Quarter Final'];
