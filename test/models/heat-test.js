@@ -42,5 +42,15 @@
       assert.same(heat.scoreToNumber('top'),      9999999);
       assert.same(heat.scoreToNumber(' ter '),    9999999);
     },
+
+    "test numberToScore": function () {
+      var heat = new AppModel.Heat(1, 'LF8F26F26QQ');
+
+      assert.same(heat.numberToScore(235005),  '23.5+');
+      assert.same(heat.numberToScore(1230125), '123.012+');
+      assert.same(heat.numberToScore(100000),  '10');
+      assert.same(heat.numberToScore(9999999), 'Top');
+      assert.same(heat.numberToScore(), '');
+    },
   });
 })();

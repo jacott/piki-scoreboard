@@ -1,12 +1,13 @@
 <template name="Event.Category">
   <div id="Category">
-    <h1>{{name}}</h1>
+    <h1>{{category.name}}</h1>
     <div class="heatUpdate">
       <template name="Heat">
         <form id="Heat">
           <h1>{{heat.name}}</h1>
           <label>
             <span class="name">{{result.climber.name}}</span>
+            <input type="text" name="score">
           </label>
         </form>
       </template>
@@ -15,6 +16,7 @@
       <thead>
         <tr>
           <th>Climber</th>
+          {{headers}}
         </tr>
       </thead>
       <tbody>
@@ -22,7 +24,13 @@
         <template name="Result">
           <tr>
             <td class="climber">{{climber.name}}</td>
+            {{scores}}
           </tr>
+        </template>
+        <template name="Score">
+          <td class="score">
+            {{score}}
+          </td>
         </template>
       </tbody>
     </table>

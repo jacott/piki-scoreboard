@@ -36,23 +36,28 @@
       });
     },
 
-    "//test selecting climber": function () {
+    "test selecting climber": function () {
+      TH.login();
       assert.dom('#Event #Category', function () {
         TH.click('td.climber', v.result.climber.name);
 
         assert.dom('.heatUpdate>form#Heat', function () {
           assert.dom('h1', 'Qualification 1');
 
-          assert.dom('label .name', v.result.climber.name, {parent: function () {
+          assert.dom('label .name', {text: v.result.climber.name, parent: function () {
             TH.input('[name=score]', "23.5+");
           }});
 
           TH.trigger(this, 'submit');
         });
 
-        assert.dom('tbody>tr:first-child', function () {
-          assert.dom('td.climber', v.result.climber.name);
-          assert.dom('td', '23.5+');
+        assert.equals(v.result.$reload().scores, [0.3, 235005]);
+
+
+        assert.dom('tbody>tr>td.climber', {
+          text: v.result.climber.name, parent: function () {
+            assert.dom('td', '23.5+');
+          }
         });
       });
     },

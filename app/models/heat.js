@@ -34,4 +34,15 @@ Heat.prototype = {
       return m[1]*10000 + extra*10 + (m[3] ? 5 : 0);
     }
   },
+
+  numberToScore: function (score) {
+    if (score == null) return '';
+    if (score === 9999999) return "Top";
+    var result = "" + Math.floor(score / 10000);
+    var dec = Math.floor(score/10) % 1000;
+
+    if (dec) result += "." + ("" + (dec + 1000)).replace(/0+$/,'').slice(1);
+    if (score % 10) result += "+";
+    return result;
+  },
 };
