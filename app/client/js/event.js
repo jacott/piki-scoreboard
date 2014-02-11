@@ -32,9 +32,9 @@ Index.$helpers({
     AppModel.Event.find({}, {sort: {date: 1}})
       .forEach(function (doc) {callback(doc)});
 
-    return AppModel.Event.Index.observe(function (doc, old) {
+    $.ctx.onDestroy(AppModel.Event.Index.observe(function (doc, old) {
       callback(doc, old, sortByDate);
-    });
+    }));
   },
 });
 
@@ -114,12 +114,12 @@ Tpl.Show.$helpers({
           }).sort(Apputil.compareByName)
           .forEach(function (doc) {callback(doc)});
 
-    return AppModel.Result.Index.observe(function (doc, old) {
+    $.ctx.onDestroy(AppModel.Result.Index.observe(function (doc, old) {
       if (doc && old) return;
       doc = doc && cats[doc.category_id];
       old = old && cats[old.category_id];
       (doc || old) && callback(doc, old, Apputil.compareByName);
-    });
+    }));
   },
 });
 

@@ -45,7 +45,13 @@ App.extend(AppModel, {
               var value = doc[fields[i]];
               tidx = tidx[value] || (tidx[value] = {});
             }
-            tidx[doc[fields[leadLen]]] = doc._id;
+            var value = doc[fields[leadLen]];
+            if (value in tidx)
+              App.log("Error: Duplicate entry in index: " + model.modelName + "> " +
+                      Array.prototype.join.call(fields, ",") + "\n" +
+                      tidx[value] + " clashes with " + doc._id);
+            else
+              tidx[value] = doc._id;
           } else if (old) {
             deleteEntry(idx, old, 0);
           }
@@ -98,6 +104,7 @@ App.extend(AppModel, {
       },
 
       removed: function (old) {
+        if (! old) return;
         if (old._id in cache) delete cache[old._id];
         inform(null, old);
       }

@@ -27,11 +27,11 @@ App.require('Bart.Event', function (Event) {
       AppModel.Competitor.find({event_id: this._id})
         .forEach(function (doc) {callback(doc)});
 
-      return AppModel.Competitor.Index.observe(function (doc, old) {
+      $.ctx.onDestroy(AppModel.Competitor.Index.observe(function (doc, old) {
         doc = doc && new AppModel.Competitor(doc);
         old = old && new AppModel.Competitor(old);
         callback(doc, old);
-      });
+      }));
     },
   });
 

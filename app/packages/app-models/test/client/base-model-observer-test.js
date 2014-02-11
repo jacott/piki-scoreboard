@@ -19,6 +19,21 @@
         });
       },
 
+      "test duplicate logs error": function () {
+        var idx = v.TestSubClass.Index.addUniqueIndex('id2', 'id1');
+
+        App.log.reset();
+        var doc1 = v.TestSubClass.create({id1: '3', id2: '4'});
+        refute.called(App.log);
+
+        var doc2 = v.TestSubClass.create({id1: '3', id2: '4'});
+        assert.calledWith(App.log, sinon.match(function (msg) {
+          return msg.match(/Error: Duplicate entry in index: TestSubClass> id2,id1\n/);
+        }));
+
+        assert.same(idx({id1: '3', id2: '4'}), doc1._id);
+      },
+
       "test adding": function () {
         var idx = v.TestSubClass.Index.addUniqueIndex('id2', 'id1');
 

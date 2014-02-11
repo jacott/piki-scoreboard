@@ -19,9 +19,9 @@ Index.$helpers({
     AppModel.Club.find({}, {sort: {name: 1}})
       .forEach(function (doc) {callback(doc)});
 
-    return AppModel.Club.Index.observe(function (doc, old) {
+    $.ctx.onDestroy(AppModel.Club.Index.observe(function (doc, old) {
       callback(doc, old, Apputil.compareByName);
-    });
+    }));
   },
 });
 

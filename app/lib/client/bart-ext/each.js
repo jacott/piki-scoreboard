@@ -15,7 +15,7 @@ Bart.registerHelpers({
     var row = Bart.lookupTemplate.call(ctpl, options.template) ||
           Bart.lookupTemplate(options.template);
 
-    $.ctx.onDestroy(ctpl._helpers[func].call(this, callback));
+    ctpl._helpers[func].call(this, callback);
 
 
     return startEach;
@@ -73,7 +73,7 @@ function callbackRender(options) {
   results.sort(sortFunc)
     .forEach(function (doc) {callback(new model(doc))});
 
-  return model.Index.observe(function (doc, old) {
+  $.ctx.onDestroy(model.Index.observe(function (doc, old) {
     if (! Apputil.includesAttributes(params, old))
       old = null;
 
@@ -83,5 +83,5 @@ function callbackRender(options) {
     if (doc || old) {
       callback(doc && new model(doc), old && new model(old), sortFunc);
     }
-  });
+  }));
 }

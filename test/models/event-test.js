@@ -31,7 +31,7 @@
       setUp: function () {
         v.cat1 = TH.Factory.createCategory({_id: 'cat1', type: 'L', heatFormat: 'F8QQ'});
         v.cat2 = TH.Factory.createCategory({_id: 'cat2', type: 'B', heatFormat: 'F8F26QQ'});
-        v.event = TH.Factory.createEvent({heats: {}});
+        v.event = TH.Factory.createEvent({heats: undefined});
       },
 
       "test new category": function () {

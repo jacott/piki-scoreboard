@@ -19,9 +19,9 @@ Index.$helpers({
     AppModel.Category.find({}, {sort: {name: 1}})
       .forEach(function (doc) {callback(doc)});
 
-    return AppModel.Category.Index.observe(function (doc, old) {
+    $.ctx.onDestroy(AppModel.Category.Index.observe(function (doc, old) {
       callback(doc, old, Apputil.compareByName);
-    });
+    }));
   },
 });
 

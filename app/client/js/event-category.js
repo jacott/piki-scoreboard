@@ -16,7 +16,7 @@ App.require('Bart.Event', function (Event) {
 
   Tpl.$helpers({
     results: function (callback) {
-      callback.render({
+      return callback.render({
         model: AppModel.Result,
         index: AppModel.Result.eventCatIndex,
         params: {event_id: Event.event._id, category_id: $.data().category._id},
@@ -61,7 +61,7 @@ App.require('Bart.Event', function (Event) {
 
       var heat = $.ctx.parentCtx.data.heat;
 
-      Bart.removeAll(parentElm.querySelector('td.score'));
+      Bart.removeAll(parentElm.querySelectorAll('td.score'));
 
       for(var i = heat.format.length; i > 0; --i) {
         parentElm.appendChild(Score.$render({heat: i, score: heat.numberToScore(scores[i])}));

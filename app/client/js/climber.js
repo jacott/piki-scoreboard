@@ -19,9 +19,9 @@ Index.$helpers({
     AppModel.Climber.find({}, {sort: {name: 1}})
       .forEach(function (doc) {callback(doc)});
 
-    return AppModel.Climber.Index.observe(function (doc, old) {
+    $.ctx.onDestroy(AppModel.Climber.Index.observe(function (doc, old) {
       callback(doc, old, Apputil.compareByName);
-    });
+    }));
   },
 });
 

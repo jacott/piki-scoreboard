@@ -1,3 +1,4 @@
+var $ = Bart.current;
 var Tpl = Bart.SystemSetup;
 
 var base = AppRoute.root.addBase(Tpl);
@@ -33,18 +34,18 @@ Tpl.$helpers({
     AppModel.Org.find({}, {sort: {date: 1}})
       .forEach(function (doc) {callback(doc)});
 
-    return AppModel.Org.Index.observe(function (doc, old) {
+    $.ctx.onDestroy(AppModel.Org.Index.observe(function (doc, old) {
       callback(doc, old, Apputil.compareByName);
-    });
+    }));
   },
 
   userList: function (callback) {
     AppModel.User.find({}, {sort: {date: 1}})
       .forEach(function (doc) {callback(doc)});
 
-    return AppModel.User.Index.observe(function (doc, old) {
+    $.ctx.onDestroy(AppModel.User.Index.observe(function (doc, old) {
       callback(doc, old, Apputil.compareByName);
-    });
+    }));
   },
 });
 

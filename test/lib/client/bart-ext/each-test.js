@@ -7,7 +7,7 @@
       v.Each = Bart.Test.Ext.Each;
 
       v.Each.$helpers({
-        fooList: v.fooList = test.stub(),
+        fooList: v.fooList = test.stub().returns({stop: v.stop = test.stub()}),
       });
     },
 
@@ -32,7 +32,7 @@
 
       v.Each.$helpers({
         fooList: function (callback) {
-          callback.render({
+          return callback.render({
             model: TestSubClass,
             index: index,
             params: {id1: Bart.current.data().major, id2: '2'},

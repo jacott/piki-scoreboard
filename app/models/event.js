@@ -15,8 +15,8 @@ App.require('AppModel.Org', function () {
   App.require('AppModel.Result', function (Result) {
     Result.afterCreate(function (doc) {
       var event = model.attrFind(doc.event_id);
-      if (doc.category_id in event.heats) return;
-      model.docs.update(doc.event_id, {$set: buildHeat(doc)});
+      if (event.heats && doc.category_id in event.heats) return;
+      model.docs.update(doc.event_id, {$set: buildHeat(doc, ! event.heats)});
     });
 
     Result.afterRemove(function (doc) {
@@ -25,11 +25,19 @@ App.require('AppModel.Org', function () {
       model.docs.update(doc.event_id, {$unset: buildHeat(doc)});
     });
 
-    function buildHeat(doc) {
-      var heat = {};
+    function buildHeat(doc, newHeats) {
       var category  = AppModel.Category.attrFind(doc.category_id);
-      heat["heats."+doc.category_id] = category.type + category.heatFormat;
-      return heat;
+      var value = category.type + category.heatFormat;
+
+      if (newHeats) {
+        var heats = {};
+        heats[doc.category_id] = value;
+        return {heats: heats};
+      } else {
+        var heat = {};
+        heat["heats."+doc.category_id] = value;
+        return heat;
+      }
     }
   });
 

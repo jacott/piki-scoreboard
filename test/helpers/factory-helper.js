@@ -115,7 +115,7 @@
         options.heats = [category._id];
       }
 
-      if ('forEach' in options.heats) {
+      if (options.heats && 'forEach' in options.heats) {
         var heats = {};
         options.heats.forEach(function (heat) {
           var category = AppModel.Category.attrFind(heat);
