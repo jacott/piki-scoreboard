@@ -1,9 +1,9 @@
 <template name="Profile">
-  <section id="Profile">
-    <nav>
-      {{systemSetup}}
-    </nav>
+  <section id="Profile" class="body">
     <div>
+      <nav>
+        {{systemSetup}}
+      </nav>
       <h1>{{name}}</h1>
       <section class="body">
       </section>

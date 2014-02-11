@@ -65,7 +65,7 @@
 
       AppRoute.gotoPage(Bart.Profile);
 
-      assert.dom('#Profile>nav', function () {
+      assert.dom('#Profile>div>nav', function () {
         TH.click('button.link', "System setup");
       });
 
