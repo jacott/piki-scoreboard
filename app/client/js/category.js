@@ -1,7 +1,7 @@
 var $ = Bart.current;
 var Tpl = Bart.Category;
 var Index = Tpl.Index;
-
+var category;
 var elm;
 
 Tpl.$extend({
@@ -39,7 +39,15 @@ base.addTemplate(Index, {defaultPage: true, path: ''});
 base.addTemplate(Tpl.Add, {
   focus: true,
   data: function () {
-    return new AppModel.Category({org_id: App.orgId});
+    var attrs = category ? category.attributes : {};
+    category = new AppModel.Category({
+      org_id: App.orgId,
+      type: attrs.type,
+      heatFormat: attrs.heatFormat,
+      gender: attrs.gender,
+      group: attrs.group,
+    });
+    return category;
   }
 });
 
@@ -52,6 +60,12 @@ base.addTemplate(Tpl.Edit, {
 
     return doc;
   }
+});
+
+Tpl.Form.$helpers({
+  typeList: function () {
+    return [['', ''], ["L", "Lead"], ["B", "Boulder"]];
+  },
 });
 
 Tpl.Add.$events({

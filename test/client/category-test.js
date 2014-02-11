@@ -41,7 +41,7 @@
         assert.dom('#AddCategory', function () {
           TH.input('[name=name]', 'Dynomites Wellington');
           TH.input('[name=shortName]', 'YB M');
-          TH.input('[name=type]', 'L');
+          TH.change('[name=type]', 'L');
           TH.input('[name=heatFormat]', 'F8F26QQ');
           TH.input('[name=group]', 'A');
           TH.change('[name=gender]', 'm');
