@@ -308,6 +308,15 @@ Meteor.isClient && (function (test, v) {
       },
     },
 
+    "test removeAll": function () {
+      test.stub(Bart, 'remove');
+
+      Bart.removeAll([1, 2]);
+
+      assert.calledWith(Bart.remove, 1);
+      assert.calledWith(Bart.remove, 2);
+    },
+
     "$render": {
       "test autostop": function () {
         Bart.newTemplate({

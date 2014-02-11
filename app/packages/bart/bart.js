@@ -124,9 +124,9 @@ Bart = {
     this.remove(document.getElementById(id));
   },
 
-  removeAll: function () {
-    for(var i = 0; i < arguments.length; ++i) {
-      this.remove(arguments[i]);
+  removeAll: function (elms) {
+    for(var i = 0; i < elms.length; ++i) {
+      this.remove(elms[i]);
     }
   },
 
