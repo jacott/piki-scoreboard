@@ -7,7 +7,7 @@
 
     <template name="Add">
       <form class="add">
-        <h1>Add competetor</h1>
+        <h1>Add competitor</h1>
         <fieldset>
           {{labelField "name" class="autoComplete" autocomplete="off"}}
         </fieldset>
