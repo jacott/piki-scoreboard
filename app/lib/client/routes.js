@@ -97,7 +97,9 @@ App.require('makeSubject', function (makeSubject) {
           page = page.Index || page;
           var href = page.onEntry(page, pageRoute) || pageRoute.pathname;
           var  title = document.title = page.title || AppRoute.title;
-          if (pageState && currentPageRoute.pathname !== pageRoute.pathname && ! ('noPageHistory' in page)) {
+          if (pageState &&
+              (pageState !== 'pushState' || currentPageRoute.pathname !== pageRoute.pathname) &&
+              ! ('noPageHistory' in page)) {
             AppRoute.history[pageState](null, title, href);
           }
           currentPage = page;

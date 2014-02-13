@@ -233,6 +233,17 @@
       refute.called(AppRoute.history.replaceState);
     },
 
+    "test replacePage always changes history": function () {
+      AppRoute.root.addTemplate(v.FooBar);
+      AppRoute.gotoPath('/foo-bar');
+
+      AppRoute.history.replaceState.reset();
+
+      AppRoute.replacePath('/foo-bar');
+
+      assert.called(AppRoute.history.replaceState);
+    },
+
     "test root": function () {
       assert.same(v.root.constructor, AppRoute);
     },
