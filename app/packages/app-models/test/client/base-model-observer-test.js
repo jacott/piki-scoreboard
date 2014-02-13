@@ -17,51 +17,45 @@
           id1: 'text',
           id2: 'text',
         });
-      },
 
-      "test duplicate logs error": function () {
-        var idx = v.TestSubClass.Index.addUniqueIndex('id2', 'id1');
+        v.obSpy = test.spy(v.TestSubClass.Index, 'observe');
+        v.idx = v.TestSubClass.Index.addUniqueIndex('id2', 'id1');
 
-        App.log.reset();
-        var doc1 = v.TestSubClass.create({id1: '3', id2: '4'});
-        refute.called(App.log);
-
-        var doc2 = v.TestSubClass.create({id1: '3', id2: '4'});
-        assert.calledWith(App.log, sinon.match(function (msg) {
-          return msg.match(/Error: Duplicate entry in index: TestSubClass> id2,id1\n/);
-        }));
-
-        assert.same(idx({id1: '3', id2: '4'}), doc1._id);
+        v.doc1 = v.TestSubClass.create({id1: '3', id2: '4'});
+        v.doc2 = v.TestSubClass.create({id1: '2', id2: '2'});
+        v.doc3 = v.TestSubClass.create({id1: '1', id2: '4'});
       },
 
       "test adding": function () {
-        var idx = v.TestSubClass.Index.addUniqueIndex('id2', 'id1');
+        assert.same(v.idx({id1: '3', id2: '4'}), v.doc1._id);
 
-        var doc1 = v.TestSubClass.create({id1: '3', id2: '4'});
-        var doc2 = v.TestSubClass.create({id1: '2', id2: '2'});
-        var doc3 = v.TestSubClass.create({id1: '1', id2: '4'});
-
-        assert.same(idx({id1: '3', id2: '4'}), doc1._id);
-
-        assert.equals(idx({id2: '4'}), {'1': doc3._id, '3': doc1._id});
+        assert.equals(v.idx({id2: '4'}), {'1': v.doc3._id, '3': v.doc1._id});
       },
 
       "test changing": function () {
-        var idx = v.TestSubClass.Index.addUniqueIndex('id2', 'id1');
+        v.doc1.$update({$set: {id1: '4'}});
 
-        var doc1 = v.TestSubClass.create({id1: '3', id2: '4'});
-        var doc2 = v.TestSubClass.create({id1: '2', id2: '2'});
-        var doc3 = v.TestSubClass.create({id1: '1', id2: '4'});
+        assert.same(v.idx({id1: '4', id2: '4'}), v.doc1._id);
+        assert.same(v.idx({id1: '3', id2: '4'}), undefined);
 
-        doc1.$update({$set: {id1: '4'}});
+        v.doc2.$update({$set: {id2: '4'}});
 
-        assert.same(idx({id1: '4', id2: '4'}), doc1._id);
-        assert.same(idx({id1: '3', id2: '4'}), undefined);
+        assert.equals(v.idx({}), {'4': {'4': v.doc1._id, '2': v.doc2._id, '1': v.doc3._id}});
 
-        doc2.$update({$set: {id2: '4'}});
+      },
 
-        assert.equals(idx({}), {'4': {'4': doc1._id, '2': doc2._id, '1': doc3._id}});
+      "test deleting": function () {
+        v.doc1.$remove();
 
+        assert.equals(v.idx({}), {'4': {'1': v.doc3._id}, '2': {'2': v.doc2._id}});
+      },
+
+      "test removing wrong object": function () {
+        assert.calledOnce(v.obSpy);
+
+        v.obSpy.yield(null, {_id: 'diff', id2: '4', id1: '3'});
+
+        assert.equals(v.idx({id2: '4', id1: '3'}), v.doc1._id);
       },
     },
   });

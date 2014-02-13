@@ -46,12 +46,7 @@ App.extend(AppModel, {
               tidx = tidx[value] || (tidx[value] = {});
             }
             var value = doc[fields[leadLen]];
-            if (value in tidx)
-              App.log("Error: Duplicate entry in index: " + model.modelName + "> " +
-                      Array.prototype.join.call(fields, ",") + "\n" +
-                      tidx[value] + " clashes with " + doc._id);
-            else
-              tidx[value] = doc._id;
+            tidx[value] = doc._id;
           } else if (old) {
             deleteEntry(idx, old, 0);
           }
@@ -69,7 +64,9 @@ App.extend(AppModel, {
         function deleteEntry(tidx, doc, count) {
           var value  = doc[fields[count]];
           if (! tidx) return true;
-          if (count < leadLen && ! deleteEntry(tidx[value], doc, count+1)) {
+          if (count === leadLen) {
+            if (tidx[value] !== doc._id) return false;
+          } else if (! deleteEntry(tidx[value], doc, count+1)) {
             return false;
           }
           delete tidx[value];
