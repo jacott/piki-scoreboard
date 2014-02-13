@@ -16,8 +16,8 @@ if [ "${1:-development}" = "test" ];then
 
     mkdir -p /tmp/pikidb
 
-    export MONGO_URL="mongodb://localhost:3003/meteor"
-    export MONGO_OPLOG_URL="mongodb://localhost:3003/local?authSource=admin"
+    export MONGO_URL="mongodb://localhost:3004/meteor"
+    export MONGO_OPLOG_URL="mongodb://localhost:3004/local?authSource=admin"
     export PORT=3100
     export METEOR_MODE=test
 
@@ -25,9 +25,9 @@ if [ "${1:-development}" = "test" ];then
     rm -rf $APP_FS_DIR
     mkdir -p $APP_FS_DIR
 
-    $METEORDIR/dev_bundle/mongodb/bin/mongod --quiet --nojournal --oplogSize 1 --replSet meteor --smallfiles --port 3003 --dbpath /tmp/pikidb >/tmp/pikidb.log 2>&1 &
+    $METEORDIR/dev_bundle/mongodb/bin/mongod --quiet --nojournal --oplogSize 1 --replSet meteor --smallfiles --port 3004 --dbpath /tmp/pikidb >/tmp/pikidb.log 2>&1 &
     mongo=$!
-    sleep 2
+    sleep 1
     $METEORDIR/meteor run --port $PORT &
     meteor=$!
 
@@ -64,7 +64,7 @@ else
 
     $METEORDIR/dev_bundle/mongodb/bin/mongod --quiet --nojournal --oplogSize 2 --replSet meteor --smallfiles --port 3003 --dbpath .meteor/local/db/ >../tmp/pikidb.log 2>&1 &
     mongo=$!
-    sleep 2
+    sleep 1
     exec $METEORDIR/meteor run --port $PORT &
     meteor=$!
 
