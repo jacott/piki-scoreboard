@@ -109,9 +109,14 @@
     },
 
     "test all deleted when competitor deregistered": function () {
+      var climber = TH.Factory.createClimber();
+      var comp2 = TH.Factory.buildCompetitor({event_id: v.competitor.event_id, category_id: v.competitor.category_id});
+      comp2.$$save();
+
+
       v.competitor.$remove();
 
-      assert.same(AppModel.Result.find().count(), 0);
+      assert.same(AppModel.Result.find().count(), 1);
     },
   });
 })();

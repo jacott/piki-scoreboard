@@ -53,7 +53,7 @@ Index.$events({
 
 var base = AppRoute.root.addBase(Tpl, 'eventId');
 
-base.addTemplate(Index, {defaultPage: true});
+base.addTemplate(Index, {defaultPage: true, path: ''});
 base.addTemplate(Tpl.Add, {
   focus: true,
   data: function () {
@@ -125,7 +125,7 @@ Tpl.Show.$helpers({
 
 function cancel(event) {
   event.$actioned = true;
-  AppRoute.gotoPage(Tpl);
+  AppRoute.history.back();
 }
 
 App.loaded('Bart.Event', Bart.Event);

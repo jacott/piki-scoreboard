@@ -35,18 +35,18 @@ Tpl.$extend({
       if (doc.$save()) {
         successPage && AppRoute.gotoPage(successPage);
       } else {
-        this.renderErrors(doc, form);
+        Tpl.renderErrors(doc, form);
       }
     };
   },
 
   saveDoc: function (doc, form) {
-    this.fillDoc(doc, form);
+    Tpl.fillDoc(doc, form);
     if (doc.$save()) {
       return true;
     }
 
-    this.renderErrors(doc, form);
+    Tpl.renderErrors(doc, form);
   },
 
   fillDoc: function (doc, form) {
@@ -68,13 +68,13 @@ Tpl.$extend({
     var errors = doc._errors;
     var focus = null;
     var otherMsgs = [];
-    this.clearErrors(form);
+    Tpl.clearErrors(form);
 
     if (errors) {
       for(var field in errors) {
         var msg = AppVal.Error.msgFor(doc, field);
         if (msg) {
-          var fieldElm = this.renderError(form, field, msg);
+          var fieldElm = Tpl.renderError(form, field, msg);
           if (fieldElm)
             focus = focus || fieldElm;
           else

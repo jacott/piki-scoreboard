@@ -67,7 +67,7 @@ App.require('AppModel.Competitor', function (Competitor) {
 
   function removeResults(ids, doc) {
     ids.forEach(function (catId) {
-      model.docs.remove({category_id: catId, event_id: doc.event_id});
+      model.docs.remove({climber_id: doc.climber_id, category_id: catId, event_id: doc.event_id});
     });
   }
 
