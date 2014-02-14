@@ -6,3 +6,5 @@
 
 @colorInputErrorBG: #fea;
 @colorErrorText: #974;
+
+@colorSelectedBackground: #8f8;

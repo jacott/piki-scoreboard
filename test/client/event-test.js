@@ -46,7 +46,8 @@
       assert.dom('#Event', function () {
         assert.dom('.events', function () {
           assert.dom('h1', 'Events');
-          assert.dom('h1+table', function () {
+          assert.dom('nav', 'Add new event');
+          assert.dom('table', function () {
             assert.dom('tr>td', events[0].name, function () {
               assert.domParent('td', events[0].date);
             });
@@ -55,7 +56,6 @@
             });
           });
         });
-        assert.dom('nav [name=add]', 'Add new event');
       });
     },
 
@@ -99,9 +99,11 @@
       },
 
       "test rendering": function () {
-        assert.dom('#Event #ShowEvent', function () {
+        assert.dom('#Event:not(.noEvent) .menu', function () {
           assert.dom('.link[name=register]');
           assert.dom('.link[name=edit]');
+        });
+        assert.dom('#Event #ShowEvent', function () {
           assert.dom('h1', v.event.name);
           assert.dom('.categories', function () {
             assert.dom('h1', 'Categories');

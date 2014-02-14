@@ -5,19 +5,22 @@ var eventSub;
 
 Tpl.$extend({
   onBaseEntry: function (page, pageRoute) {
-    document.body.appendChild(Tpl.$autoRender({}));
+    var elm = Tpl.$autoRender({});
+    document.body.appendChild(elm);
 
     if (pageRoute.eventId) {
       if (! Tpl.event || Tpl.event._id !== pageRoute.eventId) {
         if (Tpl.event =  AppModel.Event.findOne(pageRoute.eventId)) {
           eventSub = App.subscribe('Event', pageRoute.eventId, function () {
-            AppRoute.gotoPage.apply(AppRoute, loadingArgs);
+            AppRoute.replacePath.apply(AppRoute, loadingArgs);
           });
           var loadingArgs = AppRoute.loadingArgs;
           AppRoute.abortPage();
         }
       }
     }
+
+    if (! Tpl.event) Bart.addClass(elm, 'noEvent');
   },
 
   onBaseExit: function (page, pageRoute) {
@@ -35,6 +38,12 @@ Index.$helpers({
     $.ctx.onDestroy(AppModel.Event.Index.observe(function (doc, old) {
       callback(doc, old, sortByDate);
     }));
+  },
+});
+
+Index.Row.$helpers({
+  classes: function () {
+    return this.$equals(Tpl.event) ? "selected" : "";
   },
 });
 

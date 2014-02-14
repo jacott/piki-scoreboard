@@ -1,17 +1,22 @@
 <template name="Event">
   <section id="Event">
     <div>
+      <nav class="menu">
+        {{pageLink name="show" value="Results" template="Event.Show"}}
+        {{pageLink name="register" value="Registrations" template="Event.Register"}}
+        {{pageLink name="edit" value="Edit" template="Event.Edit"}}
+      </nav>
       <section class="body">
       </section>
     </div>
   </section>
   <template name="Index">
     <div>
-      <nav>
-        {{pageLink name="add" value="Add new event" template="Event.Add"}}
-      </nav>
       <section class="events">
         <h1>Events</h1>
+        <nav>
+          {{pageLink name="add" value="Add new event" template="Event.Add"}}
+        </nav>
         <table class="select">
           <thead>
             <tr>
@@ -22,7 +27,7 @@
             {{each "events" template="Row"}}
           </tbody>
           <template name="Row">
-            <tr>
+            <tr class="{{classes}}">
               <td>{{name}}</td><td>{{date}}</td>
             </tr>
           </template>
@@ -32,10 +37,6 @@
   </template>
   <template name="Show">
     <section id="ShowEvent">
-      <nav class="menu">
-        {{pageLink name="register" value="Registrations" template="Event.Register"}}
-        {{pageLink name="edit" value="Edit" template="Event.Edit"}}
-      </nav>
       <div>
         <h1>{{name}}</h1>
         <div class="categories">
