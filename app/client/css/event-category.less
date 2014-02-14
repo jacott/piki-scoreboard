@@ -1,0 +1,16 @@
+#Category {
+  [name=selectHeat] {
+    float: right;
+  }
+  table.results {
+    counter-reset: line-number;
+    td:first-child:before {
+      content: counter(line-number) ".";
+      counter-increment: line-number;
+      padding-right: 0.3em;
+    }
+    th.climber {
+      width: 30%;
+    }
+  }
+}

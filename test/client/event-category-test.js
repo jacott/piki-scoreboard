@@ -27,6 +27,10 @@
         assert.dom('table.results', function () {
           assert.dom('thead>tr', function () {
             assert.dom('th:first-child', 'Climber');
+            assert.dom('th:nth-child(2)', 'Final');
+            assert.dom('th:nth-child(3)', 'Qualification 2');
+            assert.dom('th:nth-child(4)', 'Qualification 1');
+            assert.dom('th:nth-child(5)', 'Start list');
           });
           assert.dom('tbody', function () {
             assert.dom('tr:first-child>td.climber', v.result2.climber.name);
@@ -36,13 +40,25 @@
       });
     },
 
+    "test selecting heat": function () {
+      TH.login();
+
+      assert.dom('select[name=selectHeat]', function () {
+        assert.dom('option[selected]', {value: "-1", text: 'General result'});
+        assert.dom('option:not([selected])', {value: "1", text: 'Qualification 1'});
+        TH.change(this, "1");
+      });
+
+      assert.dom('h1', 'Qualification 1');
+    },
+
     "test selecting climber": function () {
       TH.login();
       assert.dom('#Event #Category', function () {
         TH.click('td.climber', v.result.climber.name);
 
+        assert.dom('h1', 'Qualification 1');
         assert.dom('.heatUpdate>form#Heat', function () {
-          assert.dom('h1', 'Qualification 1');
 
           assert.dom('label .name', {text: v.result.climber.name, parent: function () {
             TH.input('[name=score]', "23.5+");
@@ -60,6 +76,9 @@
           }
         });
       });
+      TH.change('select[name=selectHeat]', "2");
+
+      refute.dom('#Heat');
     },
   });
 })();

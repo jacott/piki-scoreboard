@@ -13,11 +13,17 @@ Heat.prototype = {
   constructor: Heat,
 
   get name() {
+    return this.getName(this.number);
+  },
+
+  getName: function (number) {
+    if (number === -1) return "General result";
+    if (number === 0) return "Start list";
     var format = this.format;
-    if (format[format.length - this.number] === 'Q') {
-      var heatName = 'Qualification ' + this.number;
+    if (format[format.length - number] === 'Q') {
+      var heatName = 'Qualification ' + number;
     } else {
-      var heatName = FINAL_NAMES[format.length - this.number];
+      var heatName = FINAL_NAMES[format.length - number];
     }
 
     return heatName;
@@ -35,7 +41,18 @@ Heat.prototype = {
     }
   },
 
-  numberToScore: function (score) {
+  list: function () {
+    var results = [];
+    for(var i = this.format.length; i >= -1; --i) {
+      results.push([i, this.getName(i)]);
+    }
+    return results;
+  },
+
+  numberToScore: function (score, index) {
+    if (index === 0) {
+      return score;
+    }
     if (score == null) return '';
     if (score === 9999999) return "Top";
     var result = "" + Math.floor(score / 10000);

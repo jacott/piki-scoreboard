@@ -1,8 +1,7 @@
 App.require('AppModel.Competitor', function (Competitor) {
   var model = AppModel.Base.defineSubclass('Result',{
     unscoredHeat: function () {
-      return new AppModel.Heat(this.scores.length,
-                          this.event.heats[this.category_id]);
+      return this.scores.length;
     },
   },{saveRpc: true});
 
@@ -12,6 +11,7 @@ App.require('AppModel.Competitor', function (Competitor) {
     climber_id: 'belongs_to',
     category_id: 'belongs_to',
     time: 'number',
+    order: 'number',
     scores: 'number',
   });
 
@@ -60,8 +60,17 @@ App.require('AppModel.Competitor', function (Competitor) {
       var result = model.create({
         category_id: catId, event_id: doc.event_id,
         climber_id: doc.climber_id,
-        scores: [Math.random()],
+        order: Meteor.isClient ? 2 : Math.random(),
+        scores: [''],
       });
+      if (Meteor.isServer) {
+        var count = 0;
+        var docs = model.docs;
+        docs.find({event_id: doc.event_id, category_id: catId}, {
+          transform: null, sort: {order: 1}, fields: {order: 1}}).forEach(function (res) {
+            docs.update(res._id, {$set: {"scores.0": ++count}});
+        });
+      }
     });
   }
 

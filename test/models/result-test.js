@@ -61,23 +61,11 @@
       var event = TH.Factory.createEvent({heats: [category._id]});
       var result = TH.Factory.createResult();
 
-      assert.specificAttributesEqual(result.unscoredHeat(),
-                                     {number: 1, name: 'Qualification 1'});
+      assert.same(result.unscoredHeat(), 1);
 
       result.scores.push(123);
-      assert.specificAttributesEqual(result.unscoredHeat(),
-                                     {number: 2, name: 'Qualification 2'});
-
       result.scores.push(223);
-      assert.specificAttributesEqual(result.unscoredHeat(),
-                                     {number: 3, name: 'Semi Final'});
-
-      result.scores.push(223);
-      assert.specificAttributesEqual(result.unscoredHeat(),
-                                     {number: 4, name: 'Final'});
-
-      result.scores.push(1);
-      assert.equals(result.unscoredHeat().name, undefined);
+      assert.same(result.unscoredHeat(), 3);
     },
 
     "test associated": function () {
@@ -89,14 +77,23 @@
     },
 
     "test created when competitor registered": function () {
+      var cat1Comp = TH.Factory.buildCompetitor({category_ids: v.catIds});
+      cat1Comp.$$save();
       assert(v.r2 = AppModel.Result.findOne({category_id: v.categories[0]._id}));
-      v.result = AppModel.Result.findOne({category_id: v.categories[1]._id});
-      assert(v.result);
+      v.results = AppModel.Result.find({category_id: v.categories[1]._id}, {sort: {order: 1}}).fetch();
+      assert.same(v.results.length, 2);
+      v.result = v.results[0];
 
       assert.same(v.result.event_id, v.competitor.event_id);
       assert.same(v.result.climber_id, v.competitor.climber_id);
-      assert.between(v.result.scores[0], 0, 1);
-      refute.same(v.r2.scores[0], v.result.scores[0]);
+      if (Meteor.isClient)
+        assert.same(v.result.order, 2);
+      else {
+        assert.between(v.result.order, 0, 1);
+        refute.same(v.r2.order, v.result.order);
+        assert.same(v.result.scores[0], 1);
+        assert.same(v.results[1].scores[0], 2);
+      }
     },
 
     "test deleted when competitor cat removed": function () {

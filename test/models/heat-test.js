@@ -16,8 +16,14 @@
     },
 
     "test name": function () {
-      var heat = new AppModel.Heat(1, 'LF8F26F26QQ');
+      var heat = new AppModel.Heat(-1, 'LF8F26F26QQ');
 
+      assert.same(heat.name, 'General result');
+
+      heat.number = 0;
+      assert.same(heat.name, 'Start list');
+
+      heat.number = 1;
       assert.same(heat.name, 'Qualification 1');
 
       heat.number = 2;
