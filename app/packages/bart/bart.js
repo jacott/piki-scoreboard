@@ -191,6 +191,11 @@ Bart = {
       newElm._node = ast;
       ast[0] = newElm;
     }
+    ast = oldElm._bartEnd;
+    if (ast) {
+      Bart.removeInserts(oldElm);
+      Bart.remove(ast);
+    }
 
     var parentCtx = (oldElm._bart && oldElm._bart.parentCtx) || Bart.getCtx(oldElm.parentNode);
     if (parentCtx) {
@@ -396,7 +401,20 @@ function updateNode (node, data) {
         value = document.createComment('empty');
 
     } else if (typeof value === 'object' && value.nodeType === DOCUMENT_FRAGMENT_NODE) {
-      throw new Error("can't handle DOCUMENT_FRAGMENT_NODE");
+      if ('_bartEnd' in currentElement) {
+        Bart.removeInserts(currentElement);
+      } else {
+        if (currentElement.nodeType !== COMMENT_NODE) {
+          var start = document.createComment('start');
+          Bart.replaceElement(start, currentElement);
+          currentElement = start;
+        }
+        currentElement.textContent = 'start';
+        currentElement._bartEnd = document.createComment('end');
+        currentElement.parentNode.insertBefore(currentElement._bartEnd, currentElement.nextSibling);
+      }
+      currentElement.parentNode.insertBefore(value, currentElement._bartEnd);
+      value = currentElement;
 
     } else if (typeof value !== 'object' || ! ('nodeType' in value)) {
 

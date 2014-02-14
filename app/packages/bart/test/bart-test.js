@@ -342,6 +342,63 @@ Meteor.isClient && (function (test, v) {
       assert.same(elm._bartEnd.parentNode, parent);
     },
 
+    "test inserting Document Fragment": function () {
+      Bart.newTemplate({
+        name: "Foo",
+        nodes: [{
+          name:"div",
+          attrs:[],
+          children: [" ",["","bar"]," "],
+        }],
+      });
+
+      Bart.Foo.$helpers({
+        bar: function () {
+          return content.apply(this, arguments);
+        },
+      });
+
+      var content = function () {
+        var frag = document.createDocumentFragment();
+        frag.appendChild(Bart.html('<div id="e1">e1</div>'));
+        frag.appendChild(Bart.html('<div id="e2">e2</div>'));
+        frag.appendChild(Bart.html('<div id="e3">e3</div>'));
+        return frag;
+      };
+
+      var elm = Bart.Foo.$render({});
+      assert.dom(elm, function () {
+        assert.dom('div', {count: 3});
+      });
+
+      content = function () {
+        var frag = document.createDocumentFragment();
+        frag.appendChild(Bart.html('<p id="n1">n1</p>'));
+        frag.appendChild(Bart.html('<p id="n2">n2</p>'));
+        return frag;
+      };
+
+      Bart.getCtx(elm).updateAllTags();
+      assert.dom(elm, function () {
+        refute.dom('div');
+        assert.dom('p', {count: 2});
+      });
+
+      content = function () {
+        var elm = document.createElement('span');
+        elm.textContent = 'foo';
+        return elm;
+      };
+
+      Bart.getCtx(elm).updateAllTags();
+      assert.dom(elm, function () {
+        refute.dom('p');
+        assert.dom('span', 'foo', function () {
+          assert.same(this.nextSibling.nodeType, document.TEXT_NODE);
+        });
+      });
+    },
+
     "$render": {
       "test autostop": function () {
         Bart.newTemplate({
