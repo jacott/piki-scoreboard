@@ -15,7 +15,7 @@
       assert.validators(validators.name, {maxLength: [200], required: [true], trim: [true]});
       assert.validators(validators.email, {maxLength: [200], required: [true], trim: [true],
                                            inclusion: [{allowBlank: true, matches: Apputil.EMAIL_RE }], normalize: ['downcase']});
-      assert.validators(validators.shortName, {maxLength: [4], required: [true], trim: [true]});
+      assert.validators(validators.shortName, {maxLength: [10], required: [true], trim: [true]});
     },
   });
 })();

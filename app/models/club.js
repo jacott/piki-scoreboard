@@ -4,7 +4,7 @@ App.require('AppModel.Org', function () {
 
   model.defineFields({
     name: {type:  'text', trim: true, required: true, maxLength: 200},
-    shortName: {type: 'text', trim: true, required: true, maxLength: 4, normalize: 'upcase'},
+    shortName: {type: 'text', trim: true, required: true, maxLength: 10, normalize: 'upcase'},
     org_id: 'belongs_to',
     contact_id: {type: 'belongs_to', modelName: 'User'}
   });
