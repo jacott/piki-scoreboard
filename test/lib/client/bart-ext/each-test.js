@@ -104,6 +104,23 @@
       });
     },
 
+    "test works with removeInserts": function () {
+      assert.dom(v.Each.$render({}), function () {
+        var callback = v.fooList.args[0][0];
+
+        callback({id: 1, name: 'r1'});
+        callback({id: 2, name: 'r2'});
+
+        assert.dom('li', {text: 'r1', parent: function () {
+          var start = this.firstChild.nextSibling;
+          Bart.removeInserts(start);
+          assert.same(start.nextSibling, start._bartEnd);
+          assert.same(start._bartEnd.nodeType, document.COMMENT_NODE);
+        }});
+        refute.dom('li');
+      });
+    },
+
     "test ordered": function () {
       assert.dom(v.Each.$render({}), function () {
         var callback = v.fooList.args[0][0];

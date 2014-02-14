@@ -3,11 +3,11 @@ var $ = Bart.current;
 Bart.registerHelpers({
   each: function (func, options) {
     callback.render = callbackRender;
-    if ($.element._endEach) return;
+    if ($.element._bartEnd) return;
     if (typeof func !== 'string') throw new Error("first argument must be name of helper method to call");
 
     var startEach = document.createComment('start');
-    var endEach = startEach._endEach = document.createComment('end');
+    var endEach = startEach._bartEnd = document.createComment('end');
     $.element.parentNode.insertBefore(endEach, $.element.nextSibling);
 
     var col = {};
