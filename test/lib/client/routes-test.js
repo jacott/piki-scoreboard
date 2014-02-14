@@ -219,6 +219,14 @@
       assert.calledWith(AppRoute.history.replaceState, null, "baz bar", '/foo-bar');
     },
 
+    "test replacePath passes all args": function () {
+      test.stub(AppRoute, 'gotoPath');
+
+      AppRoute.replacePath(1, 2,3);
+
+      assert.calledWith(AppRoute.gotoPath, 1, 2, 3);
+    },
+
     "test pageChanged": function () {
       test.stub(AppRoute, 'gotoPath');
       AppRoute.root.addTemplate(v.FooBar);

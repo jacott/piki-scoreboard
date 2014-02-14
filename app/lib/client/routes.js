@@ -97,6 +97,7 @@ App.require('makeSubject', function (makeSubject) {
           page = page.Index || page;
           var href = page.onEntry(page, pageRoute) || pageRoute.pathname;
           var  title = document.title = page.title || AppRoute.title;
+
           if (pageState &&
               (pageState !== 'pushState' || currentPageRoute.pathname !== pageRoute.pathname) &&
               ! ('noPageHistory' in page)) {
@@ -124,9 +125,9 @@ App.require('makeSubject', function (makeSubject) {
       return this.gotoPath();
     },
 
-    replacePath: function (location) {
+    replacePath: function () {
       pageState = 'replaceState';
-      return this.gotoPath(location);
+      return this.gotoPath.apply(this, arguments);
     },
 
     gotoPath: function (page) {
