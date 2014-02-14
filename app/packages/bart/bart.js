@@ -181,17 +181,8 @@ Bart = {
     return ctx;
   },
 
-  getNode: function (elm) {
-    return elm && elm._node;
-  },
-
   replaceElement: function (newElm, oldElm, noRemove) {
-    var ast = oldElm._node;
-    if (ast) {
-      newElm._node = ast;
-      ast[0] = newElm;
-    }
-    ast = oldElm._bartEnd;
+    var ast = oldElm._bartEnd;
     if (ast) {
       Bart.removeInserts(oldElm);
       Bart.remove(ast);
@@ -432,7 +423,6 @@ function updateNode (node, data) {
     }
   }
   node[0] = value;
-  value._node = node;
 }
 
 function getValue(data, func, args) {
