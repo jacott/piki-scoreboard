@@ -137,6 +137,16 @@ Bart = {
     }
   },
 
+  removeInserts: function (start) {
+    var parent = start.parentNode;
+    if (! parent) return;
+    var end = start._bartEnd;
+    for(var elm = start.nextSibling; elm && elm !== end; elm = start.nextSibling) {
+      parent.removeChild(elm);
+      Bart.destroyData(elm);
+    }
+  },
+
   destroyChildren: function (elm, remove) {
     if (! elm) return;
 

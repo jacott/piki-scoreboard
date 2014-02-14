@@ -317,6 +317,31 @@ Meteor.isClient && (function (test, v) {
       assert.calledWith(Bart.remove, 2);
     },
 
+    "test removeInserts": function () {
+      var parent = document.createElement('div');
+      var elm = document.createComment();
+      elm._bartEnd = document.createComment();
+
+      parent.appendChild(elm);
+      [1,2,3].forEach(function (i) {
+        parent.appendChild(document.createElement('p'));
+      });
+      parent.appendChild(elm._bartEnd);
+      parent.appendChild(document.createElement('i'));
+
+      test.spy(Bart, 'destroyChildren');
+
+      Bart.removeInserts(elm);
+
+      assert.calledThrice(Bart.destroyChildren);
+
+      assert.same(parent.querySelectorAll('p').length, 0);
+      assert.same(parent.querySelectorAll('i').length, 1);
+
+      assert.same(elm.parentNode, parent);
+      assert.same(elm._bartEnd.parentNode, parent);
+    },
+
     "$render": {
       "test autostop": function () {
         Bart.newTemplate({
