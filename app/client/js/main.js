@@ -61,10 +61,12 @@ function stateChange(opts) {
   App.Ready.setNotReady();
   orgSub && orgSub.stop(); orgSub = null;
   sessionSub = App.subscribe('Session', function (err) {
+    Bart.removeId('Flash');
     if (err) return;
     App.Ready.notifyReady();
     subscribeOrg(orgShortName);
   });
+  Bart.Flash.loading();
 }
 
 var orgSub, orgShortName, pathname;
@@ -79,6 +81,7 @@ function subscribeOrg(shortName) {
     if (! App.Ready.isReady) return;
 
     orgSub = App.subscribe('Org', orgShortName, function () {
+      Bart.removeId('Flash');
       var doc = AppModel.Org.findOne({shortName: orgShortName});
       App.orgId = doc._id;
       Bart.addClass(document.body, 'inOrg');
@@ -89,6 +92,8 @@ function subscribeOrg(shortName) {
         AppRoute.replacePath(pn);
       }
     });
+
+    Bart.Flash.loading();
 
     if (AppRoute.loadingArgs) {
       pathname = AppRoute.loadingArgs[1].pathname;

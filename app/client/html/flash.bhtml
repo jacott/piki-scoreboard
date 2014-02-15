@@ -1,0 +1,5 @@
+<template name="Flash">
+  <div id="Flash" class="{{classes}}">
+    <div class="m">{{message}}</div>
+  </div>
+</template>
