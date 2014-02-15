@@ -31,11 +31,10 @@
             assert.dom('th:nth-child(3)', 'Qual Rank');
             assert.dom('th:nth-child(4)', 'Qual 2');
             assert.dom('th:nth-child(5)', 'Qual 1');
-            assert.dom('th:nth-child(6)', 'Start list');
           });
           assert.dom('tbody', function () {
-            assert.dom('tr:first-child>td.climber', v.result.climber.name);
-            assert.dom('tr:last-child>td.climber', v.result2.climber.name);
+            assert.dom('tr:first-child>td.climber', v.result2.climber.name);
+            assert.dom('tr:last-child>td.climber', v.result.climber.name);
           });
         });
         TH.login();
@@ -78,6 +77,26 @@
       });
     },
 
+    "test switching to start list": function () {
+      v.result.$update({$set: {scores: [2, 310000, 220000, 330000]}});
+      v.result2.$update({$set: {scores: [1, 210000, 320000, 230000]}});
+      TH.login();
+
+      assert.dom('#Category', function () {
+        TH.click('[name=toggleStartList]', 'Show start list');
+
+        assert.dom('h1', 'Qual 1 - Start list');
+
+        assert.dom('table.results', function () {
+          assert.dom('tr:first-child>td.climber', {text: v.result.climber.name});
+        });
+
+        TH.click('[name=toggleStartList]', 'Show results');
+
+        assert.dom('h1', 'Qual 1 - Results');
+      });
+    },
+
     "test selecting heat": function () {
       TH.login();
 
@@ -87,7 +106,7 @@
         TH.change(this, "2");
       });
 
-      assert.dom('h1', 'Qual 2');
+      assert.dom('h1', 'Qual 2 - Results');
 
       assert.dom('.results>thead', 'Climber Result');
       assert.dom('.results>tbody>tr:first-child>td', {count: 2});
@@ -98,7 +117,7 @@
       assert.dom('#Event #Category', function () {
         TH.click('td.climber', v.result.climber.name);
 
-        assert.dom('h1', 'Qual 1');
+        assert.dom('h1', 'Qual 1 - Results');
         assert.dom('.heatUpdate>form#Heat', function () {
 
           assert.dom('label .name', {text: v.result.climber.name, parent: function () {
@@ -108,7 +127,7 @@
           TH.trigger(this, 'submit');
         });
 
-        assert.equals(v.result.$reload().scores, [2, 235005]);
+        assert.equals(v.result.$reload().scores, [0.1, 235005]);
 
 
         assert.dom('tbody>tr>td.climber', {

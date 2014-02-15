@@ -2,9 +2,12 @@
   <div id="Category">
     <h1>{{category.name}}</h1>
     <div class="heatUpdate">
-      {{field "selectHeat" selectList=heats}}
+      <nav class="viewMenu">
+        <button name="toggleStartList">{{modeSwitchLabel}}</button>
+        {{field "selectHeat" selectList=heats}}
+      </nav>
 
-      <h1>{{heat.name}}</h1>
+      <h1>{{heat.name}} - {{mode}}</h1>
 
       <template name="Heat">
         <form id="Heat">

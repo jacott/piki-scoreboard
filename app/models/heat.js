@@ -50,12 +50,35 @@ Heat.prototype = {
   list: function () {
     var results = [];
     for(var i = this.format.length; i >= -1; --i) {
-      results.push([i, this.getName(i)]);
+      i && results.push([i, this.getName(i)]);
     }
     return results;
   },
 
-  sort: function (results) {
+  sortByStartOrder: function (results) {
+    var x = this.number;
+
+    if (x < 0) x = 1;
+    this.sort(results, x <= this.rankIndex ? 0 : x - 1);
+
+    if (x > this.rankIndex) {
+      (x-1) === this.rankIndex && results.sort(function (a, b) {
+        return a.rankMult === b.rankMult ? 0 :
+          a.rankMult < b.rankMult ? -1 : 1; // lower rank is better
+      });
+      return results.reverse();
+    }
+
+    if (x % 2 === 0) {
+      var mark = Math.ceil(results.length/2);
+      var bottom = results.splice(0, mark);
+      Array.prototype.push.apply(results, bottom);
+    }
+    return results;
+  },
+
+  sort: function (results, number) {
+    if (number == null) number = this.number;
     var rankIndex = this.rankIndex;
 
     // set qual ranks
@@ -84,20 +107,13 @@ Heat.prototype = {
       }
     }
 
-    // set start list numbers
-    x = 0;
-    results.sort(sortByHeat);
-    for(var i = 0; i < results.length; ++i) {
-      results[i].scores[0] = i+1;
-    }
-
     // sort by heat number
-    x = this.number;
+    x = number;
 
-    if (x > 0 && x <= rankIndex) {
+    if (x >= 0 && x <= rankIndex) {
       results.sort(sortByHeat);
 
-    } else if (x !== 0) {
+    } else {
       results.sort(function (a, b) {
         var aScores = a.scores, bScores = b.scores;
         var aLen = aScores.length;
@@ -119,8 +135,10 @@ Heat.prototype = {
     return results;
 
     function sortByHeat(a, b) {
-      var aScore = a.scores[x] || -5, bScore = b.scores[x] || -5;
-      return aScore === bScore ? 0 : aScore > bScore ? -1 : 1;
+      var aScore = a.scores[x], bScore = b.scores[x];
+      if (aScore == null) aScore = -5;
+      if (bScore == null) bScore = -5;
+      return aScore == bScore ? 0 : aScore > bScore ? -1 : 1;
     }
   },
 
@@ -131,7 +149,7 @@ Heat.prototype = {
     var len = format.length;
 
     if (num === -1) {
-      for(var i = 0; i <= len; ++i, oldType = type) {
+      for(var i = 0; i < len; ++i, oldType = type) {
         type = format[i];
         if (type === 'Q' && oldType === 'F')
           callback(-2, this.getName(-2));

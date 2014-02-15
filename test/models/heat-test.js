@@ -72,7 +72,30 @@
       assert.same(heat.numberToScore(), '');
       assert.same(heat.numberToScore(1, 0), 1);
       assert.same(heat.numberToScore(1.535, -2), 1.54);
+    },
 
+    "sortByStartOrder": {
+      setUp: function () {
+        v.call = function (number, results) {
+          v.heat = new AppModel.Heat(number, 'LF8F26QQ');
+
+          return v.heat.sortByStartOrder(results);
+        };
+      },
+
+      "test odd": function () {
+        var results = [v.r1 = {scores: [0.2]}, v.r2 = {scores: [0.4]}, v.r3 = {scores: [0.3]}];
+        assert.equals(v.call(1, results), [v.r2, v.r3, v.r1]);
+
+        assert.equals(v.call(2, results), [v.r1, v.r2, v.r3]);
+      },
+
+      "test even": function () {
+        var results = [v.r1 = {scores: [0.2]}, v.r2 = {scores: [0.4]}];
+        assert.equals(v.call(1, results), [v.r2, v.r1]);
+
+        assert.equals(v.call(2, results), [v.r1, v.r2]);
+      },
     },
 
     "sort": {
@@ -86,7 +109,7 @@
 
       "test General Result": function () {
         var results = [v.r1 = {scores: [0.2]}, v.r2 = {scores: [0.4]}];
-        assert.equals(v.call(-1, results), [v.r1, v.r2]);
+        assert.equals(v.call(-1, results), [v.r2, v.r1]);
 
         var results = [v.r1 = {scores: [0.2, 100]}, v.r2 = {scores: [0.4]}];
         assert.equals(v.call(-1, results), [v.r1, v.r2]);
@@ -121,10 +144,6 @@
 
         assert.equals(v.call(2, results), [v.r3, v.r1, v.r2]);
 
-        assert.same(v.r3.scores[0], 3);
-        assert.same(v.r1.scores[0], 2);
-        assert.same(v.r2.scores[0], 1);
-
         assert.equals(v.call(1, results), [v.r1, v.r2, v.r3]);
 
         assert.equals(v.call(0, results), [v.r2, v.r1, v.r3]);
@@ -154,7 +173,6 @@
           {number: -2, name: 'Qual Rank'},
           {number: 2, name: 'Qual 2'},
           {number: 1, name: 'Qual 1'},
-          {number: 0, name: 'Start list'},
         ]);
       },
 

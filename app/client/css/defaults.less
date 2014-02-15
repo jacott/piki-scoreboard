@@ -10,7 +10,7 @@ button.link {
   }
 }
 
-button:not(.link), textarea, input {
+button:not(.link), textarea, input, select {
   font-size: inherit;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -21,7 +21,7 @@ button:not(.link) {
   padding: 0.5em 1em;
   &:focus {
     outline: 0;
-    .box-shadow(0 0 8px fade(#000, 60%));
+    .box-shadow(0 0 2px fade(#000, 60%));
   }
   &[type=submit] {
     color: #fff;
@@ -29,12 +29,11 @@ button:not(.link) {
   }
 }
 
-textarea, input {
+textarea, input, select {
   &:focus {
-    outline: 0;
+    outline: 1px solid fade(#000, 10%);
     background-color: #eee;
   }
-  .box-shadow(inset 0 1px 3px fade(#000, 10%));
 }
 
 table {
