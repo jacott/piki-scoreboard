@@ -80,19 +80,17 @@
       var cat1Comp = TH.Factory.buildCompetitor({category_ids: v.catIds});
       cat1Comp.$$save();
       assert(v.r2 = AppModel.Result.findOne({category_id: v.categories[0]._id}));
-      v.results = AppModel.Result.find({category_id: v.categories[1]._id}, {sort: {order: 1}}).fetch();
+      v.results = AppModel.Result.find({category_id: v.categories[1]._id}).fetch();
       assert.same(v.results.length, 2);
       v.result = v.results[0];
 
       assert.same(v.result.event_id, v.competitor.event_id);
       assert.same(v.result.climber_id, v.competitor.climber_id);
       if (Meteor.isClient)
-        assert.same(v.result.order, 2);
+        assert.same(v.result.scores[0], 0);
       else {
-        assert.between(v.result.order, 0, 1);
-        refute.same(v.r2.order, v.result.order);
-        assert.same(v.result.scores[0], 1);
-        assert.same(v.results[1].scores[0], 2);
+        assert.between(v.result.scores[0], 0, 1);
+        refute.same(v.r2.scores[0], v.result.scores[0]);
       }
     },
 

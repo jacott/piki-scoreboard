@@ -34,8 +34,8 @@
             assert.dom('th:nth-child(6)', 'Start list');
           });
           assert.dom('tbody', function () {
-            assert.dom('tr:first-child>td.climber', v.result2.climber.name);
-            assert.dom('tr:last-child>td.climber', v.result.climber.name);
+            assert.dom('tr:first-child>td.climber', v.result.climber.name);
+            assert.dom('tr:last-child>td.climber', v.result2.climber.name);
           });
         });
         TH.login();
@@ -108,7 +108,7 @@
           TH.trigger(this, 'submit');
         });
 
-        assert.equals(v.result.$reload().scores, [0.1, 235005]);
+        assert.equals(v.result.$reload().scores, [2, 235005]);
 
 
         assert.dom('tbody>tr>td.climber', {

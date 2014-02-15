@@ -58,11 +58,9 @@ Heat.prototype = {
   sort: function (results) {
     var rankIndex = this.rankIndex;
 
+    // set qual ranks
     for(var x=rankIndex; x > 0; --x) {
-      results.sort(function (a, b) {
-        var aScore = a.scores[x] || -5, bScore = b.scores[x] || -5;
-        return aScore === bScore ? 0 : aScore > bScore ? -1 : 1;
-      });
+      results.sort(sortByHeat);
 
       var previ = 0;
       var rankName = 'rank' + x;
@@ -86,15 +84,20 @@ Heat.prototype = {
       }
     }
 
-    var number = this.number;
+    // set start list numbers
+    x = 0;
+    results.sort(sortByHeat);
+    for(var i = 0; i < results.length; ++i) {
+      results[i].scores[0] = i+1;
+    }
 
-    if (number >= 0 && number <= rankIndex) {
-      results.sort(function (a, b) {
-        var aScore = a.scores[number], bScore = b.scores[number];
+    // sort by heat number
+    x = this.number;
 
-        return aScore === bScore ? 0 : aScore > bScore ? -1 : 1;
-      });
-    } else {
+    if (x > 0 && x <= rankIndex) {
+      results.sort(sortByHeat);
+
+    } else if (x !== 0) {
       results.sort(function (a, b) {
         var aScores = a.scores, bScores = b.scores;
         var aLen = aScores.length;
@@ -114,6 +117,11 @@ Heat.prototype = {
       });
     }
     return results;
+
+    function sortByHeat(a, b) {
+      var aScore = a.scores[x] || -5, bScore = b.scores[x] || -5;
+      return aScore === bScore ? 0 : aScore > bScore ? -1 : 1;
+    }
   },
 
   headers: function (callback) {

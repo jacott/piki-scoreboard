@@ -86,7 +86,7 @@
 
       "test General Result": function () {
         var results = [v.r1 = {scores: [0.2]}, v.r2 = {scores: [0.4]}];
-        assert.equals(v.call(-1, results), [v.r2, v.r1]);
+        assert.equals(v.call(-1, results), [v.r1, v.r2]);
 
         var results = [v.r1 = {scores: [0.2, 100]}, v.r2 = {scores: [0.4]}];
         assert.equals(v.call(-1, results), [v.r1, v.r2]);
@@ -119,11 +119,16 @@
       "test sorting methods": function () {
         var results = [v.r1 = {scores: [0.2, 500, 300]}, v.r2 = {scores: [0.3, 500, 30]}, v.r3 = {scores: [0.1, 50, 400]}];
 
-        assert.equals(v.call(0, results), [v.r2, v.r1, v.r3]);
+        assert.equals(v.call(2, results), [v.r3, v.r1, v.r2]);
+
+        assert.same(v.r3.scores[0], 3);
+        assert.same(v.r1.scores[0], 2);
+        assert.same(v.r2.scores[0], 1);
 
         assert.equals(v.call(1, results), [v.r1, v.r2, v.r3]);
 
-        assert.equals(v.call(2, results), [v.r3, v.r1, v.r2]);
+        assert.equals(v.call(0, results), [v.r2, v.r1, v.r3]);
+
       },
     },
 
