@@ -57,6 +57,12 @@
 
         assert.equals(v.idx({id2: '4', id1: '3'}), v.doc1._id);
       },
+
+      "test fetch": function () {
+        assert.equals(v.idx.fetch({id2: '4'}).sort(Apputil.compareByField('id1')), [v.doc3.attributes, v.doc1.attributes]);
+
+        assert.equals(v.idx.fetch({}).sort(Apputil.compareByField('id1')), [v.doc3.attributes, v.doc2.attributes, v.doc1.attributes]);
+      },
     },
   });
 })();

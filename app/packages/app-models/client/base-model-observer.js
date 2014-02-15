@@ -51,7 +51,7 @@ App.extend(AppModel, {
             deleteEntry(idx, old, 0);
           }
         });
-        return function (keys) {
+        var uIndex = function (keys) {
           var ret = idx;
           for(var i = 0; ret && i < len; ++i) {
             var key = keys[fields[i]];
@@ -60,6 +60,17 @@ App.extend(AppModel, {
           }
           return ret;
         };
+
+        uIndex.fetch = function (keys) {
+          var resultIndex = uIndex(keys) || {};
+
+          var docs = model.attrDocs();
+          var results = [];
+          pushResults(docs, results, resultIndex);
+          return results;
+        };
+
+        return uIndex;
 
         function deleteEntry(tidx, doc, count) {
           var value  = doc[fields[count]];
@@ -110,3 +121,13 @@ App.extend(AppModel, {
     return model.Index = index;
   },
 });
+
+function pushResults(docs, results, index) {
+  for(var key in index) {
+    var value = index[key];
+    if (typeof value === 'string')
+      results.push(docs[value]);
+    else
+      pushResults(docs, results, value);
+  }
+}
