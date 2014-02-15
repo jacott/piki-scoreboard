@@ -119,15 +119,17 @@ App.extend(AppModel, {
     });
 
     return model.Index = index;
+
+
+    function pushResults(docs, results, index) {
+      for(var key in index) {
+        var value = index[key];
+        if (typeof value === 'string')
+          results.push(new model(docs[value]));
+        else
+          pushResults(docs, results, value);
+      }
+    }
+
   },
 });
-
-function pushResults(docs, results, index) {
-  for(var key in index) {
-    var value = index[key];
-    if (typeof value === 'string')
-      results.push(docs[value]);
-    else
-      pushResults(docs, results, value);
-  }
-}

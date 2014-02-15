@@ -59,9 +59,13 @@
       },
 
       "test fetch": function () {
-        assert.equals(v.idx.fetch({id2: '4'}).sort(Apputil.compareByField('id1')), [v.doc3.attributes, v.doc1.attributes]);
+        assert.equals(Apputil.mapField(v.idx.fetch({id2: '4'})
+                                       .sort(Apputil.compareByField('id1')), 'attributes'),
+                      [v.doc3.attributes, v.doc1.attributes]);
 
-        assert.equals(v.idx.fetch({}).sort(Apputil.compareByField('id1')), [v.doc3.attributes, v.doc2.attributes, v.doc1.attributes]);
+        assert.equals(Apputil.mapField(v.idx.fetch({})
+                                       .sort(Apputil.compareByField('id1')), 'attributes'),
+                      [v.doc3.attributes, v.doc2.attributes, v.doc1.attributes]);
       },
     },
   });
