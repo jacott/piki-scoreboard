@@ -60,13 +60,23 @@ Heat.prototype = {
         return aScore === bScore ? 0 : aScore > bScore ? -1 : 1;
       });
 
-      var prev, row;
-      var rank = 1;
+      var previ = 0;
       var rankName = 'rank' + x;
-      for(var i = 0; i < results.length; prev = row, ++i) {
-        row = results[i];
-        if (prev && prev.scores[x] !== row.scores[x])
-          ++rank;
+
+      for(var i = 1; i < results.length; ++i) {
+        if (results[previ].scores[x] !== results[i].scores[x]) {
+          setRanks(previ, i);
+          previ = i;
+        }
+      }
+      setRanks(previ, i);
+    }
+
+    function setRanks(from , to) {
+      var rank = (to - from - 1)/2 + from + 1;
+
+      for(var i = from; i < to; ++i) {
+        var row = results[i];
         row[rankName] = rank;
         row.rankMult = (row.rankMult || 1) * rank;
       }
@@ -81,7 +91,8 @@ Heat.prototype = {
 
       for(--aLen; aLen >= 0; --aLen) {
         if (aLen === rankIndex)
-          return a.rankMult === b.rankMult ? 0 : a.rankMult > b.rankMult ? -1 : 1;
+          return a.rankMult === b.rankMult ? 0 :
+          a.rankMult < b.rankMult ? -1 : 1; // lower rank is better
 
         if (aScores[aLen] !== bScores[aLen])
           return aScores[aLen] > bScores[aLen] ? -1 : 1;

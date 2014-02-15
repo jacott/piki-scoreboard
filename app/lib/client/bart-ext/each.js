@@ -65,7 +65,7 @@ function callbackRender(options) {
 
   var results = options.index.fetch(params);
   results.sort(sortFunc)
-    .forEach(function (doc) {callback(new model(doc))});
+    .forEach(function (doc) {callback(doc)});
 
   $.ctx.onDestroy(model.Index.observe(function (doc, old) {
     if (! Apputil.includesAttributes(params, old))

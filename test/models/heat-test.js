@@ -91,7 +91,24 @@
 
 
         var results = [v.r1 = {scores: [0.2, 200, 300]}, v.r2 = {scores: [0.3, 100, 300]}, v.r3 = {scores: [0.1, 50, 400]}];
-        assert.equals(v.call(-1, results), [v.r2, v.r1, v.r3]);
+        assert.equals(v.call(-1, results), [v.r1, v.r3, v.r2]);
+      },
+
+      "test ranks": function () {
+        var results = [v.r1 = {scores: [0.2, 500, 300]}, v.r2 = {scores: [0.3, 500, 30]}, v.r3 = {scores: [0.1, 50, 400]}];
+        v.call(-1, results);
+
+        assert.same(v.r1.rank1, 1.5);
+        assert.same(v.r2.rank1, 1.5);
+        assert.same(v.r3.rank1, 3);
+
+        assert.same(v.r1.rank2, 2);
+        assert.same(v.r2.rank2, 3);
+        assert.same(v.r3.rank2, 1);
+
+        assert.same(v.r1.rankMult, 3);
+        assert.same(v.r2.rankMult, 4.5);
+        assert.same(v.r3.rankMult, 3);
       },
 
     },

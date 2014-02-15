@@ -38,6 +38,18 @@
             assert.dom('tr:last-child>td.climber', v.result.climber.name);
           });
         });
+        TH.login();
+        v.result.setScore(1, "23");
+        assert.dom('.results>tbody', function () {
+          assert.dom('tr:first-child>td.climber', {text: v.result.climber.name, parent: function () {
+            assert.dom('.score>span', {text: "23", parent: function () {
+              assert.dom('i', "1");
+            }});
+          }});
+           assert.dom('tr:last-child>td.climber', {text: v.result2.climber.name, parent: function () {
+             refute.dom('i');
+          }});
+        });
       });
     },
 
@@ -73,7 +85,7 @@
 
         assert.dom('tbody>tr>td.climber', {
           text: v.result.climber.name, parent: function () {
-            assert.dom('td', '23.5+');
+            assert.dom('td>span', '23.5+');
           }
         });
       });

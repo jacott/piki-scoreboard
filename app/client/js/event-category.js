@@ -37,7 +37,7 @@ App.require('Bart.Event', function (Event) {
 
       for(var i = 0; i < results.length; ++i) {
         var row = results[i];
-        frag.appendChild(Tpl.Result.$render(new AppModel.Result(row)));
+        frag.appendChild(Tpl.Result.$render(row));
       }
       return frag;
     },
@@ -97,14 +97,24 @@ App.require('Bart.Event', function (Event) {
     scores: function () {
       var frag = document.createDocumentFragment();
       var parentElm = $.element.parentNode;
-      var scores = Bart.getCtx(parentElm).data.scores;
+      var result = Bart.getCtx(parentElm).data;
+      var scores = result.scores;
 
       var heat = $.ctx.parentCtx.data.heat;
 
       for(var i = heat.format.length; i >= 0; --i) {
-        frag.appendChild(Score.$render({heat: i, score: heat.numberToScore(scores[i], i)}));
+        frag.appendChild(Score.$render({heat: i, score: heat.numberToScore(scores[i], i), rank: scores[i] && result['rank'+i]}));
       }
       return frag;
+    },
+  });
+
+  Tpl.Score.$helpers({
+    rank: function () {
+      if (! this.rank) return;
+      var elm =  document.createElement('i');
+      elm.textContent = this.rank;
+      return elm;
     },
   });
 
