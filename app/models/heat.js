@@ -86,23 +86,33 @@ Heat.prototype = {
       }
     }
 
-    results.sort(function (a, b) {
-      var aScores = a.scores, bScores = b.scores;
-      var aLen = aScores.length;
+    var number = this.number;
 
-      if (aLen !== bScores.length)
-        return aLen > bScores.length ? -1 : 1;
+    if (number >= 0 && number <= rankIndex) {
+      results.sort(function (a, b) {
+        var aScore = a.scores[number], bScore = b.scores[number];
 
-      for(--aLen; aLen >= 0; --aLen) {
-        if (aLen === rankIndex)
-          return a.rankMult === b.rankMult ? 0 :
-          a.rankMult < b.rankMult ? -1 : 1; // lower rank is better
+        return aScore === bScore ? 0 : aScore > bScore ? -1 : 1;
+      });
+    } else {
+      results.sort(function (a, b) {
+        var aScores = a.scores, bScores = b.scores;
+        var aLen = aScores.length;
 
-        if (aScores[aLen] !== bScores[aLen])
-          return aScores[aLen] > bScores[aLen] ? -1 : 1;
-      }
-      return 0;
-    });
+        if (aLen !== bScores.length)
+          return aLen > bScores.length ? -1 : 1;
+
+        for(--aLen; aLen >= 0; --aLen) {
+          if (aLen === rankIndex)
+            return a.rankMult === b.rankMult ? 0 :
+            a.rankMult < b.rankMult ? -1 : 1; // lower rank is better
+
+          if (aScores[aLen] !== bScores[aLen])
+            return aScores[aLen] > bScores[aLen] ? -1 : 1;
+        }
+        return 0;
+      });
+    }
     return results;
   },
 

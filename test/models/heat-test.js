@@ -115,6 +115,16 @@
         assert.same(v.r2.rankMult, 4.5);
         assert.same(v.r3.rankMult, 3);
       },
+
+      "test sorting methods": function () {
+        var results = [v.r1 = {scores: [0.2, 500, 300]}, v.r2 = {scores: [0.3, 500, 30]}, v.r3 = {scores: [0.1, 50, 400]}];
+
+        assert.equals(v.call(0, results), [v.r2, v.r1, v.r3]);
+
+        assert.equals(v.call(1, results), [v.r1, v.r2, v.r3]);
+
+        assert.equals(v.call(2, results), [v.r3, v.r1, v.r2]);
+      },
     },
 
     "headers": {

@@ -101,14 +101,31 @@ App.require('Bart.Event', function (Event) {
       var scores = result.scores;
 
       var heat = $.ctx.parentCtx.data.heat;
+      if (heat.number <= heat.rankIndex) {
 
-      for(var i = heat.format.length; i >= 0; --i) {
-        if (heat.rankIndex === i)
-          frag.appendChild(Score.$render({heat: -2, score: heat.numberToScore(Math.pow(result.rankMult, 1/i), -2)}));
+        if (heat.number >= 0) {
+          renderScore(heat.number);
 
-        frag.appendChild(Score.$render({heat: i, score: heat.numberToScore(scores[i], i), rank: scores[i] && result['rank'+i]}));
+        } else for(var i = heat.format.length; i >= 0; --i) {
+          if (heat.rankIndex === i)
+            renderScore(i, -2);
+
+          renderScore(i);
+        }
+      } else {
+        renderScore(heat.number);
+        renderScore(heat.number - 1, heat.rankIndex === heat.number - 1);
       }
       return frag;
+
+      function renderScore(i, qr) {
+        if (qr)
+          var data = {heat: -2, score: scores[i] == null ? '' : heat.numberToScore(Math.pow(result.rankMult, 1/i), -2)};
+        else
+          var data = {heat: i, score: heat.numberToScore(scores[i], i), rank: scores[i] == null ? '' : result['rank'+i]};
+
+        frag.appendChild(Score.$render(data));
+      }
     },
   });
 

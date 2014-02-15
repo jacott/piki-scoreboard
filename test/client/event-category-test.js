@@ -60,6 +60,9 @@
               });
             }});
           }});
+          assert.dom('tr:last-child', function () {
+            assert.dom('td:nth-child(3)>span', '');
+          });
         });
         v.result2.setScore(2, "43.5");
         assert.dom('.results>tbody', function () {
@@ -81,10 +84,13 @@
       assert.dom('select[name=selectHeat]', function () {
         assert.dom('option[selected]', {value: "-1", text: 'General result'});
         assert.dom('option:not([selected])', {value: "1", text: 'Qual 1'});
-        TH.change(this, "1");
+        TH.change(this, "2");
       });
 
-      assert.dom('h1', 'Qual 1');
+      assert.dom('h1', 'Qual 2');
+
+      assert.dom('.results>thead', 'Climber Result');
+      assert.dom('.results>tbody>tr:first-child>td', {count: 2});
     },
 
     "test selecting climber": function () {
