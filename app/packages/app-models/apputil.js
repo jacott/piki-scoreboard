@@ -162,6 +162,13 @@ Apputil = {
     return a.name === b.name ? 0 : a.name < b.name ? -1 : 1;
   },
 
+  compareByField: function (field) {
+    return function (a, b) {
+      var afield = a[field], bfield = b[field];
+      return a[field] === b[field] ? 0 : a[field] < b[field] ? -1 : 1;
+    };
+  },
+
   includesAttributes: function (attrs /*, docs */) {
     for(var i = 1; i < arguments.length; ++i) {
       var doc = arguments[i];

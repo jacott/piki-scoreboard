@@ -31,6 +31,23 @@
       assert.same(Apputil.compareByName(a,b), 1);
     },
 
+    "test compareByField": function () {
+      var a = {f1: "Bob", f2: 1};
+      var b = {f1: "Bob", f2: 2};
+
+      assert.same(Apputil.compareByField('f1')(a,b), 0);
+
+      b.f1 = 'Cary';
+      assert.same(Apputil.compareByField('f1')(a,b), -1);
+
+      b.f1 = 'Arnold';
+      assert.same(Apputil.compareByField('f1')(a,b), 1);
+
+      assert.same(Apputil.compareByField('f2')(a,b), -1);
+
+      assert.same(Apputil.compareByField('f2')(b,a), 1);
+    },
+
     "test TwoIndex": function () {
       var sut = new Apputil.TwoIndex();
 
