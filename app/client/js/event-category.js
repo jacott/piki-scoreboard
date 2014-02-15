@@ -103,6 +103,9 @@ App.require('Bart.Event', function (Event) {
       var heat = $.ctx.parentCtx.data.heat;
 
       for(var i = heat.format.length; i >= 0; --i) {
+        if (heat.rankIndex === i)
+          frag.appendChild(Score.$render({heat: -2, score: heat.numberToScore(Math.pow(result.rankMult, 1/i), -2)}));
+
         frag.appendChild(Score.$render({heat: i, score: heat.numberToScore(scores[i], i), rank: scores[i] && result['rank'+i]}));
       }
       return frag;

@@ -35,6 +35,10 @@ Heat.prototype = {
     if (score.match(/^\s*t/i)) {
       return 9999999;
     }
+
+    if (score.match(/^\s*dnc/i)) {
+      return -1;
+    }
     var m = /^\s*(\d+)(?:\.(\d+))?(\+)?\s*$/.exec(score);
     if (m) {
       var extra = (m[2] || '000');
@@ -133,7 +137,11 @@ Heat.prototype = {
     if (index === 0) {
       return score;
     }
+    if (index === -2) {
+      return Math.round(score*100)/100;
+    }
     if (score == null) return '';
+    if (score == -1) return 'DNC';
     if (score === 9999999) return "Top";
     var result = "" + Math.floor(score / 10000);
     var dec = Math.floor(score/10) % 1000;

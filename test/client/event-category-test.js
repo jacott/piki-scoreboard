@@ -46,8 +46,30 @@
               assert.dom('i', "1");
             }});
           }});
-           assert.dom('tr:last-child>td.climber', {text: v.result2.climber.name, parent: function () {
-             refute.dom('i');
+          assert.dom('tr:last-child>td.climber', {text: v.result2.climber.name, parent: function () {
+            refute.dom('i');
+          }});
+        });
+        v.result.setScore(2, "13+");
+        assert.dom('.results>tbody', function () {
+          assert.dom('tr:first-child>td.climber', {text: v.result.climber.name, parent: function () {
+            assert.dom('.score>span', {text: "13+", parent: function () {
+              assert.dom('i', "1");
+              assert.dom(this.previousSibling, function () {
+                assert.dom('span', "1");
+              });
+            }});
+          }});
+        });
+        v.result2.setScore(2, "43.5");
+        assert.dom('.results>tbody', function () {
+          assert.dom('tr:last-child>td.climber', {text: v.result2.climber.name, parent: function () {
+            assert.dom('.score>span', {text: "43.5", parent: function () {
+              assert.dom('i', "1");
+              assert.dom(this.previousSibling, function () {
+                assert.dom('span', "1.41");
+              });
+            }});
           }});
         });
       });

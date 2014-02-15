@@ -58,6 +58,7 @@
       assert.same(heat.scoreToNumber('10 '),       100000);
       assert.same(heat.scoreToNumber('top'),      9999999);
       assert.same(heat.scoreToNumber(' ter '),    9999999);
+      assert.same(heat.scoreToNumber(' dnc '),    -1);
     },
 
     "test numberToScore": function () {
@@ -67,7 +68,11 @@
       assert.same(heat.numberToScore(1230125), '123.012+');
       assert.same(heat.numberToScore(100000),  '10');
       assert.same(heat.numberToScore(9999999), 'Top');
+      assert.same(heat.numberToScore(-1), 'DNC');
       assert.same(heat.numberToScore(), '');
+      assert.same(heat.numberToScore(1, 0), 1);
+      assert.same(heat.numberToScore(1.535, -2), 1.54);
+
     },
 
     "sort": {
@@ -110,7 +115,6 @@
         assert.same(v.r2.rankMult, 4.5);
         assert.same(v.r3.rankMult, 3);
       },
-
     },
 
     "headers": {
