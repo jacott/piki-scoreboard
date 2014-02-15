@@ -5,6 +5,7 @@ function Heat(number, format) {
   format = format.replace(/\d+/g,'');
   this.format = format.slice(1);
   this.type = format[0];
+  this.rankIndex = format.length - format.indexOf('Q');
 };
 
 var FINAL_NAMES = ['Final', 'Semi Final', 'Quarter Final'];
@@ -17,11 +18,12 @@ Heat.prototype = {
   },
 
   getName: function (number) {
+    if (number === -2) return "Qual Rank";
     if (number === -1) return "General result";
     if (number === 0) return "Start list";
     var format = this.format;
     if (format[format.length - number] === 'Q') {
-      var heatName = 'Qualification ' + number;
+      var heatName = 'Qual ' + number;
     } else {
       var heatName = FINAL_NAMES[format.length - number];
     }
@@ -47,6 +49,73 @@ Heat.prototype = {
       results.push([i, this.getName(i)]);
     }
     return results;
+  },
+
+  sort: function (results) {
+    var rankIndex = this.rankIndex;
+
+    for(var x=rankIndex; x > 0; --x) {
+      results.sort(function (a, b) {
+        var aScore = a.scores[x] || -5, bScore = b.scores[x] || -5;
+        return aScore === bScore ? 0 : aScore > bScore ? -1 : 1;
+      });
+
+      var prev, row;
+      var rank = 1;
+      var rankName = 'rank' + x;
+      for(var i = 0; i < results.length; prev = row, ++i) {
+        row = results[i];
+        if (prev && prev.scores[x] !== row.scores[x])
+          ++rank;
+        row[rankName] = rank;
+        row.rankMult = (row.rankMult || 1) * rank;
+      }
+    }
+
+    results.sort(function (a, b) {
+      var aScores = a.scores, bScores = b.scores;
+      var aLen = aScores.length;
+
+      if (aLen !== bScores.length)
+        return aLen > bScores.length ? -1 : 1;
+
+      for(--aLen; aLen >= 0; --aLen) {
+        if (aLen === rankIndex)
+          return a.rankMult === b.rankMult ? 0 : a.rankMult > b.rankMult ? -1 : 1;
+
+        if (aScores[aLen] !== bScores[aLen])
+          return aScores[aLen] > bScores[aLen] ? -1 : 1;
+      }
+      return 0;
+    });
+    return results;
+  },
+
+  headers: function (callback) {
+    var format = this.format;
+    var num = this.number;
+    var oldType, type;
+    var len = format.length;
+
+    if (num === -1) {
+      for(var i = 0; i <= len; ++i, oldType = type) {
+        type = format[i];
+        if (type === 'Q' && oldType === 'F')
+          callback(-2, this.getName(-2));
+
+        callback(len - i, this.getName(len - i));
+      }
+    } else if (num === 0) {
+      callback(0, 'Start list');
+    }
+    else {
+      type = format[len - num];
+
+      callback(num, "Result");
+      if (type === 'Q') return;
+      --num;
+      callback(format[len - num] === 'Q' ? -2 : num, 'Previous heat');
+    }
   },
 
   numberToScore: function (score, index) {

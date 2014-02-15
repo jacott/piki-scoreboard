@@ -62,14 +62,8 @@ function callbackRender(options) {
   var model = options.model;
   var params = options.params || {};
   var sortFunc = options.sort;
-  var resultIndex = options.index(params) || {};
 
-  var docs = model.attrDocs();
-  var results = [];
-  for(var key in resultIndex) {
-    results.push(docs[resultIndex[key]]);
-  }
-
+  var results = options.index.fetch(params);
   results.sort(sortFunc)
     .forEach(function (doc) {callback(new model(doc))});
 

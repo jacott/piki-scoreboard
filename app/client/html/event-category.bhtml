@@ -26,7 +26,7 @@
         </tr>
       </thead>
       <tbody>
-        {{each "results" template="Result"}}
+        {{results}}
         <template name="Result">
           <tr>
             <td class="climber">{{climber.name}}</td>

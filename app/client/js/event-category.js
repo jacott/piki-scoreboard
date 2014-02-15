@@ -8,9 +8,10 @@ App.require('Bart.Event', function (Event) {
   Event.route.addTemplate(Tpl, {
     focus: true,
     data: function (page,pageRoute) {
+      if (! Event.event) AppRoute.abortPage();
       return {
         category: AppModel.Category.findOne(pageRoute.append),
-        heat: new AppModel.Heat(-1,  Event.event ? Event.event.heats[pageRoute.append] : ""),
+        heat: new AppModel.Heat(-1,  Event.event.heats[pageRoute.append]),
         selectHeat: -1,
       };
     }
@@ -21,25 +22,37 @@ App.require('Bart.Event', function (Event) {
       return this.heat.list();
     },
     headers: function () {
-      var heat = this.heat;
       var frag = document.createDocumentFragment();
-      for(var i = heat.format.length; i >= 0; --i) {
-        frag.appendChild(HeatHeader.$render({heat: i, name: heat.getName(i)}));
-      }
+      this.heat.headers(function (number, name) {
+        frag.appendChild(HeatHeader.$render({heat: number, name: name}));
+      });
       return frag;
     },
 
-    results: function (callback) {
-      return callback.render({
-        model: AppModel.Result,
-        index: AppModel.Result.eventCatIndex,
-        params: {event_id: Event.event._id, category_id: $.data().category._id},
-        sort:   function compareResults(a, b) {
-          var aScore = a.scores && a.scores[0];
-          var bScore = b.scores && b.scores[0];
-          return aScore === bScore ? 0 : aScore < bScore ? -1 : 1;
-        },
-      });
+    results: function () {
+      var frag = document.createDocumentFragment();
+
+      var results = this.heat.sort(AppModel.Result.eventCatIndex
+                                   .fetch({event_id: Event.event._id, category_id: $.data().category._id}));
+
+      for(var i = 0; i < results.length; ++i) {
+        var row = results[i];
+        frag.appendChild(Tpl.Result.$render(new AppModel.Result(row)));
+      }
+      return frag;
+    },
+  });
+
+  Tpl.$extend({
+    $created: function (ctx, elm) {
+      ctx.onDestroy(AppModel.Result.Index.observe(function (doc, old) {
+        var result = doc || old;
+        if (result.event_id !== Event.event._id ||
+            result.category_id !== ctx.data.category._id)
+          return;
+
+        ctx.updateAllTags();
+      }));
     },
   });
 
