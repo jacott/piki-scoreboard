@@ -31,21 +31,11 @@ Tpl.$helpers({
   },
 
   orgList: function (callback) {
-    AppModel.Org.find({}, {sort: {date: 1}})
-      .forEach(function (doc) {callback(doc)});
-
-    $.ctx.onDestroy(AppModel.Org.Index.observe(function (doc, old) {
-      callback(doc, old, Apputil.compareByName);
-    }));
+    callback.render({model: AppModel.Org, sort: Apputil.compareByName});
   },
 
   userList: function (callback) {
-    AppModel.User.find({}, {sort: {date: 1}})
-      .forEach(function (doc) {callback(doc)});
-
-    $.ctx.onDestroy(AppModel.User.Index.observe(function (doc, old) {
-      callback(doc, old, Apputil.compareByName);
-    }));
+    callback.render({model: AppModel.User, sort: Apputil.compareByName});
   },
 });
 

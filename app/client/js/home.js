@@ -15,11 +15,6 @@ AppRoute.root.defaultPage = Tpl;
 
 ChooseOrg.$helpers({
   orgs: function (callback) {
-    AppModel.Org.find({}, {sort: {name: 1}})
-      .forEach(function (doc) {callback(doc)});
-
-    $.ctx.onDestroy(AppModel.Org.Index.observe(function (doc, old) {
-      callback(doc, old, Apputil.compareByName);
-    }));
+    callback.render({model: AppModel.Org, sort: Apputil.compareByName});
   },
 });

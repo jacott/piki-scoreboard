@@ -16,12 +16,7 @@ Tpl.$extend({
 
 Index.$helpers({
   categories: function (callback) {
-    AppModel.Category.find({}, {sort: {name: 1}})
-      .forEach(function (doc) {callback(doc)});
-
-    $.ctx.onDestroy(AppModel.Category.Index.observe(function (doc, old) {
-      callback(doc, old, Apputil.compareByName);
-    }));
+    callback.render({model: AppModel.Category, sort: Apputil.compareByName});
   },
 });
 

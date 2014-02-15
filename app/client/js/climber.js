@@ -16,12 +16,7 @@ Tpl.$extend({
 
 Index.$helpers({
   climbers: function (callback) {
-    AppModel.Climber.find({}, {sort: {name: 1}})
-      .forEach(function (doc) {callback(doc)});
-
-    $.ctx.onDestroy(AppModel.Climber.Index.observe(function (doc, old) {
-      callback(doc, old, Apputil.compareByName);
-    }));
+    callback.render({model: AppModel.Climber, sort: Apputil.compareByName});
   },
 });
 

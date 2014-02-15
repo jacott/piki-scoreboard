@@ -32,12 +32,7 @@ Tpl.$extend({
 
 Index.$helpers({
   events: function (callback) {
-    AppModel.Event.find({}, {sort: {date: 1}})
-      .forEach(function (doc) {callback(doc)});
-
-    $.ctx.onDestroy(AppModel.Event.Index.observe(function (doc, old) {
-      callback(doc, old, sortByDate);
-    }));
+    callback.render({model: AppModel.Event, sort: sortByDate});
   },
 });
 
@@ -127,7 +122,7 @@ Tpl.Show.$helpers({
       if (doc && old) return;
       doc = doc && cats[doc.category_id];
       old = old && cats[old.category_id];
-      (doc || old) && callback(doc, old, Apputil.compareByName);
+      (doc || old) && callback(doc && new AppModel.Category(doc), old && new AppModel.Category(old), Apputil.compareByName);
     }));
   },
 });

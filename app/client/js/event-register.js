@@ -24,14 +24,7 @@ App.require('Bart.Event', function (Event) {
 
   Tpl.$helpers({
     competitors: function (callback) {
-      AppModel.Competitor.find({event_id: this._id})
-        .forEach(function (doc) {callback(doc)});
-
-      $.ctx.onDestroy(AppModel.Competitor.Index.observe(function (doc, old) {
-        doc = doc && new AppModel.Competitor(doc);
-        old = old && new AppModel.Competitor(old);
-        callback(doc, old);
-      }));
+      callback.render({model: AppModel.Competitor});
     },
   });
 

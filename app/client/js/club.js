@@ -16,12 +16,7 @@ Tpl.$extend({
 
 Index.$helpers({
   clubs: function (callback) {
-    AppModel.Club.find({}, {sort: {name: 1}})
-      .forEach(function (doc) {callback(doc)});
-
-    $.ctx.onDestroy(AppModel.Club.Index.observe(function (doc, old) {
-      callback(doc, old, Apputil.compareByName);
-    }));
+    callback.render({model: AppModel.Club, sort: Apputil.compareByName});
   },
 });
 
