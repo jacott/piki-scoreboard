@@ -160,7 +160,7 @@ App.require('Bart.Event', function (Event) {
 
         } else {
           frag.appendChild(Score.$render({result: result, heat: -2, score: result.rank}));
-          for(var i = heat.format.length; i > 0; --i) {
+          for(var i = heat.total; i > 0; --i) {
             if (heat.rankIndex === i)
               renderScore(i, -2);
 

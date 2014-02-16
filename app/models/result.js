@@ -27,7 +27,7 @@ App.require('AppModel.Competitor', function (Competitor) {
 
       var heat = new AppModel.Heat(index, event.heats[result.category_id]);
 
-      AppVal.allowAccessIf(index >=0 && index <= heat.format.length);
+      AppVal.allowAccessIf(index >=0 && index <= heat.total);
 
 
       var changes = {};

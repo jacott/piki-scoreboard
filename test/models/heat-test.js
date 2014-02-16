@@ -10,21 +10,21 @@
     },
 
     "test type": function () {
-      var heat = new AppModel.Heat(1, 'LF8F26F26QQ');
+      var heat = new AppModel.Heat(1, 'LQQF26F26F8');
 
       assert.same(heat.type, 'L');
     },
 
     "test rankIndex": function () {
-      var heat = new AppModel.Heat(1, 'LF8F26F26QQ');
+      var heat = new AppModel.Heat(1, 'LQQF26F26F8');
       assert.same(heat.rankIndex, 2);
 
-      var heat = new AppModel.Heat(1, 'LF8QQQ');
+      var heat = new AppModel.Heat(1, 'LQQQF8');
       assert.same(heat.rankIndex, 3);
     },
 
     "test name": function () {
-      var heat = new AppModel.Heat(-1, 'LF8F26F26QQ');
+      var heat = new AppModel.Heat(-1, 'LQQF26F26F8');
 
       assert.same(heat.name, 'General');
 
@@ -51,7 +51,7 @@
     },
 
     "test scoreToNumber": function () {
-      var heat = new AppModel.Heat(1, 'LF8F26F26QQ');
+      var heat = new AppModel.Heat(1, 'LQQF26F26F8');
 
       assert.same(heat.scoreToNumber(' 23.5+'),    235005);
       assert.same(heat.scoreToNumber('123.012+'), 1230125);
@@ -62,7 +62,7 @@
     },
 
     "test numberToScore": function () {
-      var heat = new AppModel.Heat(1, 'LF8F26F26QQ');
+      var heat = new AppModel.Heat(1, 'LQQF26F26F8');
 
       assert.same(heat.numberToScore(235005),  '23.5+');
       assert.same(heat.numberToScore(1230125), '123.012+');
@@ -77,7 +77,7 @@
     "sortByStartOrder": {
       setUp: function () {
         v.call = function (number, results) {
-          v.heat = new AppModel.Heat(number, 'LF8F26QQ');
+          v.heat = new AppModel.Heat(number, 'LQQF26F8');
 
           return v.heat.sortByStartOrder(results);
         };
@@ -101,7 +101,7 @@
     "sort": {
       setUp: function () {
         v.call = function (number, results) {
-          v.heat = new AppModel.Heat(number, 'LF8F26QQ');
+          v.heat = new AppModel.Heat(number, 'LQQF26F8');
 
           return v.heat.sort(results);
         };
@@ -158,7 +158,7 @@
     "headers": {
       setUp: function () {
         v.call = function (number) {
-          v.heat = new AppModel.Heat(number, 'LF8F26QQ');
+          v.heat = new AppModel.Heat(number, 'LQQF26F8');
 
           v.results = [];
 

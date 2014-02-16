@@ -3,9 +3,10 @@ AppModel.Heat = Heat;
 function Heat(number, format) {
   this.number = number;
   format = format.replace(/\d+/g,'');
-  this.format = format.slice(1);
   this.type = format[0];
-  this.rankIndex = format.length - format.indexOf('Q');
+  format = format.slice(1);
+  this.total = format.length;
+  this.rankIndex = format.indexOf('F');
 };
 
 var FINAL_NAMES = ['Final', 'Semi Final', 'Quarter Final'];
@@ -31,7 +32,7 @@ Heat.prototype = {
     if (number <= this.rankIndex) {
       var heatName = 'Qual ' + number;
     } else {
-      var heatName = FINAL_NAMES[this.format.length - number];
+      var heatName = FINAL_NAMES[this.total - number];
     }
 
     return heatName;
@@ -55,7 +56,7 @@ Heat.prototype = {
 
   list: function () {
     var results = [];
-    for(var i = this.format.length; i >= -1; --i) {
+    for(var i = this.total; i >= -1; --i) {
       i && results.push([i, this.getName(i)]);
     }
     return results;
@@ -156,30 +157,23 @@ Heat.prototype = {
   },
 
   headers: function (callback) {
-    var format = this.format;
     var num = this.number;
-    var oldType, type;
-    var len = format.length;
 
     if (num === -1) {
       callback(-2, 'Rank');
-      for(var i = 0; i < len; ++i, oldType = type) {
-        type = format[i];
-        if (type === 'Q' && oldType === 'F')
+      for(var i = this.total; i > 0; --i) {
+        if (i == this.rankIndex)
           callback(-2, this.getName(-2));
-
-        callback(len - i, this.getName(len - i));
+        callback(i, this.getName(i));
       }
     } else if (num === 0) {
       callback(0, 'Start order');
     }
     else {
-      type = format[len - num];
-
       callback(num, "Result");
-      if (type === 'Q') return;
+      if (num <= this.rankIndex) return;
       --num;
-      callback(format[len - num] === 'Q' ? -2 : num, 'Previous heat');
+      callback(num === this.rankIndex ? -2 : num, 'Previous heat');
     }
   },
 

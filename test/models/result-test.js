@@ -16,7 +16,7 @@
 
     "Result.setScore": {
       setUp: function () {
-        v.category = TH.Factory.createCategory({heatFormat: "F8F26QQ"});
+        v.category = TH.Factory.createCategory({heatFormat: "QQF26F8"});
         v.event = TH.Factory.createEvent({heats: [v.category._id]});
         v.result = TH.Factory.createResult({scores: [1]});
       },
@@ -57,7 +57,7 @@
     },
 
     "test unscoredHeat": function () {
-      var category = TH.Factory.createCategory({heatFormat: "F8F26QQ"});
+      var category = TH.Factory.createCategory({heatFormat: "QQF26F8"});
       var event = TH.Factory.createEvent({heats: [category._id]});
       var result = TH.Factory.createResult();
 

@@ -42,7 +42,7 @@
           TH.input('[name=name]', 'Dynomites Wellington');
           TH.input('[name=shortName]', 'YB M');
           TH.change('[name=type]', 'L');
-          TH.input('[name=heatFormat]', 'F8F26QQ');
+          TH.input('[name=heatFormat]', 'QQF26F8');
           TH.input('[name=group]', 'A');
           TH.change('[name=gender]', 'm');
           TH.input('[name=minAge]', '14');
@@ -52,7 +52,7 @@
         refute.dom('#AddCategory');
       });
 
-      var cat = AppModel.Category.findOne({org_id: v.org._id, name: 'Dynomites Wellington', shortName: 'YB M', gender: 'm', group: 'A', minAge: 14, maxAge: 15, heatFormat: 'F8F26QQ'});
+      var cat = AppModel.Category.findOne({org_id: v.org._id, name: 'Dynomites Wellington', shortName: 'YB M', gender: 'm', group: 'A', minAge: 14, maxAge: 15, heatFormat: 'QQF26F8'});
 
       assert(cat);
 
@@ -71,11 +71,11 @@
 
       "test change heat format": function () {
         assert.dom('#EditCategory', function () {
-          TH.input('[name=heatFormat]', 'F2QQ');
+          TH.input('[name=heatFormat]', 'QQF2');
         });
         TH.click('#EditCategory [type=submit]');
 
-        assert.same(v.category.$reload().heatFormat, 'F2QQ');
+        assert.same(v.category.$reload().heatFormat, 'QQF2');
       },
 
       "test change name": function () {

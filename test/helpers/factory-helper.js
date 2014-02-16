@@ -73,7 +73,7 @@
     Category: function (options) {
       return new Builder('Category', options).genName()
         .addRef('org')
-        .addField('heatFormat', 'F8QQ')
+        .addField('heatFormat', 'QQF8')
         .addField('group', 'A male')
         .addField('type', 'L')
         .addField('gender', 'm')

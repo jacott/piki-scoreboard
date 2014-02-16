@@ -8,7 +8,7 @@ App.require('AppModel.Org', function () {
     shortName: {type: 'text', trim: true, required: true, maxLength: 10, normalize: 'upcase'},
     gender: {type: 'text', inclusion: {allowBlank: true, matches: /^[mf]$/ }},
     type: {type: 'text', inclusion: {matches: /^[BL]$/}},
-    heatFormat: {type: 'text', inclusion: {matches: /^(F\d+){1,3}Q{0,3}$/}},
+    heatFormat: {type: 'text', inclusion: {matches: /^Q{0,3}(F\d+){1,3}$/}},
     minAge: {type: 'number', number: {integer: true, $gt: 0, $lt: 100}},
     maxAge: {type: 'number', number: {integer: true, $gt: 0, $lt: 100}},
   });
