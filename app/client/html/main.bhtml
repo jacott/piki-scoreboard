@@ -2,13 +2,17 @@
   <template name="Head">
     <title>Piki</title>
     <meta name="viewport" content="width=device-width, user-scalable=yes, maximum-scale=2">
+    <link rel="stylesheet" type="text/css" media="print" href="/print.css">
   </template>
 
   <template name="Header">
     <header id="Header">
       <div>
         <nav class="left">
-          {{pageLink id="OrgHomeLink" value="Choose Organization" template="Home"}}
+          {{pageLink class="print" id="OrgHomeLink" value="Choose Organization" template="Home"}}
+        </nav>
+        <nav class="title">
+          {{> /PageTitle}}
         </nav>
         <nav class="right">
           {{> /SignIn}}

@@ -5,7 +5,6 @@
         {{pageLink name="show" value="Results" template="Event.Show"}}
         {{pageLink name="register" value="Registrations" template="Event.Register"}}
         {{pageLink name="edit" value="Edit event" template="Event.Edit"}}
-        {{pageLink name="edit" value="List all events" template="Event"}}
      </nav>
       <section class="body">
       </section>

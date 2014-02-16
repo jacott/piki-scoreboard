@@ -1,0 +1,3 @@
+<template name="PageTitle">
+  <button id="PageTitle" class="print link">{{title}}</button>
+</template>

@@ -11,12 +11,15 @@ Tpl.$extend({
     if (pageRoute.eventId) {
       if (! Tpl.event || Tpl.event._id !== pageRoute.eventId) {
         if (Tpl.event =  AppModel.Event.findOne(pageRoute.eventId)) {
+
           eventSub = App.subscribe('Event', pageRoute.eventId, function () {
             Bart.removeId('Flash');
             AppRoute.replacePath.apply(AppRoute, loadingArgs);
           });
           Bart.Flash.loading();
           var loadingArgs = AppRoute.loadingArgs;
+          page.title = Tpl.event.name;
+          Bart.setTitleLink([Tpl]);
           AppRoute.abortPage();
         }
       }
