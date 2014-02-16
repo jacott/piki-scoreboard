@@ -17,15 +17,21 @@ Heat.prototype = {
     return this.getName(this.number);
   },
 
+  className: function(number) {
+    if (number == null) number = this.number;
+    if (number < 0) return 'general';
+    else if (number <= this.rankIndex) return 'qual';
+    return 'final';
+  },
+
   getName: function (number) {
     if (number === -2) return "Qual Rank";
-    if (number === -1) return "General result";
+    if (number === -1) return "General";
     if (number === 0) return "Start order";
-    var format = this.format;
-    if (format[format.length - number] === 'Q') {
+    if (number <= this.rankIndex) {
       var heatName = 'Qual ' + number;
     } else {
-      var heatName = FINAL_NAMES[format.length - number];
+      var heatName = FINAL_NAMES[this.format.length - number];
     }
 
     return heatName;
@@ -105,23 +111,7 @@ Heat.prototype = {
       results.sort(sortByHeat);
 
     } else {
-      results.sort(function (a, b) {
-        var aScores = a.scores, bScores = b.scores;
-        var aLen = aScores.length;
-
-        if (aLen !== bScores.length)
-          return aLen > bScores.length ? -1 : 1;
-
-        for(--aLen; aLen >= 0; --aLen) {
-          if (aLen === rankIndex)
-            return a.rankMult === b.rankMult ? 0 :
-            a.rankMult < b.rankMult ? -1 : 1; // lower rank is better
-
-          if (aScores[aLen] !== bScores[aLen])
-            return aScores[aLen] > bScores[aLen] ? -1 : 1;
-        }
-        return 0;
-      });
+      results.sort(this.compareResults());
     }
     return results;
 
@@ -144,6 +134,27 @@ Heat.prototype = {
     }
   },
 
+  compareResults: function () {
+    var rankIndex = this.rankIndex;
+    return function (a, b) {
+      var aScores = a.scores, bScores = b.scores;
+      var aLen = aScores.length;
+
+      if (aLen !== bScores.length)
+        return aLen > bScores.length ? -1 : 1;
+
+      for(--aLen; aLen >= 0; --aLen) {
+        if (aLen === rankIndex)
+          return a.rankMult === b.rankMult ? 0 :
+          a.rankMult < b.rankMult ? -1 : 1; // lower rank is better
+
+        if (aScores[aLen] !== bScores[aLen])
+          return aScores[aLen] > bScores[aLen] ? -1 : 1;
+      }
+      return 0;
+    };
+  },
+
   headers: function (callback) {
     var format = this.format;
     var num = this.number;
@@ -151,6 +162,7 @@ Heat.prototype = {
     var len = format.length;
 
     if (num === -1) {
+      callback(-2, 'Rank');
       for(var i = 0; i < len; ++i, oldType = type) {
         type = format[i];
         if (type === 'Q' && oldType === 'F')

@@ -26,7 +26,7 @@
     "test name": function () {
       var heat = new AppModel.Heat(-1, 'LF8F26F26QQ');
 
-      assert.same(heat.name, 'General result');
+      assert.same(heat.name, 'General');
 
       heat.number = 0;
       assert.same(heat.name, 'Start order');
@@ -170,8 +170,9 @@
         };
       },
 
-      "test General result": function () {
+      "test General": function () {
         assert.equals(v.call(-1), [
+          {number: -2, name: 'Rank'},
           {number: 4, name: 'Final'},
           {number: 3, name: 'Semi Final'},
           {number: -2, name: 'Qual Rank'},

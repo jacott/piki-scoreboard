@@ -24,13 +24,14 @@
     "test rendering": function () {
       assert.dom('#Event #Category', function () {
         assert.dom('h1', v.category.name);
-        assert.dom('table.results', function () {
+        assert.dom('.rank table.results', function () {
           assert.dom('thead>tr', function () {
             assert.dom('th:first-child', 'Climber');
-            assert.dom('th:nth-child(2)', 'Final');
-            assert.dom('th:nth-child(3)', 'Qual Rank');
-            assert.dom('th:nth-child(4)', 'Qual 2');
-            assert.dom('th:nth-child(5)', 'Qual 1');
+            assert.dom('th:nth-child(2)', 'Rank');
+            assert.dom('th:nth-child(3)', 'Final');
+            assert.dom('th:nth-child(4)', 'Qual Rank');
+            assert.dom('th:nth-child(5)', 'Qual 2');
+            assert.dom('th:nth-child(6)', 'Qual 1');
           });
           assert.dom('tbody', function () {
             assert.dom('tr:first-child>td.climber', v.result2.climber.name);
@@ -41,11 +42,13 @@
         v.result.setScore(1, "23");
         assert.dom('.results>tbody', function () {
           assert.dom('tr:first-child>td.climber', {text: v.result.climber.name, parent: function () {
+            assert.dom('.score:nth-child(2)>span', '1');
             assert.dom('.score>span', {text: "23", parent: function () {
               assert.dom('i', "1");
             }});
           }});
           assert.dom('tr:last-child>td.climber', {text: v.result2.climber.name, parent: function () {
+            assert.dom('.score:nth-child(2)>span', '2');
             refute.dom('i');
           }});
         });
@@ -78,22 +81,26 @@
     },
 
     "test switching to start order": function () {
-      v.result.$update({$set: {scores: [2, 310000, 220000, 330000]}});
-      v.result2.$update({$set: {scores: [1, 210000, 320000, 230000]}});
+      v.result.$update({$set: {scores: [1, 310000, 220000, 330000]}});
+      v.result2.$update({$set: {scores: [2, 210000, 320000, 230000]}});
       TH.login();
 
       assert.dom('#Category', function () {
         TH.click('[name=toggleStartOrder]', 'Show start order');
 
-        assert.dom('h1', 'General result - Start order');
+        assert.dom('h1', 'General - Start order');
 
-        assert.dom('table.results', function () {
-          assert.dom('tr:first-child>td.climber', {text: v.result.climber.name});
+        assert.dom('.start table.results', function () {
+          assert.dom('tr:first-child>td.climber', {text: v.result2.climber.name});
         });
 
         TH.click('[name=toggleStartOrder]', 'Show results');
 
-        assert.dom('h1', 'General result - Results');
+        assert.dom('h1', 'General - Results');
+
+        assert.dom('.rank table.results', function () {
+          assert.dom('tr:first-child>td.climber', {text: v.result.climber.name});
+        });
       });
     },
 
@@ -101,7 +108,7 @@
       TH.login();
 
       assert.dom('select[name=selectHeat]', function () {
-        assert.dom('option[selected]', {value: "-1", text: 'General result'});
+        assert.dom('option[selected]', {value: "-1", text: 'General'});
         assert.dom('option:not([selected])', {value: "1", text: 'Qual 1'});
         TH.change(this, "2");
       });

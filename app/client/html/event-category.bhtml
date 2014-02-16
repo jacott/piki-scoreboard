@@ -1,12 +1,12 @@
 <template name="Event.Category">
-  <div id="Category">
+  <div id="Category" class="{{classes}}">
     <h1>{{category.name}}</h1>
     <nav class="viewMenu">
       <button name="toggleStartOrder">{{modeSwitchLabel}}</button>
       {{field "selectHeat" selectList=heats}}
     </nav>
     <h1 class="selectedHeat">{{heat.name}} - {{mode}}</h1>
-    <table class="results select">
+    <table class="select results">
       <thead>
         <tr>
           <th class="climber">Climber</th>

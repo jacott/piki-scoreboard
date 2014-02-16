@@ -25,15 +25,9 @@
     td, th {
       cursor: initial;
     }
+    border: 1px solid fade(#000, 30%);
     width: inherit;
     margin: auto;
-    counter-reset: line-number;
-    border: 1px solid fade(#000, 30%);
-    td:first-child:before {
-      content: counter(line-number) ".";
-      counter-increment: line-number;
-      padding-right: 0.3em;
-    }
     td.score {
       &:not(.heat-2) {
         cursor: pointer;
@@ -73,6 +67,19 @@
         width: 20em;
         max-width: 100%;
       }
+    }
+  }
+
+  &.general .viewMenu [name=toggleStartOrder] {
+    visibility: hidden;
+  }
+
+  &.start table.results {
+    counter-reset: line-number;
+    td:first-child:before {
+      content: counter(line-number) ".";
+      counter-increment: line-number;
+      padding-right: 0.3em;
     }
   }
 }

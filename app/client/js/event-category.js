@@ -21,6 +21,9 @@ App.require('Bart.Event', function (Event) {
   });
 
   Tpl.$helpers({
+    classes: function () {
+      return (this.showingResults ? "rank " : "start ") + this.heat.className();
+    },
     modeSwitchLabel: function () {
       return this.showingResults ? "Show start order" : "Show results";
     },
@@ -45,13 +48,19 @@ App.require('Bart.Event', function (Event) {
         event_id: Event.event._id, category_id: $.data().category._id,
       });
 
-      if (this.showingResults)
-        this.heat.sort(results);
-      else
-        this.heat.sortByStartOrder(results);
+      var heat = this.heat;
 
-      for(var i = 0; i < results.length; ++i) {
-        var row = results[i];
+      if (this.showingResults)
+        heat.sort(results);
+      else
+        heat.sortByStartOrder(results);
+
+      var prev, row, rank = 0;
+      for(var i = 0; i < results.length; ++i, prev = row) {
+        row = results[i];
+        if (! prev || heat.compareResults()(prev, row) !== 0)
+          rank = i + 1;
+        row.rank = rank;
         frag.appendChild(Tpl.Result.$render(row));
       }
       return frag;
@@ -149,11 +158,14 @@ App.require('Bart.Event', function (Event) {
         if (heat.number >= 0) {
           renderScore(heat.number);
 
-        } else for(var i = heat.format.length; i > 0; --i) {
-          if (heat.rankIndex === i)
-            renderScore(i, -2);
+        } else {
+          frag.appendChild(Score.$render({result: result, heat: -2, score: result.rank}));
+          for(var i = heat.format.length; i > 0; --i) {
+            if (heat.rankIndex === i)
+              renderScore(i, -2);
 
-          renderScore(i);
+            renderScore(i);
+          }
         }
       } else {
         renderScore(heat.number);
@@ -186,7 +198,10 @@ App.require('Bart.Event', function (Event) {
   });
 
   function setHeatNumber(ctx, value) {
-    ctx.data.heat.number = ctx.data.selectHeat =  +value;
+    var data = ctx.data;
+    data.heat.number = data.selectHeat =  +value;
+    if (data.selectHeat === -1)
+      data.showingResults = true;
     updateResults(ctx);
   }
 
