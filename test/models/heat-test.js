@@ -107,6 +107,10 @@
         };
       },
 
+      "test empty": function () {
+        assert.equals(v.call(-1, []), []);
+      },
+
       "test General Result": function () {
         var results = [v.r1 = {scores: [0.2]}, v.r2 = {scores: [0.4]}];
         assert.equals(v.call(-1, results), [v.r2, v.r1]);

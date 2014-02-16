@@ -78,6 +78,7 @@ Heat.prototype = {
   },
 
   sort: function (results, number) {
+    if (results.length === 0) return results;
     if (number == null) number = this.number;
     var rankIndex = this.rankIndex;
 
@@ -95,16 +96,6 @@ Heat.prototype = {
         }
       }
       setRanks(previ, i);
-    }
-
-    function setRanks(from , to) {
-      var rank = (to - from - 1)/2 + from + 1;
-
-      for(var i = from; i < to; ++i) {
-        var row = results[i];
-        row[rankName] = rank;
-        row.rankMult = (row.rankMult || 1) * rank;
-      }
     }
 
     // sort by heat number
@@ -133,6 +124,17 @@ Heat.prototype = {
       });
     }
     return results;
+
+
+    function setRanks(from , to) {
+      var rank = (to - from - 1)/2 + from + 1;
+
+      for(var i = from; i < to; ++i) {
+        var row = results[i];
+        row[rankName] = rank;
+        row.rankMult = (row.rankMult || 1) * rank;
+      }
+    }
 
     function sortByHeat(a, b) {
       var aScore = a.scores[x], bScore = b.scores[x];
