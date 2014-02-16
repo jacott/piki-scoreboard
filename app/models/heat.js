@@ -112,7 +112,7 @@ Heat.prototype = {
       results.sort(sortByHeat);
 
     } else {
-      results.sort(this.compareResults());
+      results.sort(this.compareResults(0));
     }
     return results;
 
@@ -135,7 +135,8 @@ Heat.prototype = {
     }
   },
 
-  compareResults: function () {
+  compareResults: function (min) {
+    if (min == null) min = 1;
     var rankIndex = this.rankIndex;
     return function (a, b) {
       var aScores = a.scores, bScores = b.scores;
@@ -144,7 +145,7 @@ Heat.prototype = {
       if (aLen !== bScores.length)
         return aLen > bScores.length ? -1 : 1;
 
-      for(--aLen; aLen >= 0; --aLen) {
+      for(--aLen; aLen >= min; --aLen) {
         if (aLen === rankIndex)
           return a.rankMult === b.rankMult ? 0 :
           a.rankMult < b.rankMult ? -1 : 1; // lower rank is better
