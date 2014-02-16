@@ -85,7 +85,7 @@
       assert.dom('#Category', function () {
         TH.click('[name=toggleStartList]', 'Show start list');
 
-        assert.dom('h1', 'Qual 1 - Start list');
+        assert.dom('h1', 'General result - Start list');
 
         assert.dom('table.results', function () {
           assert.dom('tr:first-child>td.climber', {text: v.result.climber.name});
@@ -93,7 +93,7 @@
 
         TH.click('[name=toggleStartList]', 'Show results');
 
-        assert.dom('h1', 'Qual 1 - Results');
+        assert.dom('h1', 'General result - Results');
       });
     },
 
@@ -112,33 +112,26 @@
       assert.dom('.results>tbody>tr:first-child>td', {count: 2});
     },
 
-    "test selecting climber": function () {
+    "test selecting score": function () {
       TH.login();
       assert.dom('#Event #Category', function () {
-        TH.click('td.climber', v.result.climber.name);
+        assert.dom('tr#Result_'+ v.result._id + '>td.climber', {text: v.result.climber.name, parent: function () {
+          TH.click('td:last-child');
+        }});
+      });
 
-        assert.dom('h1', 'Qual 1 - Results');
-        assert.dom('.heatUpdate>form#Heat', function () {
-
-          assert.dom('label .name', {text: v.result.climber.name, parent: function () {
-            TH.input('[name=score]', "23.5+");
-          }});
-
-          TH.trigger(this, 'submit');
-        });
-
-        assert.equals(v.result.$reload().scores, [0.1, 235005]);
-
-
-        assert.dom('tbody>tr>td.climber', {
-          text: v.result.climber.name, parent: function () {
-            assert.dom('td>span', '23.5+');
-          }
+      assert.dom('#Result_'+ v.result._id, function () {
+        assert.dom('td:last-child.input>input', function () {
+          TH.change(this, "23.5+");
         });
       });
-      TH.change('select[name=selectHeat]', "2");
 
-      refute.dom('#Heat');
+      assert.equals(v.result.$reload().scores, [0.1, 235005]);
+
+
+      assert.dom('#Result_'+ v.result._id, function () {
+          assert.dom('td>input~span', '23.5+');
+      });
     },
   });
 })();

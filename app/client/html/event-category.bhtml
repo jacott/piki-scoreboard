@@ -1,23 +1,11 @@
 <template name="Event.Category">
   <div id="Category">
     <h1>{{category.name}}</h1>
-    <div class="heatUpdate">
-      <nav class="viewMenu">
-        <button name="toggleStartList">{{modeSwitchLabel}}</button>
-        {{field "selectHeat" selectList=heats}}
-      </nav>
-
-      <h1>{{heat.name}} - {{mode}}</h1>
-
-      <template name="Heat">
-        <form id="Heat">
-          <label>
-            <span class="name">{{result.climber.name}}</span>
-            <input type="text" name="score">
-          </label>
-        </form>
-      </template>
-    </div>
+    <nav class="viewMenu">
+      <button name="toggleStartList">{{modeSwitchLabel}}</button>
+      {{field "selectHeat" selectList=heats}}
+    </nav>
+    <h1 class="selectedHeat">{{heat.name}} - {{mode}}</h1>
     <table class="results select">
       <thead>
         <tr>
@@ -31,16 +19,19 @@
       <tbody>
         {{results}}
         <template name="Result">
-          <tr>
+          <tr id="{{elmId 'Result'}}">
             <td class="climber">{{climber.name}}</td>
             {{scores}}
           </tr>
         </template>
         <template name="Score">
-          <td class="score">
+          <td class="{{classes}}">
             {{rank}}
             <span>{{score}}</span>
           </td>
+        </template>
+        <template name="ScoreInput">
+          <input id="ScoreInput" type="text" name="score" value="{{score}}">
         </template>
       </tbody>
     </table>

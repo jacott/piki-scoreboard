@@ -111,6 +111,7 @@ App.require('makeSubject', function (makeSubject) {
           ex.location && this.gotoPath(ex.location);
           return;
         }
+        console.log('Error', ex.stack);
         throw ex;
       }
       finally {

@@ -2,8 +2,9 @@ App.require('Bart.Event', function (Event) {
   var $ = Bart.current;
   var Tpl = Bart.Event.Category;
   var HeatHeader = Tpl.HeatHeader;
-  var Heat = Tpl.Heat;
+  var ScoreInput = Tpl.ScoreInput;
   var Score = Tpl.Score;
+  var scoreElm;
 
   Event.route.addTemplate(Tpl, {
     focus: '#Category [name=selectHeat]',
@@ -68,14 +69,16 @@ App.require('Bart.Event', function (Event) {
         updateResults(ctx);
       }));
     },
+
+    $destroyed: function (ctx, elm) {
+      removeScore();
+    },
   });
 
   Tpl.$events({
     'click [name=toggleStartList]': function (event) {
       event.$actioned = true;
       var data = $.data();
-      if (data.showingResults && data.selectHeat < 1)
-        data.selectHeat = 1;
       data.showingResults = ! data.showingResults;
       updateResults($.ctx);
     },
@@ -83,36 +86,49 @@ App.require('Bart.Event', function (Event) {
     'change [name=selectHeat]': function (event) {
       event.$actioned = true;
 
-      Bart.removeId('Heat');
+      Bart.removeId('ScoreInput');
 
       setHeatNumber($.ctx, this.value);
     },
 
-    'click td.climber': function (event) {
+    'click td.score': function (event) {
+      if (Bart.hasClass(this, 'input')) return;
       event.$actioned = true;
 
-      var result = $.data(this);
-      var catCtx = Bart.getCtx(document.getElementById('Category'));
+      var data = $.ctx.data;
 
-      if (catCtx.data.selectHeat === -1)
-        setHeatNumber(catCtx, result.unscoredHeat());
+      addScore(this);
 
-      var heatElm = document.getElementById('Heat');
-      if (! heatElm) {
-        heatElm = Heat.$autoRender();
-        event.currentTarget.querySelector('.heatUpdate').appendChild(heatElm);
+      if (data.showingResults) {
+        data.showingResults = false;
+        data.selectHeat = $.data(this).heat;
       }
 
-      Bart.getCtx(heatElm).updateAllTags({result: result, heat: catCtx.data.heat});
+      updateResults($.ctx);
     },
   });
 
-  Heat.$events({
-    'submit': function (event) {
-      event.$actioned = true;
+  ScoreInput.$events({
+    'change': function (event) {
+      saveScore(this);
+    },
+    'keydown': function (event) {
+      switch(event.which) {
+      case 27:
+        removeScore();
+        focusSelectHeat();
+        return;
+      case 13:
+        event.$actioned = true;
+        saveScore(this);
+        return;
+      case 9:
+        saveScore(this);
 
-      var data = $.data(this);
-      data.result.setScore(data.heat.number, this.querySelector('[name=score]').value);
+        if (nextScore(event.shiftKey ? -1 : 1))
+          event.$actioned = true;
+        return;
+      }
     },
   });
 
@@ -143,9 +159,9 @@ App.require('Bart.Event', function (Event) {
 
       function renderScore(i, qr) {
         if (qr)
-          var data = {heat: -2, score: scores[i] == null ? '' : heat.numberToScore(Math.pow(result.rankMult, 1/i), -2)};
+          var data = {result: result, heat: -2, score: scores[i] == null ? '' : heat.numberToScore(Math.pow(result.rankMult, 1/i), -2)};
         else
-          var data = {heat: i, score: heat.numberToScore(scores[i], i), rank: scores[i] == null ? '' : result['rank'+i]};
+          var data = {result: result, heat: i, score: heat.numberToScore(scores[i], i), rank: scores[i] == null ? '' : result['rank'+i]};
 
         frag.appendChild(Score.$render(data));
       }
@@ -159,6 +175,10 @@ App.require('Bart.Event', function (Event) {
       elm.textContent = this.rank;
       return elm;
     },
+
+    classes: function () {
+      return 'score heat' + this.heat;
+    },
   });
 
   function setHeatNumber(ctx, value) {
@@ -167,7 +187,69 @@ App.require('Bart.Event', function (Event) {
   }
 
   function updateResults(ctx) {
+    var scoreData = getScoreData();
+
     ctx.updateAllTags();
+    if (scoreData) {
+      if (ctx.data.showingResults) {
+        removeScore();
+      } else {
+        addScore(document.querySelector('#Result_' + scoreData.result._id + ' td.score.heat' + scoreData.heat),
+                 scoreData);
+      }
+      return;
+    }
+    focusSelectHeat();
+  }
+
+  function saveScore(elm) {
+    var data = $.data(elm);
+    data.result.setScore(data.heat, data.score = elm.value);
+  }
+
+  function getScoreData() {
+    if (scoreElm) {
+      var ctx = Bart.getCtx(scoreElm);
+      if (ctx) return ctx.data;
+
+      removeScore();
+    }
+  }
+
+  function addScore(elm, data) {
+    if (! elm) return;
+    removeScore();
+    scoreElm = ScoreInput.$autoRender(data || $.data(elm));
+    elm.insertBefore(scoreElm, elm.firstChild);
+    Bart.addClass(elm, 'input');
+    scoreElm.focus();
+  }
+
+  function removeScore() {
+    if (! scoreElm) return;
+    Bart.removeClass(scoreElm.parentNode, 'input');
+    Bart.remove(scoreElm);
+    scoreElm = null;
+  }
+
+  function nextScore(direction) {
+    var elm = scoreElm.parentNode.parentNode;
+
+    if (direction === 1)
+      elm = elm.nextElementSibling;
+    else
+      elm = elm.previousElementSibling;
+
+    if (elm) {
+      var scoreData = getScoreData();
+      if (scoreData) {
+        addScore(elm.querySelector(' td.score.heat' + scoreData.heat));
+        return true;
+      }
+    }
+  }
+
+  function focusSelectHeat() {
     var elm = document.querySelector('#Category [name=selectHeat]');
     elm && elm.focus();
   }

@@ -172,6 +172,10 @@ function field(doc, name, options) {
 }
 
 Bart.registerHelpers({
+  elmId: function (prefix) {
+    return prefix + '_' + this._id;
+  },
+
   field: function (name, options) {
     return field(this, name, options);
   },
