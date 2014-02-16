@@ -122,13 +122,23 @@
       },
 
       "test gotoPage": function () {
+        var orig = Bart.setTitle;
+        Bart.setTitle = test.stub();
+        test.onEnd(function () {
+          Bart.setTitle = orig;
+        });
+        v.RootBar.onEntry = function (page) {
+          page.title = 'Root bar';
+        };
         AppRoute.gotoPage(v.RootBar, {bazId: "an-id", append: 'one/two'});
-        assert.calledWith(AppRoute.history.pushState, null, 'Piki', '/baz/an-id/root-bar/one/two');
+        assert.calledWith(AppRoute.history.pushState, null, 'Root bar', '/baz/an-id/root-bar/one/two');
 
         AppRoute.gotoPage(v.RootBar, {bazId: "diff-id"});
-        assert.calledWith(AppRoute.history.pushState, null, 'Piki', '/baz/diff-id/root-bar');
+        assert.calledWith(AppRoute.history.pushState, null, 'Root bar', '/baz/diff-id/root-bar');
 
         assert.calledTwice(v.Baz.onBaseEntry);
+
+        assert.calledWith(Bart.setTitle, 'Root bar');
       },
 
       "test loadingArgs": function () {

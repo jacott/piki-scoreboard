@@ -97,6 +97,7 @@ App.require('makeSubject', function (makeSubject) {
           page = page.Index || page;
           var href = page.onEntry(page, pageRoute) || pageRoute.pathname;
           var  title = document.title = page.title || AppRoute.title;
+          Bart.setTitle && Bart.setTitle(page.title);
 
           if (pageState &&
               (pageState !== 'pushState' || currentPageRoute.pathname !== pageRoute.pathname) &&
