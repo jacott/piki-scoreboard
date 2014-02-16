@@ -23,7 +23,7 @@ App.require('AppModel.Competitor', function (Competitor) {
       var result = AppModel.Result.findOne(id);
       var event = result.event;
 
-      AppVal.allowAccessIf(user.isSuperUser() || user.org_id === event.org_id);
+      AppVal.allowAccessIf(user && (user.isSuperUser() || user.org_id === event.org_id));
 
       var heat = new AppModel.Heat(index, event.heats[result.category_id]);
 

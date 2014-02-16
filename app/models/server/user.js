@@ -66,4 +66,14 @@ App.require('AppModel.User', function (model) {
       return {success: true};
     },
   });
+
+  (function () {
+    var TEXT = App.format.compile(Assets.getText('reset-password.txt'));
+
+    Accounts.emailTemplates.resetPassword.text = function (user, url) {
+      user = AppModel.User.findOne(user._id);
+
+      return App.format(TEXT, {user: user, url: url.replace(/\/#\//,'/')});
+    };
+  })();
 });

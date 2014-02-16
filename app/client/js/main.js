@@ -83,6 +83,11 @@ function subscribeOrg(shortName) {
     orgSub = App.subscribe('Org', orgShortName, function () {
       Bart.removeId('Flash');
       var doc = AppModel.Org.findOne({shortName: orgShortName});
+      if (! doc) {
+        subscribeOrg();
+        Bart.Flash.error('Organization not found');
+        return;
+      }
       App.orgId = doc._id;
       Bart.addClass(document.body, 'inOrg');
       if (orgLink) orgLink.textContent = doc.name;

@@ -19,6 +19,14 @@ Tpl.$helpers({
   },
 });
 
+Tpl.$events({
+  'click [name=signOut]': function (event) {
+    event.$actioned = true;
+    Meteor.logout();
+    AppRoute.gotoPage(Bart.Home);
+  },
+});
+
 Tpl.$extend({
   onBaseEntry: function () {
     document.body.appendChild(Tpl.$autoRender(AppModel.User.me()));
@@ -41,7 +49,7 @@ ChangePassword.$events({
     Accounts.changePassword(oldPassword, newPassword.value, function (error) {
       if (error) {
         Bart.removeClass(form, 'submitting');
-        Form.renderError(form, 'newPassword', 'Password did not match.');
+        Form.renderError(form, 'oldPassword', 'invalid password.');
       } else {
         AppRoute.history.back();
       }

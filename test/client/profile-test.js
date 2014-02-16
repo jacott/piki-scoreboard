@@ -50,7 +50,7 @@
 
           v.func('fail');
 
-          assert.dom('.errorMsg', 'Password did not match.');
+          assert.dom('.errorMsg', 'invalid password.');
 
           refute.called(AppRoute.history.back);
 

@@ -1,7 +1,7 @@
 <template name="SignIn">
   <span id="SignIn">
     <template name="SignInLink">
-      <button class="link" name="signIn">Sign in / register</button>
+      <button class="link" name="signIn">Sign in</button>
     </template>
     <template name="ProfileLink">
       <span>

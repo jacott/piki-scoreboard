@@ -9,7 +9,7 @@ Session = function (sub) {
   }
 
   sess.sub = sub;
-  var user = sub.userId ? AppModel.User.attrFind(sub.userId) : AppModel.User.guestUser();
+  var user = sub.userId ? AppModel.User.attrFind(sub.userId) : AppModel.User.guestUser().attributes;
   if (! user) {
     sub.error(new Meteor.Error(404, 'User not found'));
     return;

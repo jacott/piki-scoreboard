@@ -34,16 +34,14 @@ App.extend(Tpl, {
 Dialog.$events({
   'click [name=forgot]': function (event) {
     event.$actioned = true;
-    Bart.Dialog.close();
+    closeDialog();
 
     Bart.Dialog.open(ForgotPassword.$autoRender({
       email: event.currentTarget.querySelector('[name=email]').value}));
   },
 
-  'click [name=cancel]': function (event) {
-    event.$actioned = true;
-    Bart.Dialog.close();
-  },
+  'click [name=cancel]': closeDialog,
+
   'click [type=submit]': function (event) {
     event.$actioned = true;
     var button = this;
@@ -57,10 +55,14 @@ Dialog.$events({
       if (error)
         setState(form, 'error');
       else
-        Bart.Dialog.close();
+        closeDialog();
     });
   },
 });
+
+function closeDialog() {
+  Bart.Dialog.close();
+}
 
 function setState(form, state) {
   form.className = state;
@@ -81,6 +83,10 @@ Dialog.Progress.$helpers({
 });
 
 ForgotPassword.$events({
+  'click [name=cancel]': function () {
+    closeDialog();
+    Bart.Dialog.open(Dialog.$autoRender({}));
+  },
   'submit': function (event) {
     event.$actioned = true;
 
