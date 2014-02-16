@@ -2,7 +2,7 @@
   <div id="Category">
     <h1>{{category.name}}</h1>
     <nav class="viewMenu">
-      <button name="toggleStartList">{{modeSwitchLabel}}</button>
+      <button name="toggleStartOrder">{{modeSwitchLabel}}</button>
       {{field "selectHeat" selectList=heats}}
     </nav>
     <h1 class="selectedHeat">{{heat.name}} - {{mode}}</h1>

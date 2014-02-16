@@ -20,7 +20,7 @@ Heat.prototype = {
   getName: function (number) {
     if (number === -2) return "Qual Rank";
     if (number === -1) return "General result";
-    if (number === 0) return "Start list";
+    if (number === 0) return "Start order";
     var format = this.format;
     if (format[format.length - number] === 'Q') {
       var heatName = 'Qual ' + number;
@@ -159,7 +159,7 @@ Heat.prototype = {
         callback(len - i, this.getName(len - i));
       }
     } else if (num === 0) {
-      callback(0, 'Start list');
+      callback(0, 'Start order');
     }
     else {
       type = format[len - num];

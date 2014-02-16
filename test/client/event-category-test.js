@@ -77,21 +77,21 @@
       });
     },
 
-    "test switching to start list": function () {
+    "test switching to start order": function () {
       v.result.$update({$set: {scores: [2, 310000, 220000, 330000]}});
       v.result2.$update({$set: {scores: [1, 210000, 320000, 230000]}});
       TH.login();
 
       assert.dom('#Category', function () {
-        TH.click('[name=toggleStartList]', 'Show start list');
+        TH.click('[name=toggleStartOrder]', 'Show start order');
 
-        assert.dom('h1', 'General result - Start list');
+        assert.dom('h1', 'General result - Start order');
 
         assert.dom('table.results', function () {
           assert.dom('tr:first-child>td.climber', {text: v.result.climber.name});
         });
 
-        TH.click('[name=toggleStartList]', 'Show results');
+        TH.click('[name=toggleStartOrder]', 'Show results');
 
         assert.dom('h1', 'General result - Results');
       });

@@ -29,7 +29,7 @@
       assert.same(heat.name, 'General result');
 
       heat.number = 0;
-      assert.same(heat.name, 'Start list');
+      assert.same(heat.name, 'Start order');
 
       heat.number = 1;
       assert.same(heat.name, 'Qual 1');
@@ -204,9 +204,9 @@
         ]);
       },
 
-      "test Start list": function () {
+      "test Start order": function () {
         assert.equals(v.call(0), [
-          {number: 0, name: 'Start list'},
+          {number: 0, name: 'Start order'},
         ]);
       },
     },

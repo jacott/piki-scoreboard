@@ -22,10 +22,10 @@ App.require('Bart.Event', function (Event) {
 
   Tpl.$helpers({
     modeSwitchLabel: function () {
-      return this.showingResults ? "Show start list" : "Show results";
+      return this.showingResults ? "Show start order" : "Show results";
     },
     mode: function () {
-      return this.showingResults ? "Results" : "Start list";
+      return this.showingResults ? "Results" : "Start order";
     },
     heats: function () {
       return this.heat.list();
@@ -76,7 +76,7 @@ App.require('Bart.Event', function (Event) {
   });
 
   Tpl.$events({
-    'click [name=toggleStartList]': function (event) {
+    'click [name=toggleStartOrder]': function (event) {
       event.$actioned = true;
       var data = $.data();
       data.showingResults = ! data.showingResults;
@@ -93,15 +93,19 @@ App.require('Bart.Event', function (Event) {
 
     'click td.score': function (event) {
       if (Bart.hasClass(this, 'input')) return;
+      var data = $.ctx.data;
+
+      var heat = $.data(this).heat;
+      if (heat < 1) return;
+
       event.$actioned = true;
 
-      var data = $.ctx.data;
 
       addScore(this);
 
       if (data.showingResults) {
         data.showingResults = false;
-        data.selectHeat = $.data(this).heat;
+        data.selectHeat = heat;
       }
 
       updateResults($.ctx);
