@@ -207,9 +207,6 @@ BaseModel.defineSubclass = function (name,properties,options) {
     model.quickFind = function quickFind(id) {
       return model.Index.quickFind(id);
     };
-    model.attrIndex = function () {
-      return model.docs._collection.docs;
-    };
   }
 
   deleteMeteorMethods(name);
@@ -571,7 +568,7 @@ function setUpValidators(model, field, options) {
 
 function reload(reactive) {
   if (! reactive && Meteor.isClient) {
-    var attrs = AppModel[modelName(this)].docs.find().collection.docs[this._id];
+    var attrs = AppModel[modelName(this)].attrDocs()[this._id];
     if (attrs) attrs = App.extend({}, attrs);
   } else {
     var attrs = AppModel[modelName(this)].findOne(this._id, {transform: null});

@@ -51,7 +51,7 @@ AppModel._support.setupExtras.push(function (model) {
   };
 
   model.attrDocs = function () {
-    return model.docs._collection.docs;
+    return model.docs._collection._docs._map;
   };
 });
 
@@ -63,7 +63,7 @@ function removeFunc(method) {
 
 App.extend(_support, {
   attrFind: function (id) {
-    return this.docs._collection.docs[id];
+    return this.attrDocs()[id];
   },
 
   pushRpc: function(model, field) {

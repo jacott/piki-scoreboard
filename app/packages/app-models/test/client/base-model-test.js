@@ -14,7 +14,7 @@
     "test attrDocs": function () {
       var TestSubClass = AppModel.Base.defineSubclass('TestSubClass');
 
-      assert.same(TestSubClass.docs._collection.docs, TestSubClass.attrDocs());
+      assert.same(TestSubClass.docs._collection._docs._map, TestSubClass.attrDocs());
     },
 
     "test $remove": function () {
