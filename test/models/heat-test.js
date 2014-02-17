@@ -50,28 +50,52 @@
       assert.same(heat.name, 'Final');
     },
 
-    "test scoreToNumber": function () {
+    "test lead scoreToNumber": function () {
       var heat = new AppModel.Heat(1, 'LQQF26F26F8');
 
-      assert.same(heat.scoreToNumber(' 23.5+'),    235005);
-      assert.same(heat.scoreToNumber('123.012+'), 1230125);
-      assert.same(heat.scoreToNumber('10 '),       100000);
-      assert.same(heat.scoreToNumber('top'),      9999999);
-      assert.same(heat.scoreToNumber(' ter '),    9999999);
-      assert.same(heat.scoreToNumber(' dnc '),    -1);
+      assert.same(heat.scoreToNumber(' 23.5+'   ),  235005);
+      assert.same(heat.scoreToNumber('123.012+' ), 1230125);
+      assert.same(heat.scoreToNumber('10 '      ),  100000);
+      assert.same(heat.scoreToNumber('top'      ), 9999999);
+      assert.same(heat.scoreToNumber(' ter '    ), 9999999);
+      assert.same(heat.scoreToNumber(' dnc '    ),      -1);
     },
 
-    "test numberToScore": function () {
+    "test lead numberToScore": function () {
       var heat = new AppModel.Heat(1, 'LQQF26F26F8');
 
-      assert.same(heat.numberToScore(235005),  '23.5+');
-      assert.same(heat.numberToScore(1230125), '123.012+');
-      assert.same(heat.numberToScore(100000),  '10');
-      assert.same(heat.numberToScore(9999999), 'Top');
-      assert.same(heat.numberToScore(-1), 'DNC');
-      assert.same(heat.numberToScore(), '');
-      assert.same(heat.numberToScore(1, 0), 1);
-      assert.same(heat.numberToScore(1.535, -2), 1.54);
+      assert.same(heat.numberToScore( 235005   ),  '23.5+');
+      assert.same(heat.numberToScore(1230125   ), '123.012+');
+      assert.same(heat.numberToScore( 100000   ),  '10');
+      assert.same(heat.numberToScore(9999999   ), 'Top');
+      assert.same(heat.numberToScore(     -1   ), 'DNC');
+      assert.same(heat.numberToScore(          ), '');
+      assert.same(heat.numberToScore(1, 0      ), 1);
+      assert.same(heat.numberToScore(1.535, -2 ), 1.54);
+    },
+
+    "test boulder scoreToNumber": function () {
+      var heat = new AppModel.Heat(1, 'BFF');
+
+      assert.same(heat.scoreToNumber(' 3t3 4b6 ' ), 3030406);
+      assert.same(heat.scoreToNumber(' 0'        ),       0);
+      assert.same(heat.scoreToNumber(' 0t 0b '   ),       0);
+      assert.same(heat.scoreToNumber(' 0t 4b20'  ),     420);
+      assert.same(heat.scoreToNumber(' 2t20 5b99'), 2200599);
+      assert.same(heat.scoreToNumber(' dnc '     ),      -1);
+    },
+
+    "test boulder numberToScore": function () {
+      var heat = new AppModel.Heat(1, 'BFF');
+
+      assert.same(heat.numberToScore(3030406   ), '3t3 4b6');
+      assert.same(heat.numberToScore(0         ), '0t 0b');
+      assert.same(heat.numberToScore(    420   ), '0t 4b20');
+      assert.same(heat.numberToScore(2200599   ), '2t20 5b99');
+      assert.same(heat.numberToScore(     -1   ), 'DNC');
+      assert.same(heat.numberToScore(          ), '');
+      assert.same(heat.numberToScore(1, 0      ), 1);
+      assert.same(heat.numberToScore(1.535, -2 ), 1.54);
     },
 
     "sortByStartOrder": {

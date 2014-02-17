@@ -38,19 +38,65 @@ Heat.prototype = {
     return heatName;
   },
 
-  scoreToNumber: function (score) {
-    if (score.match(/^\s*t/i)) {
-      return 9999999;
-    }
 
+  numberToScore: function (score, index) {
+    if (index === 0) {
+      return score;
+    }
+    if (index === -2) {
+      return Math.round(score*100)/100;
+    }
+    if (score == null) return '';
+    if (score == -1) return 'DNC';
+
+    switch (this.type) {
+    case 'L':
+      if (score === 9999999) return "Top";
+      var result = "" + Math.floor(score / 10000);
+      var dec = Math.floor(score/10) % 1000;
+
+      if (dec) result += "." + ("" + (dec + 1000)).replace(/0+$/,'').slice(1);
+      if (score % 10) result += "+";
+      return result;
+    case 'B':
+      var mod, result = "";
+      for(var i = 0; i < 2; ++i,
+              score = Math.floor(score/10000)) {
+
+        if (mod = score % 100)
+          result = mod + result;
+        mod = Math.floor(score/100) % 100;
+        result = mod + (i == 0 ? 'b' : 't') + result;
+        if (i === 0) result = " " + result;
+      }
+      return result;
+    }
+  },
+
+  scoreToNumber: function (score) {
     if (score.match(/^\s*dnc/i)) {
       return -1;
     }
-    var m = /^\s*(\d+)(?:\.(\d+))?(\+)?\s*$/.exec(score);
-    if (m) {
-      var extra = (m[2] || '000');
-      extra = extra + '000'.slice(extra.length);
-      return m[1]*10000 + extra*10 + (m[3] ? 5 : 0);
+
+    switch (this.type) {
+    case 'L':
+      if (score.match(/^\s*t/i)) {
+        return 9999999;
+      }
+
+      var m = /^\s*(\d+)(?:\.(\d+))?(\+)?\s*$/.exec(score);
+      if (m) {
+        var extra = (m[2] || '000');
+        extra = extra + '000'.slice(extra.length);
+        return m[1]*10000 + extra*10 + (m[3] ? 5 : 0);
+      }
+      break;
+    case 'B':
+      var m = /^\s*(\d{1,2})t(\d{1,2})?\s+(\d{1,2})b(\d{1,2})?\s*$/.exec(score);
+      if (m) {
+        return (m[1]||0)*1000000 + (m[2]||0)*10000 + (m[3]||0)*100 + +(m[4]||0);
+      }
+      if (score.match(/^\s*0\s*$/)) return 0;
     }
   },
 
@@ -176,23 +222,5 @@ Heat.prototype = {
       --num;
       callback(num === this.rankIndex ? -2 : num, 'Previous heat');
     }
-  },
-
-  numberToScore: function (score, index) {
-    if (index === 0) {
-      return score;
-    }
-    if (index === -2) {
-      return Math.round(score*100)/100;
-    }
-    if (score == null) return '';
-    if (score == -1) return 'DNC';
-    if (score === 9999999) return "Top";
-    var result = "" + Math.floor(score / 10000);
-    var dec = Math.floor(score/10) % 1000;
-
-    if (dec) result += "." + ("" + (dec + 1000)).replace(/0+$/,'').slice(1);
-    if (score % 10) result += "+";
-    return result;
   },
 };
