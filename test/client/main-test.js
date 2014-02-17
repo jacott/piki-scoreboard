@@ -30,8 +30,8 @@
 
     "test autowired": function () {
       var queue = Meteor.startup.queue();
-      assert.same(queue.length, 1);
-      assert.same(queue[0], App._startup);
+      assert.same(queue.length, 2);
+      assert.same(queue[1], App._startup);
     },
 
     "test popstate": function () {

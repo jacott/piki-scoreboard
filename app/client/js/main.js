@@ -5,9 +5,9 @@ App.org = function () {
   return AppModel.Org.findOne(App.orgId);
 };
 
-document.head.appendChild(Tpl.Head.$render({}));
-
 App._startup = function () {
+  document.head.appendChild(Tpl.Head.$render({}));
+
   pathname = document.location;
   var handle = App.Ready.onReady(whenReady);
   document.body.insertBefore(Tpl.Header.$render({}), document.body.firstChild);
