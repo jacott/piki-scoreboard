@@ -61,6 +61,7 @@
   var defines = {
     Org: function (options) {
       return new Builder('Org', options).genName()
+        .addField('email', 'email' in options || generateName('email').replace(/\s+/g, '') + '@obeya.co')
         .addField('shortName', 'shortName' in options || generateName('SN').replace(/\s+/g, ''));
     },
 

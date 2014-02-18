@@ -3,14 +3,14 @@ var Tpl = Bart.SystemSetup;
 
 var base = AppRoute.root.addBase(Tpl);
 base.addTemplate(Tpl.Index, {defaultPage: true});
-base.addTemplate(Tpl.AddOrg, {
-  data: function () {
-    return new AppModel.Org();
+base.addTemplate(Tpl.OrgForm, {
+  data: function (page, pageRoute) {
+    return AppModel.Org.findOne(pageRoute.append) || new AppModel.Org();
   }
 });
-base.addTemplate(Tpl.AddUser, {
-  data: function () {
-    return new AppModel.User({org_id: App.orgId});
+base.addTemplate(Tpl.UserForm, {
+  data: function (page, pageRoute) {
+    return AppModel.User.findOne(pageRoute.append) || new AppModel.User({org_id: App.orgId});
   }
 });
 
@@ -39,27 +39,58 @@ Tpl.$helpers({
   },
 });
 
-
-
 Tpl.$events({
   'click [name=cancel]': function (event) {
     event.$actioned = true;
     AppRoute.history.back();
   },
+
+  'click [name=delete]': function (event) {
+    var doc = $.data(event.currentTarget.querySelector('form'));
+
+    event.$actioned = true;
+    Bart.Dialog.confirm({
+      data: doc,
+      classes: 'small warn',
+      okay: 'Delete',
+      content: Tpl.ConfirmDelete,
+      callback: function(confirmed) {
+        if (confirmed) {
+          doc.$remove();
+          AppRoute.replacePath(Tpl);
+        }
+      },
+    });
+
+  },
+
+  'click .orgs tr': function (event) {
+    event.$actioned = true;
+
+    var data = $.data(this);
+    AppRoute.gotoPage(Tpl.OrgForm, {append: data._id});
+  },
+
+  'click .users tr': function (event) {
+    event.$actioned = true;
+
+    var data = $.data(this);
+    AppRoute.gotoPage(Tpl.UserForm, {append: data._id});
+  },
 });
 
 
 
-Tpl.AddOrg.$events({
-  'click [type=submit]': Bart.Form.submitFunc('AddOrg', Tpl),
+Tpl.OrgForm.$events({
+  'click [type=submit]': Bart.Form.submitFunc('OrgForm', Tpl),
 });
 
-Tpl.AddUser.$helpers({
+Tpl.UserForm.$helpers({
   orgList: function () {
     return AppModel.Org.find({}, {sort: {name: 1}}).fetch();
   },
 });
 
-Tpl.AddUser.$events({
-  'click [type=submit]': Bart.Form.submitFunc('AddUser', Tpl),
+Tpl.UserForm.$events({
+  'click [type=submit]': Bart.Form.submitFunc('UserForm', Tpl),
 });
