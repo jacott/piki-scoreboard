@@ -107,14 +107,14 @@
           assert.dom('h1', v.event.name);
           assert.dom('.categories', function () {
             assert.dom('h1', 'Categories');
-            assert.dom('.link', v.cats[0].shortName);
-            assert.dom('.link', v.cats[1].shortName);
+            assert.dom('.link', v.cats[0].name);
+            assert.dom('.link', v.cats[1].name);
           });
         });
       },
 
       "test selecting category": function () {
-        TH.click('.categories .link', v.cats[0].shortName);
+        TH.click('.categories .link', v.cats[0].name);
 
         assert.dom('#Event #Category', function () {
           assert.dom('h1', v.cats[0].name);

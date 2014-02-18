@@ -44,7 +44,7 @@
           {{each "categories" template="Cat"}}
           <template name="Cat">
             <div>
-              {{pageLink value=shortName template="Event.Category" append=_id}}
+              {{pageLink value=name template="Event.Category" append=_id}}
             </div>
           </template>
         </div>
