@@ -18,6 +18,10 @@ Heat.prototype = {
     return this.getName(this.number);
   },
 
+  isFinalRound: function () {
+    return this.number === this.total;
+  },
+
   className: function(number) {
     if (number == null) number = this.number;
     if (number < 0) return 'general';
@@ -191,6 +195,9 @@ Heat.prototype = {
       if (aLen !== bScores.length)
         return aLen > bScores.length ? -1 : 1;
 
+      if (a.time !== b.time)
+        return a.time < b.time ? -1 : 1;
+
       for(--aLen; aLen >= min; --aLen) {
         if (aLen === rankIndex)
           return a.rankMult === b.rankMult ? 0 :
@@ -217,6 +224,8 @@ Heat.prototype = {
       callback(0, 'Start order');
     }
     else {
+      if (this.type === 'L' && num === this.total)
+        callback(99, 'Time taken');
       callback(num, "Result");
       if (num <= this.rankIndex) return;
       --num;

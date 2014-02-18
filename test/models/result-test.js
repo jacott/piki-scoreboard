@@ -44,6 +44,25 @@
         });
       },
 
+      "test invalid time": function () {
+        if (Meteor.isClient) return assert(true);
+
+        assert.accessDenied(function () {
+          TH.call("Result.setScore", v.result._id, 99, '2:63');
+        });
+      },
+
+      "test update time": function () {
+        test.spy(Meteor.isServer ? global : window, 'check');
+
+        TH.call("Result.setScore", v.result._id, 99, '2:23');
+
+        assert.calledWith(check, 99, Number);
+        assert.calledWith(check, [v.result._id, '2:23'], [String]);
+
+        assert.equals(v.result.$reload().time, (2*60+23));
+      },
+
       "test updates": function () {
         test.spy(Meteor.isServer ? global : window, 'check');
 
@@ -54,6 +73,16 @@
 
         assert.equals(v.result.$reload().scores, [1, 235005]);
       },
+    },
+
+    "test displayTimeTaken": function () {
+      var result = TH.Factory.buildResult();
+
+      assert.same(result.displayTimeTaken(), "");
+
+      result.time = 5*60 + 59;
+      assert.same(result.displayTimeTaken(), "5:59");
+
     },
 
     "test unscoredHeat": function () {

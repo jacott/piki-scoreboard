@@ -3,6 +3,11 @@ App.require('AppModel.Competitor', function (Competitor) {
     unscoredHeat: function () {
       return this.scores.length;
     },
+
+    displayTimeTaken: function () {
+      if (this.time == null) return '';
+      return Math.floor(this.time / 60) + ':' + (this.time % 60);
+    },
   },{saveRpc: true});
 
 
@@ -26,6 +31,13 @@ App.require('AppModel.Competitor', function (Competitor) {
       AppVal.allowAccessIf(user && (user.isSuperUser() || user.org_id === event.org_id));
 
       var heat = new AppModel.Heat(index, event.heats[result.category_id]);
+
+      if (index === 99) {
+        var m = /^\s*(?:(\d{1,2}):)?([0-5]\d)\s*$/.exec(score);
+        AppVal.allowAccessIf(m);
+        model.docs.update(id, {$set: {time: m[1]*60 + +m[2]}});
+        return;
+      }
 
       AppVal.allowAccessIf(index >=0 && index <= heat.total);
 

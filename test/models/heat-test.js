@@ -23,6 +23,14 @@
       assert.same(heat.rankIndex, 3);
     },
 
+    "test isFinalRound": function () {
+      var heat = new AppModel.Heat(1, 'LQQF26F26F8');
+      assert.isFalse(heat.isFinalRound());
+
+      heat.number = 5;
+      assert.isTrue(heat.isFinalRound());
+    },
+
     "test name": function () {
       var heat = new AppModel.Heat(-1, 'LQQF26F26F8');
 
@@ -135,6 +143,18 @@
         assert.equals(v.call(-1, []), []);
       },
 
+      "test final": function () {
+        var results = [v.r1 = {scores: [0.2, 200, 300, 400, 300]},
+                       v.r2 = {time: 123, scores: [0.3, 100, 300, 400, 400]},
+                       v.r3 = {time: 100, scores: [0.3, 100, 300, 400, 400]}];
+
+        assert.equals(v.call(4, results), [v.r3, v.r2, v.r1]);
+
+        v.r3.time = 200;
+
+        assert.equals(v.call(4, results), [v.r2, v.r3, v.r1]);
+      },
+
       "test General Result": function () {
         var results = [v.r1 = {scores: [0.2]}, v.r2 = {scores: [0.4]}];
         assert.equals(v.call(-1, results), [v.r2, v.r1]);
@@ -182,7 +202,7 @@
     "headers": {
       setUp: function () {
         v.call = function (number) {
-          v.heat = new AppModel.Heat(number, 'LQQF26F8');
+          v.heat = new AppModel.Heat(number, v.format || 'LQQF26F8');
 
           v.results = [];
 
@@ -205,8 +225,18 @@
         ]);
       },
 
+      "test Final boulder": function () {
+        v.format = "BFF6";
+
+        assert.equals(v.call(2), [
+          {number: 2, name: 'Result'},
+          {number: 1, name: 'Previous heat'},
+        ]);
+      },
+
       "test Final": function () {
         assert.equals(v.call(4), [
+          {number: 99, name: 'Time taken'},
           {number: 4, name: 'Result'},
           {number: 3, name: 'Previous heat'},
         ]);

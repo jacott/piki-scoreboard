@@ -109,12 +109,11 @@ App.require('Bart.Event', function (Event) {
 
       event.$actioned = true;
 
-
       addScore(this);
 
       if (data.showingResults) {
         data.showingResults = false;
-        data.selectHeat = heat;
+        data.selectHeat = heat === 99 ? data.heat.total : heat;
       }
 
       updateResults($.ctx);
@@ -168,6 +167,8 @@ App.require('Bart.Event', function (Event) {
           }
         }
       } else {
+        if (heat.type === 'L' && heat.isFinalRound())
+          frag.appendChild(Score.$render({result: result, heat: 99, score: result.displayTimeTaken()}));
         renderScore(heat.number);
         renderScore(heat.number - 1, heat.rankIndex === heat.number - 1);
       }
