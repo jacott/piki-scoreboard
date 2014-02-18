@@ -92,8 +92,13 @@ BaseModel.prototype = {
       for(var field in fVTors) {
         var validators = fVTors[field];
         for(var vTor in validators) {
+
           var args = validators[vTor];
-          args[0](doc,field,args[1],args[2]);
+          var options = args[1];
+
+          if (typeof options === 'function')
+            options = options.call(doc, field, args[2]);
+          args[0](doc,field, options, args[2]);
         }
       }
     }

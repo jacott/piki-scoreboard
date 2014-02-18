@@ -3,7 +3,7 @@
 
   var TestSubClass, doc, v;
 
-  buster.testCase('packages/app-models/base-model:', {
+  buster.testCase('packages/app-models/test/base-model:', {
     setUp: function () {
       test = this;
       v = {};
@@ -282,6 +282,23 @@
     'with TestSubClass': {
       setUp: function () {
         TestSubClass = AppModel.Base.defineSubclass('TestSubClass', {t1: 123, authorize: function () {}}, {saveRpc: true});
+      },
+
+      "test validator passing function": function () {
+        TestSubClass.defineFields({foo: {type: 'text', required: function (field, options) {
+          assert.same(this, doc);
+          assert.same(field, 'foo');
+          assert.same(options.type, 'text');
+          return v.answer;
+        }}});
+
+        var doc = TestSubClass.build({foo: ''});
+
+        v.answer = false;
+        assert(doc.$isValid());
+
+        v.answer = true;
+        refute(doc.$isValid());
       },
 
       "test change": function () {

@@ -3,6 +3,7 @@ AppVal.register('required', function (doc,field,reqType) {
 
   switch (reqType) {
   case 'not_null': break;
+  case false: return;
   case 1:
     if (! val || ! val.length) val = null;
   default:

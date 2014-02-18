@@ -1,7 +1,7 @@
 (function () {
   var doc;
 
-  buster.testCase('packages/app-models/validators/required-validator:', {
+  buster.testCase('packages/app-models/test/validators/required-validator:', {
     setUp: function () {
       doc = {exists: 'a', empty: ''};
     },
@@ -29,7 +29,12 @@
       refute(doc._errors);
     },
 
-    'test false': function () {
+    "test required false": function () {
+      AppVal.validators('required')(doc, 'empty', false);
+      refute(doc._errors);
+    },
+
+    'test false with not_null': function () {
       doc = {foo: false};
       AppVal.validators('required')(doc,'foo', 'not_null');
       refute(doc._errors);
