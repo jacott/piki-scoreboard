@@ -117,6 +117,7 @@ App.require('Bart.Event', function (Event) {
 
   Tpl.Row.$helpers({
     categories: function () {
+
       return this.category_ids.map(function (id) {
         return AppModel.Category.quickFind(id).shortName;
       }).join(', ');
