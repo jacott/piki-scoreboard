@@ -34,48 +34,53 @@
             assert.dom('th:nth-child(6)', 'Qual 1');
           });
           assert.dom('tbody', function () {
-            assert.dom('tr:first-child>td.climber', v.result2.climber.name);
-            assert.dom('tr:last-child>td.climber', v.result.climber.name);
+            assert.dom('tr:first-child>td.climber>.name', v.result2.climber.name);
+            assert.dom('tr:last-child>td.climber>.name', v.result.climber.name);
           });
         });
         TH.login();
         v.result.setScore(1, "23");
         assert.dom('.results>tbody', function () {
-          assert.dom('tr:first-child>td.climber', {text: v.result.climber.name, parent: function () {
-            assert.dom('.score:nth-child(2)>span', '1');
-            assert.dom('.score>span', {text: "23", parent: function () {
-              assert.dom('i', "1");
-            }});
+          assert.dom('tr:first-child>td.climber>.name', {text: v.result.climber.name, parent: function () {
+            assert.dom('.club', v.result.climber.club.shortName);
+            assert.dom(this.parentNode, function () {
+              assert.dom('.score:nth-child(2)>span', '1');
+              assert.dom('.score>span', {text: "23", parent: function () {
+                assert.dom('i', "1");
+              }});
+            });
           }});
-          assert.dom('tr:last-child>td.climber', {text: v.result2.climber.name, parent: function () {
-            assert.dom('.score:nth-child(2)>span', '2');
-            refute.dom('i');
+          assert.dom('tr:last-child>td.climber>.name', {text: v.result2.climber.name, parent: function () {
+            assert.dom(this.parentNode, function () {
+              assert.dom('.score:nth-child(2)>span', '2');
+              refute.dom('i');
+            });
           }});
         });
         v.result.setScore(2, "13+");
         assert.dom('.results>tbody', function () {
-          assert.dom('tr:first-child>td.climber', {text: v.result.climber.name, parent: function () {
+          assert.dom('tr:first-child',  function () {
             assert.dom('.score>span', {text: "13+", parent: function () {
               assert.dom('i', "1");
               assert.dom(this.previousSibling, function () {
                 assert.dom('span', "1");
               });
             }});
-          }});
+          });
           assert.dom('tr:last-child', function () {
             assert.dom('td:nth-child(3)>span', '');
           });
         });
         v.result2.setScore(2, "43.5");
         assert.dom('.results>tbody', function () {
-          assert.dom('tr:last-child>td.climber', {text: v.result2.climber.name, parent: function () {
+          assert.dom('tr:last-child', function () {
             assert.dom('.score>span', {text: "43.5", parent: function () {
               assert.dom('i', "1");
               assert.dom(this.previousSibling, function () {
                 assert.dom('span', "1.41");
               });
             }});
-          }});
+          });
         });
       });
     },
@@ -91,7 +96,7 @@
         assert.dom('h1', 'General - Start order');
 
         assert.dom('.start table.results', function () {
-          assert.dom('tr:first-child>td.climber', {text: v.result2.climber.name});
+          assert.dom('tr:first-child>td.climber>.name', {text: v.result2.climber.name});
         });
 
         TH.click('[name=toggleStartOrder]', 'Show results');
@@ -99,7 +104,7 @@
         assert.dom('h1', 'General - Results');
 
         assert.dom('.rank table.results', function () {
-          assert.dom('tr:first-child>td.climber', {text: v.result.climber.name});
+          assert.dom('tr:first-child>td.climber>.name', {text: v.result.climber.name});
         });
       });
     },
@@ -134,9 +139,9 @@
       TH.login();
 
       TH.change('select[name=selectHeat]', 3);
-      assert.dom('tr#Result_'+ v.result._id + '>td.climber', {text: v.result.climber.name, parent: function () {
+      assert.dom('tr#Result_'+ v.result._id, function () {
         TH.click('td.heat99');
-      }});
+      });
 
       assert.dom('.start table.results', function () {
         assert.dom('thead>tr', function () {
@@ -146,8 +151,8 @@
           assert.dom('th:nth-child(4)', 'Previous heat');
         });
         assert.dom('tbody', function () {
-          assert.dom('tr:first-child>td.climber', v.result2.climber.name);
-          assert.dom('tr:last-child>td.climber', v.result.climber.name);
+          assert.dom('tr:first-child>td.climber>.name', v.result2.climber.name);
+          assert.dom('tr:last-child>td.climber>.name', v.result.climber.name);
         });
       });
     },
@@ -155,16 +160,16 @@
     "test entering finals": function () {
       TH.login();
       assert.dom('#Event #Category', function () {
-        assert.dom('tr#Result_'+ v.result._id + '>td.climber', {text: v.result.climber.name, parent: function () {
+        assert.dom('tr#Result_'+ v.result._id, function () {
           TH.click('td:nth-child(3)');
-        }});
+        });
         assert.dom('h1', 'Final - Start order');
-        assert.dom('tr#Result_'+ v.result._id + '>td.climber', {text: v.result.climber.name, parent: function () {
+        assert.dom('tr#Result_'+ v.result._id, function () {
           assert.dom('td:nth-child(3)>input');
           assert.dom('td:nth-child(2)', function () {
             TH.click(this);
           });
-        }});
+        });
         assert.dom('tr#Result_'+ v.result._id + '>td:nth-child(2)>input', function () {
           assert.same(document.activeElement, this);
           TH.change(this, "3:44");
@@ -192,9 +197,9 @@
     "test selecting score": function () {
       TH.login();
       assert.dom('#Event #Category', function () {
-        assert.dom('tr#Result_'+ v.result._id + '>td.climber', {text: v.result.climber.name, parent: function () {
+        assert.dom('tr#Result_'+ v.result._id,  function() {
           TH.click('td:last-child');
-        }});
+        });
       });
 
       assert.dom('#Result_'+ v.result._id, function () {

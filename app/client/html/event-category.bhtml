@@ -20,7 +20,10 @@
         {{results}}
         <template name="Result">
           <tr id="{{elmId 'Result'}}">
-            <td class="climber">{{climber.name}}</td>
+            <td class="climber">
+              <span class="club">{{climber.club.shortName}}</span>
+              <span class="name">{{climber.name}}</span>
+            </td>
             {{scores}}
           </tr>
         </template>
