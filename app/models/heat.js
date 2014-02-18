@@ -195,17 +195,21 @@ Heat.prototype = {
       if (aLen !== bScores.length)
         return aLen > bScores.length ? -1 : 1;
 
-      if (a.time !== b.time)
-        return a.time < b.time ? -1 : 1;
-
       for(--aLen; aLen >= min; --aLen) {
-        if (aLen === rankIndex)
-          return a.rankMult === b.rankMult ? 0 :
-          a.rankMult < b.rankMult ? -1 : 1; // lower rank is better
+        if (aLen === rankIndex) {
+          if (a.rankMult === b.rankMult) {
+            if (a.time !== b.time )
+              return a.time < b.time ? -1 : 1; // lower time is better
+            else
+              return 0;
+          } else
+            return a.rankMult < b.rankMult ? -1 : 1; // lower rank is better
+        }
 
         if (aScores[aLen] !== bScores[aLen])
           return aScores[aLen] > bScores[aLen] ? -1 : 1;
       }
+
       return 0;
     };
   },

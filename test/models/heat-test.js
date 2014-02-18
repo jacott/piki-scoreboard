@@ -143,8 +143,10 @@
         assert.equals(v.call(-1, []), []);
       },
 
+
+
       "test final": function () {
-        var results = [v.r1 = {scores: [0.2, 200, 300, 400, 300]},
+        var results = [v.r1 = {time: 30, scores: [0.2, 200, 300, 400, 300]},
                        v.r2 = {time: 123, scores: [0.3, 100, 300, 400, 400]},
                        v.r3 = {time: 100, scores: [0.3, 100, 300, 400, 400]}];
 
