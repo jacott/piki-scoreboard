@@ -59,6 +59,16 @@ Bart = {
     classList && classList.remove(name);
   },
 
+  setSuffixClass: function (elm, name, suffix) {
+    if (!elm) return;
+    var classes = elm.className.replace(new RegExp(' *\\b[^ ]*'+suffix+'\\b', 'g'), '').replace(/(^ | $)/g,'');
+
+    if (name)
+      elm.className = (classes.length ? classes + ' ' : '') + name + suffix;
+    else
+      elm.className = classes;
+  },
+
   setClass: function (name, isAdd, elm) {
     (isAdd ? Bart.addClass : Bart.removeClass)(elm || currentElement, name);
   },

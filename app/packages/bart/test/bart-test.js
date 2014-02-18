@@ -123,6 +123,29 @@ Meteor.isClient && (function (test, v) {
       });
     },
 
+    "test setSuffixClass": function () {
+      var elm = {className: ''};
+
+      Bart.setSuffixClass(elm, 'use', 'Mode');
+      assert.same(elm.className, 'useMode');
+
+      Bart.setSuffixClass(elm, 'design', 'Mode');
+      assert.same(elm.className, 'designMode');
+
+      Bart.setSuffixClass(elm, 'discard', 'Avatar');
+      assert.same(elm.className, 'designMode discardAvatar');
+
+      Bart.setSuffixClass(elm, 'use', 'Mode');
+      assert.same(elm.className, 'discardAvatar useMode');
+
+      Bart.setSuffixClass(elm, null, 'Avatar');
+      assert.same(elm.className, 'useMode');
+
+      Bart.setSuffixClass(elm, 'devMode prod', 'Mode');
+      Bart.setSuffixClass(elm, 'devMode prod', 'Mode');
+      assert.same(elm.className, 'devMode prodMode');
+    },
+
     "test classList": function () {
       var elm = document.createElement('div');
 
