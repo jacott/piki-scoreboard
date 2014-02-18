@@ -8,7 +8,7 @@
   <template name="Index">
     <div>
       <nav>
-        {{pageLink name="addClimber" value="Add new climber" template="Climber.Add"}}
+        {{pageLink class="adminAccess" name="addClimber" value="Add new climber" template="Climber.Add"}}
       </nav>
       <section class="climbers">
         <h1>Climbers</h1>

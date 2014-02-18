@@ -5,6 +5,7 @@
       v = {
         org: TH.Factory.createOrg(),
       };
+      TH.login();
       TH.setOrg(v.org);
     },
 

@@ -25,13 +25,9 @@
       var subject = TH.Factory.createUser();
       var user = TH.Factory.createUser('su');
 
-      subject.role = "bad";
       refute.accessDenied(function () {
         subject.authorize(user._id);
       });
-
-      assert.same(subject.role, "a");
-
 
       user = TH.Factory.createUser();
 
@@ -49,6 +45,19 @@
 
       AppModel.User.addMemDoc(user.attributes);
       assert.same(AppModel.User.guestUser().attributes, user.attributes);
+    },
+
+    "test change email": function () {
+      TH.Factory.createUser('su');
+      TH.login();
+
+      TH.call('User.save', TH.userId(), {email: "foo@bar.com"});
+
+      var user = AppModel.User.findOne(TH.userId());
+
+      assert.same(user.email, "foo@bar.com");
+      var mu = Meteor.users.findOne(TH.userId());
+      assert.equals(mu.emails, [{address: "foo@bar.com", verified: false}]);
     },
 
     "forgotPassword": {

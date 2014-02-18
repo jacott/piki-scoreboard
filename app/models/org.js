@@ -7,4 +7,6 @@ model.defineFields({
   shortName: {type: 'text', trim: true, required: true, maxLength: 10},
 });
 
+model.addRemoveRpc();
+
 App.loaded('AppModel.Org', model);

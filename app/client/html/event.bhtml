@@ -3,8 +3,8 @@
     <div>
       <nav class="menu">
         {{pageLink name="show" value="Results" template="Event.Show"}}
-        {{pageLink name="register" value="Registrations" template="Event.Register"}}
-        {{pageLink name="edit" value="Edit event" template="Event.Edit"}}
+        {{pageLink class="adminAccess" name="register" value="Registrations" template="Event.Register"}}
+        {{pageLink class="adminAccess" name="edit" value="Edit event" template="Event.Edit"}}
      </nav>
       <section class="body">
       </section>
@@ -15,7 +15,7 @@
       <section class="events">
         <h1>Events</h1>
         <nav>
-          {{pageLink name="add" value="Add new event" template="Event.Add"}}
+          {{pageLink class="adminAccess" name="add" value="Add new event" template="Event.Add"}}
         </nav>
         <table class="select">
           <thead>

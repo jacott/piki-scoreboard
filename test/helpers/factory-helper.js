@@ -136,7 +136,7 @@
 
       return new Builder('User', options)
         .addRef('org')
-        .addField('role', 'p')
+        .addField('role', 'a')
         .addField('name', 'name' in options || 'fn '+username)
         .addField('email', 'email' in options || ('email-'+username.replace(/\s+/g,'.')+'@test.co').toLowerCase())
         .addField('initials', 'initials' in options || 'u'+username.substring(4))

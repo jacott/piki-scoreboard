@@ -32,6 +32,12 @@ App.require('AppModel.User', function (model) {
     }
   });
 
+  model.afterUpdate(function (user) {
+    if ('email' in user.changes) {
+      Meteor.users.update(user._id, {$set: {emails: [{address: user.email, verified: false}]}});
+    }
+  });
+
   model.afterCreate(function (doc) {
     Accounts.createUser({email: doc.email, password: "changeme", profile: {id: doc._id}});
   });
@@ -39,7 +45,6 @@ App.require('AppModel.User', function (model) {
   App.extend(model.prototype, {
     authorize: function (userId) {
       AppVal.allowAccessIf(AppModel.User.exists({_id: userId, role: AppModel.User.ROLE.superUser}));
-      this.role = "a";
     },
   });
 

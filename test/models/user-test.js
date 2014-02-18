@@ -9,6 +9,15 @@
       v = null;
     },
 
+    "test org_id required": function () {
+      var user = TH.Factory.buildUser({role: 's', org_id: null});
+
+      assert(user.$isValid(), TH.showErrors(user));
+
+      user.role = 'a';
+      refute(user.$isValid());
+    },
+
     "test isSuperUser": function () {
       var user = TH.Factory.buildUser('su');
 
@@ -34,7 +43,6 @@
       var validators = AppModel.User._fieldValidators;
 
       assert.validators(validators.name, {maxLength: [200], required: [true], trim: [true]});
-      assert.validators(validators.org_id, {required: [true]});
       assert.validators(validators.email, {maxLength: [200], required: [true], trim: [true],
                                            inclusion: [{allowBlank: true, matches: Apputil.EMAIL_RE }], normalize: ['downcase']});
       assert.validators(validators.initials, {maxLength: [3], required: [true], trim: [true]});

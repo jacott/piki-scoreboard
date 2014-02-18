@@ -18,7 +18,7 @@
       assert.dom('head', function () {
         assert.dom('title', 'Piki');
       });
-      assert.dom('body', function () {
+      assert.dom('body.readOnlyAccess', function () {
         assert.dom('body>header', function () {
           assert.dom('button#OrgHomeLink', "Choose Organization", function () {
              assert.same(Bart.getCtx(this).data.link, Bart.Home);
@@ -73,8 +73,6 @@
       assert.same(App.orgId, null);
       assert.dom('#OrgHomeLink', "Choose Organization");
       refute.className(document.body, 'inOrg');
-
-
     },
 
     "test whenReady": function () {

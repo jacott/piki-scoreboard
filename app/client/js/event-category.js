@@ -101,7 +101,9 @@ App.require('Bart.Event', function (Event) {
     },
 
     'click td.score': function (event) {
-      if (Bart.hasClass(this, 'input')) return;
+      if (Bart.hasClass(this, 'input') ||
+          ! Bart.hasClass(document.body, 'jAccess'))
+        return;
       var data = $.ctx.data;
 
       var heat = $.data(this).heat;

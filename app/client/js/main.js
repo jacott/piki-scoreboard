@@ -20,9 +20,16 @@ App._startup = function () {
     return false;
   }
 
+  AppModel.User.Index.observe(function (user) {
+    if (user && user._id === App.userId())
+      setAccess();
+  });
+
   Deps.autorun(function () {
     if (Accounts.loginServicesConfigured() && Meteor.status().connected) {
-      Meteor.userId();
+      if (! Meteor.userId())
+        setAccess();
+
       Deps.nonreactive(function () {stateChange()});
     }
   });
@@ -31,6 +38,8 @@ App._startup = function () {
     App.Ready.isReady && AppRoute.pageChanged();
   });
 };
+
+Tpl.setAccess = setAccess;
 
 Meteor.startup(App._startup);
 
@@ -71,7 +80,14 @@ function stateChange(opts) {
 
 var orgSub, orgShortName, pathname;
 
+function setAccess() {
+  var _id = App.userId();
+  var user = _id && AppModel.User.quickFind(_id);
+  Bart.setSuffixClass(document.body, user ? user.accessClasses(App.orgId) : 'readOnly', 'Access');
+}
+
 function subscribeOrg(shortName) {
+  setAccess();
   orgSub && orgSub.stop();
   var orgLink = document.getElementById('OrgHomeLink');
   if (shortName) {
@@ -89,6 +105,7 @@ function subscribeOrg(shortName) {
         return;
       }
       App.orgId = doc._id;
+      setAccess();
       Bart.addClass(document.body, 'inOrg');
       if (orgLink) orgLink.textContent = doc.name;
       if (pathname) {

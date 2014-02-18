@@ -5,7 +5,7 @@
         {{pageLink value="Clubs" template="Club"}}
         {{pageLink value="Climbers" template="Climber"}}
         {{pageLink value="Events" template="Event"}}
-        {{pageLink value="Event categories" template="Category"}}
+        {{pageLink class="adminAccess" value="Event categories" template="Category"}}
       </nav>
       <section class="body">
       </section>

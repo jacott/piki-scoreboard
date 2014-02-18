@@ -20,6 +20,10 @@ body {
   font-smoothing: antialiased;
   background: rgba(0,0,0,0) url(/images/jj.svg) no-repeat -1px @headerHeight - 1;
   background-size: 25%;
+
+  &:not(.aAccess) .adminAccess {
+    display: none;
+  }
 }
 
 *, :after, :before {

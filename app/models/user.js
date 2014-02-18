@@ -7,6 +7,22 @@ var ROLE = {
 };
 
 var model = AppModel.Base.defineSubclass('User',{
+  accessClasses: function (orgId) {
+    if (! this.isSuperUser() && this.org_id !== orgId)
+      return "readOnly";
+
+    var classes = "";
+    switch(this.role) {
+    case 's':
+      classes += "sAccess ";
+    case 'a':
+      classes += "aAccess ";
+    case 'j':
+      classes += "jAccess";
+    }
+
+    return classes + " p";
+  },
   emailWithName: function () {
     return this.name.replace('/<>/','')+" <"+this.email+">";
   },
@@ -17,13 +33,15 @@ var model = AppModel.Base.defineSubclass('User',{
 
 },{saveRpc: true});
 
+model.addRemoveRpc();
+
 model.ROLE = ROLE;
 
 model.defineFields({
   name: {type:  'text', trim: true, required: true, maxLength: 200},
   email: {type:  'text', trim: true, required: true, maxLength: 200, inclusion: {allowBlank: true, matches: Apputil.EMAIL_RE },  normalize: 'downcase'},
   initials: {type: 'text', trim: true, required: true, maxLength: 3},
-  org_id: {type: 'belongs_to', required: true},
+  org_id: {type: 'belongs_to', required: function () {return ! this.isSuperUser()}},
   role: 'text',
 });
 

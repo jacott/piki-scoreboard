@@ -22,6 +22,7 @@ Index.$helpers({
 
 Index.$events({
   'click .clubs tr': function (event) {
+    if (! Bart.hasClass(document.body, 'aAccess')) return;
     event.$actioned = true;
 
     var data = $.data(this);

@@ -276,6 +276,8 @@ TH = (function () {
         }
       }
 
+      Bart && Bart.Main.setAccess();
+
       if (! func) return user;
 
       return DDP._CurrentInvocation.withValue(new MethodInvocation(TH.invocation = {userId: TH.userId()}), func);

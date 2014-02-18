@@ -89,6 +89,15 @@ Tpl.UserForm.$helpers({
   orgList: function () {
     return AppModel.Org.find({}, {sort: {name: 1}}).fetch();
   },
+
+  roleList: function () {
+    var role =  AppModel.User.ROLE;
+    var results = [];
+    for(var key in role) {
+      results.push([role[key], Apputil.capitalize(Apputil.humanize(key))]);
+    }
+    return results;
+  },
 });
 
 Tpl.UserForm.$events({

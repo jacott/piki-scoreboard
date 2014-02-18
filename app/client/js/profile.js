@@ -13,7 +13,8 @@ base.addTemplate(Tpl.ChangePassword, {focus: true});
 
 Tpl.$helpers({
   systemSetup: function () {
-    if ($.data().isSuperUser()) {
+    var user = $.data();
+    if (user && user.isSuperUser()) {
       return Form.pageLink({value: "System setup", template: "SystemSetup"});
     }
   },

@@ -79,6 +79,7 @@
         {{labelField "org_id" selectList=orgList includeBlank="true"}}
         {{labelField "name"}}
         {{labelField "initials"}}
+        {{labelField "role" selectList=roleList includeBlank="true"}}
         {{labelField "email"}}
       </fieldset>
       <fieldset class="actions">

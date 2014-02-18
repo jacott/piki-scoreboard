@@ -132,6 +132,7 @@
           TH.input('[name=name]', 'Foo Bar');
         });
         TH.input('[name=initials]', 'FB');
+        TH.change('[name=role]', 'a');
         TH.change('[name=org_id]', v.org._id);
         TH.input('[name=email]', 'FB@foo.com');
         TH.click('[type=submit]');
@@ -141,7 +142,8 @@
       var user = AppModel.User.findOne({name: 'Foo Bar'});
       assert(user);
       assert.attributesEqual(user, {
-        org_id: v.org._id, name: 'Foo Bar', initials: 'FB', email: 'fb@foo.com'
+        org_id: v.org._id, name: 'Foo Bar', initials: 'FB', email: 'fb@foo.com',
+        role: 'a',
       }, ['_id']);
 
       refute.dom('#UserForm');
