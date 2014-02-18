@@ -11,6 +11,22 @@
       v = null;
     },
 
+    "test Index.quickFind": function () {
+      v.TestSubClass = AppModel.Base.defineSubclass('TestSubClass').defineFields({
+        name: 'text',
+      });
+
+      var bob = v.TestSubClass.create({name: 'bob'});
+
+      var qBob = v.TestSubClass.Index.quickFind(bob._id);
+
+      refute.same(qBob, bob);
+
+      assert.equals(bob.attributes, qBob.attributes);
+
+      assert.same(v.TestSubClass.Index.quickFind(bob._id), qBob);
+    },
+
     "addUniqueIndex": {
       setUp: function () {
         v.TestSubClass = AppModel.Base.defineSubclass('TestSubClass').defineFields({

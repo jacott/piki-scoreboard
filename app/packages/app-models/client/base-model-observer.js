@@ -18,7 +18,7 @@ App.extend(AppModel, {
         var doc = cache[id];
         if (doc) return doc;
 
-        var attrs = model.attrDocs();
+        var attrs = model.attrDocs()[id];
         if (attrs)
           return cache[attrs._id] = new model(attrs);
       },
