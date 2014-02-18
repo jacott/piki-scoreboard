@@ -35,5 +35,8 @@
         </template>
       </tbody>
     </table>
+    <span class="note">
+      Start lists subject to change prior to start of heat, as later registrations will be inserted randomly.
+    </span>
   </div>
 </template>
