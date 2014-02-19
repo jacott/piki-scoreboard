@@ -15,6 +15,7 @@
           {{> /PageTitle}}
         </nav>
         <nav class="right">
+          <button class="link" name="help">Help</button>
           {{> /SignIn}}
         </nav>
       </div>

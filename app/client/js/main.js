@@ -10,7 +10,7 @@ App._startup = function () {
 
   pathname = document.location;
   var handle = App.Ready.onReady(whenReady);
-  document.body.insertBefore(Tpl.Header.$render({}), document.body.firstChild);
+  document.body.insertBefore(Tpl.Header.$autoRender({}), document.body.firstChild);
 
   function whenReady() {
     handle && handle.stop();
@@ -38,6 +38,13 @@ App._startup = function () {
     App.Ready.isReady && AppRoute.pageChanged();
   });
 };
+
+Tpl.Header.$events({
+  'click [name=help]': function (event) {
+    event.$actioned = true;
+    Bart.Dialog.open(Bart.Help.$autoRender({}));
+  },
+});
 
 Tpl.setAccess = setAccess;
 

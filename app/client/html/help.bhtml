@@ -1,0 +1,260 @@
+<template name="Help">
+  <template name="ContentLine">
+    <li><button class="link topics">{{desc}}</button></li>
+  </template>
+  <div id="Help">
+    <button name="close">Close help</button>
+    <h1>Piki Help</h1>
+
+    <abstract>
+      Results management system for climbing competitions
+    </abstract>
+
+    <nav>
+      <h1>Topics</h1>
+      {{contents}}
+    </nav>
+
+    <section name="view-and-print">
+      <h1>View and print event details, start lists and results</h1>
+      <p>
+        To view details of an organization’s events, including results
+        and start lists, a login is not required.
+      </p>
+      <ol>
+        <li>At {{pageLink value="Piki's home page" template="Home"}},
+          click on the desired organization in the list. This takes you to
+          the organization’s Piki home page.</li>
+        <li>Click on <i>Events</i> in the main menu.</li>
+        <li>Check that the relevant event is highlighted; if not, click on the event.</li>
+        <li>Click on <i>Results</i> in the main menu.</li>
+        <li>Browse results and start lists.</li>
+      </ol>
+      <p>
+        To print a start list or results list, use your browser’s
+        commands or menus to print; the page will automatically convert
+        to a printable form, stipped of images etc.
+    </section>
+
+    <section name="org-reg">
+      <h1>Register as an organization</h1>
+      <p>
+        Piki is currently in beta. Climbing New Zealand (CNZ) is the
+        sole organization using the system; Piki is not currently
+        available to other organizations.
+    </section>
+
+    <section name="user-reg">
+      <h1>Register and sign in as a user</h1>
+      <p>
+        To manage your organization’s events, contact your
+        organization’s Piki Administrator (CNZ: Treefrog), providing the
+        email address you wish to use as your login and requesting to be
+        added as a Piki user.
+      <p>
+        Yet to be set up:<br>
+        Sign in at <a href="https://piki.getobeya.com">Piki</a>
+    </section>
+
+    <section name="user-add">
+      <h1>Add and remove users</h1>
+      <p>
+        Organization Administrators only.
+      <p>
+        You must be signed in.
+      </p>
+      <ol>
+        <li>Click on your user name (top right-hand of page).</li>
+        <li>Click on <i>System setup</i>.</li>
+        <li>Add new user.</li>
+      </ol>
+    </section>
+
+    <section name="event-add">
+      <h1>Add events</h1>
+      <p>
+        You must be signed in.
+      </p>
+      <ol>
+        <li>Click on your organization’s name (top left-hand of page) to go
+          to your organization’s Piki home page.</li>
+        <li>Click on <i>Events</i> in the main menu.</li>
+        <li>Click on <i>Add new event</i>.</li>
+        <li>Add event.</li>
+      </ol>
+    </section>
+
+    <section name="event-edit">
+      <h1>Edit an event’s name or date</h1>
+      <p>
+        You must be signed in.
+      </p>
+      <ol>
+        <li>Click on your organization’s name (top left-hand of page) to
+          go to your organization’s Piki home page.</li>
+        <li>Click on <i>Events</i> in the main menu.</li>
+        <li>Check that the event to be edited is highlighted; if not, click on the event.</li>
+        <li>Click on <i>Edit event</i> in the main menu.</li>
+        <li>Edit the event’s name or date.</li>
+      </ol>
+    </section>
+
+    <section name="comp-cat">
+      <h1>Add and edit competitor categories</h1>
+      <p>
+        You must be signed in.
+      </p>
+      <ol>
+        <li>Click on your organization’s name (top left-hand of page) to
+          go to your organization’s Piki home page.</li>
+        <li>Click on <i>Competitor categories</i> (currently <i>Event
+            categories</i>) in the main menu.</li>
+        <li>Add and edit competitor categories.<br>
+          Under <i>Heat format</i>, enter:
+          <ul>
+            <li>“Q” for every open heat, followed by</li>
+            <li>“Fn” for every restricted heat, where n = the number of competitors in the heat.</li>
+          </ul>
+          For example, for a competition with two qualification heats, a
+          semifinal heat with 26 competitors, and a final heat with 8
+          competitors, enter “QQF26F8”.</li>
+      </ol>
+      <p>
+        Yet to be set up:<br> Change the heat format for a specific
+        instance of a category, that is, change the heat format for a
+        category for one event, without changing the heat format for that
+        category for all future events.
+    </section>
+
+    <section name="comp-cat-allow">
+      <h1>Allow or disallow competitor categories for an event</h1>
+      <p>
+        Yet to be set up:</br>
+        Designate for an individual event which competitor categories apply.
+      <p>
+        Currently, organizations should only enter into the system
+        registrations in categories that it wishes to allow for the
+        event. Categories will be automatically added to an event when a
+        registration in that category is entered in the system.
+    </section>
+
+    <section name="clubs">
+      <h1>Add and edit clubs</h1>
+      <p>
+        You must be signed in.
+      </p>
+      <ol>
+        <li>Click on your organization’s name (top left-hand of page) to
+          go to your organization’s Piki home page.</li>
+        <li>Click on <i>Clubs</i> in the main menu.</li>
+        <li>Add and edit clubs.</li>
+      </ol>
+    </section>
+
+    <section name="competitors">
+      <h1>Add and edit competitors</h1>
+      <p>
+        You must be signed in.
+      </p>
+      <ol>
+        <li>Click on your organization’s name (top left-hand of page) to
+          go to your organization’s Piki home page.</li>
+        <li>Click on <i>Competitors</i> (currently <i>Climbers</i>) in the main menu.</li>
+        <li>Add and edit competitors.</li>
+      </ol>
+    </section>
+
+    <section name="registration">
+      <h1>Register competitors for an event</h1>
+      <p>
+        You must be signed in.
+      </p>
+      <ol>
+        <li>Click on your organization’s name (top left-hand of page) to
+          go to your organization’s Piki home page.</li>
+        <li>Click on <i>Events</i> in the main menu.</li>
+        <li>Check that the relevant event is highlighted; if not, click on the event.</li>
+        <li>Click on <i>Registrations</i> in the main menu.<br>  Yet to be
+          set up<br> To register multiple competitors for the event,
+          upload a CSV file of prearranged format.</li>
+        <li>To register an individual competitor for the event:
+          <ol>
+            <li>Begin entering the competitor’s name in the box provided.</li>
+            <li>Select the climber’s name from the dropdown list.<br>
+              If the competitor’s name does not appear in the dropdown
+              list, the competitor has not been entered into the Piki
+              system. In the future, there will be an <i>Add climber</i> button here.
+              Currently, it is necessary to go to
+              <span>{{pageLink value="Add climber" template="Climber.Add"}}</span>
+              under <span>{{pageLink value="Climber page" template="Climber"}}<span>
+                  and then return to the event’s <i>Registrations</i> page.</li>
+            <li>Follow the instructions to choose the categories the competitor is entering. </li>
+            <li>Click on <i>Register</i> to confirm registration.</li>
+          </ol>
+      </ol>
+    </section>
+
+    <section name="reg-change">
+      <h1>Change or remove a competitor’s registration</h1>
+      <p>
+        You must be signed in.
+      </p>
+      <ol>
+        <li>Click on your organization’s name (top left-hand of page)
+          to go to your organization’s Piki home page.</li>
+        <li>Click on <i>Events</i> in the main menu.</li>
+        <li>Check that the relevant event is highlighted; if not, click on the event.</li>
+        <li>Click on <i>Registrations</i> in the main menu.</li>
+        <li>Click on the competitor’s name.</li>
+        <li>Change, using the dropdown options, or deregister the competitor.</li>
+      </ol>
+    </section>
+
+    <section name="results">
+      <h1>Enter and edit results</h1>
+      <p>
+        You must be signed in.
+      </p>
+      <ol>
+        <li>Click on your organization’s name (top left-hand of page) to
+          go to your organization’s Piki home page.</li>
+        <li>Click on <i>Events</i> in the main menu.</li>
+        <li>Check that the relevant event is highlighted; if not, click on the event.</li>
+        <li>Click on <i>Results</i> in the main menu.</li>
+        <li>Click on the relevant category.</li>
+        <li>Select the relevant heat from the dropdown menu on the top right of the page.</li>
+        <li>For individual heats, choose from the button near the top
+          right of the page: <i>Show start order</i> or <i>Show
+            results</i>.</li>
+        <li>To enter or edit results, click on the relevant cell in the
+          table and begin to type in the result. If in <i>Results</i>
+          view, the screen will automatically switch to <i>Start order</i>
+          view of the heat being edited so that competitors are listed in
+          the order in which they climbed.<br>  Lead scores permitted:
+          <ul>
+            <li><tt>n</tt> (e.g. 23)</li>
+            <li><tt>n+</tt> (e.g. 23+)</li>
+            <li><tt>top</tt></li>
+            <li><tt>dnc</tt> (did not climb)</li>
+          </ul>
+          To record time taken in a Lead Final (to use in scoring in case
+          of a tie after countback), enter time in format:
+          <ul>
+            <li><tt>m:ss (e.g. 7:33)</li>
+          </ul>
+          Boulder scores permitted:
+          <ul>
+            <li><tt>nta nba</tt> (n = the number of tops or bonus holds achieved; a
+              = the number of attempts taken to achieve those tops or
+              bonus holds;<br> e.g. 2t5 3b3 is a score indicating 2 tops
+              achieved in 5 attempts and 3 bonus holds achieved in 3
+              attempts)</li>
+            <li><tt>0t nba</tt> (no tops achieved)</li>
+            <li><tt>0t 0b</tt> (no tops or bonus holds achieved)</li>
+            <li><tt>dnc</tt> (did not climb)</li>
+          </ul>
+        </li>
+      </ol>
+    </section>
+  </div>
+</template>

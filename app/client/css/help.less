@@ -1,0 +1,39 @@
+#Help {
+  padding: 10px;
+  max-width: 780px;
+
+  button.link {
+    color: #07a;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+    text-decoration: underline;
+  }
+
+  section.current>h1:first-child {
+    background-color: #ff0;
+  }
+
+  [name=close] {
+    position: fixed;
+    display: block;
+    right: 30px;
+  }
+
+  ol, ul {
+    margin-left: 2em;
+    &>li {
+      margin: 0;
+      padding: 0;
+    }
+    ul {
+      list-style-type: circle;
+    }
+  }
+  ol>li {
+    list-style-type: decimal;
+  }
+  ul>li {
+    list-style-type: disc;
+  }
+}
