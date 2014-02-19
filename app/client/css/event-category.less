@@ -1,3 +1,5 @@
+@import "global.lessimport";
+
 #Category {
   .viewMenu {
     float: right;
@@ -39,6 +41,14 @@
         margin: 0;
         border: none;
         padding: 1px;
+        ~span.errorMsg {
+          display: block;
+          position: absolute;
+          background-color: fade(@colorInputErrorBG, 80%);
+        }
+        ~span:not(.errorMsg) {
+          display: none;
+        }
       }
       >i {
         font-style: normal;
@@ -54,7 +64,7 @@
       }
     }
     td.input {
-      span {
+      span:not(.errorMsg) {
         display: none;
       }
     }

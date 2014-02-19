@@ -42,7 +42,6 @@ Heat.prototype = {
     return heatName;
   },
 
-
   numberToScore: function (score, index) {
     if (index === 0) {
       return score;
@@ -77,7 +76,14 @@ Heat.prototype = {
     }
   },
 
-  scoreToNumber: function (score) {
+  scoreToNumber: function (score, index) {
+    if (score.trim() === '') return;
+
+    if (index === 99) {
+      var m = /^\s*(?:(\d{1,2}):)?([0-5]\d)\s*$/.exec(score);
+      return m ? m[1]*60 + +m[2] : false;
+    }
+
     if (score.match(/^\s*dnc/i)) {
       return -1;
     }
@@ -102,6 +108,7 @@ Heat.prototype = {
       }
       if (score.match(/^\s*0\s*$/)) return 0;
     }
+    return false;
   },
 
   list: function () {

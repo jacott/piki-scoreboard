@@ -34,7 +34,12 @@
           </td>
         </template>
         <template name="ScoreInput">
-          <input id="ScoreInput" type="text" name="score" value="{{score}}">
+          <input id="ScoreInput" type="text" name="score" placeholder="{{placeholder}}" value="{{score}}">
+        </template>
+        <template name="InvalidInput">
+          <span class="errorMsg">
+            Invalid format
+          </span>
         </template>
       </tbody>
     </table>

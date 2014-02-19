@@ -5,6 +5,7 @@ App.require('Bart.Event', function (Event) {
   var ScoreInput = Tpl.ScoreInput;
   var Score = Tpl.Score;
   var scoreElm;
+  var InvalidInput = Tpl.InvalidInput.$render();
 
   Event.route.addTemplate(Tpl, {
     focus: '#Category [name=selectHeat]',
@@ -137,13 +138,22 @@ App.require('Bart.Event', function (Event) {
         saveScore(this);
         return;
       case 9:
-        saveScore(this);
-
-        if (nextScore(event.shiftKey ? -1 : 1))
+        if (! saveScore(this) ||
+            nextScore(event.shiftKey ? -1 : 1)) {
           event.$actioned = true;
+        }
+
         return;
       }
     },
+  });
+
+  ScoreInput.$helpers({
+    placeholder: function () {
+      if (this.heat === 99)
+        return "h:mm";
+      return $.data(document.getElementById('Category')).heat.type === 'B' ? "ntn nbn" : "nn.n+";
+    }
   });
 
   Tpl.Result.$helpers({
@@ -225,8 +235,18 @@ App.require('Bart.Event', function (Event) {
   }
 
   function saveScore(elm) {
-    var data = $.data(elm);
-    data.result.setScore(data.heat, data.score = elm.value);
+    var ctx = Bart.getCtx(elm);
+    var data = ctx.data;
+    var number = $.data(document.getElementById('Category')).heat.scoreToNumber(elm.value, data.heat);
+
+    if (number !== false) {
+      data.result.setScore(data.heat, data.score = elm.value);
+      return true;
+    } else {
+      Bart.addClass(elm, 'error');
+      elm.parentNode.insertBefore(InvalidInput, elm.nextSibling);
+      return false;
+    }
   }
 
   function getScoreData() {

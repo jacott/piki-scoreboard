@@ -33,9 +33,9 @@ App.require('AppModel.Competitor', function (Competitor) {
       var heat = new AppModel.Heat(index, event.heats[result.category_id]);
 
       if (index === 99) {
-        var m = /^\s*(?:(\d{1,2}):)?([0-5]\d)\s*$/.exec(score);
-        AppVal.allowAccessIf(m);
-        model.docs.update(id, {$set: {time: m[1]*60 + +m[2]}});
+        var time =  heat.scoreToNumber(score, 99);
+        AppVal.allowAccessIf(time !== false);
+        model.docs.update(id, {$set: {time: time}});
         return;
       }
 

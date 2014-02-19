@@ -109,30 +109,49 @@
       });
     },
 
-    "test no time column in boulder events": function () {
-      v.category = TH.Factory.createCategory({type: 'B', heatFormat: 'FF6'});
-      v.event = TH.Factory.createEvent();
-      v.result = TH.Factory.createResult({scores: [0.1]});
+    "boulder category": {
+      setUp: function () {
+        v.category = TH.Factory.createCategory({type: 'B', heatFormat: 'FF6'});
+        v.event = TH.Factory.createEvent();
+        v.result = TH.Factory.createResult({scores: [0.1]});
 
-      TH.login();
+        TH.login();
 
-      v.eventSub.reset();
-      AppRoute.gotoPage(Bart.Event.Category, {eventId: v.event._id, append: v.category._id});
-      v.eventSub.yield();
+        v.eventSub.reset();
+        AppRoute.gotoPage(Bart.Event.Category, {eventId: v.event._id, append: v.category._id});
+        v.eventSub.yield();
+      },
 
-      TH.change('select[name=selectHeat]', 2);
+      "test no time column": function () {
+        TH.change('select[name=selectHeat]', 2);
 
-      assert.dom('#Event #Category', function () {
-        assert.dom('.rank table.results', function () {
-          assert.dom('thead>tr', function () {
-            assert.dom('th:first-child', 'Climber');
-            assert.dom('th:nth-child(2)', 'Result');
-            assert.dom('th:nth-child(3)', 'Previous heat');
+        assert.dom('#Event #Category', function () {
+          assert.dom('.rank table.results', function () {
+            assert.dom('thead>tr', function () {
+              assert.dom('th:first-child', 'Climber');
+              assert.dom('th:nth-child(2)', 'Result');
+              assert.dom('th:nth-child(3)', 'Previous heat');
+            });
+
+            refute.dom('td.heat99');
           });
-
-          refute.dom('td.heat99');
         });
-      });
+      },
+
+      "test entering finals": function () {
+        assert.dom('#Event #Category', function () {
+          assert.dom('tr#Result_'+ v.result._id, function () {
+            TH.click('td:nth-child(3)');
+          });
+          assert.dom('h1', 'Final - Start order');
+          assert.dom('tr#Result_'+ v.result._id, function () {
+            assert.dom('td:nth-child(2)>input[placeholder="ntn nbn"]', function () {
+              TH.change(this, '3t4 3x');
+              assert.className(this, 'error');
+            });
+          });
+        });
+      },
     },
 
     "test clicking on time in results mode": function () {
@@ -165,12 +184,12 @@
         });
         assert.dom('h1', 'Final - Start order');
         assert.dom('tr#Result_'+ v.result._id, function () {
-          assert.dom('td:nth-child(3)>input');
+          assert.dom('td:nth-child(3)>input[placeholder="nn.n+"]');
           assert.dom('td:nth-child(2)', function () {
             TH.click(this);
           });
         });
-        assert.dom('tr#Result_'+ v.result._id + '>td:nth-child(2)>input', function () {
+        assert.dom('tr#Result_'+ v.result._id + '>td:nth-child(2)>input[placeholder="h:mm"]', function () {
           assert.same(document.activeElement, this);
           TH.change(this, "3:44");
         });
@@ -212,7 +231,7 @@
 
 
       assert.dom('#Result_'+ v.result._id, function () {
-          assert.dom('td>input~span', '23.5+');
+        assert.dom('td>input~span', '23.5+');
       });
     },
   });
