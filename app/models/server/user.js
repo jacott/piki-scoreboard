@@ -1,4 +1,6 @@
 App.require('AppModel.User', function (model) {
+  var permitSpec = AppVal.permitSpec('name', 'email', 'initials', 'org_id', 'role');
+
   var guestUserId;
   App.extend(model, {
     _clearGuestUser: function () {
@@ -12,9 +14,7 @@ App.require('AppModel.User', function (model) {
           guestUserId = user._id;
           return user;
         }
-        var org = AppModel.Org.findOne();
-        if (! org) return;
-        guestUserId = model.docs.insert({role: 'g', org_id: org._id});
+        guestUserId = model.docs.insert({role: 'g'});
       }
       return new AppModel.User(model.attrFind(guestUserId));
     },
@@ -44,7 +44,20 @@ App.require('AppModel.User', function (model) {
 
   App.extend(model.prototype, {
     authorize: function (userId) {
-      AppVal.allowAccessIf(AppModel.User.exists({_id: userId, role: AppModel.User.ROLE.superUser}));
+      var role = AppModel.User.ROLE;
+
+      AppVal.permitDoc(this, permitSpec);
+
+      var authUser = AppModel.User.findOne({
+        _id: userId,
+        $or: [{role: role.superUser},
+              {
+                role: role.admin,
+                org_id: this.attributes.org_id,
+              }]});
+
+      AppVal.allowAccessIf(authUser &&
+                           (authUser.isSuperUser() || ! ('org_id' in this.changes)));
     },
   });
 

@@ -28,8 +28,20 @@ var model = AppModel.Base.defineSubclass('User',{
   },
 
   isSuperUser: function () {
-    return this.role.indexOf(ROLE.superUser) !== -1;
+    return this.attributes.role === ROLE.superUser;
   },
+
+  validate: function () {
+    var me = AppModel.User.me();
+    AppVal.allowAccessIf(me);
+    if (me.isSuperUser()) return;
+    if (this.isSuperUser() || this.role === 's')
+      AppVal.addError(this, 'role', 'is_invalid');
+    if ('org_id' in this.changes) {
+      AppVal.addError(this, 'org_id', 'is_invalid');
+    }
+
+  }
 
 },{saveRpc: true});
 
@@ -41,8 +53,8 @@ model.defineFields({
   name: {type:  'text', trim: true, required: true, maxLength: 200},
   email: {type:  'text', trim: true, required: true, maxLength: 200, inclusion: {allowBlank: true, matches: Apputil.EMAIL_RE },  normalize: 'downcase'},
   initials: {type: 'text', trim: true, required: true, maxLength: 3},
-  org_id: {type: 'belongs_to', required: function () {return ! this.isSuperUser()}},
-  role: 'text',
+  org_id: {type: 'belongs_to', required: function () {return this.role !== ROLE.superUser}},
+  role: {type: 'text', inclusion: {in: _.values(ROLE)}},
 });
 
 

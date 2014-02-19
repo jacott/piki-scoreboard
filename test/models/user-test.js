@@ -10,6 +10,7 @@
     },
 
     "test org_id required": function () {
+      TH.loginAs(TH.Factory.createUser('su'));
       var user = TH.Factory.buildUser({role: 's', org_id: null});
 
       assert(user.$isValid(), TH.showErrors(user));
@@ -21,9 +22,12 @@
     "test isSuperUser": function () {
       var user = TH.Factory.buildUser('su');
 
+      assert.isFalse(user.isSuperUser());
+      user.attributes.role = 's';
+
       assert.isTrue(user.isSuperUser());
 
-      user.role = 'x';
+      user.attributes.role = 'x';
       assert.isFalse(user.isSuperUser());
     },
 

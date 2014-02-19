@@ -65,6 +65,7 @@ Tpl.$events({
   },
 
   'click .orgs tr': function (event) {
+    if (! Bart.hasClass(document.body, 'sAccess')) return;
     event.$actioned = true;
 
     var data = $.data(this);
@@ -91,10 +92,12 @@ Tpl.UserForm.$helpers({
   },
 
   roleList: function () {
+    var su = AppModel.User.me().isSuperUser();
     var role =  AppModel.User.ROLE;
     var results = [];
-    for(var key in role) {
-      results.push([role[key], Apputil.capitalize(Apputil.humanize(key))]);
+    for(var name in role) {
+      if (su || name !== 'superUser')
+        results.push([role[name], Apputil.capitalize(Apputil.humanize(name))]);
     }
     return results;
   },

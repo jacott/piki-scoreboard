@@ -11,6 +11,7 @@
     },
 
     "test createUser": function () {
+      TH.loginAs(TH.Factory.createUser('su'));
       var user = TH.Factory.buildUser();
       user.$$save();
 
@@ -29,7 +30,7 @@
         subject.authorize(user._id);
       });
 
-      user = TH.Factory.createUser();
+      user = TH.Factory.createUser({role: 'j'});
 
       assert.accessDenied(function () {
         subject.authorize(user._id);
@@ -37,10 +38,9 @@
     },
 
     "test guestUserId": function () {
-      var org = TH.Factory.createOrg();
       var user = AppModel.User.guestUser();
 
-      assert.same(user.org_id, org._id);
+      assert.same(user.org_id, undefined);
       refute.same(AppModel.User.guestUser(), user);
 
       AppModel.User.addMemDoc(user.attributes);

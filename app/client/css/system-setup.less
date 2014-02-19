@@ -4,3 +4,11 @@
 body:not(.inOrg) #SystemSetup .menu>[name=addUser] {
   display: none;
 }
+
+#SystemSetup {
+  table.orgs {
+    body:not(sAccess) & {
+      cursor: inherit;
+    }
+  }
+}

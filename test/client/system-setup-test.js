@@ -4,6 +4,7 @@
       test = this;
       v = {};
       App.Ready.isReady = true;
+      TH.loginAs(TH.Factory.createUser('su'));
     },
 
     tearDown: function () {
