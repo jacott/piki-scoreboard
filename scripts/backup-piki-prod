@@ -1,0 +1,15 @@
+#!/bin/bash
+set -em
+
+mkdir -p /backup/pikidb.mongo/prod
+cd /backup/pikidb.mongo/prod
+rm -f *
+mongodump -o .. -h 127.0.0.1:3210 -d piki
+
+if [ ! -e .git ];then
+    git init .
+fi
+
+git add .
+
+git commit -am 'auto' || echo ""
