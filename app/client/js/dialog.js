@@ -2,8 +2,12 @@ var $ = Bart.current;
 var Tpl = Bart.Dialog;
 
 App.extend(Tpl, {
-  open: function (content) {
-    document.body.appendChild(Tpl.$autoRender({content: content}));
+  open: function (content, options) {
+    var elm = Tpl.$autoRender({content: content});
+    document.body.appendChild(elm);
+    if (options && options.focus) {
+      Bart.focus(elm, options.focus);
+    }
   },
 
   close: function (elm) {

@@ -21,7 +21,7 @@
       v = null;
     },
 
-    "test adding": function () {
+    "test registering": function () {
       gotoPage();
 
       assert.dom('#Event #Register', function () {
@@ -79,6 +79,29 @@
       });
     },
 
+    "test adding new climber": function () {
+      gotoPage();
+
+      assert.dom('#Register', function () {
+        assert.dom('label .name', {parent: function () {
+          TH.input('[name=name]', 'John Smith');
+          assert.dom('ul>li', 'Add "John Smith"', function () {
+            TH.trigger(this, 'mousedown');
+          });
+        }});
+      });
+
+      assert.dom('.Dialog #AddClimber', function () {
+        TH.input('[name=dateOfBirth]', '1999-10-12');
+        TH.change('[name=gender]', 'm');
+        TH.change('[name=club_id]', v.climbers[0].club_id);
+        TH.click('[name=create]');
+      });
+
+      refute.dom('#AddClimber');
+      assert.dom('.Groups');
+    },
+
     "test can't add twice": function () {
       var oComp = TH.Factory.createCompetitor({climber_id: v.climbers[1]._id});
 
@@ -86,7 +109,7 @@
 
       assert.dom('#Event #Register', function () {
         TH.input('[name=name]', v.climbers[1].name);
-        refute.dom('ul>li');
+        assert.dom('ul>li', {count: 1, text: 'Already registered'});
       });
     },
 

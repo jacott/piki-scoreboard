@@ -40,6 +40,17 @@
       </label>
     </template>
 
+    <template name="AddClimber">
+      <form id="AddClimber">
+        <h1>Add new climber</h1>
+        {{> /Climber.Form}}
+        <fieldset class="actions">
+          <button type="submit" name="create">Create</button>
+          <button type="button" name="cancel">Cancel</button>
+        </fieldset>
+      </form>
+    </template>
+
     <table class="select">
       <thead><tr>
           <th>Competitor</th><th>Categories</th>

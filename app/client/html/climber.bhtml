@@ -65,7 +65,7 @@
       {{labelField "name"}}
       {{labelField "dateOfBirth" placeholder="yyyy-mm-dd"}}
       {{labelField "gender" selectList=genderList}}
-      {{labelField "club_id" selectList=clubList}}
+      {{labelField "club_id" selectList=clubList includeBlank=""}}
     </fieldset>
   </template>
 </template>

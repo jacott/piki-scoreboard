@@ -6,6 +6,7 @@ App.require('Bart.Event', function (Event) {
   var Edit = Tpl.Edit;
   var Category = Tpl.Category;
   var Groups = Tpl.Groups;
+  var AddClimber = Tpl.AddClimber;
   var competitor;
 
 
@@ -99,18 +100,41 @@ App.require('Bart.Event', function (Event) {
     'submit': submit,
 
     'input [name=name]': function (event) {
-      var value = this.value;
+      var input = this;
+      var value = input.value;
       if (value) value = value.trim();
-      var form = event.currentTarget;
-      var competitor = $.data();
+      if (value)  {
+        var form = event.currentTarget;
+        var competitor = $.data();
 
-      var competitors = AppModel.Competitor.eventIndex({event_id: competitor.event_id}) || {};
-      Form.completeList(this, value && AppModel.Climber.search(value, 20, function (doc) {
-        return ! (doc._id in competitors);
-      }), function (climber) {
-        competitor.climber_id = climber._id;
+        var competitors = AppModel.Competitor.eventIndex({event_id: competitor.event_id}) || {};
 
-        addGroups(form, competitor);
+        var found = false;
+        var completeList = value && AppModel.Climber.search(value, 20, function (doc) {
+          found = true;
+          return ! (doc._id in competitors);
+        });
+        if (completeList.length === 0) {
+          if (found) {
+            completeList = [{name: "Already registered"}];
+          } else {
+            completeList = [{name: 'Add "' + value + '"', addNew: true}];
+          }
+        }
+      }
+      Form.completeList({
+        input: this,
+        completeList: completeList,
+        callback: function (ret) {
+          if (ret._id) {
+            input.value = ret.name;
+            competitor.climber_id = ret._id;
+
+            addGroups(form, competitor);
+          } else if (ret.addNew) {
+            addNew(form, value);
+          }
+        },
       });
     },
   });
@@ -122,6 +146,22 @@ App.require('Bart.Event', function (Event) {
         return AppModel.Category.quickFind(id).shortName;
       }).join(', ');
 
+    },
+  });
+
+  AddClimber.$events({
+    'submit': Bart.Form.submitFunc('AddClimber', function (doc) {
+      Bart.Dialog.close();
+      var form = document.querySelector('#Register form.add');
+      var competitor = $.data(form);
+      competitor.climber_id = doc._id;
+      addGroups(form, competitor);
+    }),
+
+    'click [name=cancel]': function (event) {
+      event.$actioned = true;
+      Bart.Dialog.close();
+      document.querySelector('#Register [name=name].autoComplete').focus();
     },
   });
 
@@ -143,6 +183,10 @@ App.require('Bart.Event', function (Event) {
     if (Form.saveDoc(competitor, form)) {
       AppRoute.gotoPage(Add);
     }
+  }
+
+  function addNew(form, name) {
+    Bart.Dialog.open(AddClimber.$autoRender(AppModel.Climber.build({org_id: App.orgId, name: name})), {focus: '[name=dateOfBirth]'});
   }
 
   function addGroups(form, competitor) {

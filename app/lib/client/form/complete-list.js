@@ -18,14 +18,15 @@ Tpl.$extend({
 });
 
 Bart.Form.$extend({
-  completeList: function (elm, list, callback) {
+  completeList: function (options) {
     close();
-    if (! list) return;
+    if (! options.completeList) return;
     v = {
-      input: elm,
-      completeList: Tpl.$autoRender(list),
-      callback: callback
+      input: options.input,
+      completeList: Tpl.$autoRender(options.completeList),
+      callback: options.callback,
     };
+    var elm = v.input;
     elm.parentNode.insertBefore(v.completeList, elm.nextSibling);
     elm.addEventListener('blur', close);
     elm.addEventListener('keydown', keydown, true);
@@ -60,8 +61,10 @@ function keydown(event) {
 function select(li) {
   if (li) {
     var data = $.data(li);
-    v.input.value = data.name;
-    v.callback && v.callback(data);
+    if (v.callback)
+      v.callback(data);
+    else
+      v.input.value = data.name;
     close();
   }
 }

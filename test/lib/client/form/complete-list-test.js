@@ -14,14 +14,14 @@
     "test rendering": function () {
       assert.dom(v.CompleteList.$autoRender({}), function () {
         assert.dom('[name=name]', function () {
-          Bart.Form.completeList(this, [{name: 'abc'}, {name: 'def'}]);
+          Bart.Form.completeList({input: this, completeList: [{name: 'abc'}, {name: 'def'}]});
         });
         assert.dom('[name=name]+ul.complete', function () {
           assert.dom('li.selected', 'abc');
           assert.dom('li', 'def');
         });
         assert.dom('[name=name]', function () {
-          Bart.Form.completeList(this, [{name: 'foo'}]);
+          Bart.Form.completeList({input: this, completeList: [{name: 'foo'}]});
         });
         refute.dom('li', 'abc');
         assert.dom('[name=name]+ul.complete', function () {
@@ -29,7 +29,7 @@
         });
 
         assert.dom('[name=name]', function () {
-          Bart.Form.completeList(this);
+          Bart.Form.completeList({input: this});
         });
         refute.dom('.complete');
       });
@@ -39,7 +39,7 @@
       setUp: function () {
         document.body.appendChild(v.CompleteList.$autoRender({}));
         assert.dom('[name=name]', function () {
-          Bart.Form.completeList(this, v.list = [{name: 'abc'}, {name: 'def'}], v.callback = test.stub());
+          Bart.Form.completeList({input: this,  completeList: v.list = [{name: 'abc'}, {name: 'def'}], callback: v.callback = test.stub()});
         });
 
         v.inp = document.querySelector('[name=name]');
@@ -50,10 +50,17 @@
           TH.trigger(this, 'mousedown');
         });
 
-        assert.same(v.inp.value, 'abc');
         refute.dom('.complete');
 
         assert.calledWith(v.callback, v.list[0]);
+
+        assert.dom('[name=name]', {value: ''}, function () {
+          Bart.Form.completeList({input: this,  completeList: v.list = [{name: 'abc'}, {name: 'def'}]});
+        });
+        assert.dom('li', 'abc', function () {
+          TH.trigger(this, 'mousedown');
+        });
+        assert.dom('[name=name]', {value: 'abc'});
       },
 
       "test enter no select": function () {
@@ -67,7 +74,6 @@
         });
 
         TH.trigger(v.inp, 'keydown', {which: 13});
-        assert.same(v.inp.value, 'abc');
 
         refute.dom('.complete');
 
@@ -79,7 +85,6 @@
       "test enter after select": function () {
         TH.trigger(v.inp, 'keydown', {which: 40}); // down
         TH.trigger(v.inp, 'keydown', {which: 13});
-        assert.same(v.inp.value, 'def');
 
         refute.dom('.complete');
 
@@ -102,7 +107,7 @@
     "test blur": function () {
       document.body.appendChild(v.CompleteList.$autoRender({}));
       assert.dom('[name=name]', function () {
-        Bart.Form.completeList(this, [{name: 'abc'}, {name: 'def'}]);
+        Bart.Form.completeList({input: this,  completeList: [{name: 'abc'}, {name: 'def'}]});
         TH.trigger(this, 'blur');
       });
       refute.dom('ul');

@@ -34,7 +34,14 @@ Tpl.$extend({
       extraSetup && extraSetup(doc, elm);
 
       if (doc.$save()) {
-        successPage && AppRoute.gotoPage(successPage);
+        switch(typeof successPage) {
+        case 'object':
+          AppRoute.gotoPage(successPage);
+          break;
+        case 'function':
+          successPage(doc);
+          break;
+        }
       } else {
         Tpl.renderErrors(doc, form);
       }
