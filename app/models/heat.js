@@ -80,7 +80,7 @@ Heat.prototype = {
     if (score.trim() === '') return;
 
     if (index === 99) {
-      var m = /^\s*(?:(\d{1,2}):)?([0-5]\d)\s*$/.exec(score);
+      var m = /^\s*(?:(\d{1,2})[.:])?([0-5]\d)\s*$/.exec(score);
       return m ? m[1]*60 + +m[2] : false;
     }
 

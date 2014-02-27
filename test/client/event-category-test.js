@@ -141,11 +141,11 @@
       "test entering finals": function () {
         assert.dom('#Event #Category', function () {
           assert.dom('tr#Result_'+ v.result._id, function () {
-            TH.click('td:nth-child(3)');
+            TH.trigger('td:nth-child(3)', 'mousedown');
           });
           assert.dom('h1', 'Final - Start order');
           assert.dom('tr#Result_'+ v.result._id, function () {
-            assert.dom('td:nth-child(2)>input[placeholder="ntn nbn"]', function () {
+            assert.dom('td:nth-child(2)>input[placeholder="nta nba"]', function () {
               TH.change(this, '3t4 3x');
               assert.className(this, 'error');
             });
@@ -159,7 +159,7 @@
 
       TH.change('select[name=selectHeat]', 3);
       assert.dom('tr#Result_'+ v.result._id, function () {
-        TH.click('td.heat99');
+        TH.trigger('td.heat99', 'mousedown');
       });
 
       assert.dom('.start table.results', function () {
@@ -180,18 +180,18 @@
       TH.login();
       assert.dom('#Event #Category', function () {
         assert.dom('tr#Result_'+ v.result._id, function () {
-          TH.click('td:nth-child(3)');
+          TH.trigger('td:nth-child(3)', 'mousedown');
         });
         assert.dom('h1', 'Final - Start order');
         assert.dom('tr#Result_'+ v.result._id, function () {
-          assert.dom('td:nth-child(3)>input[placeholder="nn.n+"]');
+          assert.dom('td:nth-child(3)>input[placeholder="n+"]');
           assert.dom('td:nth-child(2)', function () {
-            TH.click(this);
+            TH.trigger(this, 'mousedown');
           });
         });
-        assert.dom('tr#Result_'+ v.result._id + '>td:nth-child(2)>input[placeholder="h:mm"]', function () {
+        assert.dom('tr#Result_'+ v.result._id + '>td:nth-child(2)>input[placeholder="m:ss"]', function () {
           assert.same(document.activeElement, this);
-          TH.change(this, "3:44");
+          TH.change(this, "3.44");
         });
         assert.equals(v.result.$reload().time, 3*60+44);
         assert.dom('tr#Result_'+ v.result._id + '>td:nth-child(2)>span', '3:44');
@@ -217,7 +217,7 @@
       TH.login();
       assert.dom('#Event #Category', function () {
         assert.dom('tr#Result_'+ v.result._id,  function() {
-          TH.click('td:last-child');
+          TH.trigger('td:last-child', 'mousedown');
         });
       });
 

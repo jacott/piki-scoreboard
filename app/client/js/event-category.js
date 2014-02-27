@@ -101,25 +101,33 @@ App.require('Bart.Event', function (Event) {
       setHeatNumber($.ctx, this.value);
     },
 
-    'click td.score': function (event) {
+    'mousedown td.score': function (event) {
       if (Bart.hasClass(this, 'input') ||
           ! Bart.hasClass(document.body, 'jAccess'))
         return;
-      var data = $.ctx.data;
 
-      var heat = $.data(this).heat;
+      var ctx = $.ctx;
+      var data = ctx.data;
+
+      var scoreData = $.data(this);
+      var heat = scoreData.heat;
       if (heat < 1) return;
 
       event.$actioned = true;
 
-      addScore(this);
+      var input = document.getElementById('ScoreInput');
+      if (input === document.activeElement) {
+        if (! saveScore(input)) return;
+        addScore(document.querySelector('#Result_' + scoreData.result._id + ' td.score.heat' + scoreData.heat));
+      } else
+        addScore(this);
 
       if (data.showingResults) {
         data.showingResults = false;
         data.selectHeat = heat === 99 ? data.heat.total : heat;
       }
 
-      updateResults($.ctx);
+      updateResults(ctx);
     },
   });
 
@@ -151,8 +159,8 @@ App.require('Bart.Event', function (Event) {
   ScoreInput.$helpers({
     placeholder: function () {
       if (this.heat === 99)
-        return "h:mm";
-      return $.data(document.getElementById('Category')).heat.type === 'B' ? "ntn nbn" : "nn.n+";
+        return "m:ss";
+      return $.data(document.getElementById('Category')).heat.type === 'B' ? "nta nba" : "n+";
     }
   });
 
@@ -259,9 +267,10 @@ App.require('Bart.Event', function (Event) {
   }
 
   function addScore(elm, data) {
-    if (! elm) return;
+    var ctx = Bart.getCtx(elm);
+    if (! ctx) return;
     removeScore();
-    scoreElm = ScoreInput.$autoRender(data || $.data(elm));
+    scoreElm = ScoreInput.$autoRender(data || ctx.data);
     elm.insertBefore(scoreElm, elm.firstChild);
     Bart.addClass(elm, 'input');
     scoreElm.focus();
