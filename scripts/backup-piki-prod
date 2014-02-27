@@ -1,8 +1,8 @@
 #!/bin/bash
 set -em
 
-mkdir -p /backup/pikidb.mongo/prod
-cd /backup/pikidb.mongo/prod
+mkdir -p /backup/piki-prod.mongo/piki
+cd /backup/piki-prod.mongo/piki
 rm -f *
 mongodump -o .. -h 127.0.0.1:3210 -d piki
 
