@@ -16,58 +16,133 @@
       v = null;
     },
 
-    "test callback.render": function () {
-      test.onEnd(function () {
+    "test default template": function () {
+      v.Each.nodes[0].children[1].pop();
+
+      Bart.newTemplate({
+        name: "Test.Ext.Each.Each_fooList",
+        nodes: [{
+          name:"li",
+          attrs:[["=","id",["", "id"]]],
+          children: [["","name"]],
+        }],
+      });
+
+      assert.dom(v.Each.$render({}), function () {
+        v.fooList.yield({id: "id1", name: 'r1'});
+        assert.dom('li#id1', 'r1');
+      });
+    },
+
+    "callback.render": {
+      setUp: function () {
+        v.TestSubClass = AppModel.Base.defineSubclass('TestSubClass').defineFields({
+          id1: 'text',
+          id2: 'text',
+          name: 'text',
+          score: 'number',
+        });
+        v.index = v.TestSubClass.Index.addUniqueIndex('id1', 'id2', 'name');
+
+        v.doc1 = v.TestSubClass.create({id1: '1', id2: '2', name: 'bob'});
+        v.doc2 = v.TestSubClass.create({id1: '1', id2: '2', name: 'alice'});
+        v.other = v.TestSubClass.create({id1: '2', id2: '3', name: 'Caprice'});
+      },
+
+      tearDown: function () {
         AppModel && TH.clearDB(); // remove old data (for AppModel building)
         TH.destroyModel('TestSubClass');
-      });
+      },
 
-      var TestSubClass = AppModel.Base.defineSubclass('TestSubClass').defineFields({
-        id1: 'text',
-        id2: 'text',
-        name: 'text',
-        score: 'number',
-      });
-      var index = TestSubClass.Index.addUniqueIndex('id1', 'id2', 'name');
+      "test params and index": function () {
+        v.Each.$helpers({
+          fooList: function (callback) {
+            return callback.render({
+              model: v.TestSubClass,
+              index: v.index,
+              params: {id1: Bart.current.data().major, id2: '2'},
+              sort: Apputil.compareByName,
+            });
+          }
+        });
 
-      v.Each.$helpers({
-        fooList: function (callback) {
-          return callback.render({
-            model: TestSubClass,
-            index: index,
-            params: {id1: Bart.current.data().major, id2: '2'},
-            sort: Apputil.compareByName,
-          });
-        }
-      });
+        assert.dom(v.Each.$render({major: '1'}), function () {
+          assert.dom('li', {count: 2});
+          assert.dom('li:first-child', 'alice');
+          assert.dom('li:nth-child(2)', 'bob');
 
-      var doc1 = TestSubClass.create({id1: '1', id2: '2', name: 'bob'});
-      var doc2 = TestSubClass.create({id1: '1', id2: '2', name: 'alice'});
-      var other = TestSubClass.create({id1: '2', id2: '3', name: 'henry'});
+          v.TestSubClass.create({id1: '1', id2: '2', name: 'barny'});
+          assert.dom('li', {count: 3});
+          assert.dom('li:nth-child(2)', 'barny');
 
-      assert.dom(v.Each.$render({major: '1'}), function () {
-        assert.dom('li', {count: 2});
-        assert.dom('li:first-child', 'alice');
-        assert.dom('li:nth-child(2)', 'bob');
+          v.doc1.$update({$set: {name: 'aalan'}});
+          assert.dom('li', {count: 3});
+          assert.dom('li:nth-child(1)', 'aalan');
 
-        TestSubClass.create({id1: '1', id2: '2', name: 'barny'});
-        assert.dom('li', {count: 3});
-        assert.dom('li:nth-child(2)', 'barny');
+          v.doc1.$update({$set: {id2: '3'}});
+          assert.dom('li', {count: 2});
+          refute.dom('li', 'aalan');
 
-        doc1.$update({$set: {name: 'aalan'}});
-        assert.dom('li', {count: 3});
-        assert.dom('li:nth-child(1)', 'aalan');
+          v.doc1.$update({$set: {id2: '2'}});
+          assert.dom('li', {count: 3});
+          assert.dom('li', 'aalan');
 
-        doc1.$update({$set: {id2: '3'}});
-        assert.dom('li', {count: 2});
-        refute.dom('li', 'aalan');
+          v.other.$update({$set: {id2: '2'}});
+          assert.dom('li', {count: 3});
+        });
+      },
 
-        doc1.$update({$set: {id2: '2'}});
-        assert.dom('li', {count: 3});
-        assert.dom('li', 'aalan');
+      "test filter and model": function () {
+         v.Each.$helpers({
+          fooList: function (callback) {
+            return callback.render({
+              model: v.TestSubClass,
+              params: {id1: Bart.current.data().major, id2: '2'},
+              filter: function (doc) {
+                return doc.name.match(/ice/);
+              },
+            });
+          }
+        });
 
-        other.$update({$set: {id2: '2'}});
-        assert.dom('li', {count: 3});
+        assert.dom(v.Each.$render({major: '1'}), function () {
+          assert.dom('li', {count: 1});
+          assert.dom('li', 'alice');
+
+          v.TestSubClass.create({id1: '1', id2: '2', name: 'Rick'});
+          assert.dom('li', {count: 1});
+          assert.dom('li', 'alice');
+
+
+          v.TestSubClass.create({id1: '1', id2: '2', name: 'Patrice'});
+          assert.dom('li', {count: 2});
+          assert.dom('li:last-child', 'Patrice');
+
+          v.doc1.$update({$set: {name: 'Maurice'}});
+          assert.dom('li', {count: 3});
+          assert.dom('li:last-child', 'Maurice');
+
+          v.doc1.$update({$set: {id2: '3'}});
+          assert.dom('li', {count: 2});
+          refute.dom('li', 'Maurice');
+
+          v.doc1.$update({$set: {id2: '2'}});
+          assert.dom('li', {count: 3});
+          assert.dom('li', 'Maurice');
+
+          v.other.$update({$set: {id2: '2'}});
+          assert.dom('li', {count: 3});
+        });
+      },
+    },
+
+    "test sets parentCtx": function () {
+      assert.dom(v.Each.$render({}), function () {
+        var eachCtx = Bart.getCtx(this);
+        v.fooList.yield({id: 1, name: 'r1'});
+        assert.dom('li', function () {
+          assert.same(Bart.getCtx(this).parentCtx, eachCtx);
+        });
       });
     },
 

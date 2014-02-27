@@ -3,6 +3,7 @@ var $ = Bart.current;
 Bart.registerHelpers({
   each: function (func, options) {
     callback.render = callbackRender;
+    var eachCtx = $.ctx;
     if ($.element._bartEnd) return;
     if (typeof func !== 'string') throw new Error("first argument must be name of helper method to call");
 
@@ -12,10 +13,17 @@ Bart.registerHelpers({
 
     var col = {};
     var ctpl = $.template;
-    var row = Bart.lookupTemplate.call(ctpl, options.template) ||
-          Bart.lookupTemplate(options.template);
+    options = options || {};
+    var templateName = options.template || "Each_" + func;
 
-    ctpl._helpers[func].call(this, callback);
+    var row = Bart.lookupTemplate.call(ctpl, templateName) ||
+          Bart.lookupTemplate(templateName);
+    if (! row) throw new Error("template '" + templateName + "' not found in template '" + ctpl.name + "'");
+
+    var helper = ctpl._helpers[func];
+    if (! helper) throw new Error("helper '" + func + "' not found in template '" + ctpl.name + "'");
+
+    helper.call(this, callback);
 
 
     return startEach;
@@ -38,7 +46,7 @@ Bart.registerHelpers({
       }
       var parentNode = endEach.parentNode;
       if (!parentNode) return;
-      insert(col[id] = row.$autoRender(doc), sort);
+      insert(col[id] = row.$autoRender(doc, eachCtx), sort);
     }
 
     function insert(elm, sort) {
@@ -60,19 +68,27 @@ Bart.registerHelpers({
 function callbackRender(options) {
   var callback = this;
   var model = options.model;
-  var params = options.params || {};
+  var params = options.params;
   var sortFunc = options.sort;
+  var filter = options.filter;
 
-  var results = options.index ? options.index.fetch(params) : model.find(params).fetch();
+  var results = options.index ? options.index.fetch(params || {}) : model.find(params || {}).fetch();
+  if (filter) results = results.filter(function (doc) {
+    return filter(doc);
+  });
   results.sort(sortFunc)
     .forEach(function (doc) {callback(doc)});
 
   $.ctx.onDestroy(model.Index.observe(function (doc, old) {
-    if (! Apputil.includesAttributes(params, old))
-      old = null;
+    if (params) {
+      if (old && ! Apputil.includesAttributes(params, old)) old = null;
+      if (doc && ! Apputil.includesAttributes(params, doc)) doc = null;
+    }
 
-    if (! Apputil.includesAttributes(params, doc))
-      doc = null;
+    if (filter) {
+      if (old && ! filter(old)) old = null;
+      if (doc && ! filter(doc)) doc = null;
+    }
 
     if (doc || old) {
       callback(doc && new model(doc), old && new model(old), sortFunc);
