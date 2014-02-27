@@ -87,21 +87,21 @@
     "test boulder scoreToNumber": function () {
       var heat = new AppModel.Heat(1, 'BFF');
 
-      assert.same(heat.scoreToNumber(' 3t3 4b6 ' ), 3030406);
+      assert.same(heat.scoreToNumber(' 3t3 4b6 ' ), 3960493);
       assert.same(heat.scoreToNumber(' 0'        ),       0);
-      assert.same(heat.scoreToNumber(' 0t 0b '   ),       0);
-      assert.same(heat.scoreToNumber(' 0t 4b20'  ),     420);
-      assert.same(heat.scoreToNumber(' 2t20 5b99'), 2200599);
+      assert.same(heat.scoreToNumber(' 0t 0b '   ),  990099);
+      assert.same(heat.scoreToNumber(' 0t 4b20'  ),  990479);
+      assert.same(heat.scoreToNumber(' 2t20 5b99'), 2790500);
       assert.same(heat.scoreToNumber(' dnc '     ),      -1);
     },
 
     "test boulder numberToScore": function () {
       var heat = new AppModel.Heat(1, 'BFF');
 
-      assert.same(heat.numberToScore(3030406   ), '3t3 4b6');
+      assert.same(heat.numberToScore(3960493   ), '3t3 4b6');
       assert.same(heat.numberToScore(0         ), '0t 0b');
-      assert.same(heat.numberToScore(    420   ), '0t 4b20');
-      assert.same(heat.numberToScore(2200599   ), '2t20 5b99');
+      assert.same(heat.numberToScore( 990479   ), '0t 4b20');
+      assert.same(heat.numberToScore(2790500   ), '2t20 5b99');
       assert.same(heat.numberToScore(     -1   ), 'DNC');
       assert.same(heat.numberToScore(          ), '');
       assert.same(heat.numberToScore(1, 0      ), 1);

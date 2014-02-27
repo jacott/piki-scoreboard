@@ -205,7 +205,7 @@ App.require('Bart.Event', function (Event) {
     },
   });
 
-  Tpl.Score.$helpers({
+  Score.$helpers({
     rank: function () {
       if (! this.rank) return;
       var elm =  document.createElement('i');

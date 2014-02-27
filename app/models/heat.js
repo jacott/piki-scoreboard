@@ -62,11 +62,12 @@ Heat.prototype = {
       if (score % 10) result += "+";
       return result;
     case 'B':
+      if (score == 0) return "0t 0b";
       var mod, result = "";
       for(var i = 0; i < 2; ++i,
               score = Math.floor(score/10000)) {
 
-        if (mod = score % 100)
+        if (mod = (99 - (score % 100)))
           result = mod + result;
         mod = Math.floor(score/100) % 100;
         result = mod + (i == 0 ? 'b' : 't') + result;
@@ -81,7 +82,7 @@ Heat.prototype = {
 
     if (index === 99) {
       var m = /^\s*(?:(\d{1,2})[.:])?([0-5]\d)\s*$/.exec(score);
-      return m ? m[1]*60 + +m[2] : false;
+      return m ? (m[1]||0)*60 + +m[2] : false;
     }
 
     if (score.match(/^\s*dnc/i)) {
@@ -104,7 +105,10 @@ Heat.prototype = {
     case 'B':
       var m = /^\s*(\d{1,2})t(\d{1,2})?\s+(\d{1,2})b(\d{1,2})?\s*$/.exec(score);
       if (m) {
-        return (m[1]||0)*1000000 + (m[2]||0)*10000 + (m[3]||0)*100 + +(m[4]||0);
+        var t = +m[1], ta = +(m[2]||0);
+        var b = +(m[3]||0), ba = +(m[4]||0);
+        if (t > ta || b > ba) return false;
+        return t*1000000 + (99-ta)*10000 + b*100 + (99 - ba);
       }
       if (score.match(/^\s*0\s*$/)) return 0;
     }
