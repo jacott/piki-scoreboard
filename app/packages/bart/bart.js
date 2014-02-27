@@ -59,6 +59,17 @@ Bart = {
     classList && classList.remove(name);
   },
 
+  toggleClass: function (elm, name) {
+    if (! elm) return;
+    if (Bart.hasClass(elm, name)) {
+      Bart.removeClass(elm, name);
+      return false;
+    }
+
+    Bart.addClass(elm, name);
+    return true;
+  },
+
   setSuffixClass: function (elm, name, suffix) {
     if (!elm) return;
     var classes = elm.className.replace(new RegExp(' *\\b[^ ]*'+suffix+'\\b', 'g'), '').replace(/(^ | $)/g,'');
@@ -137,6 +148,14 @@ Bart = {
   removeAll: function (elms) {
     for(var i = 0; i < elms.length; ++i) {
       this.remove(elms[i]);
+    }
+  },
+
+  forEach: function (elm, querySelector, func) {
+    if (! elm) return;
+    var elms = elm.querySelectorAll(querySelector);
+    for(var i = 0; i < elms.length; ++i) {
+      func(elms[i]);
     }
   },
 
@@ -497,7 +516,7 @@ function evalPartial(func, args) {
   }
 
   if (currentElement._bart) {
-    return currentCtx.updateAllTags(args);
+    return currentElement._bart.updateAllTags(args);
   }
 
 
@@ -546,9 +565,9 @@ BartTemplate.prototype = {
     return this;
   },
 
-  $autoRender: function (data) {
+  $autoRender: function (data, parentCtx) {
     var tpl = this;
-    var elm = tpl.$render(data);
+    var elm = tpl.$render(data, parentCtx);
     if (tpl._events.length > 0) {
       tpl.$attachEvents(elm);
       Bart.getCtx(elm).onDestroy(function () {
@@ -558,9 +577,9 @@ BartTemplate.prototype = {
     return elm;
   },
 
-  $render: function (data) {
-    var parentCtx = currentCtx;
-    currentCtx = new BartCtx(this, parentCtx, data);
+  $render: function (data, parentCtx) {
+    var prevCtx = currentCtx;
+    currentCtx = new BartCtx(this, parentCtx || currentCtx, data);
     try {
       var frag = document.createDocumentFragment();
       this.nodes && addNodes.call(this, frag, this.nodes);
@@ -579,7 +598,7 @@ BartTemplate.prototype = {
       currentCtx.data === undefined || currentCtx.updateAllTags(currentCtx.data);
       return frag;
     } finally {
-      currentCtx = parentCtx;
+      currentCtx = prevCtx;
     }
   },
 

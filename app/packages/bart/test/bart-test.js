@@ -50,6 +50,20 @@ Meteor.isClient && (function (test, v) {
         delete Bart.Bar;
       },
 
+      "test updateAllTags": function () {
+        var elm = Bart.Foo.$render({myFunc: 'one'});
+
+        assert.dom(elm, function () {
+          assert.dom('i', 'one');
+
+          elm._bart.updateAllTags({myFunc: 'two'});
+
+          refute.dom('i', 'one');
+          assert.dom('i', 'two');
+        });
+
+      },
+
       "test default arg is data": function () {
         Bart.Bar.$created = test.stub();
 
@@ -165,6 +179,13 @@ Meteor.isClient && (function (test, v) {
       Bart.removeClass(elm, 'bar');
       assert(Bart.hasClass(elm, 'foo'));
       refute(Bart.hasClass(elm, 'bar'));
+
+      // test toggle
+      assert(Bart.toggleClass(elm, 'bar'));
+      assert(Bart.hasClass(elm, 'bar'));
+
+      refute(Bart.toggleClass(elm, 'bar'));
+      refute(Bart.hasClass(elm, 'bar'));
     },
 
     "test parentOf": function () {
@@ -249,15 +270,18 @@ Meteor.isClient && (function (test, v) {
       },
 
       "test $created": function () {
+        var pCtx = {foo: 'bar'};
         Bart.Foo.$extend({
           $created: function (ctx, elm) {
             v.ctx = ctx;
+            assert.same(ctx.parentCtx, pCtx);
+
             v.elm = elm;
             ctx.data = {myHelper: v.myHelper = test.stub()};
           },
         });
 
-        assert.dom(Bart.Foo.$render({}), function () {
+        assert.dom(Bart.Foo.$render({}, pCtx), function () {
           assert.called(v.myHelper);
           assert.same(v.elm, this);
           assert.same(v.ctx, Bart.getCtx(this));
@@ -340,10 +364,33 @@ Meteor.isClient && (function (test, v) {
       assert.calledWith(Bart.remove, 2);
     },
 
+    "test forEach": function () {
+      var elm = Bart.html('<div></div>');
+      document.body.appendChild(elm);
+      for(var i = 0; i < 5; ++i) {
+        elm.appendChild(Bart.html('<div class="foo">'+i+'</div>'));
+      }
+
+      var results = [];
+      Bart.forEach(elm, '.foo', function (e) {
+        results.push(e.textContent);
+      });
+
+      assert.same(results.join(','), '0,1,2,3,4');
+
+      results = 0;
+      Bart.forEach(document, 'div', function (e) {
+        ++results;
+      });
+
+      assert.same(results, 6);
+
+    },
+
     "test removeInserts": function () {
       var parent = document.createElement('div');
-      var elm = document.createComment();
-      elm._bartEnd = document.createComment();
+      var elm = document.createComment('start');
+      elm._bartEnd = document.createComment('end');
 
       parent.appendChild(elm);
       [1,2,3].forEach(function (i) {
