@@ -122,6 +122,10 @@ App.require('makeSubject', function (makeSubject) {
       }
     },
 
+    get currentPage() {
+      return currentPage;
+    },
+
     pageChanged: function () {
       pageState = null;
       return this.gotoPath();
@@ -135,7 +139,14 @@ App.require('makeSubject', function (makeSubject) {
     gotoPath: function (page) {
       var pageRoute = {};
       if (typeof page === 'string') {
+        var m = /^([^?#]*)(\?[^#]*)?(#.*)$/.exec(page);
+        if (m) {
+          pageRoute.pathname = page = m[1];
+          pageRoute.search = m[2];
+          pageRoute.hash = m[3];
+        }
         pageRoute.pathname = page;
+
       } else {
         if (page == null)
           page = document.location;
@@ -144,6 +155,9 @@ App.require('makeSubject', function (makeSubject) {
 
         if ('search' in page)
           pageRoute.search = page.search;
+
+        if ('hash' in page)
+          pageRoute.hash = page.hash;
 
         pageRoute.pathname = page = page.pathname;
       }

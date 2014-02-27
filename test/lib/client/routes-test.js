@@ -5,7 +5,9 @@
       v = {
         root: AppRoute.root,
         onGotoPath: AppRoute._onGotoPath,
+        origTile: AppRoute.title,
       };
+      AppRoute.title = "TestTitle";
       v.FooBar = {
         name: 'FooBar',
         $autoRender: test.stub(),
@@ -19,6 +21,7 @@
     },
 
     tearDown: function () {
+      AppRoute.title = AppRoute.title;
       AppRoute.root = v.root;
       AppRoute._onGotoPath = v.onGotoPath;
       AppRoute.gotoPage();
@@ -178,7 +181,7 @@
       AppRoute.root.addTemplate(RootBar);
       AppRoute.gotoPage(RootBar, {append: "ap/this"});
 
-      assert.calledWith(AppRoute.history.pushState, null, 'Piki', '/root-bar/ap/this');
+      assert.calledWith(AppRoute.history.pushState, null, 'TestTitle', '/root-bar/ap/this');
     },
 
     "test abort page change": function () {
@@ -397,14 +400,20 @@
       assert.calledWith(Bar.onEntry, Bar, v.loc);
     },
 
-    "test default": function () {
+    "test passing string": function () {
       AppRoute.root.defaultPage = v.FooBar;
 
-      AppRoute.gotoPath({pathname: '/anything', search: '?abc=123&def=456'});
+      AppRoute.gotoPath('/anything?abc=123&def=456#hash');
 
-      assert.calledWith(v.FooBar.onEntry, v.FooBar, {pathname: '', search: '?abc=123&def=456'});
+      assert.calledWith(v.FooBar.onEntry, v.FooBar, {pathname: '', search: '?abc=123&def=456', hash: '#hash'});
+    },
 
-      AppRoute.gotoPage();
+    "test passing object": function () {
+      AppRoute.root.defaultPage = v.FooBar;
+
+      AppRoute.gotoPath({pathname: '/anything', search: '?abc=123&def=456', hash: '#hash'});
+
+      assert.calledWith(v.FooBar.onEntry, v.FooBar, {pathname: '', search: '?abc=123&def=456', hash: '#hash'});
     },
   });
 })();
