@@ -12,11 +12,11 @@
         <div {{classes}}>
           <div>
             {{content}}
+            <fieldset class="actions">
+              <button type="button" id="okay" name="okay">{{okay}}</button>
+              <button type="button" id="cancel" name="cancel">Cancel</button>
+            </fieldset>
           </div>
-          <fieldset>
-            <button type="button" id="okay" name="okay">{{okay}}</button>
-            <button type="button" id="cancel" name="cancel">Cancel</button>
-          </fieldset>
         </div>
       </div>
     </div>
