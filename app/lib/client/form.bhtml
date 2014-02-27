@@ -13,4 +13,10 @@
     <select name="{{name}}" {{htmlOptions}}>
     </select>
   </template>
+
+  <template name="OnOff">
+    <div class="{{classes}}">
+      <i></i><span>On</span><span>Off</span>
+    </div>
+  </template>
 </template>

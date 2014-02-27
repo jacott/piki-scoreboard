@@ -29,6 +29,7 @@ Tpl.$extend({
       var doc = ctx.data;
       var form = elm.querySelector('.fields');
 
+      if (! form) throw new Error('no "fields" class within ' + elmId);
       Tpl.fillDoc(doc, form);
       extraSetup && extraSetup(doc, elm);
 
@@ -42,6 +43,15 @@ Tpl.$extend({
 
   saveDoc: function (doc, form) {
     Tpl.fillDoc(doc, form);
+    if (doc.$save()) {
+      return true;
+    }
+
+    Tpl.renderErrors(doc, form);
+  },
+
+  saveChanges: function (doc, form) {
+    Tpl.clearErrors(form);
     if (doc.$save()) {
       return true;
     }
@@ -108,11 +118,18 @@ Tpl.$extend({
     return fieldElm;
   },
 
-});
-
-Tpl.LabelField.$helpers({
-  label: function () {
-    return Apputil.capitalize(Apputil.humanize(this.name));
+  addChangeFields: function (template, fields, action) {
+    action = action || 'change';
+    var events = {};
+    for(var i=0;i < fields.length;++i) {
+      var field = fields[i];
+      if (action === 'change' && field.match(/color/i)) {
+        events['click [name=' + field + ']'] = changeColorEvent(template, field);
+      } else {
+        events[action + ' [name=' + field + ']'] = changeFieldEvent(template, field);
+      }
+    }
+    Bart[template].$events(events);
   },
 });
 
@@ -124,21 +141,27 @@ Tpl.Select.$extend({
     var data = ctx.data;
     var value = data.doc[data.name];
     var options = data.options;
-    if (options.selectList.length === 0) return;
-    if ('_id' in data.options.selectList[0]) {
+    var sl = options.selectList;
+    if ('fetch' in sl)
+      sl = sl.fetch();
+    if (sl.length === 0) return;
+    if ('_id' in sl[0]) {
       var getValue = function (row) {return row._id};
       var getContent = function (row) {return row.name};
     } else {
       var getValue = function (row) {return row[0]};
       var getContent = function (row) {return row[1]};
     }
-    if ('includeBlank' in options) {
+    var includeBlank = options.includeBlank;
+    if (('includeBlank' in options) && includeBlank !== 'false') {
+      if (typeof includeBlank !== 'string' || includeBlank === 'true')
+        includeBlank = '';
       var option = document.createElement('option');
       option.value = '';
-      option.textContent = '';
+      option.textContent = includeBlank;
       elm.appendChild(option);
     }
-    options.selectList.forEach(function (row) {
+    sl.forEach(function (row) {
       var option = document.createElement('option');
       option.value = getValue(row);
       option.textContent = getContent(row);
@@ -148,6 +171,42 @@ Tpl.Select.$extend({
     });
   },
 });
+
+var errorMsg = document.createElement('span');
+errorMsg.className = 'errorMsg';
+
+Bart.registerHelpers({
+  errorMsg: function () {
+    var elm = Bart.current.element;
+    return Bart.hasClass(elm, 'errorMsg') ? elm : errorMsg.cloneNode(true);
+  },
+
+  $checked: function (value) {
+    return value ? 'checked' : '';
+  },
+
+  elmId: function (prefix) {
+    return prefix + '_' + this._id;
+  },
+
+  field: function (name, options) {
+    return field(this, name, options);
+  },
+
+  labelField: function (name, options) {
+    return Tpl.LabelField.$autoRender({
+      name: name,
+      value: field(this, name, options),
+      label: (options && options.label) ||  Apputil.capitalize(Apputil.humanize(name)),
+    });
+  },
+
+  genderList: function () {
+    return [['', ''], ["m", "Male"], ["f", "Female"]];
+  },
+});
+
+
 
 function helpers(name, funcs) {
   Tpl[name].$helpers(App.reverseExtend(funcs, DEFAULT_HELPERS));
@@ -165,26 +224,43 @@ function field(doc, name, options) {
   case 'hidden':
   case 'password':
     return Tpl.TextInput.$autoRender({type: options.type || 'text', name: name, doc: doc, options: options});
+  case 'onOff':
+    return Tpl.OnOff.$autoRender({type: options.type, name: name, doc: doc, options: options});
   default:
     throw new Error('unknown type: ' + options.type);
   }
 
 }
 
-Bart.registerHelpers({
-  elmId: function (prefix) {
-    return prefix + '_' + this._id;
-  },
+function changeColorEvent(formId, field) {
+  return function (event) {
+    event.$actioned = true;
+    var doc = $.data();
 
-  field: function (name, options) {
-    return field(this, name, options);
-  },
+    Bart.ColorPicker.choose(doc[field], function (result) {
+      if (result) {
+        doc[field] = result;
+        Tpl.saveChanges(doc, document.getElementById(formId));
+      }
+    });
+  };
+}
 
-  labelField: function (name, options) {
-    return Tpl.LabelField.$autoRender({name: name, value: field(this, name, options)});
-  },
+function changeFieldEvent(formId, field) {
+  return function (event, templ) {
+    event.$actioned = true;
+    var doc = $.data();
 
-  genderList: function () {
-    return [['', ''], ["m", "Male"], ["f", "Female"]];
-  },
-});
+    var value;
+    switch (this.type) {
+    case 'checkbox':
+      value = this.checked;
+      break;
+    default:
+      value = this.value;
+    }
+
+    doc[field] = value;
+    Tpl.saveChanges(doc, document.getElementById(formId));
+  };
+}

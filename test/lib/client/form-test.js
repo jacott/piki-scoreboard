@@ -51,19 +51,42 @@
         });
       },
 
-      "test with includeBlank": function () {
-        var elm = Bart.Form.Select.$autoRender({
-          name: 'foo_id',
-          doc: v.doc,
-          options: {
-            includeBlank: true,
-            selectList: v.list,
-          }
-        });
+      "includeBlank": {
+        setUp: function () {
+          v.call = function (arg) {
+            v.elm = Bart.Form.Select.$autoRender({
+              name: 'foo_id',
+              doc: v.doc,
+              options: {
+                includeBlank: arg,
+                selectList: v.list,
+              }
+            });
+          };
+        },
 
-        assert.dom(elm, function () {
-          assert.dom('option:first-child', {value: '', text: ''});
-        });
+        "test msg": function () {
+          v.call('hello world');
+
+          assert.dom(v.elm, function () {
+            assert.dom('option:first-child', {value: '', text: 'hello world'});
+          });
+        },
+
+        "test 'true'": function () {
+          v.call('true');
+
+          assert.dom(v.elm, function () {
+            assert.dom('option:first-child', {value: '', text: ''});
+          });
+        },
+
+        "test empty": function () {
+          v.call('');
+          assert.dom(v.elm, function () {
+            assert.dom('option:first-child', {value: '', text: ''});
+          });
+        },
       },
     },
   });
