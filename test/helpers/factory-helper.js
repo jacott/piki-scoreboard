@@ -86,7 +86,7 @@
         .addRef('org')
         .addRef('club')
         .addField('gender', 'm')
-        .addField('dateOfBirth', '2000/01/01');
+        .addField('dateOfBirth', '2000-01-01');
     },
 
     Competitor: function (options) {
@@ -128,7 +128,7 @@
       return new Builder('Event', options).genName()
         .addRef('org')
         .addField('heats')
-        .addField('date', '20014/04/01');
+        .addField('date', '2014-04-01');
     },
 
     User: function (options) {

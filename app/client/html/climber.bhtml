@@ -63,7 +63,7 @@
   <template name="Form">
     <fieldset class="fields">
       {{labelField "name"}}
-      {{labelField "dateOfBirth"}}
+      {{labelField "dateOfBirth" placeholder="yyyy-mm-dd"}}
       {{labelField "gender" selectList=genderList}}
       {{labelField "club_id" selectList=clubList}}
     </fieldset>

@@ -23,6 +23,7 @@
 
       assert.validators(validators.name, {maxLength: [200], required: [true], trim: [true]});
       assert.validators(validators.gender, {required: [true], inclusion: [{allowBlank: true, matches: /^[mf]$/ }]});
+      assert.validators(validators.dateOfBirth, {inclusion: [{matches: /^\d{4}-[01]\d-[0-3]\d$/ }]});
     },
 
     "test removeRpc": function () {

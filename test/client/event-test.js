@@ -66,13 +66,13 @@
         TH.click('[name=add]');
         assert.dom('#AddEvent', function () {
           TH.input('[name=name]', 'National Cup 1 - Auckland');
-          TH.input('[name=date]', '2014/03/14');
+          TH.input('[name=date]', '2014-03-14');
           TH.click('[type=submit]');
         });
         refute.dom('#AddEvent');
       });
 
-      assert(AppModel.Event.exists({org_id: v.org._id, name: 'National Cup 1 - Auckland', date: '2014/03/14'}));
+      assert(AppModel.Event.exists({org_id: v.org._id, name: 'National Cup 1 - Auckland', date: '2014-03-14'}));
 
       assert.dom('#Event [name=add]');
     },

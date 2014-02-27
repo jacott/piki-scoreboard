@@ -7,7 +7,7 @@ App.require('AppModel.Org', function () {
     name: {type:  'text', trim: true, required: true, maxLength: 200},
     org_id: 'belongs_to',
     heats: 'has-many',
-    date: {type: 'date'},
+    date: {type: 'date', inclusion: {matches: /^\d{4}-[01]\d-[0-3]\d$/}},
   });
 
   model.addRemoveRpc();

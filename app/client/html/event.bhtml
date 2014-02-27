@@ -84,7 +84,7 @@
   <template name="Form">
     <fieldset class="fields">
       {{labelField "name"}}
-      {{labelField "date"}}
+      {{labelField "date" placeholder="yyyy-mm-dd"}}
     </fieldset>
   </template>
 </template>
