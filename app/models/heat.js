@@ -158,7 +158,7 @@ Heat.prototype = {
       var rankName = 'rank' + x;
 
       for(var i = 1; i < results.length; ++i) {
-        if (results[previ].scores[x] !== results[i].scores[x]) {
+        if (results[previ].scores[x] != results[i].scores[x]) {
           setRanks(previ, i);
           previ = i;
         }
@@ -201,24 +201,34 @@ Heat.prototype = {
     var rankIndex = this.rankIndex;
     return function (a, b) {
       var aScores = a.scores, bScores = b.scores;
-      var aLen = aScores.length;
+      var mLen = Math.max(aScores.length, bScores.length);
+      var as, bs;
 
-      if (aLen !== bScores.length)
-        return aLen > bScores.length ? -1 : 1;
-
-      for(--aLen; aLen >= min; --aLen) {
-        if (aLen === rankIndex) {
-          if (a.rankMult === b.rankMult) {
-            if (a.time !== b.time )
-              return a.time < b.time ? -1 : 1; // lower time is better
-            else
+      for(--mLen; mLen >= min; --mLen) {
+        if (mLen === rankIndex) {
+          if (a.rankMult == b.rankMult) {
+            if (a.time != b.time ) {
+              return (a.time || 0) < (b.time || 0) ? -1 : 1; // lower time is better
+            } else
               return 0;
-          } else
-            return a.rankMult < b.rankMult ? -1 : 1; // lower rank is better
+          } else {
+            as = a.rankMult;
+            bs = b.rankMult;
+            if (as == null) as = -5;
+            if (bs == null) bs = -5;
+            return as < bs ? -1 : 1; // lower rank is better
+          }
         }
 
-        if (aScores[aLen] !== bScores[aLen])
-          return aScores[aLen] > bScores[aLen] ? -1 : 1;
+        as = aScores[mLen];
+        bs = bScores[mLen];
+
+        if (as != bs) {
+          if (as == null) as = -5;
+          if (bs == null) bs = -5;
+
+          return as > bs ? -1 : 1;
+        }
       }
 
       return 0;

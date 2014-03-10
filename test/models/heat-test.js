@@ -174,21 +174,68 @@
         assert.equals(v.call(-1, results), [v.r1, v.r3, v.r2]);
       },
 
-      "test ranks": function () {
-        var results = [v.r1 = {scores: [0.2, 500, 300]}, v.r2 = {scores: [0.3, 500, 30]}, v.r3 = {scores: [0.1, 50, 400]}];
-        v.call(-1, results);
+      "Ranking general result": {
+        setUp: function () {
+          v.results =[v.r1 = {scores: v.s1 = [0.2]},
+                      v.r2 = {scores: v.s2 = [0.4]},
+                      v.r3 = {scores: v.s3 = [0.3]},
+                     ];
+          v.run = function () {
+            return v.call(-1, v.results);
+          };
+        },
 
-        assert.same(v.r1.rank1, 1.5);
-        assert.same(v.r2.rank1, 1.5);
-        assert.same(v.r3.rank1, 3);
+        "test no scores": function () {
+          v.run();
 
-        assert.same(v.r1.rank2, 2);
-        assert.same(v.r2.rank2, 3);
-        assert.same(v.r3.rank2, 1);
+          assert.same(v.r1.rank1, 2);
 
-        assert.same(v.r1.rankMult, 3);
-        assert.same(v.r2.rankMult, 4.5);
-        assert.same(v.r3.rankMult, 3);
+          assert.same(v.r1.rankMult, 4);
+          assert.same(v.r2.rankMult, 4);
+        },
+
+        "test diff length": function () {
+          v.s1.push(null);
+          v.run();
+
+          assert.same(v.r1.rankMult, 4);
+        },
+
+        "test semis 2 null": function () {
+          v.s1.push(500, 10, 999);
+          v.s2.push(500, 10, null);
+          v.s3.push(500, 10);
+
+          assert.equals(v.run(), [v.r1, v.r2, v.r3]);
+        },
+
+        "test semis 3 null": function () {
+          v.s1.push(500, 10, 999);
+          v.s2.push(500, 10);
+          v.s3.push(500, 10, null);
+
+          assert.equals(v.run(), [v.r1, v.r2, v.r3]);
+        },
+
+        "test quals": function () {
+          v.s1.push(500, 300);
+          v.s2.push(500, 30);
+          v.s3.push(50, 400);
+
+          v.run();
+
+          assert.same(v.r1.rank1, 1.5);
+          assert.same(v.r2.rank1, 1.5);
+          assert.same(v.r3.rank1, 3);
+
+          assert.same(v.r1.rank2, 2);
+          assert.same(v.r2.rank2, 3);
+          assert.same(v.r3.rank2, 1);
+
+          assert.same(v.r1.rankMult, 3);
+          assert.same(v.r2.rankMult, 4.5);
+          assert.same(v.r3.rankMult, 3);
+        },
       },
 
       "test sorting methods": function () {

@@ -24,7 +24,6 @@ Tpl.$events({
   'click .topics': function (event) {
     Bart.stopEvent();
     var elm = document.querySelector('#Help section[name="'+$.data(this).tag + '"]');
-    console.log('DEBUG elm',elm);
     Bart.removeClass(document.querySelector('#Help section.current'), 'current');
     Bart.addClass(elm, 'current');
     elm.scrollIntoView(true);
