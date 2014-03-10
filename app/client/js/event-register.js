@@ -31,12 +31,12 @@ App.require('Bart.Event', function (Event) {
 
   Tpl.$events({
     'click tbody>tr': function (event) {
-      event.$actioned = true;
+      Bart.stopEvent();
       AppRoute.gotoPage(Edit, {append: $.data(this)._id});
     },
 
     'click [name=cancel]': function (event) {
-      event.$actioned = true;
+      Bart.stopEvent();
       AppRoute.history.back();
     },
   });
@@ -66,7 +66,7 @@ App.require('Bart.Event', function (Event) {
     'submit': submit,
 
     'click [name=delete]': function (event) {
-      event.$actioned = true;
+      Bart.stopEvent();
       var doc = $.data();
 
       Bart.Dialog.confirm({
@@ -94,7 +94,7 @@ App.require('Bart.Event', function (Event) {
 
   Add.$events({
     'click [name=cancel]': function (event) {
-      event.$actioned = true;
+      Bart.stopEvent();
       AppRoute.replacePath(Tpl);
     },
     'submit': submit,
@@ -159,14 +159,14 @@ App.require('Bart.Event', function (Event) {
     }),
 
     'click [name=cancel]': function (event) {
-      event.$actioned = true;
+      Bart.stopEvent();
       Bart.Dialog.close();
       document.querySelector('#Register [name=name].autoComplete').focus();
     },
   });
 
   function submit(event) {
-    event.$actioned = true;
+    Bart.stopEvent();
 
     var competitor = $.data();
     var ids = [];

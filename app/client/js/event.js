@@ -53,7 +53,7 @@ function sortByDate(a, b) {
 
 Index.$events({
   'click .events tr': function (event) {
-    event.$actioned = true;
+    Bart.stopEvent();
 
     var data = $.data(this);
     AppRoute.gotoPage(Tpl.Show, {eventId: data._id});
@@ -96,7 +96,7 @@ Tpl.Edit.$events({
   'click [name=delete]': function (event) {
     var doc = $.data();
 
-    event.$actioned = true;
+    Bart.stopEvent();
     Bart.Dialog.confirm({
       data: doc,
       classes: 'small warn',
@@ -133,7 +133,7 @@ Tpl.Show.$helpers({
 });
 
 function cancel(event) {
-  event.$actioned = true;
+  Bart.stopEvent();
   AppRoute.history.back();
 }
 

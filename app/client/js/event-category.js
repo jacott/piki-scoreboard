@@ -87,14 +87,14 @@ App.require('Bart.Event', function (Event) {
 
   Tpl.$events({
     'click [name=toggleStartOrder]': function (event) {
-      event.$actioned = true;
+      Bart.stopEvent();
       var data = $.data();
       data.showingResults = ! data.showingResults;
       updateResults($.ctx);
     },
 
     'change [name=selectHeat]': function (event) {
-      event.$actioned = true;
+      Bart.stopEvent();
 
       Bart.removeId('ScoreInput');
 
@@ -113,7 +113,7 @@ App.require('Bart.Event', function (Event) {
       var heat = scoreData.heat;
       if (heat < 1) return;
 
-      event.$actioned = true;
+      Bart.stopEvent();
 
       var input = document.getElementById('ScoreInput');
       if (input === document.activeElement) {
@@ -142,13 +142,13 @@ App.require('Bart.Event', function (Event) {
         focusSelectHeat();
         return;
       case 13:
-        event.$actioned = true;
+        Bart.stopEvent();
         saveScore(this);
         return;
       case 9:
         if (! saveScore(this) ||
             nextScore(event.shiftKey ? -1 : 1)) {
-          event.$actioned = true;
+          Bart.stopEvent();
         }
 
         return;

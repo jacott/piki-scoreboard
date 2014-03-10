@@ -17,12 +17,12 @@ Tpl.$helpers({
 
 Tpl.$events({
   'click [name=close]': function (event) {
-    event.$actioned = true;
+    Bart.stopEvent();
     Bart.Dialog.close();
   },
 
   'click .topics': function (event) {
-    event.$actioned = true;
+    Bart.stopEvent();
     var elm = document.querySelector('#Help section[name="'+$.data(this).tag + '"]');
     console.log('DEBUG elm',elm);
     Bart.removeClass(document.querySelector('#Help section.current'), 'current');

@@ -2,7 +2,7 @@ var Tpl = Bart.Flash;
 
 Tpl.$events({
   'click .m': function (event) {
-    event.$actioned = true;
+    Bart.stopEvent();
     Bart.remove(event.currentTarget);
   },
 });

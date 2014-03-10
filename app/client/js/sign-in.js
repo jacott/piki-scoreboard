@@ -15,7 +15,7 @@ Tpl.$helpers({
 
 Tpl.SignInLink.$events({
   'click': function (event) {
-    event.$actioned = true;
+    Bart.stopEvent();
     Bart.Dialog.open(Dialog.$autoRender({}));
   },
 });
@@ -33,7 +33,7 @@ App.extend(Tpl, {
 
 Dialog.$events({
   'click [name=forgot]': function (event) {
-    event.$actioned = true;
+    Bart.stopEvent();
     closeDialog();
 
     Bart.Dialog.open(ForgotPassword.$autoRender({
@@ -43,7 +43,7 @@ Dialog.$events({
   'click [name=cancel]': closeDialog,
 
   'click [type=submit]': function (event) {
-    event.$actioned = true;
+    Bart.stopEvent();
     var button = this;
     var form = document.getElementById('SignInDialog');
     var email = form.querySelector('input[name=email]').value;
@@ -65,7 +65,7 @@ function closeDialog() {
 }
 
 function setState(form, state) {
-  form.className = state;
+  Bart.setSuffixClass(form, state, "-state");
   Bart.getCtx('#SignInProgress').updateAllTags({state: state});
 }
 
@@ -85,10 +85,9 @@ Dialog.Progress.$helpers({
 ForgotPassword.$events({
   'click [name=cancel]': function () {
     closeDialog();
-    Bart.Dialog.open(Dialog.$autoRender({}));
   },
   'submit': function (event) {
-    event.$actioned = true;
+    Bart.stopEvent();
 
     AppModel.User.forgotPassword(document.getElementById('email').value, function (error, response) {
       var form = document.getElementById('ForgotPassword');

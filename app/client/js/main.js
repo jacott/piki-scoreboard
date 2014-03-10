@@ -41,7 +41,7 @@ App._startup = function () {
 
 Tpl.Header.$events({
   'click [name=help]': function (event) {
-    event.$actioned = true;
+    Bart.stopEvent();
     Bart.Dialog.open(Bart.Help.$autoRender({}));
   },
 });

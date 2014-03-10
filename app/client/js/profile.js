@@ -22,7 +22,7 @@ Tpl.$helpers({
 
 Tpl.$events({
   'click [name=signOut]': function (event) {
-    event.$actioned = true;
+    Bart.stopEvent();
     Meteor.logout();
     AppRoute.gotoPage(Bart.Home);
   },
@@ -40,7 +40,7 @@ Tpl.$extend({
 
 ChangePassword.$events({
   'submit': function (event) {
-    event.$actioned = true;
+    Bart.stopEvent();
     var form = event.currentTarget;
     var oldPassword = form.querySelector('[name=oldPassword]').value;
     var newPassword = form.querySelector('[name=newPassword]');
@@ -59,7 +59,7 @@ ChangePassword.$events({
   },
 
   'input [name=newPassword],[name=confirm]': function (event) {
-    event.$actioned = true;
+    Bart.stopEvent();
 
     var form = event.currentTarget;
     var newPassword = form.querySelector('[name=newPassword]').value;

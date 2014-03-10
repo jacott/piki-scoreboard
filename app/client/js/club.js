@@ -23,7 +23,7 @@ Index.$helpers({
 Index.$events({
   'click .clubs tr': function (event) {
     if (! Bart.hasClass(document.body, 'aAccess')) return;
-    event.$actioned = true;
+    Bart.stopEvent();
 
     var data = $.data(this);
     AppRoute.gotoPage(Tpl.Edit, {clubId: data._id});
@@ -61,7 +61,7 @@ Tpl.Edit.$events({
   'click [name=delete]': function (event) {
     var doc = $.data();
 
-    event.$actioned = true;
+    Bart.stopEvent();
     Bart.Dialog.confirm({
       data: doc,
       classes: 'small warn',
@@ -80,6 +80,6 @@ Tpl.Edit.$events({
 });
 
 function cancel(event) {
-  event.$actioned = true;
+  Bart.stopEvent();
   AppRoute.gotoPage(Tpl);
 }

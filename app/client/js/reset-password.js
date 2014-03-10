@@ -10,7 +10,7 @@ AppRoute.root.addTemplate(Tpl, {
 
 Tpl.$events({
   'submit form': function (event) {
-    event.$actioned = true;
+    Bart.stopEvent();
 
     var form = this;
 

@@ -103,10 +103,10 @@
 
         assert.calledWith(Meteor.loginWithPassword, 'test', 'bad', sinon.match(function(func) {return v.loginCallback = func}));
 
-        assert.dom('form.submit #SignInProgress', 'Signing in...');
+        assert.dom('form.submit-state #SignInProgress', 'Signing in...');
         v.loginCallback('ex');
 
-        assert.dom('form.error #SignInProgress', 'Invalid email or password');
+        assert.dom('form.error-state #SignInProgress', 'Invalid email or password');
 
         assert.dom('[type=submit]', function () {
           assert.same(this.style.display, '');

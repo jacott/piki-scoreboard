@@ -22,7 +22,7 @@ Index.$helpers({
 
 Index.$events({
   'click .categories tr': function (event) {
-    event.$actioned = true;
+    Bart.stopEvent();
 
     var data = $.data(this);
     AppRoute.gotoPage(Tpl.Edit, {categoryId: data._id});
@@ -73,7 +73,7 @@ Tpl.Edit.$events({
   'click [name=delete]': function (event) {
     var doc = $.data();
 
-    event.$actioned = true;
+    Bart.stopEvent();
     Bart.Dialog.confirm({
       data: doc,
       classes: 'small warn',
@@ -92,6 +92,6 @@ Tpl.Edit.$events({
 });
 
 function cancel(event) {
-  event.$actioned = true;
+  Bart.stopEvent();
   AppRoute.gotoPage(Tpl);
 }

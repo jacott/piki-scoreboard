@@ -41,14 +41,14 @@ Tpl.$helpers({
 
 Tpl.$events({
   'click [name=cancel]': function (event) {
-    event.$actioned = true;
+    Bart.stopEvent();
     AppRoute.history.back();
   },
 
   'click [name=delete]': function (event) {
     var doc = $.data(event.currentTarget.querySelector('form'));
 
-    event.$actioned = true;
+    Bart.stopEvent();
     Bart.Dialog.confirm({
       data: doc,
       classes: 'small warn',
@@ -66,14 +66,14 @@ Tpl.$events({
 
   'click .orgs tr': function (event) {
     if (! Bart.hasClass(document.body, 'sAccess')) return;
-    event.$actioned = true;
+    Bart.stopEvent();
 
     var data = $.data(this);
     AppRoute.gotoPage(Tpl.OrgForm, {append: data._id});
   },
 
   'click .users tr': function (event) {
-    event.$actioned = true;
+    Bart.stopEvent();
 
     var data = $.data(this);
     AppRoute.gotoPage(Tpl.UserForm, {append: data._id});

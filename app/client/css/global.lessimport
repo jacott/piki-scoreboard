@@ -2,6 +2,14 @@
 
 @import "geometry.lessimport";
 
+.clearAfter() {
+  &:after {
+    content: " ";
+    display: table;
+    clear: both;
+  }
+}
+
 .inline-icon(@content) {
   font-family: "iconFont";
   content: @content;

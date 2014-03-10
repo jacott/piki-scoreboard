@@ -1,7 +1,0 @@
-<template name="Form.CompleteList">
-  <ul class="complete">
-    <template name="Row">
-      <li>{{name}}</li>
-    </template>
-  </ul>
-</template>

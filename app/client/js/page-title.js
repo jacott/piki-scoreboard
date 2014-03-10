@@ -15,7 +15,7 @@ Tpl.$extend({
 
 Tpl.$events({
   'click': function (event) {
-    event.$actioned = true;
+    Bart.stopEvent();
     if (titleArgs) {
       AppRoute.gotoPath.apply(AppRoute, titleArgs);
     }
