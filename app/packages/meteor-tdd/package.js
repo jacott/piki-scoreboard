@@ -8,7 +8,7 @@ Npm.depends({
 });
 
 Package.on_use(function(api) {
-  api.use(['accounts-base'], ['server']);
+  api.use(['accounts-base', 'app-file-server'], ['server']);
 
   api.add_files([
     'meteor-tdd.js'

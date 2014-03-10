@@ -15,12 +15,14 @@ var matches = document.documentElement[vendorFuncPrefix+'MatchesSelector'] || do
 var COMMENT_NODE = document.COMMENT_NODE;
 var TEXT_NODE = document.TEXT_NODE;
 var DOCUMENT_FRAGMENT_NODE = document.DOCUMENT_FRAGMENT_NODE;
+var DOCUMENT_NODE = document.DOCUMENT_NODE;
 
 var bartEvent = null;
 
-var currentCtx, currentElement;
+var currentCtx, currentElement, currentEvent;
 
 Bart = {
+  Ctx: BartCtx,
   current: {
     data: function (elm) {
       if (elm)
@@ -34,7 +36,8 @@ Bart = {
     get element() {return currentElement},
   },
 
-  INPUT_SELECTOR: 'input,textarea',
+  INPUT_SELECTOR: 'input,textarea,select,select>option',
+  WIDGET_SELECTOR:'input,textarea,select,select>option,button,a',
 
   _helpers: {},
 
@@ -84,6 +87,14 @@ Bart = {
     (isAdd ? Bart.addClass : Bart.removeClass)(elm || currentElement, name);
   },
 
+  setBoolean: function (name, isAdd, elm) {
+    elm = elm || currentElement;
+    if (isAdd)
+      elm.setAttribute(name, name);
+    else
+      elm.removeAttribute(name);
+  },
+
   focus: function (elm, selector) {
     if (!elm) return;
     if (typeof selector !== 'string') selector = "input,textarea";
@@ -92,7 +103,7 @@ Bart = {
   },
 
   parentOf: function (parent, elm) {
-    while(elm && elm.nodeType !== 9) {
+    while(elm && elm.nodeType !== DOCUMENT_NODE) {
       if (parent === elm) return parent;
       elm = elm.parentNode;
     }
@@ -112,11 +123,15 @@ Bart = {
   lookupTemplate: function (name) {
     var names = name.split('.');
     var node = this;
-    names.forEach(function (name) {
-      node = node[name];
-    });
+    for(var i = 0; node && i < names.length; ++i) {
+      node = node[names[i]];
+    }
 
     return node;
+  },
+
+  stopEvent: function () {
+    currentEvent = null;
   },
 
   destroyData: function (elm) {
@@ -142,7 +157,7 @@ Bart = {
   },
 
   removeId: function (id) {
-    this.remove(document.getElementById(id));
+    return this.remove(document.getElementById(id));
   },
 
   removeAll: function (elms) {
@@ -163,6 +178,7 @@ Bart = {
     if (elm) {
       Bart.destroyData(elm);
       elm.parentNode && elm.parentNode.removeChild(elm);
+      return true;
     }
   },
 
@@ -176,23 +192,24 @@ Bart = {
     }
   },
 
-  destroyChildren: function (elm, remove) {
+  removeChildren: function (elm) {
     if (! elm) return;
 
-    if (remove) {
-      var row;
-      while(row = elm.firstChild) {
-        Bart.destroyData(row);
-        elm.removeChild(row);
-      }
-      return;
-    } else {
-      var iter = elm.firstChild;
-      while (iter) {
-        var row = iter;
-        iter = iter.nextSibling; // incase side affect
-        Bart.destroyData(row);
-      }
+    var row;
+    while(row = elm.firstChild) {
+      Bart.destroyData(row);
+      elm.removeChild(row);
+    }
+  },
+
+  destroyChildren: function (elm) {
+    if (! elm) return;
+
+    var iter = elm.firstChild;
+    while (iter) {
+      var row = iter;
+      iter = iter.nextSibling; // incase side affect
+      Bart.destroyData(row);
     }
   },
 
@@ -208,6 +225,11 @@ Bart = {
     while(! ctx && elm.parentNode)
       ctx = (elm = elm.parentNode)._bart;
     return ctx;
+  },
+
+  getCtxById: function (id) {
+    var elm = document.getElementById(id);
+    return elm && elm._bart;
   },
 
   replaceElement: function (newElm, oldElm, noRemove) {
@@ -246,11 +268,17 @@ Bart = {
   },
 
   getClosest: function (elm, selector) {
-    while(elm && elm.nodeType !== 9) {
+    while(elm && elm.nodeType !== DOCUMENT_NODE) {
       if (matches.call(elm, selector)) return elm;
       elm = elm.parentNode;
     }
-    return;
+  },
+
+  getClosestClass: function (elm, className) {
+    while(elm && elm.nodeType !== DOCUMENT_NODE) {
+      if (Bart.hasClass(elm, className)) return elm;
+      elm = elm.parentNode;
+    }
   },
 
   matches: function (elm, selector) {
@@ -376,6 +404,14 @@ BartCtx.prototype = {
     return this;
   },
 
+  element: function () {
+    var elm = this.evals[0][0];
+    while(elm && elm.nodeType !== DOCUMENT_NODE && elm._bart !== this)
+      elm = elm.parentNode;
+
+    return elm;
+  },
+
   updateAllTags: function (data) {
     var prevCtx = currentCtx;
     var prevElm = currentElement;
@@ -410,46 +446,44 @@ function updateNode (node, data) {
 
   var value = getValue(data, node[1], node[2]);
 
-  if (value === undefined)
+  if (value === undefined || value === currentElement)
     return;
 
-  if (value !== currentElement) {
-    if (value == null)  {
-      if (currentElement.nodeType === COMMENT_NODE)
-        value = currentElement;
-      else
-        value = document.createComment('empty');
-
-    } else if (typeof value === 'object' && value.nodeType === DOCUMENT_FRAGMENT_NODE) {
-      if ('_bartEnd' in currentElement) {
-        Bart.removeInserts(currentElement);
-      } else {
-        if (currentElement.nodeType !== COMMENT_NODE) {
-          var start = document.createComment('start');
-          Bart.replaceElement(start, currentElement);
-          currentElement = start;
-        }
-        currentElement.textContent = 'start';
-        currentElement._bartEnd = document.createComment('end');
-        currentElement.parentNode.insertBefore(currentElement._bartEnd, currentElement.nextSibling);
-      }
-      currentElement.parentNode.insertBefore(value, currentElement._bartEnd);
+  if (value === null)  {
+    if (currentElement.nodeType === COMMENT_NODE)
       value = currentElement;
+    else
+      value = document.createComment('empty');
 
-    } else if (typeof value !== 'object' || ! ('nodeType' in value)) {
-
-      // ***  Text output ***
-      if (currentElement.nodeType === TEXT_NODE) {
-        currentElement.textContent = value.toString();
-        value = currentElement;
-      } else {
-        value = document.createTextNode(value.toString());
+  } else if (typeof value === 'object' && value.nodeType === DOCUMENT_FRAGMENT_NODE) {
+    if ('_bartEnd' in currentElement) {
+      Bart.removeInserts(currentElement);
+    } else {
+      if (currentElement.nodeType !== COMMENT_NODE) {
+        var start = document.createComment('start');
+        Bart.replaceElement(start, currentElement);
+        currentElement = start;
       }
-    } // else *** User created node
-
-    if (currentElement !== value) {
-      Bart.replaceElement(value, currentElement);
+      currentElement.textContent = 'start';
+      currentElement._bartEnd = document.createComment('end');
+      currentElement.parentNode.insertBefore(currentElement._bartEnd, currentElement.nextSibling);
     }
+    currentElement.parentNode.insertBefore(value, currentElement._bartEnd);
+    value = currentElement;
+
+  } else if (typeof value !== 'object' || ! ('nodeType' in value)) {
+
+    // ***  Text output ***
+    if (currentElement.nodeType === TEXT_NODE) {
+      currentElement.textContent = value.toString();
+      value = currentElement;
+    } else {
+      value = document.createTextNode(value.toString());
+    }
+  } // else *** User created node
+
+  if (currentElement !== value) {
+    Bart.replaceElement(value, currentElement);
   }
   node[0] = value;
 }
@@ -486,7 +520,7 @@ function getValue(data, func, args) {
     if (func[0] === '"')
       return func.slice(1);
     if (func === 'this') return data;
-    var value = data[func];
+    var value = data && data[func];
     if (value === undefined) {
       value = currentCtx.template._helpers[func] || Bart._helpers[func];
     }
@@ -557,6 +591,18 @@ function BartTemplate(parent) {
 BartTemplate.prototype = {
   constructor: BartTemplate,
 
+  $ctx: function (ctx) {
+    if (typeof ctx === 'string') ctx = document.getElementById(ctx);
+    if (! ctx)
+      ctx = currentCtx;
+    else if ('_bart' in ctx)
+      ctx = ctx._bart;
+
+    for(; ctx; ctx = ctx.parentCtx) {
+      if (ctx.template === this) return ctx;
+    }
+  },
+
   $initOptions: function (options) {
     this.name = options.name;
     this.nodes = options.nodes;
@@ -584,15 +630,10 @@ BartTemplate.prototype = {
       var frag = document.createDocumentFragment();
       this.nodes && addNodes.call(this, frag, this.nodes);
       if (frag.firstChild) {
-        if (frag.lastChild === frag.firstChild) {
+        if (frag.lastChild === frag.firstChild)
           frag = frag.firstChild;
-          frag._bart = currentCtx;
-        } else {
-          var nodes = frag.childNodes;
-          for(var i = 0; i < nodes.length; ++i) {
-            nodes[i]._bart = currentCtx;
-          }
-        }
+
+        frag._bart = currentCtx;
       }
       this.$created && this.$created(currentCtx, frag);
       currentCtx.data === undefined || currentCtx.updateAllTags(currentCtx.data);
@@ -615,6 +656,15 @@ BartTemplate.prototype = {
       this._events.push([m[1], m[2].trim(), events[key]]);
     }
     return this;
+  },
+
+  $findEvent: function (type, css) {
+    var events = this._events;
+    for(var i = 0; i < events.length; ++i) {
+      var row = events[i];
+      if (row[0] === type && row[1] === css)
+        return row;
+    }
   },
 
   $actions: function (actions) {
@@ -661,10 +711,11 @@ function nativeOn(parent, eventType, selector, func) {
       parent.addEventListener(eventType, onEvent);
   }
 
-  eventTypes[selector||':TOP'] = func; // FIXME support multiple funcs for same selector
+  eventTypes[selector||':TOP'] = func;
 }
 
 function onEvent(event) {
+  currentEvent = event;
   currentCtx = event.currentTarget._bart;
   var eventTypes = currentCtx._events[event.type];
 
@@ -681,7 +732,7 @@ function onEvent(event) {
       }
       else if (matches.call(elm, key)) {
         if (fire(event, elm, eventTypes[key])) return;
-      } else if (matches.call(elm, key.replace(/,/g, ' *,')+' *')) // FIXME should split "," selectors early like in $events()
+      } else if (matches.call(elm, key.replace(/,/g, ' *,')+' *'))
         later[key] = true;
     }
 
@@ -710,12 +761,13 @@ function onEvent(event) {
       throw ex;
     }
   } finally {
+    currentEvent = null;
     currentCtx = null;
   }
 }
 
 function fire(event, elm, func) {
-  if (func.call(elm, event) === false || event.$actioned) {
+  if (func.call(elm, event) === false || currentEvent === null) {
     event.preventDefault();
     event.stopImmediatePropagation();
     return true;

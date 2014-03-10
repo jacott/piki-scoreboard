@@ -38,7 +38,7 @@ __meteor_runtime_config__ = { ROOT_URL: "http://test.local:1234", serverId: "tes
     body.className = '';
     var lc;
     while(lc = body.lastChild) {
-      body.removeChild(lc);
+      Bart.remove(lc);
     }
     App.orgId = null;
     AppRoute.title = pageTitle;
@@ -49,7 +49,6 @@ __meteor_runtime_config__ = { ROOT_URL: "http://test.local:1234", serverId: "tes
   }
 
   function timeoutStub(func,duration) {
-    try {Deps.flush();} catch(e) {};
     func();
     return ++timeoutCount;
   }

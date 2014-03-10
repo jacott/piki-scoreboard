@@ -1,6 +1,6 @@
 (function (test) {
   if (Meteor.isServer) return;
-  buster.testCase('packages/app-models/client/app-observable:', {
+  buster.testCase('packages/app-models/test/client/app-observable:', {
     setUp: function () {
       test = this;
     },

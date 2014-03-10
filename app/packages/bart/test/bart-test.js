@@ -25,6 +25,7 @@ Meteor.isClient && (function (test, v) {
           name: "Foo",
           nodes:[{
             name:"section",
+            attrs: [["=","id","FooId"]],
             children:[' ', ['>', '/Bar']],
           }],
         });
@@ -50,6 +51,34 @@ Meteor.isClient && (function (test, v) {
         delete Bart.Bar;
       },
 
+      "test find ctx": function () {
+        Bart.Bar.$helpers({
+          myFunc: function () {
+            v.helperFoundCtx = Bart.Foo.$ctx();
+
+            return 'one';
+          },
+        });
+        var elm = Bart.Foo.$render({});
+
+        assert.same(v.helperFoundCtx, elm._bart);
+
+        assert.dom(elm, function () {
+          assert.dom('i', 'one', function () {
+            var ctx = Bart.Foo.$ctx(this);
+            assert.same(ctx, elm._bart);
+            assert.same(ctx.element(), elm);
+          });
+        });
+
+        document.body.appendChild(elm);
+
+        assert.dom('#FooId');
+        assert.same(Bart.Foo.$ctx('FooId'), elm._bart);
+
+        assert.same(Bart.getCtxById('FooId'), elm._bart);
+      },
+
       "test updateAllTags": function () {
         var elm = Bart.Foo.$render({myFunc: 'one'});
 
@@ -59,7 +88,14 @@ Meteor.isClient && (function (test, v) {
           elm._bart.updateAllTags({myFunc: 'two'});
 
           refute.dom('i', 'one');
-          assert.dom('i', 'two');
+          assert.dom('i', 'two', function () {
+            this._bart.updateAllTags(null);
+
+            assert.same(this.textContent, '');
+
+            assert.same(this._bart.data, null);
+          });
+
         });
 
       },
@@ -239,6 +275,11 @@ Meteor.isClient && (function (test, v) {
         assert.equals(tpl._events, []);
       },
 
+      "test not found": function () {
+        Bart.newTemplate({name: "Foo.Bar.Baz"});
+        assert.same(Bart.lookupTemplate('Foo.Fizz.Bar'), undefined);
+      },
+
       "test nest by name": function () {
         Bart.newTemplate({name: "Foo.Bar.Baz"});
 
@@ -285,6 +326,33 @@ Meteor.isClient && (function (test, v) {
           assert.called(v.myHelper);
           assert.same(v.elm, this);
           assert.same(v.ctx, Bart.getCtx(this));
+        });
+      },
+
+      "test setBoolean": function () {
+        assert.exception(function () {
+          Bart.setBoolean('disabled', true);
+        });
+
+        assert.dom(document.createElement('div'), function () {
+          Bart.setBoolean('checked', true, this);
+          assert.same(this.getAttribute('checked'), 'checked');
+          Bart.setBoolean('checked', false, this);
+          assert.same(this.getAttribute('checked'), null);
+        });
+
+        Bart.Foo.$helpers({
+          myHelper: function () {
+            Bart.setBoolean('disabled', this.on);
+          },
+        });
+
+        assert.dom(Bart.Foo.$render({on: true}), function () {
+          assert.same(this.getAttribute('disabled'), 'disabled');
+
+          Bart.getCtx(this).updateAllTags({on: false});
+
+          assert.same(this.getAttribute('disabled'), null);
         });
       },
 
@@ -410,6 +478,25 @@ Meteor.isClient && (function (test, v) {
 
       assert.same(elm.parentNode, parent);
       assert.same(elm._bartEnd.parentNode, parent);
+    },
+
+    "test rendering fragment": function () {
+      Bart.newTemplate({
+        name: "Foo",
+        nodes: [{
+          name:"div",
+          attrs: [["=","id","div1"]],
+          children: [" ",["","bar"]," "]
+        }, {
+          name:"div",
+          attrs: [["=","id","div2"]],
+        }],
+      });
+
+      var frag = Bart.Foo.$render({});
+
+      assert.same(frag.nodeType, document.DOCUMENT_FRAGMENT_NODE);
+      assert(frag._bart);
     },
 
     "test inserting Document Fragment": function () {

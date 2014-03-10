@@ -23,6 +23,10 @@ function setup(model) {
     return stopObserver(key);
   };
 
+  model.memDocs = function () {
+    return docs;
+  };
+
   model.memFind = function(id) {
     return docs[id];
   };

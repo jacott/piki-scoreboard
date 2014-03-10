@@ -21,6 +21,7 @@ Package.on_use(function(api) {
     'resource-strings.js',
     'error.js',
     'apputil-dim.js',
+    'make-subject.js',
   ], ['server', 'client']);
 
 

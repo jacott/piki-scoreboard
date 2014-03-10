@@ -477,7 +477,7 @@
 
         assert.equals(TestSubClass.userIds, { user_id: 'create' });
 
-        TH.login(this, function () {
+        TH.login(function () {
           var doc = TestSubClass.create({name: 'testing'});
 
           assert(doc._id);

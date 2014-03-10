@@ -1,4 +1,24 @@
-process.env.METEOR_MODE === 'test' && startTest();
+switch(process.env.METEOR_MODE) {
+case 'test':
+  startTest();
+  break;
+case 'development':
+  var fs = Npm.require('fs');
+  var path = Npm.require('path');
+  var glob = Npm.require('glob');
+
+  AppFS.handle('/quick.css', function (req, res) {
+    res.writeHead(200, {
+      'Content-Type': 'text/css',
+    });
+
+    var topDir = "../client";
+    var filename = glob.sync("*.css", {cwd: topDir})[0];
+
+    res.end(fs.readFileSync(path.resolve(topDir, filename)));
+  });
+  break;
+}
 
 function startTest() {
 

@@ -21,7 +21,12 @@ AppVal.register('color', function (doc,field) {
 AppVal.register('number', function (doc,field, options) {
   var val = doc[field];
 
-  if (! val) return doc[field] = null;
+  if (val === '') {
+    doc[field] = null;
+    return;
+  }
+
+  if (val == null) return;
 
   if (options === true || options == null) options = {};
 

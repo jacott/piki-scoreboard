@@ -22,6 +22,7 @@ module.exports = function(config) {
       "browser-setup.js",
       // {pattern: 'client-src/app/client/css/**/*.css', included: false, served: true},
       // {pattern: 'client-src/**/*.map', included: false, served: true},
+      "../../app/packages/*/test/helpers/**-helper.js",
       "../compiled-templates/**/*.js",
       "../helpers/testhelper.js", "../helpers/**-helper.js", "../client/helpers/**-helper.js",
       "../../app/packages/*/test/**/*-test.js",

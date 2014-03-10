@@ -96,7 +96,7 @@
     },
 
     "test userId": function () {
-      TH.login(test, function () {
+      TH.login(function () {
         assert.same(App.userId(), TH.userId());
       });
     },

@@ -10,10 +10,12 @@ BartCompiler = {
     var template;
     var result = '';
     try {
+      var test;
       var parser = new htmlparser.Parser({
         onopentag: function(name, attrs){
           if (name === 'template') {
             name = attrs.name;
+            test = test || attrs.test;
             if (! name)
               throw new BartCompiler.Error("Template name is missing", parser.startIndex);
             if (! name.match(/^([A-Z]\w*\.?)+$/))
@@ -43,6 +45,9 @@ BartCompiler = {
       });
       parser.write(code);
       parser.end();
+      if (test) {
+        result = test+' = function(){'+result+'};';
+      }
       return result;
     } catch (e) {
       throw e;

@@ -1,5 +1,6 @@
 config.options = {
   files: [
+    "../app/packages/*/test/helpers/**-helper.js",
     "helpers/testhelper.js",
     "helpers/**-helper.js",
     "server/helpers/**-helper.js",

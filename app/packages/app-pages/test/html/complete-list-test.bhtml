@@ -1,0 +1,5 @@
+<template name="Test.CompleteList" test="_Test.CompleteList">
+  <div id="TestCompleteList">
+    <input name="name">
+  </div>
+</template>
