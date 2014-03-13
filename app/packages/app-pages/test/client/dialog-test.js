@@ -24,7 +24,7 @@
       Bart.Dialog.open(Bart.html('<div id="foo">Foo!!</div>'));
 
       assert.dom('.Dialog', function () {
-        assert.dom('>.dialogContainer>.ui-dialog>#foo', 'Foo!!');
+        assert.dom('>div>.dialogContainer>.ui-dialog>#foo', 'Foo!!');
       });
     },
 

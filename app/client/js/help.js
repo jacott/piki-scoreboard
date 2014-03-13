@@ -37,6 +37,7 @@ Tpl.$extend({
 
   $destroyed: function (ctx, elm) {
     document.removeEventListener('click', clicked, true);
+
   },
 });
 

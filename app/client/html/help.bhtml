@@ -263,6 +263,13 @@
         <p>Ensure you are signed in with the appropriate access rights:
           Admin or Judge.
         </p>
+
+        <h1>A competitor did not climb in a qualification heat, and I
+          would like their qualification rank to be displayed in the
+          results</h1>
+
+        <p>Enter "<tt>dnc</tt>" (did not climb) as the competitor's score for the heat(s) in which they did not climb.
+        </p>
       </section>
     </section>
   </div>

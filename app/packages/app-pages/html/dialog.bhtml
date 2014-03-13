@@ -1,6 +1,8 @@
 <template name="Dialog">
   <div class="Dialog">
-    {{content}}
+    <div>
+      {{content}}
+    </div>
   </div>
   <template name="Confirm">
     <div class="Dialog Confirm">
