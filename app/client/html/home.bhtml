@@ -6,6 +6,7 @@
         {{pageLink value="Climbers" template="Climber"}}
         {{pageLink value="Events" template="Event"}}
         {{pageLink class="adminAccess" value="Event categories" template="Category"}}
+        {{pageLink value="Change organization" template="Home.ChooseOrg"}}
       </nav>
       <section class="body">
       </section>

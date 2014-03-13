@@ -5,6 +5,7 @@ node_modules
 TAG*
 tmp
 app/.meteor/local-sym-link
+.npm
 app/private/restart.txt
 /app/packages/bart/test/plugin/template-test.js
 test/compiled-templates
