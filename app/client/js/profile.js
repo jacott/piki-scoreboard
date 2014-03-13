@@ -35,6 +35,12 @@ Tpl.$extend({
   onBaseExit: function () {
     Bart.removeId('Profile');
   },
+
+  $created: function (ctx) {
+    ctx.onDestroy(App.Ready.onUserChange(function () {
+      AppRoute.replacePath(Bart.Home);
+    }));
+  },
 });
 
 ChangePassword.$events({

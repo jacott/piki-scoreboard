@@ -11,7 +11,20 @@ function stopFunc(cKey) {
   };
 }
 
+var userChange = {};
+App.makeSubject(userChange);
+
 App.Ready = {
+  onUserChange: function () {
+    if (! userChange.autorun)  {
+      userChange.autorun = Deps.autorun(function () {
+        App.userId();
+        userChange.notify();
+      });
+    }
+    return userChange.onChange.apply(userChange, arguments);
+  },
+
   stopAll: function () {
     key = 0;
     observers = {};
@@ -37,6 +50,9 @@ App.Ready = {
     return stopFunc(key);
   }
 };
+
+
+
 
 function stopFunc(cKey) {
   return {

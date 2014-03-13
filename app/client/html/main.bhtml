@@ -9,7 +9,7 @@
     <header id="Header">
       <div>
         <nav class="left">
-          {{pageLink class="print" id="OrgHomeLink" value="Choose Organization" template="Home"}}
+          {{pageLink class="print" id="OrgHomeLink" value=orgHomeLinkText template="Home"}}
         </nav>
         <nav class="title">
           {{> /PageTitle}}

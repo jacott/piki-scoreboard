@@ -5,7 +5,7 @@ var ChooseOrg = Tpl.ChooseOrg;
 AppRoute.root.addTemplate(Tpl, {
   path: "",
   data: function (page, pageRoute) {
-    if (! ('orgSN' in pageRoute)) AppRoute.abortPage(ChooseOrg);
+    if (! App.org()) AppRoute.abortPage(ChooseOrg);
   }
 });
 

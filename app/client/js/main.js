@@ -2,7 +2,7 @@ var Tpl = Bart.Main;
 
 AppRoute.title = 'Piki';
 App.org = function () {
-  return AppModel.Org.findOne(App.orgId);
+  return App.orgId && AppModel.Org.findOne(App.orgId);
 };
 
 App._startup = function () {
@@ -59,6 +59,14 @@ App._startup = function () {
     App.Ready.isReady && AppRoute.pageChanged();
   });
 };
+
+Tpl.Header.$helpers({
+  orgHomeLinkText: function () {
+    var org = App.org();
+    if (org) return org.name;
+    return 'Choose Organization';
+  },
+});
 
 Tpl.Header.$events({
   'click [name=help]': function (event) {
