@@ -38,6 +38,9 @@
       border-left: 1px solid fade(#000, 20%);
       padding: 4px;
       input {
+        .readOnlyAccess & {
+          display: none;
+        }
         width: 4em;
         margin: 0;
         border: none;
@@ -46,9 +49,6 @@
           display: block;
           position: absolute;
           background-color: fade(@colorInputErrorBG, 80%);
-        }
-        ~span:not(.errorMsg) {
-          display: none;
         }
       }
       >i {
@@ -65,7 +65,7 @@
       }
     }
     td.input {
-      span:not(.errorMsg) {
+      body:not(.readOnlyAccess) & span:not(.errorMsg) {
         display: none;
       }
     }

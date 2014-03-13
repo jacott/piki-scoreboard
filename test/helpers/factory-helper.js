@@ -132,7 +132,7 @@
     },
 
     User: function (options) {
-      var username = 'username' in options || generateName('user');
+      var username = 'username' in options ? options.username : generateName('user');
 
       return new Builder('User', options)
         .addRef('org')

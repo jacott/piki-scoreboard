@@ -24,7 +24,6 @@ Tpl.$events({
   'click [name=signOut]': function (event) {
     Bart.stopEvent();
     Meteor.logout();
-    AppRoute.gotoPage(Bart.Home);
   },
 });
 

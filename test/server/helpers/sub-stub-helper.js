@@ -7,16 +7,12 @@ TH.subStub = function (userId, mainSub) {
     },
     error: test.stub(), ready: test.stub(), stop: test.stub(),
 
-    aSpy: test.stub(),
-    cSpy: test.stub(),
-    rSpy: test.stub(),
+    sendSpy: test.stub(),
   };
 
 
   sub._session = mainSub ? mainSub._session : {
-    sendAdded: sub.aSpy,
-    sendChanged: sub.cSpy,
-    sendRemoved: sub.rSpy,
+    send: sub.sendSpy,
     id: Random.id(),
   };
 

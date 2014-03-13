@@ -10,11 +10,11 @@
       v.onStart = Session._private.observers()['on.start'];
 
       test.stub(v.onStart, 'AllOrgs');
-      v.sess = new Session(v.sub);
+      v.sess = Session.get(v.sub);
     },
 
     tearDown: function () {
-      v.sub && v.sub.stopFunc && v.sub.stopFunc();
+      v.sess.release();
       v = null;
     },
 
@@ -29,7 +29,7 @@
       assert.called(spyOrg);
       assert.calledWith(v.sess.addObserver, 'AllOrgs', spyOrg.returnValues[0]);
 
-      assert.calledWith(v.sub.aSpy, 'Org', v.org._id);
+      assert.calledWith(v.sub.sendSpy, {msg: 'added', collection: 'Org', id: v.org._id, fields: v.org.attributes});
     },
   });
 })();

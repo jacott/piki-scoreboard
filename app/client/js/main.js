@@ -6,11 +6,23 @@ App.org = function () {
 };
 
 App._startup = function () {
+  App.Ready.setNotReady();
+
   document.head.appendChild(Tpl.Head.$render({}));
 
   pathname = document.location;
+
   var handle = App.Ready.onReady(whenReady);
-  document.body.insertBefore(Tpl.Header.$autoRender({}), document.body.firstChild);
+  var header = Tpl.Header.$autoRender({});
+  document.body.insertBefore(header, document.body.firstChild);
+
+  App.subscribe('Session', function (err) {
+    Bart.removeId('Flash');
+    if (err) return;
+    App.Ready.notifyReady();
+    subscribeOrg(orgShortName);
+  });
+  Bart.Flash.loading();
 
   function whenReady() {
     handle && handle.stop();
@@ -25,12 +37,21 @@ App._startup = function () {
       setAccess();
   });
 
-  Deps.autorun(function () {
-    if (Accounts.loginServicesConfigured() && Meteor.status().connected) {
-      if (! Meteor.userId())
-        setAccess();
+  var userId = undefined;
 
-      Deps.nonreactive(function () {stateChange()});
+  Deps.autorun(function () {
+    var connected = Meteor.status().connected;
+
+    var newUserId = Meteor.userId();
+
+    if (Accounts.loginServicesConfigured() && connected) {
+      Deps.nonreactive(function stateChange() {
+        if (userId !== newUserId) {
+          userId = newUserId;
+          Bart.getCtx(header).updateAllTags();
+          setAccess();
+        }
+      });
     }
   });
 
@@ -66,24 +87,7 @@ AppRoute.root.onBaseExit = function () {
   subscribeOrg(null);
 };
 
-var sessionSub;
 
-function stateChange(opts) {
-  if (sessionSub) {
-    sessionSub.stop();
-    sessionSub = null;
-  }
-
-  App.Ready.setNotReady();
-  orgSub && orgSub.stop(); orgSub = null;
-  sessionSub = App.subscribe('Session', function (err) {
-    Bart.removeId('Flash');
-    if (err) return;
-    App.Ready.notifyReady();
-    subscribeOrg(orgShortName);
-  });
-  Bart.Flash.loading();
-}
 
 var orgSub, orgShortName, pathname;
 
@@ -104,11 +108,11 @@ function subscribeOrg(shortName) {
     if (! App.Ready.isReady) return;
 
     orgSub = App.subscribe('Org', orgShortName, function () {
+
       Bart.removeId('Flash');
       var doc = AppModel.Org.findOne({shortName: orgShortName});
       if (! doc) {
         subscribeOrg();
-        Bart.Flash.error('Organization not found');
         return;
       }
       App.orgId = doc._id;

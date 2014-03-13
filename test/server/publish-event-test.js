@@ -28,18 +28,13 @@
       v = null;
     },
 
-    "test not subscribed": function () {
-      assert.accessDenied(function () {
-        v.pub.call(v.tsub);
-      });
-    },
-
     "with Session": {
       setUp: function () {
-        v.sess = new Session(v.sub);
+        TH.getPublish('Session').call(v.sub);
+        v.sess = Session._private.get(v.sub);
         test.spy(v.sess, 'addObserver');
         test.spy(v.sess, 'removeObserver');
-        v.sub.aSpy.reset();
+        v.sub.sendSpy.reset();
       },
 
       "test observes org": function () {
@@ -61,13 +56,15 @@
         assert(v.tsub.stopFunc);
 
         children.forEach(function (modelName) {
-          assert.calledWith(v.sub.aSpy, modelName, v.cm[modelName]._id);
+          assert.calledWith(v.sub.sendSpy, {msg: 'added', collection: modelName,
+                                            id: v.cm[modelName]._id, fields: v.cm[modelName].attributes});
         });
 
         v.tsub.stopFunc();
 
         children.forEach(function (modelName) {
-          assert.calledWith(v.sub.rSpy, modelName, v.cm[modelName]._id);
+          assert.calledWith(v.sub.sendSpy, {msg: 'removed', collection: modelName,
+                                            id: v.cm[modelName]._id});
         });
       },
     },

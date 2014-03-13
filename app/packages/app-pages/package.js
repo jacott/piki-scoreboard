@@ -23,6 +23,7 @@ Package.on_use(function(api) {
     'html/page-link.bhtml',
     'html/dialog.bhtml',
 
+    'client/bart-ext.js',
     'client/form.js',
     'client/each.js',
     'client/button-menu.js',

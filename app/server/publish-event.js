@@ -27,6 +27,7 @@ Meteor.publish('Event', function (eventId) {
     observers.forEach(function (modelName) {
       sess.removeObserver(modelName);
     });
+    sess.release();
   });
   this.ready();
 });

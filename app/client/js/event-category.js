@@ -70,6 +70,10 @@ App.require('Bart.Event', function (Event) {
 
   Tpl.$extend({
     $created: function (ctx, elm) {
+      Bart.autoUpdate(ctx, {
+        subject: ctx.data.category,
+        removed: function () {AppRoute.replacePath(Bart.Event)},
+      });
       ctx.onDestroy(AppModel.Result.Index.observe(function (doc, old) {
         var result = doc || old;
         if (result.event_id !== Event.event._id ||

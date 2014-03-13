@@ -43,6 +43,7 @@ Meteor.publish('Org', function (shortName) {
     observers.forEach(function (modelName) {
       sess.removeObserver(obName(modelName));
     });
+    sess.release();
   });
   this.ready();
 });
