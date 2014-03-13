@@ -7,6 +7,7 @@ Package._transitional_registerBuildPlugin({
   name: "compileBartTemplates",
   use: [],
   sources: [
+    'plugin/mode.js',
     'plugin/bart-compiler.js',
     'plugin/compile-templates.js'
   ],

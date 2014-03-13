@@ -8,7 +8,10 @@ cd `dirname "$0"`/../app
 # export NODE_OPTIONS='--prof'
 # send SIGUSR1 to debug
 
-if [ "${1:-development}" = "test" ];then
+mode="${1:-development}"
+echo "var mode='${mode}';" >packages/bart/plugin/mode.js
+
+if [ $mode = "test" ];then
     cd ..
     node_modules/karma/bin/karma start test/karma/karma.conf.js &
     karma=$!
