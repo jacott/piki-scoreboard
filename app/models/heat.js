@@ -9,7 +9,7 @@ function Heat(number, format) {
   this.rankIndex = format.indexOf('F');
 };
 
-var FINAL_NAMES = ['Final', 'Semi Final', 'Quarter Final'];
+var FINAL_NAMES = ['Final', 'Semi final', 'Quarter final'];
 
 Heat.prototype = {
   constructor: Heat,
@@ -30,7 +30,7 @@ Heat.prototype = {
   },
 
   getName: function (number) {
-    if (number === -2) return "Qual Rank";
+    if (number === -2) return "Qual points";
     if (number === -1) return "General";
     if (number === 0) return "Start order";
     if (number <= this.rankIndex) {

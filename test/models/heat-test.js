@@ -46,13 +46,13 @@
       assert.same(heat.name, 'Qual 2');
 
       heat.number = -2;
-      assert.same(heat.name, 'Qual Rank');
+      assert.same(heat.name, 'Qual points');
 
       heat.number = 3;
-      assert.same(heat.name, 'Quarter Final');
+      assert.same(heat.name, 'Quarter final');
 
       heat.number = 4;
-      assert.same(heat.name, 'Semi Final');
+      assert.same(heat.name, 'Semi final');
 
       heat.number = 5;
       assert.same(heat.name, 'Final');
@@ -269,8 +269,8 @@
         assert.equals(v.call(-1), [
           {number: -2, name: 'Rank'},
           {number: 4, name: 'Final'},
-          {number: 3, name: 'Semi Final'},
-          {number: -2, name: 'Qual Rank'},
+          {number: 3, name: 'Semi final'},
+          {number: -2, name: 'Qual points'},
           {number: 2, name: 'Qual 2'},
           {number: 1, name: 'Qual 1'},
         ]);

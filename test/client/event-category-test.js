@@ -29,7 +29,7 @@
             assert.dom('th:first-child', 'Climber');
             assert.dom('th:nth-child(2)', 'Rank');
             assert.dom('th:nth-child(3)', 'Final');
-            assert.dom('th:nth-child(4)', 'Qual Rank');
+            assert.dom('th:nth-child(4)', 'Qual points');
             assert.dom('th:nth-child(5)', 'Qual 2');
             assert.dom('th:nth-child(6)', 'Qual 1');
           });
