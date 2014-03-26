@@ -3,8 +3,9 @@
     setUp: function () {
       test = this;
       v = {};
-      test.stub(AppRoute, 'gotoPath');
+      test.stub(AppRoute, 'replacePath');
       test.stub(Meteor, 'status').returns({connected: true});
+      test.stub(window, 'addEventListener');
     },
 
     tearDown: function () {
@@ -36,7 +37,6 @@
     },
 
     "test popstate": function () {
-      test.stub(window, 'addEventListener');
       test.stub(AppRoute, 'pageChanged');
 
       App._startup();
@@ -52,17 +52,28 @@
     },
 
     "test subscribing to Org": function () {
-      App.Ready.isReady = true;
-      document.body.appendChild(Bart.Main.Header.$render({}));
-      v.org = TH.Factory.createOrg({shortName: 'FOO'});
-      v.subStub = test.stub(App, 'subscribe').withArgs('Org').returns({stop: v.stopStub = test.stub()});
+      AppRoute.replacePath.restore();
+      test.stub(AppClient, 'getLocation').returns({pathname: '/FOO'});
 
+      var subscribe = test.stub(App, 'subscribe');
+
+      v.sessSub = subscribe.withArgs('Session');
+      v.orgSub = subscribe.withArgs('Org').returns({stop: v.stopStub = test.stub()});
 
       assert.same(AppRoute.root.routeVar, 'orgSN');
-      AppRoute.root.onBaseEntry(null, {orgSN: 'FOO'});
 
-      assert.called(v.subStub);
-      v.subStub.yield();
+      App._startup();
+
+      assert.called(v.sessSub);
+      refute.called(v.orgSub);
+      v.sessSub.yield();
+
+      assert.called(v.orgSub);
+
+      // simulate org added by subscribe
+      v.org = TH.Factory.createOrg({shortName: 'FOO'});
+      Bart.getCtxById('Header').updateAllTags();
+      v.orgSub.yield();
 
       assert.same(App.orgId, v.org._id);
       assert.equals(App.org().attributes, v.org.attributes);
@@ -89,7 +100,7 @@
 
       assert.isFalse(ready.onReady.args[0][0]());
 
-      assert.calledWith(AppRoute.gotoPath, document.location);
+      assert.calledWith(AppRoute.replacePath, document.location);
       assert.called(v.stopStub);
     },
 

@@ -1,5 +1,7 @@
 var Tpl = Bart.Main;
 
+var orgSub, orgShortName, pathname;
+
 AppRoute.title = 'Piki';
 App.org = function () {
   return App.orgId && AppModel.Org.findOne(App.orgId);
@@ -10,7 +12,7 @@ App._startup = function () {
 
   document.head.appendChild(Tpl.Head.$render({}));
 
-  pathname = document.location;
+  pathname = AppClient.getLocation();
 
   var handle = App.Ready.onReady(whenReady);
   var header = Tpl.Header.$autoRender({});
@@ -94,10 +96,6 @@ AppRoute.root.onBaseExit = function () {
   subscribeOrg(null);
 };
 
-
-
-var orgSub, orgShortName, pathname;
-
 function setAccess() {
   var _id = App.userId();
   var user = _id && AppModel.User.quickFind(_id);
@@ -107,7 +105,6 @@ function setAccess() {
 function subscribeOrg(shortName) {
   setAccess();
   orgSub && orgSub.stop();
-  var orgLink = document.getElementById('OrgHomeLink');
   if (shortName) {
     orgShortName = shortName;
     App.orgId = null;
@@ -125,6 +122,7 @@ function subscribeOrg(shortName) {
       App.orgId = doc._id;
       setAccess();
       Bart.addClass(document.body, 'inOrg');
+      var orgLink = document.getElementById('OrgHomeLink');
       if (orgLink) orgLink.textContent = doc.name;
       if (pathname) {
         var pn = pathname;
@@ -143,6 +141,7 @@ function subscribeOrg(shortName) {
   } else {
     orgSub = orgShortName = App.orgId = pathname = null;
     Bart.removeClass(document.body, 'inOrg');
+    var orgLink = document.getElementById('OrgHomeLink');
     if (orgLink) orgLink.textContent = "Choose Organization";
   }
 }
