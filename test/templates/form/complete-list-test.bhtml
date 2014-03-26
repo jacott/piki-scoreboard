@@ -1,5 +1,0 @@
-<template name="Test.Form.CompleteList">
-  <div id="TestCompleteList">
-    <input name="name">
-  </div>
-</template>

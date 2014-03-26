@@ -235,7 +235,7 @@ Apputil = {
 
     switch(Object.prototype.toString.call(orig)) {
     case "[object Date]":
-      return new Date(orig);
+      return new Date(orig.getTime());
     case "[object Array]":
       return orig.map(function (item) {
         return Apputil.deepCopy(item);

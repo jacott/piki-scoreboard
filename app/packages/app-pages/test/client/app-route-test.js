@@ -124,7 +124,7 @@
         assert.calledWith(AppRoute.gotoPage, v.RootBar, {bazId: "diff-id", pathname: '/baz/diff-id/root-bar'});
       },
 
-      "test gotoPage": function () {
+      "test gotoPage, pushCurrent": function () {
         var orig = Bart.setTitle;
         Bart.setTitle = test.stub();
         test.onEnd(function () {
@@ -142,6 +142,12 @@
         assert.calledTwice(v.Baz.onBaseEntry);
 
         assert.calledWith(Bart.setTitle, 'Root bar');
+
+        AppRoute.history.pushState.reset();
+
+        AppRoute.pushCurrent();
+
+        assert.calledWith(AppRoute.history.pushState, null, 'Root bar', '/baz/diff-id/root-bar');
       },
 
       "test loadingArgs": function () {
@@ -277,7 +283,7 @@
       assert.same(v.root.constructor, AppRoute);
     },
 
-    "test addBase": function () {
+    "test addBase and addAlias": function () {
       var Baz = {
         name: 'Baz',
         onBaseEntry: test.stub(),
@@ -310,6 +316,8 @@
       Baz.route.addBase(Fnord);
       Fnord.route.addTemplate(v.FooBar);
       Baz.route.addTemplate(BazBar);
+
+      AppRoute.root.addAlias(BazBar, 'short-cut');
 
       assert.same(Fnord.route.path, 'fnord');
       assert.same(Fnord.route.parent, Baz.route);
@@ -349,6 +357,12 @@
       AppRoute.gotoPage(RootBar);
 
       assert.calledWith(Baz.onBaseExit, RootBar, { pathname: "/root-bar" });
+
+      BazBar.onEntry.reset();
+
+      AppRoute.gotoPath('/short-cut/12345');
+
+      assert.calledWith(BazBar.onEntry, BazBar, {append: '12345', pathname: "/baz/baz/12345"});
     },
 
     "test addTemplate": function () {

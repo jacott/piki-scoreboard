@@ -36,6 +36,8 @@ Bart = {
     get element() {return currentElement},
   },
 
+  MOUSEWHEEL_EVENT: vendorFuncPrefix === 'moz' ? 'wheel' : 'mousewheel',
+
   INPUT_SELECTOR: 'input,textarea,select,select>option',
   WIDGET_SELECTOR:'input,textarea,select,select>option,button,a',
 
@@ -73,12 +75,25 @@ Bart = {
     return true;
   },
 
-  setSuffixClass: function (elm, name, suffix) {
+  setClassBySuffix: function (name, suffix, elm) {
+    elm = elm || currentElement;
     if (!elm) return;
-    var classes = elm.className.replace(new RegExp(' *\\b[^ ]*'+suffix+'\\b', 'g'), '').replace(/(^ | $)/g,'');
+    var classes = elm.className.replace(new RegExp('\\s*\\S*'+suffix+'\\b', 'g'), '').replace(/(^ | $)/g,'');
 
     if (name)
       elm.className = (classes.length ? classes + ' ' : '') + name + suffix;
+    else
+      elm.className = classes;
+  },
+
+  setClassByPrefix: function (name, suffix, elm) {
+    elm = elm || currentElement;
+    if (!elm) return;
+
+    var classes = elm.className.replace(new RegExp('\\s*'+suffix+'\\S*', 'g'), '').replace(/(^ | $)/g,'');
+
+    if (name)
+      elm.className = (classes.length ? classes + ' ' : '') + suffix + name;
     else
       elm.className = classes;
   },
@@ -320,6 +335,7 @@ Bart = {
   },
 
   vendorTransform: vendorTransform,
+  vendorTransformOrigin: vendorTransform+'Origin',
 
   vendorPrefix: vendorFuncPrefix,
 
@@ -359,6 +375,9 @@ _private = {
   BartTemplate: BartTemplate,
   getValue: getValue,
   evalArgs: evalArgs,
+  set currentElement(value) {
+    return currentElement = value;
+  }
 };
 
 function extend(obj, properties) {
@@ -405,7 +424,9 @@ BartCtx.prototype = {
   },
 
   element: function () {
-    var elm = this.evals[0][0];
+    var evals = this.evals;
+    evals = evals && this.evals[0];
+    var elm = evals && evals[0];
     while(elm && elm.nodeType !== DOCUMENT_NODE && elm._bart !== this)
       elm = elm.parentNode;
 
@@ -413,6 +434,7 @@ BartCtx.prototype = {
   },
 
   updateAllTags: function (data) {
+    var activeElement = document.activeElement;
     var prevCtx = currentCtx;
     var prevElm = currentElement;
     currentCtx = this;
@@ -437,6 +459,9 @@ BartCtx.prototype = {
     } finally {
       currentElement = prevElm;
       currentCtx = prevCtx;
+    }
+    if (document.activeElement !== activeElement) {
+      activeElement.focus();
     }
   },
 };

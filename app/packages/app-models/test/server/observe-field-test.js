@@ -1,5 +1,5 @@
 (function (test, v) {
-  buster.testCase('packages/app-models/server/observe-field:', {
+  buster.testCase('packages/app-models/test/server/observe-field:', {
     setUp: function () {
       test = this;
       TH.stubOplog();
@@ -18,6 +18,55 @@
         row.stop();
       }
       v = null;
+    },
+
+    "observe array field": {
+      setUp: function () {
+        v.TestSubClass.registerObserveField('toys');
+
+        v.obs.push(v.toys = v.TestSubClass.observeToys(['buzz', 'woody'], {
+          added: v.added = test.stub(),
+          removed: v.removed = test.stub(),
+          changed: v.changed = test.stub(),
+          stopped: v.stopped = test.stub(),
+        }));
+      },
+
+      "test adding observed field": function () {
+        var doc = v.TestSubClass.create({name: 'Andy', age: 7, toys: ['woody', 'slinky']});
+        AppOplog.simulate('i', 'TestSubClass', doc._id, doc.attributes);
+
+        assert.calledOnceWith(v.added, doc._id, doc.attributes);
+      },
+
+      "test adding two observed fields": function () {
+        var doc = v.TestSubClass.create({name: 'Andy', age: 7, toys: ['woody', 'buzz']});
+        AppOplog.simulate('i', 'TestSubClass', doc._id, doc.attributes);
+
+        assert.calledOnceWith(v.added, doc._id, doc.attributes);
+      },
+
+      "test updating observered field": function () {
+        v.doc.$update({$set: v.attrs = {toys: ['woody', 'slinky']}});
+        AppOplog.simulate('u', 'TestSubClass', v.doc._id, v.attrs);
+
+        assert.calledWith(v.changed, v.doc._id, v.attrs);
+      },
+
+      "test updating two observered fields": function () {
+        v.doc.$update({$set: v.attrs = {toys: ['woody', 'buzz']}});
+        AppOplog.simulate('u', 'TestSubClass', v.doc._id, v.attrs);
+
+        assert.calledOnceWith(v.changed, v.doc._id, v.attrs, ['woody', 'buzz']);
+      },
+
+      "test updating other field": function () {
+        v.doc.$update({$set: {toys: ['woody', 'buzz']}});
+        v.doc.$update({$set: v.attrs = {age: 8}});
+        AppOplog.simulate('u', 'TestSubClass', v.doc._id, v.attrs);
+
+        assert.calledOnceWith(v.changed, v.doc._id, v.attrs, ['woody', 'buzz']);
+      },
     },
 
     "manipulation": {
@@ -123,7 +172,7 @@
 
         AppOplog.simulate('u', 'TestSubClass', v.doc._id, {age: 6});
 
-        assert.calledWith(v.changed, v.doc._id, {age: 6}, undefined);
+        assert.calledWith(v.changed, v.doc._id, {age: 6}, 6);
       },
 
       "test field unknown": function () {
@@ -146,10 +195,12 @@
       },
     },
 
-    "test delete anything": function () {
-      v.obs.push(v.TestSubClass.observeAge([6], {
+    "test removed": function () {
+      v.obs.push(v.TestSubClass.observeAge([5], {
         removed: v.removed = test.stub(),
       }));
+      v.TestSubClass.addMemDoc(v.doc);
+      test.onEnd(function () {v.TestSubClass.delMemDoc(v.doc._id)});
 
       AppOplog.simulate('d', 'TestSubClass', v.doc._id);
 

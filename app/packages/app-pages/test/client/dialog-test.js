@@ -15,16 +15,40 @@
         assert.dom('form#Foo');
       });
 
+      assert.isTrue(Bart.Dialog.isOpen());
+
+      Bart.Dialog.open(Bart.html('<div id="Nested"></div>'));
+
+      assert.dom('#Nested');
+
+      assert.isTrue(Bart.Dialog.isOpen());
+
+      Bart.Dialog.close();
+
+      refute.dom('#Nested');
+
+      assert.isTrue(Bart.Dialog.isOpen());
+
       Bart.Dialog.close('Foo');
 
       refute.dom('.Dialog');
+
+      assert.isFalse(Bart.Dialog.isOpen());
     },
 
-    "test wrapping": function () {
+    "test full wrapping": function () {
       Bart.Dialog.open(Bart.html('<div id="foo">Foo!!</div>'));
 
       assert.dom('.Dialog', function () {
-        assert.dom('>div>.dialogContainer>.ui-dialog>#foo', 'Foo!!');
+        assert.dom('>.dialogContainer>.ui-dialog>#foo', 'Foo!!');
+      });
+    },
+
+    "test partial wrapping": function () {
+      Bart.Dialog.open(Bart.html('<div id="foo" class="ui-dialog">Foo!!</div>'));
+
+      assert.dom('.Dialog', function () {
+        assert.dom('>.dialogContainer>#foo.ui-dialog', 'Foo!!');
       });
     },
 

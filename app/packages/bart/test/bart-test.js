@@ -41,8 +41,8 @@ Meteor.isClient && (function (test, v) {
         Bart.newTemplate({
           name: "Bar.Baz",
           nodes:[{
-            name:"i",
-            children:[['', 'initials']]
+            name:"input",
+            attrs:[["=","type",'text'], ["=", 'value', ['', 'initials']]]
           }],
         });
       },
@@ -64,7 +64,7 @@ Meteor.isClient && (function (test, v) {
         assert.same(v.helperFoundCtx, elm._bart);
 
         assert.dom(elm, function () {
-          assert.dom('i', 'one', function () {
+          assert.dom('input', {value: 'one'}, function () {
             var ctx = Bart.Foo.$ctx(this);
             assert.same(ctx, elm._bart);
             assert.same(ctx.element(), elm);
@@ -82,22 +82,55 @@ Meteor.isClient && (function (test, v) {
       "test updateAllTags": function () {
         var elm = Bart.Foo.$render({myFunc: 'one'});
 
+        document.body.appendChild(elm);
+
         assert.dom(elm, function () {
-          assert.dom('i', 'one');
+          assert.dom('input', {value: 'one'});
 
           elm._bart.updateAllTags({myFunc: 'two'});
 
-          refute.dom('i', 'one');
-          assert.dom('i', 'two', function () {
+          assert.dom('input', {count: 1});
+          assert.dom('input', {value: 'two'}, function () {
             this._bart.updateAllTags(null);
 
             assert.same(this.textContent, '');
 
             assert.same(this._bart.data, null);
           });
-
         });
+      },
 
+      "test restoring focus": function () {
+        Bart.Bar.$helpers({
+          myFunc: function () {
+            v.helperFoundCtx = Bart.Foo.$ctx();
+
+            document.activeElement.blur(); // same effect as moving the focused element
+            return 'foo';
+          },
+        });
+        var elm = Bart.Foo.$render({});
+
+        document.body.appendChild(elm);
+
+        assert.dom(elm, function () {
+          assert.dom('input', function () {
+            this.focus();
+            assert.same(document.activeElement, this);
+          });
+
+          elm._bart.updateAllTags();
+
+          assert.dom('input', function () {
+            assert.same(document.activeElement, this);
+
+            this._bart.updateAllTags(null);
+
+            assert.same(this.textContent, '');
+
+            assert.same(this._bart.data, null);
+          });
+        });
       },
 
       "test default arg is data": function () {
@@ -122,7 +155,7 @@ Meteor.isClient && (function (test, v) {
         var result = Bart.Foo.$render({});
 
         assert.dom(result, function () {
-          assert.dom('>div>i', 'BJ');
+          assert.dom('>div>input', {value: 'BJ'});
         });
       },
     },
@@ -173,27 +206,58 @@ Meteor.isClient && (function (test, v) {
       });
     },
 
-    "test setSuffixClass": function () {
+    "test setClassBySuffix": function () {
       var elm = {className: ''};
 
-      Bart.setSuffixClass(elm, 'use', 'Mode');
+      Bart.setClassBySuffix('use', 'Mode', elm);
       assert.same(elm.className, 'useMode');
 
-      Bart.setSuffixClass(elm, 'design', 'Mode');
+      Bart.setClassBySuffix('design', 'Mode', elm);
       assert.same(elm.className, 'designMode');
 
-      Bart.setSuffixClass(elm, 'discard', 'Avatar');
+      Bart.setClassBySuffix('discard', 'Avatar', elm);
       assert.same(elm.className, 'designMode discardAvatar');
 
-      Bart.setSuffixClass(elm, 'use', 'Mode');
+      _private.currentElement = elm;
+
+      Bart.setClassBySuffix('use', 'Mode');
       assert.same(elm.className, 'discardAvatar useMode');
 
-      Bart.setSuffixClass(elm, null, 'Avatar');
+      Bart.setClassBySuffix(null, 'Avatar');
       assert.same(elm.className, 'useMode');
 
-      Bart.setSuffixClass(elm, 'devMode prod', 'Mode');
-      Bart.setSuffixClass(elm, 'devMode prod', 'Mode');
+      Bart.setClassBySuffix('devMode prod', 'Mode', elm);
+      Bart.setClassBySuffix('devMode prod', 'Mode', elm);
       assert.same(elm.className, 'devMode prodMode');
+
+      Bart.setClassBySuffix('', 'Mode', elm);
+      assert.same(elm.className, '');
+    },
+
+    "test setClassByPrefix": function () {
+      var elm = {className: ''};
+
+      Bart.setClassByPrefix('use', 'mode-', elm);
+      assert.same(elm.className, 'mode-use');
+
+      Bart.setClassByPrefix('design', 'mode-', elm);
+      assert.same(elm.className, 'mode-design');
+
+      _private.currentElement = elm;
+
+      Bart.setClassByPrefix('discard', 'avatar-');
+      assert.same(elm.className, 'mode-design avatar-discard');
+
+      Bart.setClassByPrefix('use', 'mode-');
+      assert.same(elm.className, 'avatar-discard mode-use');
+
+      Bart.setClassByPrefix(null, 'avatar-');
+      assert.same(elm.className, 'mode-use');
+      Bart.setClassByPrefix('dev mode-prod', 'mode-');
+      assert.same(elm.className, 'mode-dev mode-prod');
+
+      Bart.setClassByPrefix('', 'mode-', elm);
+      assert.same(elm.className, '');
     },
 
     "test classList": function () {

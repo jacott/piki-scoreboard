@@ -1,8 +1,0 @@
-<template name="Test.Ext.Each">
-  <ul id="EachTest">
-    {{each "fooList" template="Row"}}
-  </ul>
-  <template name="Row">
-    <li>{{name}}</li>
-  </template>
-</template>

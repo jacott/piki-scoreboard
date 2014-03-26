@@ -9,6 +9,7 @@
 
     tearDown: function () {
       v = null;
+      App.Ready.stopAll();
     },
 
     "test rendering": function () {
@@ -40,8 +41,11 @@
 
       App._startup();
 
+      refute.called(window.addEventListener);
+
+      App.Ready.notifyReady();
+
       assert.calledOnceWith(window.addEventListener, 'popstate');
-      App.Ready.isReady = true;
       window.addEventListener.getCall(0).yield();
 
       assert.calledWithExactly(AppRoute.pageChanged);

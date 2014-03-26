@@ -273,8 +273,11 @@
     'test remove': function () {
       TestSubClass = AppModel.Base.defineSubclass('TestSubClass', {}, {saveRpc: true});
       var sut = AppModel.TestSubClass.create();
+      test.spy(TestSubClass, 'fencedRemove');
 
       sut.$remove();
+
+      assert.calledWith(TestSubClass.fencedRemove, sut._id);
 
       assert.same(AppModel.TestSubClass.find().count(),0);
     },
@@ -282,6 +285,21 @@
     'with TestSubClass': {
       setUp: function () {
         TestSubClass = AppModel.Base.defineSubclass('TestSubClass', {t1: 123, authorize: function () {}}, {saveRpc: true});
+      },
+
+      "Fenched writes": {
+
+        "test fencedUpdate can only be called with string id": function () {
+          assert.exception(function () {
+            TestSubClass.fencedUpdate({_id: "123"}, {name: "foo"});
+          }, "Error", "Invalid arguments [500]");
+        },
+
+        "test fencedRemove can only be called with string id": function () {
+          assert.exception(function () {
+            TestSubClass.fencedRemove({_id: "123"}, {name: "foo"});
+          }, "Error", "Invalid arguments [500]");
+        },
       },
 
       "test validator passing function": function () {
@@ -516,6 +534,7 @@
       },
 
       'test create': function () {
+        this.spy(AppModel.TestSubClass,'fencedInsert');
         this.spy(AppModel.TestSubClass.docs,'insert');
         var attrs = {name: 'testing'};
 
@@ -525,6 +544,7 @@
         assert.equals(doc.changes,{});
 
         attrs._id = doc._id;
+        assert.calledOnceWith(AppModel.TestSubClass.fencedInsert,attrs);
         assert.calledOnceWith(AppModel.TestSubClass.docs.insert,attrs);
         if(Meteor.isClient)
           assert.calledOnceWith(Meteor.call,'TestSubClass.save', doc._id,{_id: doc._id, name: "testing"});
@@ -533,20 +553,34 @@
 
       },
 
+      "test $reload on removed doc": function () {
+        TestSubClass.defineFields({name: 'string'});
+        doc = TestSubClass.create({name: 'old'});
+
+        doc.$remove();
+
+        assert.same(doc.$reload(), doc);
+
+        assert.equals(doc.attributes, {});
+      },
+
       'test update': function () {
         TestSubClass.defineFields({name: 'string'});
         doc = TestSubClass.create({name: 'old'});
 
+        this.spy(AppModel.TestSubClass,'fencedUpdate');
         this.spy(AppModel.TestSubClass.docs,'update');
         this.spy(Meteor,'call');
 
         doc.name = 'new';
         doc.$save();
 
+
         doc.$reload();
         assert.same(doc.name, 'new');
         assert.equals(doc.changes,{});
 
+        assert.calledOnceWith(AppModel.TestSubClass.fencedUpdate, doc._id, {$set: {name: 'new'}});
         assert.calledOnceWith(AppModel.TestSubClass.docs.update,doc._id,{$set: {name: 'new'}});
         if(Meteor.isClient)
           assert.calledOnceWith(Meteor.call,'TestSubClass.save', doc._id,{name: "new"});

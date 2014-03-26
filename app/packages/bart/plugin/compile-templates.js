@@ -39,43 +39,6 @@ if (process.env.METEOR_MODE === 'test') (function () {
   var result = compile(template, errorCatch);
 
   fs.writeFileSync(dir + 'template-test.js', '_BartTest = function(Bart) {'+result+'\n};');
-
-  if (global.BART_WATCHER) return;
-  global.BART_WATCHER = true;
-
-  dir = process.cwd() + '/../test/templates/';
-
-  fs.existsSync(dir) && compileTestTemplates(dir);
-
-  function compileTestTemplates(dir) {
-    var buildDir = dir.replace(/\/test\/templates\//, '/test/compiled-templates/');
-    fs.existsSync(buildDir) || fs.mkdirSync(buildDir);
-
-    fs.watch(dir, {persistent: false}, function (event, file) {
-      if (event === 'change' && file.match(/.bhtml$/))
-        compilefile(fs, dir, buildDir, file);
-    });
-
-    fs.readdirSync(dir).forEach(function (file) {
-      if (file.match(/\./)) {
-        var m = /^([^.]+)\.bhtml$/.exec(file);
-        if (m) {
-          compilefile(fs, dir, buildDir, file);
-        }
-      } else if (fs.statSync(dir+file).isDirectory()) {
-        compileTestTemplates(dir+file+'/');
-      }
-    });
-  }
-
-  function compilefile(fs, dir, buildDir, file) {
-    var template = fs.readFileSync(dir+file);
-    errorCatch.inputPath = dir+file;
-    var result = compile(template, errorCatch);
-    var name = '_BartTest_' + dir.replace(/^.*\/test\/templates\//,'') + file.replace(/.bhtml/,'');
-    fs.writeFileSync(buildDir+file.replace(/\.bhtml$/, '.js'), name.replace(/\W+/g,'_') + ' = function(Bart) {'+result+'\n};');
-
-  }
 })();
 
 function compile(contents, compileStep) {

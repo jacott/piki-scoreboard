@@ -49,13 +49,25 @@
         });
       },
 
-      "test blurring list closes list": function () {
+      "test tab closes list": function () {
         renderButton();
 
         assert.dom('#TestButton', function () {
           TH.trigger(this, 'mousedown');
           TH.trigger(this, 'mouseup');
-          TH.trigger(this, 'blur');
+          TH.trigger(this, 'keydown', {which: 9});
+        });
+
+        refute.dom('#TestList');
+      },
+
+      "test escape closes list": function () {
+        renderButton();
+
+        assert.dom('#TestButton', function () {
+          TH.trigger(this, 'mousedown');
+          TH.trigger(this, 'mouseup');
+          TH.trigger(this, 'keydown', {which: 27});
         });
 
         refute.dom('#TestList');

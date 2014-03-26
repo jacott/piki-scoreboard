@@ -31,6 +31,8 @@ function setup(model) {
       }
 
       var obsSet = {};
+      var setKey = ++key;
+      options = App.extend(options, {_key: setKey});
       for(var i=0;i < values.length;++i) {
         var ob = observeValue(values[i], options);
         obsSet[ob.value]=ob;
@@ -41,20 +43,20 @@ function setup(model) {
 
     function observeValue(value, options) {
       var obs = observers[value] || (observers[value] = {});
-      obs[++key] = options;
+      obs[options._key] = options;
       oplogObserver || initOplogObserver();
-      return stopObserver(value, obs, key, options);
+      return stopObserver(value, obs, options);
     };
 
-    function stopObserver(value, obs, key, options) {
+    function stopObserver(value, obs, options) {
       return {
         stop: function() {
-          delete obs[key];
+          delete obs[options._key];
           var stopped = options.stopped;
           stopped && stopped(value);
-          for(key in obs) return;
+          for(var key in obs) return;
           delete observers[value];
-          for(key in observers) return;
+          for(var key in observers) return;
           oplogObserver && oplogObserver.stop();
           oplogObserver = null;
         },
@@ -144,48 +146,71 @@ function setup(model) {
     function initOplogObserver() {
       oplogObserver = model.observeOplog({
         ins: function (attrs) {
-          var id = attrs._id;
-          var cbs = observers[attrs[field]];
-          if (cbs) for(var i in cbs) {
-            var cb = cbs[i];
-            cb.added && cb.added(id, attrs);
-          }
+          callObservers(added, attrs[field], attrs._id, attrs);
         },
 
         lookup: field,
 
         upd: function (id, attrs) {
           if (field in attrs) {
-            var cbs = observers[attrs[field]];
-            if (cbs) for(var i in cbs) {
-              var cb = cbs[i];
-              cb.changed && cb.changed(id, attrs, doc && doc[field]);
+            var memDoc = model.memFind(id);
+            if (memDoc) {
+              var called = callObservers(changed, memDoc[field], id, attrs);
             }
-          }
-          var doc = model.attrFind(id, findFieldOpts);
-          if (doc) {
-            var cbs = observers[doc[field]];
-            if (cbs) for(var i in cbs) {
-              var cb = cbs[i];
-              cb.changed && cb.changed(id, attrs, doc && doc[field]);
+            callObservers(changed, attrs[field], id, attrs, called);
+          } else {
+            var doc = model.attrFind(id, findFieldOpts);
+            if (doc) {
+              model.addMemDoc(doc);
+              try {
+                callObservers(changed, doc[field], id, attrs);
+              } finally {
+                model.delMemDoc(doc._id);
+              }
             }
           }
         },
         del: function (id) {
-          // don't know what observer is interested in this so have to tell them all
-          try {
-            for(var value in observers) {
-              var cbs = observers[value];
-              for(var i in cbs) {
-                var cb = cbs[i];
-                cb.removed && cb.removed(id);
-              }
-            }
-          } catch(ex) {
-            process.stderr.write(ex.stack);
-          }
+          var memDoc = model.memFind(id);
+          if (memDoc) {
+            var called = callObservers(removed, memDoc[field], id, memDoc);
+          } // else no one knows about it?
         }
       });
+    }
+
+    function callObservers(func, value, id, attrs, called) {
+      if (_.isArray(value)) {
+        called = called || {};
+        for(var v = 0; v < value.length; ++v) {
+          var cbs = observers[value[v]];
+          if (cbs) for(var i in cbs) {
+            var cb = cbs[i];
+            if (! (cb._key in called)) {
+              called[cb._key] = true;
+              func(cb, value, id, attrs);
+            }
+          }
+        }
+      } else {
+        var cbs = observers[value];
+        if (cbs) for(var i in cbs) {
+          var cb = cbs[i];
+          func(cb, value, id, attrs);
+        }
+      }
+      return called;
+    }
+
+    function added(cb, value, id, attrs) {
+      cb.added && cb.added(id, attrs);
+    }
+
+    function changed(cb, value, id, attrs) {
+      cb.changed && cb.changed(id, attrs, value);
+    }
+    function removed(cb, value, id, attrs) {
+      cb.removed && cb.removed(id, attrs, value);
     }
   }
 };

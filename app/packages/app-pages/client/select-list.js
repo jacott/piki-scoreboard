@@ -25,15 +25,19 @@ Bart.Form.SelectList = {
         button.appendChild(ctx.listElm = list.$autoRender());
         var listCtx = Bart.getCtx(ctx.listElm);
         var callback = function (event) {
-          if (event.type === 'mousedown' && Bart.parentOf(button, event.target)) return;
+          if (event.type === 'mousedown') {
+              if (Bart.parentOf(button, event.target)) return;
+          } else if (event.which !== 9 && event.which !== 27) {
+            return;
+          }
 
           Bart.remove(ctx.listElm);
         };
-        button.addEventListener('blur', callback, true);
+        button.addEventListener('keydown', callback, true);
         document.addEventListener('mousedown', callback, true);
         listCtx.onDestroy(function () {
           ctx.listElm = null;
-          button.removeEventListener('blur', callback, true);
+          button.removeEventListener('keydown', callback, true);
           document.removeEventListener('mousedown', callback, true);
         });
       }
@@ -43,8 +47,8 @@ Bart.Form.SelectList = {
 
 function actionItem(func) {
   return function (event) {
-    Bart.stopEvent();
     if (Bart.hasClass(this, 'disabled')) return;
+    Bart.stopEvent();
     func(this, event);
   };
 }

@@ -37,6 +37,28 @@ AppModel._support.setupExtras.push(function (model) {
       },
     });
   };
+
+  model.fencedInsert = function (attrs) {
+    return AppModel.beginWaitFor(model.modelName, attrs._id, function () {
+      return model.docs.insert(attrs);
+    });
+  };
+
+  model.fencedUpdate = function (id /* args */) {
+    if (typeof id !== 'string') throw new Meteor.Error(500, "Invalid arguments");
+    var args = arguments;
+    return AppModel.beginWaitFor(model.modelName, id, function () {
+      return model.docs.update.apply(model.docs, args);
+    });
+  };
+
+  model.fencedRemove = function (id /* args */) {
+    if (typeof id !== 'string') throw new Meteor.Error(500, "Invalid arguments");
+    var args = arguments;
+    return AppModel.beginWaitFor(model.modelName, id, function () {
+      return model.docs.remove.apply(model.docs, args);
+    });
+  };
 });
 
 
@@ -62,7 +84,7 @@ App.extend(_support, {
 
       var update = {};
       update[field] = value;
-      model.docs.update(_id, {$push: update});
+      model.fencedUpdate(_id, {$push: update});
     };
   },
 
@@ -76,7 +98,7 @@ App.extend(_support, {
 
       var update = {};
       update[field] = value;
-      model.docs.update(_id, {$pull: update});
+      model.fencedUpdate(_id, {$pull: update});
     };
   },
 

@@ -11,6 +11,27 @@
       v = null;
     },
 
+    "Fenched writes": {
+      setUp: function () {
+        TestSubClass = AppModel.Base.defineSubclass('TestSubClass');
+      },
+
+      "test fencedInsert": function () {
+        var insert = test.stub(TestSubClass.docs, 'insert').withArgs({_id: "123", name: "foo"}).returns('insert-result');
+        assert.same(TestSubClass.fencedInsert({_id: "123", name: "foo"}), 'insert-result');
+      },
+
+      "test fencedUpdate": function () {
+        var update = test.stub(TestSubClass.docs, 'update').withArgs("123", {name: "foo"}, "other").returns('update-result');
+        assert.same(TestSubClass.fencedUpdate("123", v.attrs = {name: "foo"}, "other"), 'update-result');
+      },
+
+      "test fencedRemove": function () {
+        var remove = test.stub(TestSubClass.docs, 'remove').withArgs("123", "other").returns('remove-result');
+        assert.same(TestSubClass.fencedRemove("123", "other"), 'remove-result');
+      },
+    },
+
     "test attrDocs": function () {
       var TestSubClass = AppModel.Base.defineSubclass('TestSubClass');
 

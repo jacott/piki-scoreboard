@@ -30,6 +30,10 @@ AppRoute.prototype = {
       template.onExit = onExitFunc(template);
   },
 
+  addAlias: function (template, path) {
+    this.routes[path] = template;
+  },
+
   addBase: function (template, routeVar) {
     if ('route' in template) throw new Error(template.name + ' is already a route base');
     var path = templatePath(template);
@@ -54,6 +58,7 @@ AppRoute.prototype = {
 var inGotoPage = false;
 var currentPage = null;
 var currentPageRoute = {};
+var currentTitle, currentHref;
 var pageState = 'pushState';
 var excludes = {append: 1, href: 1, hash: 1};
 App.extend(AppRoute, {
@@ -101,12 +106,14 @@ App.extend(AppRoute, {
       } else {
         page = page.Index || page;
         var href = page.onEntry(page, pageRoute) || pageRoute.pathname;
-        var  title = document.title = page.title || AppRoute.title;
+        var title = document.title = page.title || AppRoute.title;
         Bart.setTitle && Bart.setTitle(page.title);
 
         if (pageState &&
             (pageState !== 'pushState' || currentPageRoute.pathname !== pageRoute.pathname) &&
             ! ('noPageHistory' in page)) {
+          currentHref = href;
+          currentTitle = title;
           AppRoute.history[pageState](null, title, href);
         }
         currentPage = page;
@@ -127,6 +134,10 @@ App.extend(AppRoute, {
       pageState = 'pushState';
       currentPageRoute = pageRoute;
     }
+  },
+
+  pushCurrent: function () {
+    AppRoute.history.pushState(null, currentTitle, currentHref);
   },
 
   get currentPage() {

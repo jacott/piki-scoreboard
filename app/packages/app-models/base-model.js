@@ -41,7 +41,10 @@ var _support = AppModel._support = {
   modelName: modelName,
 
   performBumpVersion: function(model, _id, _version) {
-    model.docs.update({_id: _id, _version: _version}, {$inc: {_version: 1}});
+    AppModel.beginWaitFor(model.modelName, _id, function () {
+      model.docs.update({_id: _id, _version: _version}, {$inc: {_version: 1}}) ||
+        AppModel.endWaitFor(model.modelName, _id);
+    });
   },
 
   performInsert: function (doc) {
@@ -51,7 +54,7 @@ var _support = AppModel._support = {
     _support.callObserver('beforeSave', doc);
     model.hasVersioning && (doc.changes._version = 1);
 
-    model.docs.insert(doc.changes);
+    model.fencedInsert(doc.changes);
     _support.callObserver('afterCreate', doc);
     _support.callObserver('afterSave', doc);
   },
@@ -63,7 +66,8 @@ var _support = AppModel._support = {
     _support.callObserver('beforeSave', doc);
     var updates = {$set: doc.changes};
     model.hasVersioning && (updates.$inc = {_version: 1});
-    model.docs.update(doc._id, updates);
+
+    model.fencedUpdate(doc._id, updates);
     _support.callObserver('afterUpdate', doc);
     _support.callObserver('afterSave', doc);
   },
@@ -132,7 +136,7 @@ BaseModel.prototype = {
   },
 
   $remove: function () {
-    var result = AppModel[modelName(this)].docs.remove(this._id);
+    var result = AppModel[modelName(this)].fencedRemove(this._id);
     _support.callObserver('afterRemove', this);
     return result;
   },
@@ -571,17 +575,15 @@ function setUpValidators(model, field, options) {
   }
 }
 
-function reload(reactive) {
-  if (! reactive && Meteor.isClient) {
+function reload() {
+  if (Meteor.isClient) {
     var attrs = AppModel[modelName(this)].attrDocs()[this._id];
     if (attrs) attrs = App.extend({}, attrs);
   } else {
     var attrs = AppModel[modelName(this)].findOne(this._id, {transform: null});
   }
 
-  if(attrs == null) throw new Meteor.Error(404,"Can't find "+modelName(this)+"("+this._id+")");
-
-  this.attributes = attrs;
+  this.attributes = attrs || {};
   this.changes = {};
   this._errors = null;
   this._cache = null;

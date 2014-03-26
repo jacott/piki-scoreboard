@@ -6,10 +6,9 @@ __meteor_runtime_config__ = { ROOT_URL: "http://test.local:1234", serverId: "tes
 
   geddon.onTestStart(setUp);
   geddon.onTestEnd(tearDown);
-  sinon.stub(App, 'log');
+  App.log = function () {};
 
   function setUp () {
-    App.log.reset();
     if(firstTime) {
       firstTime = false;
       pageTitle = AppRoute.title;
@@ -19,9 +18,18 @@ __meteor_runtime_config__ = { ROOT_URL: "http://test.local:1234", serverId: "tes
         replaceState: function () {},
         back: function () {},
       };
+      // AppClient._orig_setLocalItem = AppClient.setLocalItem;
+      // AppClient._orig_getLocalItem = AppClient.getLocalItem;
+      // AppClient._orig_removeLocalItem = AppClient.removeLocalItem;
+
+      // AppClient.setLocalItem = function () {};
+      // AppClient.getLocalItem = function () {};
+      // AppClient.removeLocalItem = function () {};
       Accounts.loginServicesConfigured = loginServicesConfiguredStub;
       Meteor.setTimeout = timeoutStub;
     } else {
+      App.orgId = null;
+      AppRoute.title = pageTitle;
       cleanup();
     }
 
@@ -40,8 +48,8 @@ __meteor_runtime_config__ = { ROOT_URL: "http://test.local:1234", serverId: "tes
     while(lc = body.lastChild) {
       Bart.remove(lc);
     }
-    App.orgId = null;
-    AppRoute.title = pageTitle;
+    body.parentNode.scrollTop = 1;
+    body.parentNode.scrollLeft = 1;
   }
 
   function loginServicesConfiguredStub() {

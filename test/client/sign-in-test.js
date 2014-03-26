@@ -69,6 +69,8 @@
       },
 
       "test unexpected error": function () {
+        test.stub(App, 'log');
+
         v.callback({message: 'foo'});
 
         assert.dom('#ForgotPassword', function () {

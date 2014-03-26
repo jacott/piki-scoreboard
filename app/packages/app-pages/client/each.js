@@ -33,11 +33,19 @@ function createEach(func, options) {
   options = options || {};
   var templateName = options.template || "Each_" + func;
 
-  var row = Bart.lookupTemplate.call(ctpl, templateName) ||
-        Bart.lookupTemplate(templateName);
-  if (! row) throw new Error("template '" + templateName +
-                             "' not found in template '" + ctpl.name + "'");
+  if (typeof templateName === 'object') {
+    if ('$autoRender' in templateName)
+      var row = templateName;
+    else
+      templateName = templateName.toString();
+  }
 
+  if (! row) {
+    var row = Bart.lookupTemplate.call(ctpl, templateName) ||
+          Bart.lookupTemplate(templateName);
+    if (! row) throw new Error("template '" + templateName +
+                               "' not found in template '" + ctpl.name + "'");
+  }
 
   callback.render = callbackRender;
   callback.clear = function () {

@@ -3,7 +3,18 @@ Package.describe({
   internal: true
 });
 
+var fs = Npm.require('fs');
+
+var topDir = process.cwd() +'/packages/bart/';
+
+var mode = topDir + 'plugin/mode.js';
+
+if (! fs.existsSync(mode)) {
+  fs.writeFileSync(mode, '');
+}
+
 Package._transitional_registerBuildPlugin({
+
   name: "compileBartTemplates",
   use: [],
   sources: [

@@ -51,7 +51,9 @@ AppVal = {
   allowIfValid: function (truthy, doc) {
     if (! truthy) {
       if (doc) App.log('INVALID ' + this.inspectErrors(doc));
-      throw new Meteor.Error(400, 'Invalid request' + (doc ? ": " + AppVal.inspectErrors(doc) : ''));
+      var error = Meteor.Error(400, 'Invalid request' + (doc ? ": " + AppVal.inspectErrors(doc) : ''));
+      error.doc = doc;
+      throw error;
     }
     return truthy;
   },

@@ -28,7 +28,10 @@ App._startup = function () {
     handle && handle.stop();
     handle = null;
 
-    AppRoute.gotoPath(pathname || document.location);
+    window.addEventListener('popstate', function (event) {
+      App.Ready.isReady && AppRoute.pageChanged();
+    });
+    AppRoute.replacePath(pathname || document.location);
     return false;
   }
 
@@ -53,10 +56,6 @@ App._startup = function () {
         }
       });
     }
-  });
-
-  window.addEventListener('popstate', function (event) {
-    App.Ready.isReady && AppRoute.pageChanged();
   });
 };
 
@@ -102,7 +101,7 @@ var orgSub, orgShortName, pathname;
 function setAccess() {
   var _id = App.userId();
   var user = _id && AppModel.User.quickFind(_id);
-  Bart.setSuffixClass(document.body, user ? user.accessClasses(App.orgId) : 'readOnly', 'Access');
+  Bart.setClassBySuffix(user ? user.accessClasses(App.orgId) : 'readOnly', 'Access', document.body);
 }
 
 function subscribeOrg(shortName) {

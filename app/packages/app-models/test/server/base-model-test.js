@@ -14,6 +14,47 @@
       TestSubClass = v = null;
     },
 
+    "Fenched writes": {
+      setUp: function () {
+        test.stub(AppModel, 'beginWaitFor').returns('beginWaitFor-result');
+        TestSubClass = AppModel.Base.defineSubclass('TestSubClass');
+      },
+
+      "test fencedInsert": function () {
+        var insert = test.stub(TestSubClass.docs, 'insert').returns('insert-result');
+        assert.same(TestSubClass.fencedInsert(v.attrs = {_id: "123", name: "foo"}), 'beginWaitFor-result');
+
+        assert.calledOnceWith(AppModel.beginWaitFor, 'TestSubClass', '123');
+        refute.called(insert);
+        assert.same(AppModel.beginWaitFor.args[0][2](), 'insert-result');
+
+        assert.calledWith(insert, v.attrs);
+      },
+
+      "test fencedUpdate": function () {
+        var update = test.stub(TestSubClass.docs, 'update').returns('update-result');
+        assert.same(TestSubClass.fencedUpdate("123", v.attrs = {name: "foo"}, "other"), 'beginWaitFor-result');
+
+        assert.calledOnceWith(AppModel.beginWaitFor, 'TestSubClass', '123');
+        refute.called(update);
+        assert.same(AppModel.beginWaitFor.args[0][2](), 'update-result');
+
+        assert.calledWith(update, "123", v.attrs, "other");
+      },
+
+      "test fencedRemove": function () {
+        var remove = test.stub(TestSubClass.docs, 'remove').returns('remove-result');
+        assert.same(TestSubClass.fencedRemove("123", "other"), 'beginWaitFor-result');
+
+        assert.calledOnceWith(AppModel.beginWaitFor, 'TestSubClass', '123');
+        refute.called(remove);
+        assert.same(AppModel.beginWaitFor.args[0][2](), 'remove-result');
+
+        assert.calledWith(remove, "123", "other");
+      },
+    },
+
+
     'test removeRpc': function () {
       TestSubClass = AppModel.Base.defineSubclass('TestSubClass', {
         authorize: v.auth = test.stub()

@@ -53,6 +53,20 @@ AppModel._support.setupExtras.push(function (model) {
   model.attrDocs = function () {
     return model.docs._collection._docs._map;
   };
+
+  model.fencedInsert = function (attrs) {
+    return model.docs.insert(attrs);
+  };
+
+  model.fencedUpdate = function (id /* args */) {
+    if (typeof id !== 'string') throw new Meteor.Error(500, "Invalid arguments");
+    return model.docs.update.apply(model.docs, arguments);
+  };
+
+  model.fencedRemove = function (id /* args */) {
+    if (typeof id !== 'string') throw new Meteor.Error(500, "Invalid arguments");
+    return model.docs.remove.apply(model.docs, arguments);
+  };
 });
 
 function removeFunc(method) {
@@ -60,6 +74,15 @@ function removeFunc(method) {
     Meteor.call(method, this._id);
   };
 }
+
+App.extend(AppModel, {
+  beginWaitFor: function (colName, id, func) {
+    return func();
+  },
+
+  endWaitFor: function (colName, id) {},
+});
+
 
 App.extend(_support, {
   attrFind: function (id) {

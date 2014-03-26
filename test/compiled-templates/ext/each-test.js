@@ -1,2 +1,0 @@
-_BartTest_ext_each_test = function(Bart) {Bart.newTemplate({"name":"Test.Ext.Each","nested":[{"name":"Row","nodes":[{"name":"li","attrs":[],"children":[["","name"]]}]}],"nodes":[{"name":"ul","attrs":[["=","id","EachTest"]],"children":[" ",["","each","\"fooList",["=","template","\"Row"]]," "]}]});
-};

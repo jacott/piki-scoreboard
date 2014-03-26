@@ -12,8 +12,6 @@ branchOld=/u/app/${branch}.old
 branchCurrent=/u/app/${branch}
 branchNew=/u/app/${branch}.new
 
-echo "" >packages/bart/plugin/mode.js
-
 ${meteor}/bin/meteor bundle $bundle
 
 rm -rf $branchOld $branchNew

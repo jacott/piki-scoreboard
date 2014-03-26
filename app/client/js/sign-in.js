@@ -65,7 +65,7 @@ function closeDialog() {
 }
 
 function setState(form, state) {
-  Bart.setSuffixClass(form, state, "-state");
+  Bart.setClassBySuffix(state, "-state", form);
   Bart.getCtx('#SignInProgress').updateAllTags({state: state});
 }
 

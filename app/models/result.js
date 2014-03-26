@@ -46,7 +46,7 @@ App.require('AppModel.Competitor', function (Competitor) {
 
       changes['scores.' + index] = heat.scoreToNumber(score);
 
-      model.docs.update(id, {$set: changes});
+      model.fencedUpdate(id, {$set: changes});
     },
   });
 

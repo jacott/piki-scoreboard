@@ -25,6 +25,8 @@
         return typeof callback === 'function';
       }));
 
+      test.stub(App, 'log');
+
       v.callback({error: 403, reason: 'token expired', message: 'foo'});
 
       assert.dom('#ResetPassword', function () {

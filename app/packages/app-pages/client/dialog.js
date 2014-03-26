@@ -1,7 +1,13 @@
 var $ = Bart.current;
 var Tpl = Bart.Dialog;
 
+var count = 0;
+
 Tpl.$extend({
+  isOpen: function () {
+    return count !== 0;
+  },
+
   open: function (content) {
     document.body.appendChild(Tpl.$autoRender({content: content}));
   },
@@ -14,7 +20,6 @@ Tpl.$extend({
       return;
     }
 
-    Bart.Form.cancelModalize('all');
     var dialogs = document.getElementsByClassName('Dialog');
     if (dialogs.length > 0) Bart.remove(dialogs[dialogs.length - 1]);
   },
@@ -37,6 +42,11 @@ Tpl.$helpers({
 
      var dc = document.createElement('div');
      dc.className = 'dialogContainer';
+
+     if (Bart.hasClass(content, 'ui-dialog')) {
+       dc.appendChild(content);
+       return dc;
+     }
 
      var dialog = document.createElement('div');
      dialog.className = 'ui-dialog';
@@ -77,11 +87,13 @@ Tpl.Confirm.$extend({
 });
 
 function modalize(ctx, elm) {
-    Bart.Form.modalize(elm, function (event) {
-      Bart.remove(elm);
+  ++count;
+  Bart.Form.modalize(elm, function (event) {
+    Bart.remove(elm);
     });
   }
 
 function cancelModalize() {
+  --count;
   Bart.Form.cancelModalize();
 }
