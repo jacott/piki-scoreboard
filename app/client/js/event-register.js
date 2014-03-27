@@ -32,12 +32,12 @@ App.require('Bart.Event', function (Event) {
   Tpl.$events({
     'click tbody>tr': function (event) {
       Bart.stopEvent();
-      AppRoute.gotoPage(Edit, {append: $.data(this)._id});
+      AppRoute.replacePath(Edit, {append: $.data(this)._id});
     },
 
     'click [name=cancel]': function (event) {
       Bart.stopEvent();
-      AppRoute.history.back();
+      AppRoute.replacePath(Tpl);
     },
   });
 
@@ -77,7 +77,7 @@ App.require('Bart.Event', function (Event) {
         callback: function(confirmed) {
           if (confirmed) {
             doc.$remove();
-            AppRoute.gotoPage(Tpl);
+            AppRoute.replacePath(Tpl);
           }
         },
       });
@@ -172,6 +172,17 @@ App.require('Bart.Event', function (Event) {
     var ids = [];
     var form = event.currentTarget;
 
+    var compNumber = form.querySelector('[name=number]');
+
+    if (compNumber.value) {
+      var climber = competitor.climber;
+      climber.number = compNumber.value;
+      if (! climber.$save()) {
+        Form.renderErrors(climber, compNumber.parentNode);
+        return;
+      }
+    }
+
     var groups = form.querySelectorAll('.Groups select');
     for(var i = 0; i < groups.length; ++i) {
       var row = groups[i];
@@ -181,7 +192,7 @@ App.require('Bart.Event', function (Event) {
     competitor.category_ids = ids;
 
     if (Form.saveDoc(competitor, form)) {
-      AppRoute.gotoPage(Add);
+      AppRoute.replacePath(Add);
     }
   }
 

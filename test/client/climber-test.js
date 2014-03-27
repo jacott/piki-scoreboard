@@ -49,13 +49,15 @@
             assert.domParent('.name', 'Club');
           });
 
+          TH.input('[name=number]', '123');
+
           TH.change('[name=gender]', 'm');
           TH.click('[type=submit]');
         });
         refute.dom('#AddClimber');
       });
 
-      var climber = AppModel.Climber.findOne({org_id: v.org._id, name: 'Magnus Midtbø', dateOfBirth: '1988-09-18'});
+      var climber = AppModel.Climber.findOne({org_id: v.org._id, name: 'Magnus Midtbø', dateOfBirth: '1988-09-18', number: 123});
 
       assert(climber);
 

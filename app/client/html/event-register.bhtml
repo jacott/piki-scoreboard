@@ -31,6 +31,13 @@
     <template name="Groups">
       <div class="Groups">
         <h1>Choose Categories for {{climber.name}} to compete in</h1>
+
+        {{>ClimberNumber climber}}
+        <template name="ClimberNumber">
+          <fieldset class="fields climber">
+            {{labelField "number" label="Competitor number"}}
+          </fieldset>
+        </template>
       </div>
     </template>
     <template name="Category">
@@ -53,12 +60,16 @@
 
     <table class="select">
       <thead><tr>
-          <th>Competitor</th><th>Categories</th>
+          <th>Competitor</th><th>Number</th><th>Categories</th>
       </tr></thead>
       <tbody>
         {{each "competitors" template="Row"}}
         <template name="Row">
-          <tr><td>{{climber.name}}</td><td>{{categories}}</td></tr>
+          <tr>
+            <td>{{climber.name}}</td>
+            <td>{{climber.number}}</td>
+            <td>{{categories}}</td>
+          </tr>
         </template>
       </tbody>
     </table>

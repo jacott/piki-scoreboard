@@ -23,6 +23,7 @@
             <td class="climber">
               <span class="club">{{climber.club.shortName}}</span>
               <span class="name">{{climber.name}}</span>
+              <span class="number">{{climber.number}}</span>
             </td>
             {{scores}}
           </tr>

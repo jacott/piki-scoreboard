@@ -86,7 +86,8 @@
         .addRef('org')
         .addRef('club')
         .addField('gender', 'm')
-        .addField('dateOfBirth', '2000-01-01');
+        .addField('dateOfBirth', '2000-01-01')
+        .addField('number', 'number' in options || +generateName('cn').slice(2));
     },
 
     Competitor: function (options) {

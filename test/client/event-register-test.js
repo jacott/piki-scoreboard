@@ -59,9 +59,23 @@
             }});
         });
 
+        assert.dom('fieldset.fields.climber', function( ){
+          assert.dom('label', function () {
+            assert.dom('.name', 'Competitor number');
+            TH.input('[name=number]', '567a');
+          });
+        });
+
+        TH.click('fieldset.actions [type=submit]');
+
+        assert.dom('[name=number].error+.errorMsg', 'not numeric');
+        TH.input('[name=number]', '567');
+
         TH.click('fieldset.actions [type=submit]');
         var competitor = AppModel.Competitor.findOne({climber_id: v.climbers[1]._id});
         assert.equals(competitor.category_ids, [v.u18._id, v.open._id]);
+        assert.same(competitor.climber.number, 567);
+
 
         assert.dom('table td', 'brendon', {parent: function () {
           assert.dom('td', [v.u18.shortName, v.open.shortName].join(', '));
@@ -77,6 +91,7 @@
         });
 
       });
+
     },
 
     "test adding new climber": function () {
@@ -155,11 +170,11 @@
       },
 
       "test cancel": function () {
-        test.stub(AppRoute.history, 'back');
+        test.stub(AppRoute, 'replacePath');
 
         TH.click('#Register form [name=cancel]');
 
-        assert.called(AppRoute.history.back);
+        assert.calledWithExactly(AppRoute.replacePath, Bart.Event.Register);
       },
 
       "test delete competitor": function () {

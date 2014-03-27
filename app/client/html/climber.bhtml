@@ -15,7 +15,7 @@
         <table class="select">
           <thead>
             <tr>
-              <th>Name</th><th>Club</th>
+              <th>Name</th><th>Number</th><th>Club</th>
             </tr>
           </thead>
           <tbody>
@@ -23,7 +23,9 @@
           </tbody>
           <template name="Row">
             <tr>
-              <td>{{name}}</td><td>{{club.name}}</td>
+              <td>{{name}}</td>
+              <td>{{number}}</td>
+              <td>{{club.name}}</td>
             </tr>
           </template>
         </table>
@@ -66,6 +68,7 @@
       {{labelField "dateOfBirth" placeholder="yyyy-mm-dd"}}
       {{labelField "gender" selectList=genderList}}
       {{labelField "club_id" selectList=clubList includeBlank=""}}
+      {{labelField "number"}}
     </fieldset>
   </template>
 </template>

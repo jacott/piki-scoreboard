@@ -34,7 +34,9 @@
             assert.dom('th:nth-child(6)', 'Qual 1');
           });
           assert.dom('tbody', function () {
-            assert.dom('tr:first-child>td.climber>.name', v.result2.climber.name);
+            assert.dom('tr:first-child>td.climber>.name', {text: v.result2.climber.name, parent: function () {
+              assert.dom('.number', '' + v.result2.climber.number);
+            }});
             assert.dom('tr:last-child>td.climber>.name', v.result.climber.name);
           });
         });

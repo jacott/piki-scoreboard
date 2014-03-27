@@ -9,6 +9,7 @@ App.require('AppModel.Club', function () {
     club_id: {type: 'belongs_to', required: true},
     dateOfBirth: {type: 'date', inclusion: {matches: /^\d{4}-[01]\d-[0-3]\d$/}},
     gender: {type: 'text', required: true, inclusion: {allowBlank: true, matches: /^[mf]$/ }},
+    number: {type: 'number', number: {integer: true, $gt: 0}},
   });
 
   model.addRemoveRpc();
