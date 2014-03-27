@@ -37,6 +37,16 @@
       });
     },
 
+    "test admin deleting superuser": function () {
+      var org = TH.Factory.createOrg();
+      var subject = TH.Factory.createUser({org_id: org._id, role: AppModel.User.ROLE.admin});
+      var user = TH.Factory.createUser('su', {org_id: org._id});
+
+      assert.accessDenied(function () {
+        user.authorize(subject._id);
+      });
+    },
+
     "test guestUserId": function () {
       var user = AppModel.User.guestUser();
 

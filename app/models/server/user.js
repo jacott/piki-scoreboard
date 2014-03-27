@@ -57,7 +57,8 @@ App.require('AppModel.User', function (model) {
               }]});
 
       AppVal.allowAccessIf(authUser &&
-                           (authUser.isSuperUser() || ! ('org_id' in this.changes)));
+                           (authUser.isSuperUser() || (this.attributes.role !== role.superUser &&
+                                                       ! ('org_id' in this.changes))));
     },
   });
 
