@@ -71,7 +71,7 @@ App.require('Bart.Event', function (Event) {
 
       Bart.Dialog.confirm({
         data: doc,
-        classes: 'small warn',
+        classes: 'warn',
         okay: 'Deregister',
         content: Tpl.ConfirmDelete,
         callback: function(confirmed) {

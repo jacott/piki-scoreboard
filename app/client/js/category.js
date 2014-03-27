@@ -76,7 +76,7 @@ Tpl.Edit.$events({
     Bart.stopEvent();
     Bart.Dialog.confirm({
       data: doc,
-      classes: 'small warn',
+      classes: 'warn',
       okay: 'Delete',
       content: Tpl.ConfirmDelete,
       callback: function(confirmed) {

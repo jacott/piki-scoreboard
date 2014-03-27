@@ -15,7 +15,7 @@
         <table class="select">
           <thead>
             <tr>
-              <th>Name</th><th>Short name</th>
+              <th>Name</th><th>Short name</th><th>Group</th>
             </tr>
           </thead>
           <tbody>
@@ -23,7 +23,7 @@
           </tbody>
           <template name="Row">
             <tr>
-              <td>{{name}}</td><td>{{shortName}}</td>
+              <td>{{name}}</td><td>{{shortName}}</td><td>{{group}}</td>
             </tr>
           </template>
         </table>
