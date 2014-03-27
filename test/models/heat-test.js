@@ -128,6 +128,19 @@
 
       },
 
+      "test nulls in scores": function () {
+        v.heat = new AppModel.Heat(3, 'LQQF2');
+        var results = [v.r0 = {scores: [0.53, 340000, 430000]},
+                       v.r1 = {scores: [0.98,  30000, 320000, null]},
+                       v.r2 = {scores: [0.52, 340000, 100000, null]},
+                       v.r3 = {scores: [0.68, 340000, 100000, null]}];
+
+        results = v.heat.sortByStartOrder(results);
+
+        assert.same(results.length, 3);
+        assert.equals(results, [v.r3, v.r2, v.r0]);
+      },
+
       "test odd": function () {
         var results = [v.r1 = {scores: [0.2]}, v.r2 = {scores: [0.4]}, v.r3 = {scores: [0.3]}];
         assert.equals(v.call(1, results), [v.r2, v.r3, v.r1]);
