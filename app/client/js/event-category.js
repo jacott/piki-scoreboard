@@ -57,9 +57,11 @@ App.require('Bart.Event', function (Event) {
         heat.sortByStartOrder(results);
 
       var prev, row, rank = 0;
+      var compareResults = heat.compareResults();
+
       for(var i = 0; i < results.length; ++i, prev = row) {
         row = results[i];
-        if (! prev || heat.compareResults()(prev, row) !== 0)
+        if (! prev || compareResults(prev, row) !== 0)
           rank = i + 1;
         row.rank = rank;
         frag.appendChild(Tpl.Result.$render(row));

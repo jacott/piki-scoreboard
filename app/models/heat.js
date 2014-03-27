@@ -2,6 +2,7 @@ AppModel.Heat = Heat;
 
 function Heat(number, format) {
   this.number = number;
+  this.cutoffs = format.split('F').slice(1);
   format = format.replace(/\d+/g,'');
   this.type = format[0];
   format = format.slice(1);
@@ -126,16 +127,37 @@ Heat.prototype = {
   sortByStartOrder: function (results) {
     var x = this.number;
 
-    if (x < 0) x = 1;
-    this.sort(results, x <= this.rankIndex ? 0 : x - 1);
+    if (x <= 0) x = 1;
 
     if (x > this.rankIndex) {
+      this.sort(results, x - 1);
       (x-1) === this.rankIndex && results.sort(function (a, b) {
         return a.rankMult === b.rankMult ? 0 :
           a.rankMult < b.rankMult ? -1 : 1; // lower rank is better
       });
+
+      var cutoff = +this.cutoffs[x - this.rankIndex - 1];
+
+      var prev, row, rank = 0;
+      var compareResults = this.compareResults();
+      for(var i = 0; i < results.length; ++i, prev = row) {
+        row = results[i];
+        if (! prev || compareResults(prev, row) !== 0)
+          rank = i + 1;
+
+        if (rank > cutoff) {
+          results.length = i;
+          break;
+        }
+
+        row.rank = rank;
+      }
+
       return results.reverse();
     }
+
+    this.sort(results, 0);
+
 
     if (x % 2 === 0) {
       var mark = Math.ceil(results.length/2);
@@ -197,6 +219,7 @@ Heat.prototype = {
   },
 
   compareResults: function (min) {
+    // FIXME if min zero then need to to a pseduo random sort for ties
     if (min == null) min = 1;
     var rankIndex = this.rankIndex;
     return function (a, b) {

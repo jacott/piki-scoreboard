@@ -117,6 +117,17 @@
         };
       },
 
+      "test final": function () {
+        v.heat = new AppModel.Heat(2, 'LQF2');
+        var results = [v.r1 = {scores: [0.2, 300, 300]}, v.r2 = {scores: [0.4, 400, 100]}, v.r3 = {scores: [0.3, 300, 300]}, v.r4 = {scores: [0.1, 50, 300]}];
+
+        results = v.heat.sortByStartOrder(results);
+
+        assert.same(results.length, 3);
+        assert.equals(results, [v.r3, v.r1, v.r2]);
+
+      },
+
       "test odd": function () {
         var results = [v.r1 = {scores: [0.2]}, v.r2 = {scores: [0.4]}, v.r3 = {scores: [0.3]}];
         assert.equals(v.call(1, results), [v.r2, v.r3, v.r1]);

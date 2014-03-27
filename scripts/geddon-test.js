@@ -21,9 +21,13 @@ if (ARGV[0] === 'emacs') {
   var processBuffer = processTtyBuffer;
 }
 
+var runTime = Date.now();
+
 runTests(ARGV.shift());
 
 function runTests(mode) {
+  if (mode === 'both' && process.env.TEST_MODE)
+    mode = process.env.TEST_MODE;
   switch (mode) {
   case 'both':
     runCount = 2;
@@ -44,7 +48,7 @@ function runTests(mode) {
 
 function done(key) {
   timer && sendResults();
-  endMsg.push(key + " exited with status " + exitCodes[key]);
+  endMsg.push(key + " elapsed time: " + (Date.now() - runTime) + "ms. exited with status " + exitCodes[key]);
   if (--runCount === 0) {
     exitProcess(endMsg.join(', ')+"\n");
   }
@@ -217,14 +221,14 @@ function runClient(serverPending) {
   });
 
   fs.writeFileSync('./test/karma/context.html', wrapper[0] + srcFiles.join('\n') +
-                   '\n<script type="text/javascript">geddon = {runArg: "' + ARGV[0] + '"}</script>' +
+                   '\n<script type="text/javascript">geddon = {runArg: "' + (ARGV[0] || process.env.TEST_ARG || '') + '"}</script>' +
                    wrapper[1]);
 
   if (serverPending) {
     serverTimeout = setTimeout(function () {
       serverTimeout = null;
       serverPending();
-    }, 2000);
+    }, 1000);
   }
 
   run();
