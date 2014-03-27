@@ -37,6 +37,18 @@ body {
 
 
 #Header {
+  body:not(.inOrg) &>div {
+    &:after {
+      content: "Piki";
+      margin-left: 10px;
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+    >nav {
+      display: none;
+    }
+  }
+
   background-color: fade(@colorHeaderBackground, 60%);
   max-width: 100%;
   >div {
