@@ -28,6 +28,51 @@
       TH.assertRemoveRpc(AppModel.Event);
     },
 
+    "heat validation": {
+      setUp: function () {
+        v.oOrg = TH.Factory.createOrg();
+        v.oCat = TH.Factory.createCategory();
+
+        v.org = TH.Factory.createOrg();
+        v.cat = TH.Factory.createCategory();
+
+        v.event = TH.Factory.createEvent();
+        v.heats = v.event.$change('heats');
+      },
+
+      "test okay": function () {
+        v.heats[v.cat._id] = 'LQF8F2';
+
+        assert(v.event.$isValid(), TH.showErrors(v.event));
+      },
+
+      "test wrong org": function () {
+        delete v.heats[v.cat._id];
+        v.heats[v.oCat._id] = 'LQF8F2';
+
+        assert.accessDenied(function () {
+          v.event.$isValid();
+        });
+      },
+
+      "test wrong heat format": function () {
+        v.heats[v.cat._id] = 'LQF8F2X';
+
+        refute(v.event.$isValid());
+
+        assert.modelErrors(v.event, {heats: 'is_invalid'});
+      },
+
+      "test wrong category type": function () {
+        v.heats[v.cat._id] = 'BQF8F2';
+
+        refute(v.event.$isValid());
+
+        assert.modelErrors(v.event, {heats: 'is_invalid'});
+      },
+
+    },
+
     "competitor registration": {
       setUp: function () {
         v.cat1 = TH.Factory.createCategory({_id: 'cat1', type: 'L', heatFormat: 'QQF8'});

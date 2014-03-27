@@ -1,5 +1,6 @@
 var $ = Bart.current;
 var Tpl = Bart.Event;
+var ShowCat = Tpl.Show.Cat;
 var Index = Tpl.Index;
 var eventSub;
 
@@ -132,9 +133,55 @@ Tpl.Show.$helpers({
   },
 });
 
+Tpl.Show.$extend({
+  $created: function (ctx) {
+    Bart.autoUpdate(ctx);
+  },
+});
+
+ShowCat.$helpers({
+  eventFormat: eventFormat,
+});
+
+ShowCat.$events({
+  'click [name=format]': function (event) {
+    Bart.stopEvent();
+
+    this.parentNode.insertBefore(ShowCat.ChangeFormat.$autoRender($.ctx.data, $.ctx.parentCtx), this);
+  },
+});
+
+ShowCat.ChangeFormat.$helpers({
+  format: eventFormat,
+});
+
+ShowCat.ChangeFormat.$events({
+  'submit': function (event) {
+    Bart.stopEvent();
+
+    var cat = $.data(this);
+
+    var ev = $.ctx.parentCtx.data;
+
+    ev.$change('heats')[cat._id] = cat.type + this.querySelector('input').value;
+    if (ev.$save())
+      Bart.remove(this);
+    else {
+      Bart.Form.renderError(this, 'changeFormat', AppVal.Error.msgFor(ev, 'heats'));
+      ev.$reload();
+    }
+  },
+});
+
+
 function cancel(event) {
   Bart.stopEvent();
   AppRoute.history.back();
+}
+
+function eventFormat() {
+  var event = $.ctx.parentCtx.data;
+  return event.heats[this._id].slice(1);
 }
 
 App.loaded('Bart.Event', Bart.Event);

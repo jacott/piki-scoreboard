@@ -45,7 +45,13 @@
           <template name="Cat">
             <div>
               {{pageLink value=name template="Event.Category" append=_id}}
+              <button class="link adminAccess" name="format">{{eventFormat}}</button>
             </div>
+            <template name="ChangeFormat">
+              <form>
+                <input name="changeFormat" value="{{format}}">
+              </form>
+            </template>
           </template>
         </div>
       </div>

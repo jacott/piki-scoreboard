@@ -1,5 +1,16 @@
 App.require('AppModel.Org', function () {
   var model = AppModel.Base.defineSubclass('Event',{
+    validate: function () {
+      var  heats = this.changes.heats;
+      if (heats) for(var id in heats) {
+        var cat = AppModel.Category.findOne(id);
+        AppVal.allowAccessIf(cat.org_id === this.org_id);
+        var format = heats[id];
+        if (format[0] !== cat.type || ! format.slice(1).match(AppModel.Category.HEAT_FORMAT_REGEX)) {
+          AppVal.addError(this, 'heats', 'is_invalid');
+        }
+      }
+    },
   },{saveRpc: true});
 
 

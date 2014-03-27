@@ -107,10 +107,43 @@
           assert.dom('h1', v.event.name);
           assert.dom('.categories', function () {
             assert.dom('h1', 'Categories');
-            assert.dom('.link', v.cats[0].name);
+            assert.dom('.link', {text: v.cats[0].name, parent: function () {
+              assert.dom('.link.adminAccess', 'QQF8');
+            }});
             assert.dom('.link', v.cats[1].name);
           });
         });
+      },
+
+      "test changing format": function () {
+        assert.dom('.link', {text: v.cats[0].name, parent: function () {
+          TH.click('.link.adminAccess', 'QQF8');
+          assert.dom('form+.link.adminAccess');
+          assert.dom('form>input[name=changeFormat]', {value: "QQF8"}, function () {
+            TH.input(this, 'QQF8F2');
+            TH.trigger(this.parentNode, 'submit');
+          });
+          refute.dom('form+.link.adminAccess');
+          assert.dom('.link.adminAccess', 'QQF8F2');
+        }});
+
+        assert.equals(v.event.$reload().heats[v.cats[0]._id], 'LQQF8F2');
+      },
+
+      "test format error": function () {
+        assert.dom('.link', {text: v.cats[0].name, parent: function () {
+          TH.click('.link.adminAccess', 'QQF8');
+          assert.dom('form+.link.adminAccess');
+          assert.dom('form>input[name=changeFormat]', {value: "QQF8"}, function () {
+            TH.input(this, 'QQF8FX');
+            TH.trigger(this.parentNode, 'submit');
+          });
+          assert.dom('form+.link.adminAccess', 'QQF8');
+          assert.dom('form>input.error+.errorMsg', 'not valid');
+        }});
+
+        assert.equals(Bart.Event.event.heats[v.cats[0]._id], 'LQQF8'); // ensure reverted
+        assert.equals(v.event.$reload().heats[v.cats[0]._id], 'LQQF8');
       },
 
       "test selecting category": function () {
