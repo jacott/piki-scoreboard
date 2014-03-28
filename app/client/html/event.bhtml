@@ -5,6 +5,7 @@
         {{pageLink name="show" value="Results" template="Event.Show"}}
         {{pageLink class="adminAccess" name="register" value="Registrations" template="Event.Register"}}
         {{pageLink class="adminAccess" name="edit" value="Edit event" template="Event.Edit"}}
+        {{pageLink class="adminAccess" name="edit" value="Upload registrations" template="Event.RegUpload"}}
      </nav>
       <section class="body">
       </section>

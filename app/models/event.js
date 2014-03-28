@@ -19,6 +19,7 @@ App.require('AppModel.Org', function () {
     org_id: 'belongs_to',
     heats: 'has-many',
     date: {type: 'date', inclusion: {matches: /^\d{4}-[01]\d-[0-3]\d$/}},
+    errors: 'has-many',
   });
 
   model.addRemoveRpc();

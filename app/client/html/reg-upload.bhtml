@@ -1,11 +1,34 @@
-<template name="RegUpload">
-  <div id="RegUpload" class="dialogContainer">
-    <section  class="ui-dialog">
+<template name="Event.RegUpload">
+  <div id="RegUpload">
+    <section  class="upload no-print">
       <h1>Upload Registrations</h1>
 
       <label>Choose File to import
         <input id="regUploadFile" type="file" name="filename">
       </label>
     </section>
+
+    <section class="errors">
+      <h1>Upload Errors</h1>
+
+      <table class="select">
+        <thead>
+          <tr>
+            <th>Line number</th><th>Fields</th><th>Message</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{eachError}}
+        </tbody>
+        <template name="ErrorRow">
+          <tr>
+            <td>{{line}}</td>
+            <td>{{fields}}</td>
+            <td>{{message}}</td>
+          </tr>
+        </template>
+      </table>
+    </section>
+
   </div>
 </template>

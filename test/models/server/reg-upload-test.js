@@ -43,7 +43,7 @@
               '"Mountain Goats,Junior (Early Bird) [MJL]","Mark","Ford","1995-11-26","230"\n'
              );
 
-      assert.equals(v.event.$reload().attributes.errors, [[1, {
+      assert.equals(v.event.$reload().attributes.errors, [[2, {
         'Fee level': 'Mountain Goats,Junior (Early Bird) [MJL]',
         'First Name': 'Mark',
         'Last Name': 'Ford',

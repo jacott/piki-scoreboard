@@ -42,7 +42,7 @@ Meteor.methods({
         row =  data[i];
         importCompetitor();
       } catch(ex) {
-        errors.push([i, data[i], ex.toString()]);
+        errors.push([i+1, data[i], ex.toString()]);
       }
     };
 

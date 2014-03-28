@@ -4,10 +4,10 @@
       test = this;
 
       v = {
-        org: TH.Factory.createOrg(),
+        event: TH.Factory.createEvent(),
         user: TH.Factory.createUser('admin'),
 
-        changeListener: Bart.RegUpload.$findEvent('change', 'input[name=filename]'),
+        changeListener: Bart.Event.RegUpload.$findEvent('change', 'input[name=filename]'),
       };
 
       v.origListener = v.changeListener[2];
@@ -18,12 +18,15 @@
       test.stub(AppClient, 'setLocationHref');
 
       TH.loginAs(v.user);
-      Bart.RegUpload.show(v.org);
+
+      TH.setOrg(v.org);
+      v.eventSub = App.subscribe.withArgs('Event').returns({stop: v.stop = test.stub()});
+      AppRoute.gotoPage(Bart.Event.RegUpload, {eventId: v.event._id});
+      v.eventSub.yield();
     },
 
     tearDown: function () {
       v.changeListener[2] = v.origListener;
-      Bart.Dialog.close();
       v = null;
     },
 
@@ -48,7 +51,7 @@
         assert.dom('#RegUpload:not(.uploading)', function () {
           TH.trigger('input[name=filename]', 'change');
         });
-        assert.calledOnceWith(uploadStub, v.org._id, 'foo file', sinon.match(function (result) {
+        assert.calledOnceWith(uploadStub, v.event._id, 'foo file', sinon.match(function (result) {
           return typeof result === 'function';
         }));
         assert.dom('#RegUpload.uploading');
@@ -56,7 +59,7 @@
     },
 
     "test rendering": function () {
-      assert.dom('.Dialog #RegUpload .ui-dialog', function () {
+      assert.dom('#Event #RegUpload .upload', function () {
         assert.dom('label input[type=file][name=filename]');
       });
     },
