@@ -14,7 +14,9 @@
       <table class="select">
         <thead>
           <tr>
-            <th>Line number</th><th>Fields</th><th>Message</th>
+            <th>Line</th>
+            <th>Message</th>
+            <th>Fields</th>
           </tr>
         </thead>
         <tbody>
@@ -23,8 +25,8 @@
         <template name="ErrorRow">
           <tr>
             <td>{{line}}</td>
-            <td>{{fields}}</td>
             <td>{{message}}</td>
+            <td>{{fields}}</td>
           </tr>
         </template>
       </table>

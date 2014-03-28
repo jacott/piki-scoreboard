@@ -63,15 +63,22 @@ Meteor.methods({
       codes = codes && codes[1].trim().split(',');
 
       var gender = (codes && codes[0][0]) || null;
+      gender = gender && gender.toLowerCase();
 
-      var climber = AppModel.Climber.build({name: name, org_id: event.org_id, club_id: club._id,
-                                            dateOfBirth: get('Birth Date').trim(),
-                                            gender: gender.toLowerCase(),
-                                            uploadId: get('Participant ID')});
+      var climber = AppModel.Climber.findOne({name: name, org_id: event.org_id, club_id: club._id});
 
-      if (! climber.$isValid())
-        throw "Climber: " + AppVal.inspectErrors(climber);
-      climber.$save();
+      if (! climber) {
+        climber = AppModel.Climber.build({
+          name: name, org_id: event.org_id, club_id: club._id,
+          dateOfBirth: get('Birth Date').trim(),
+          gender: gender,
+          uploadId: get('Participant ID'),
+        });
+
+        if (! climber.$isValid())
+          throw "Climber: " + AppVal.inspectErrors(climber);
+        climber.$save();
+      }
 
       if (! (codes && codes.length))
         throw "Invalid or missing codes";
@@ -82,12 +89,17 @@ Meteor.methods({
         code = code.trim();
         var cat = AppModel.Category.findOne({shortName: code});
         if (! cat) {
-          throw "Category not found: " + cat;
+          throw "Category not found: " + code;
         }
         category_ids.push(cat._id);
       });
 
-      AppModel.Competitor.create({event_id: event._id, climber_id: climber._id, category_ids: category_ids.sort()});
+
+      var competitor = AppModel.Competitor.findOne({event_id: event._id, climber_id: climber._id}) ||
+            AppModel.Competitor.build({event_id: event._id, climber_id: climber._id});
+
+      competitor.category_ids = category_ids.sort();
+      competitor.$$save();
     }
 
     function get(field) {
