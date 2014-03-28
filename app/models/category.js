@@ -5,7 +5,8 @@ App.require('AppModel.Org', function () {
   model.HEAT_FORMAT_REGEX = /^Q{0,3}(F\d+){1,3}$/;
 
   model.defineFields({
-    org_id: 'belongs_to',    name: {type:  'text', trim: true, required: true, maxLength: 200},
+    org_id: 'belongs_to',
+    name: {type:  'text', trim: true, required: true, maxLength: 200},
     group: {type:  'text', trim: true, required: true, maxLength: 30},
     shortName: {type: 'text', trim: true, required: true, maxLength: 10, normalize: 'upcase'},
     gender: {type: 'text', inclusion: {allowBlank: true, matches: /^[mf]$/ }},

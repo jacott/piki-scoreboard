@@ -29,7 +29,7 @@ Package._transitional_registerBuildPlugin({
 // This on_use describes the *runtime* implications of using this package.
 Package.on_use(function (api) {
 
-  api.export(['Bart', '_private']);
+  api.export(['Bart', '_private'], 'client');
 
   api.add_files([
     'bart.js',

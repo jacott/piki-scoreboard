@@ -3,15 +3,8 @@ Package.describe({
 });
 
 Package.on_use(function(api) {
-  api.export(['AppRoute', '_Test']);
-  api.use(['app-models'], ['server']);
+  api.export(['AppRoute', '_Test'], 'client');
   api.use(['less', 'bart', 'app-models'], 'client');
-
-  api.add_files([
-  ], ['server', 'client']);
-
-  api.add_files([
-  ], 'server');
 
   api.add_files([
     'client/app-route.js',

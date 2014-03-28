@@ -276,7 +276,8 @@ TH = (function () {
         }
       }
 
-      Bart && Bart.Main.setAccess();
+      if (typeof Bart !== 'undefined')
+        Bart.Main.setAccess();
 
       if (! func) return user;
 

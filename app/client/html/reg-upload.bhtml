@@ -1,0 +1,11 @@
+<template name="RegUpload">
+  <div id="RegUpload" class="dialogContainer">
+    <section  class="ui-dialog">
+      <h1>Upload Registrations</h1>
+
+      <label>Choose File to import
+        <input id="regUploadFile" type="file" name="filename">
+      </label>
+    </section>
+  </div>
+</template>

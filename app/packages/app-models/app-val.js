@@ -53,6 +53,9 @@ AppVal = {
       if (doc) App.log('INVALID ' + this.inspectErrors(doc));
       var error = Meteor.Error(400, 'Invalid request' + (doc ? ": " + AppVal.inspectErrors(doc) : ''));
       error.doc = doc;
+      error.toString = function () {
+        return this.message;
+      };
       throw error;
     }
     return truthy;

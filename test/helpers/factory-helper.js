@@ -42,6 +42,10 @@
           email: "su@example.com", role: 's', org_id: null
         });
       },
+
+      admin: function (options) {
+        App.reverseExtend(options, {role: AppModel.User.ROLE.admin});
+      }
     },
   };
 
