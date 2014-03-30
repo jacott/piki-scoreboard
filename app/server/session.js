@@ -12,6 +12,9 @@ Meteor.publish("Session", function () {
 
 Session = function(sub) {
   var sess = this;
+  if (sub._session.id  in sessions) {
+    sessions[sub._session.id].sub.stop();
+  }
 
   sess._count = 0;
   sess.sub = sub;
@@ -23,12 +26,13 @@ Session = function(sub) {
     throw error;
   }
 
+  sess.conn = sub._session;
+  sessions[sess.conn.id] = sess;
   var _models = sess._models = {};
   sess.userId = sub.userId;
   sess.observers = {};
-  sess.conn = sub._session;
-  sessions[sess.conn.id] = sess;
 
+  App.log(""+new Date()+" INFO Login: " + sess.user.email + ". Doc count: " + AppModel.globalMemCount());
   sess.added('User', sess.user._id, sess.user);
   sess.user = new AppModel.User(sess.user);
 
@@ -88,7 +92,16 @@ Session._private = {
 })();
 
 Session.get = function (sub) {
-  var sess = sessions[sub._session.id] || new Session(sub);
+  var sess = sessions[sub._session.id];
+
+  if (sess && sess.userId !== sub.userId) {
+    sess._count = 1;
+    sess.release();
+    sess = null;
+  }
+
+  if (! sess) sess = new Session(sub);
+
   ++sess._count;
   return sess;
 };

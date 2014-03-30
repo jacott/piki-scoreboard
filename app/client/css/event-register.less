@@ -1,6 +1,25 @@
+@import "global.lessimport";
+
 #Event #Register {
   [name=name] {
     width: 40ex;
+  }
+
+  [name=number] {
+    width: 7ex;
+  }
+
+  .Groups {
+    .clearAfter();
+    margin-bottom: 1em;
+    label {
+      display: block;
+      float: left;
+      margin-right: 10px;
+      >.name {
+        display: block;
+      }
+    }
   }
 
   fieldset+fieldset.actions {

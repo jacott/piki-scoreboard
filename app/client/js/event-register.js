@@ -149,6 +149,12 @@ App.require('Bart.Event', function (Event) {
     },
   });
 
+  Tpl.Row.$extend({
+    $created: function (ctx) {
+      Bart.autoUpdate(ctx, {subject: ctx.data.climber});
+    },
+  });
+
   AddClimber.$events({
     'submit': Bart.Form.submitFunc('AddClimber', function (doc) {
       Bart.Dialog.close();

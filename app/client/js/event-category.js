@@ -170,6 +170,12 @@ App.require('Bart.Event', function (Event) {
     }
   });
 
+  Tpl.Result.$extend({
+    $created: function (ctx) {
+      Bart.autoUpdate(ctx, {subject: ctx.data.climber});
+    },
+  });
+
   Tpl.Result.$helpers({
     scores: function () {
       var frag = document.createDocumentFragment();
