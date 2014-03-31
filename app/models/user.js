@@ -37,10 +37,9 @@ var model = AppModel.Base.defineSubclass('User',{
     if (me.isSuperUser()) return;
     if (this.isSuperUser() || this.role === 's')
       AppVal.addError(this, 'role', 'is_invalid');
-    if ('org_id' in this.changes) {
+    if (('org_id' in this.changes) &&
+        (! this.$isNewRecord() || this.org_id !== me.org_id))
       AppVal.addError(this, 'org_id', 'is_invalid');
-    }
-
   }
 
 },{saveRpc: true});

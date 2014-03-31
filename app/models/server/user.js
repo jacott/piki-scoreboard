@@ -50,15 +50,12 @@ App.require('AppModel.User', function (model) {
 
       var authUser = AppModel.User.findOne({
         _id: userId,
-        $or: [{role: role.superUser},
-              {
-                role: role.admin,
-                org_id: this.attributes.org_id,
-              }]});
+        role: {$in: [role.superUser, role.admin]}
+      });
 
-      AppVal.allowAccessIf(authUser &&
-                           (authUser.isSuperUser() || (this.attributes.role !== role.superUser &&
-                                                       ! ('org_id' in this.changes))));
+      AppVal.allowAccessIf(authUser);
+
+      AppVal.allowAccessIf(this.$isNewRecord() || authUser.isSuperUser() || this.attributes.role !== role.superUser);
     },
   });
 
