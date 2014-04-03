@@ -15,7 +15,11 @@
         <table class="select">
           <thead>
             <tr>
-              <th>Name</th><th>Number</th><th>Club</th>
+              <th>Name</th>
+              <th>DOB</th>
+              <th>m/f</th>
+              <th>Number</th>
+              <th>Club</th>
             </tr>
           </thead>
           <tbody>
@@ -24,6 +28,8 @@
           <template name="Row">
             <tr>
               <td>{{name}}</td>
+              <td>{{dateOfBirth}}</td>
+              <td>{{gender}}</td>
               <td>{{number}}</td>
               <td>{{club.name}}</td>
             </tr>
