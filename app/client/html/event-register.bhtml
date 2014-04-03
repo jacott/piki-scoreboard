@@ -30,12 +30,14 @@
 
     <template name="Groups">
       <div class="Groups">
-        <h1>Choose Categories for {{climber.name}} to compete in</h1>
+        <h1>{{climber.name}}</h1>
 
         {{>ClimberNumber climber}}
+
         <template name="ClimberNumber">
           <fieldset class="fields climber">
             {{labelField "number" label="Competitor number"}}
+            <button name="editClimber" type="button">Edit Climber</button>
           </fieldset>
         </template>
       </div>

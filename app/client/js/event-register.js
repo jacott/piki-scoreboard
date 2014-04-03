@@ -177,6 +177,14 @@ App.require('Bart.Event', function (Event) {
     },
   });
 
+  Groups.$events({
+    'click [name=editClimber]': function (event) {
+      Bart.stopEvent();
+
+      AppRoute.gotoPage(Bart.Climber.Edit, {climberId: $.ctx.data.climber._id});
+    },
+  });
+
   function submit(event) {
     Bart.stopEvent();
 
@@ -217,7 +225,7 @@ App.require('Bart.Event', function (Event) {
     var groupsElm = form.querySelector('.Groups');
 
     Bart.remove(groupsElm);
-    groupsElm = Groups.$render(competitor);
+    groupsElm = Groups.$autoRender(competitor);
     AppModel.Category.groupApplicable(climber, function (group, docs) {
       groupsElm.appendChild(Category.$autoRender({
         groupName: group,

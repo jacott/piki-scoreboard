@@ -40,7 +40,7 @@ Tpl.Form.$helpers({
 
 Tpl.Add.$events({
   'click [name=cancel]': cancel,
-  'click [type=submit]': Bart.Form.submitFunc('AddClimber', Tpl),
+  'click [type=submit]': Bart.Form.submitFunc('AddClimber', "back"),
 });
 
 Tpl.Edit.$events({
@@ -63,7 +63,7 @@ Tpl.Edit.$events({
     });
 
   },
-  'click [type=submit]': Bart.Form.submitFunc('EditClimber', Tpl),
+  'click [type=submit]': Bart.Form.submitFunc('EditClimber', "back"),
 });
 
 var base = AppRoute.root.addBase(Tpl, 'climberId');
@@ -88,5 +88,5 @@ base.addTemplate(Tpl.Edit, {
 
 function cancel(event) {
   Bart.stopEvent();
-  AppRoute.gotoPage(Tpl);
+  AppRoute.history.back();
 }

@@ -99,6 +99,10 @@ Tpl.$extend({
         case 'function':
           successPage(doc);
           break;
+        case 'string':
+          if (successPage === 'back')
+            AppRoute.history.back();
+          break;
         }
       } else {
         Tpl.renderErrors(doc, form);

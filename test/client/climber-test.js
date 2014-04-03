@@ -38,6 +38,7 @@
       var club = TH.Factory.createClub();
 
       AppRoute.gotoPage(Bart.Climber.Index);
+      test.stub(AppRoute.history, 'back');
 
       assert.dom('#Climber', function () {
         TH.click('[name=addClimber]');
@@ -54,7 +55,7 @@
           TH.change('[name=gender]', 'm');
           TH.click('[type=submit]');
         });
-        refute.dom('#AddClimber');
+        assert.called(AppRoute.history.back);
       });
 
       var climber = AppModel.Climber.findOne({org_id: v.org._id, name: 'Magnus Midtbø', dateOfBirth: '1988-09-18', number: 123});
@@ -63,9 +64,6 @@
 
       assert.same(climber.club_id, club._id);
       assert.same(climber.gender, "m");
-
-
-      assert.dom('#Climber [name=addClimber]');
     },
 
     "edit": {
@@ -79,13 +77,15 @@
       },
 
       "test change name": function () {
+        test.stub(AppRoute.history, 'back');
+
         assert.dom('#EditClimber', function () {
           assert.dom('h1', 'Edit ' + v.climber.name);
           TH.input('[name=name]', {value: v.climber.name}, 'new name');
           TH.click('[type=submit]');
         });
 
-        assert.dom('#Climber td', 'new name');
+        assert.called(AppRoute.history.back);
       },
 
       "test delete": function () {
