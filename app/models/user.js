@@ -31,6 +31,15 @@ var model = AppModel.Base.defineSubclass('User',{
     return this.attributes.role === ROLE.superUser;
   },
 
+  canAdminister: function () {
+    switch(this.attributes.role) {
+    case ROLE.superUser:
+    case ROLE.admin:
+      return true;
+    }
+    return false;
+  },
+
   validate: function () {
     var me = AppModel.User.me();
     AppVal.allowAccessIf(me);
