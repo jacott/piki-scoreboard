@@ -1,6 +1,9 @@
-var observers = ['Category', 'Club', 'Event'];
+var observers = ['Category', 'Club', 'Climber', 'Event'];
 
-var pubClimberFields = ['name', 'org_id', 'club_id', 'gender', 'number'];
+var pubFields = {
+  Climber: ['name', 'org_id', 'club_id', 'gender', 'number'],
+  Event: ['name', 'org_id', 'heats', 'date'],
+};
 
 Meteor.publish('Org', function (shortName) {
   var sess = Session.get(this);
@@ -28,42 +31,30 @@ Meteor.publish('Org', function (shortName) {
   })));
 
   observers.forEach(function (modelName) {
+    var fields = user.canAdminister() ? undefined : pubFields[modelName];
     sess.addObserver(obName(modelName), AppModel[modelName].observeOrg_id(sess.orgId, sess.buildUpdater(modelName, {
+      fields: fields,
+
       addedQuery: {},
 
-      stopped: stopFunc(modelName),
+      stopped: function() {
+        var docs = sess.docs(modelName);
+        for(var id in docs) {
+          sess.removed(modelName, id);
+        }
+      },
     })));
   });
 
-  if (! user.canAdminister()) {
-    var climberFields = pubClimberFields;
-  }
-
-  sess.addObserver(obName('Climber'), AppModel.Climber.observeOrg_id(sess.orgId, sess.buildUpdater('Climber', {
-    fields: climberFields,
-
-    addedQuery: {},
-    stopped: stopFunc('Climber'),
-  }, {})));
 
   this.onStop(function () {
     sess.removeObserver('OrgUsers');
     observers.forEach(function (modelName) {
       sess.removeObserver(obName(modelName));
     });
-    sess.removeObserver(obName('Climber'));
     sess.release();
   });
   this.ready();
-
-  function stopFunc(modelName) {
-    return function() {
-      var docs = sess.docs(modelName);
-      for(var id in docs) {
-        sess.removed(modelName, id);
-      }
-    };
-  }
 });
 
 function obName(modelName) {
