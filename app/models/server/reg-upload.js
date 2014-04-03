@@ -32,6 +32,7 @@ Meteor.methods({
 
     var errors = [];
     var row;
+    var climbers = {};
 
     if (data.length === 1)
       throw new Meteor.Error(415, 'unsupported_import_format');
@@ -53,6 +54,11 @@ Meteor.methods({
 
     function importCompetitor() {
       var name = get('First Name') + ' ' + get('Last Name');
+
+      if (name in climbers)
+        throw 'Name: "' + name + '" registered more than once';
+
+      climbers[name] = true;
 
       var meta = get('Fee level');
 
