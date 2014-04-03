@@ -13,6 +13,7 @@ Tpl.$extend({
       if (! Tpl.event || Tpl.event._id !== pageRoute.eventId) {
         if (Tpl.event =  AppModel.Event.findOne(pageRoute.eventId)) {
 
+          eventSub && eventSub.stop();
           eventSub = App.subscribe('Event', pageRoute.eventId, function () {
             Bart.removeId('Flash');
             AppRoute.replacePath.apply(AppRoute, loadingArgs);
@@ -30,8 +31,6 @@ Tpl.$extend({
   },
 
   onBaseExit: function (page, pageRoute) {
-    eventSub && eventSub.stop();
-    Tpl.event = eventSub = null;
     Bart.removeId('Event');
   },
 });
