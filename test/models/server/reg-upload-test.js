@@ -11,7 +11,7 @@
       v.fjl = TH.Factory.createCategory({shortName: 'FJL', gender: 'f', name: 'Female Junior Lead', group: 'Youth Lead'});
       v.mjl = TH.Factory.createCategory({shortName: 'MJL', gender: 'm', name: 'Male Junior Lead', group: 'Youth Lead'});
       v.fol = TH.Factory.createCategory({shortName: 'FOL', gender: 'f', name: 'Female Open Lead', group: 'Open Lead'});
-      v.sam = TH.Factory.createClimber({name: 'Sam Smith'});
+      v.sam = TH.Factory.createClimber({name: 'Sam Smith', dateOfBirth: '1996-04-16'});
       TH.loginAs(v.user);
     },
 

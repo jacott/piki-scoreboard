@@ -65,7 +65,7 @@ Meteor.methods({
       var gender = (codes && codes[0][0]) || null;
       gender = gender && gender.toLowerCase();
 
-      var climber = AppModel.Climber.findOne({name: name, org_id: event.org_id, club_id: club._id});
+      var climber = AppModel.Climber.findOne({name: name, org_id: event.org_id});
 
       if (! climber) {
         climber = AppModel.Climber.build({
@@ -74,11 +74,14 @@ Meteor.methods({
           gender: gender,
           uploadId: get('Participant ID'),
         });
-
-        if (! climber.$isValid())
-          throw "Climber: " + AppVal.inspectErrors(climber);
-        climber.$save();
       }
+
+      if (climber.dateOfBirth !== get('Birth Date').trim())
+        throw "Climber's date-of-birth does not match: " + climber.dateOfBirth;
+
+      if (! climber.$isValid())
+        throw "Climber: " + AppVal.inspectErrors(climber);
+      climber.$save();
 
       if (! (codes && codes.length))
         throw "Invalid or missing codes";

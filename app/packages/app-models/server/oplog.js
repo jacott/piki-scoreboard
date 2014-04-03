@@ -58,7 +58,7 @@ App.extend(AppModel, {
     waitId = id;
     timeout = setTimeout(function () {
       if (future) {
-        var error = new Error('wait for "' + collName + '":"' + id + '" timed out');
+        var error = new Error('wait for "' + collname + '":"' + id + '" timed out');
         if (waitCollName === collname && waitId === id)
           resetFuture().throw(error);
       }
