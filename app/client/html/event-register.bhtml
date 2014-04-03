@@ -60,13 +60,20 @@
 
     <table class="select">
       <thead><tr>
-          <th>Competitor</th><th>Number</th><th>Categories</th>
+          <th>Competitor</th>
+          <th>DOB</th>
+          <th>M/F</th>
+          <th>Club</th>
+          <th>Number</th><th>Categories</th>
       </tr></thead>
       <tbody>
         {{each "competitors" template="Row"}}
         <template name="Row">
           <tr>
             <td>{{climber.name}}</td>
+            <td>{{climber.dateOfBirth}}</td>
+            <td>{{climber.gender}}</td>
+            <td><abbr title="{{climber.club.name}}">{{climber.club.shortName}}</abbr></td>
             <td>{{climber.number}}</td>
             <td>{{categories}}</td>
           </tr>

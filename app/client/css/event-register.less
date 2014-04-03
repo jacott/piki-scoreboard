@@ -22,6 +22,16 @@
     }
   }
 
+  table {
+    tr>th:first-child {
+      width: 20em;
+    }
+
+    td abbr+abbr:before {
+      content: ", ";
+    }
+  }
+
   fieldset+fieldset.actions {
     display: none;
   }

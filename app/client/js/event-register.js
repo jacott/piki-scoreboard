@@ -88,7 +88,9 @@ App.require('Bart.Event', function (Event) {
 
   Add.$extend({
     $created: function (ctx) {
-      ctx.data = new AppModel.Competitor({event_id: Event.event._id});
+      if (Event.event) {
+        ctx.data = new AppModel.Competitor({event_id: Event.event._id});
+      }
     },
   });
 
@@ -141,11 +143,15 @@ App.require('Bart.Event', function (Event) {
 
   Tpl.Row.$helpers({
     categories: function () {
-
-      return this.category_ids.map(function (id) {
-        return AppModel.Category.quickFind(id).shortName;
-      }).join(', ');
-
+      var frag = document.createDocumentFragment();
+      this.category_ids.forEach(function (id) {
+        var abbr = document.createElement('abbr');
+        var cat = AppModel.Category.quickFind(id);
+        abbr.setAttribute("title", cat.name);
+        abbr.textContent = cat.shortName;
+        frag.appendChild(abbr);
+      });
+      return frag;
     },
   });
 
