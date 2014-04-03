@@ -37,6 +37,14 @@ Meteor.methods({
     if (data.length === 1)
       throw new Meteor.Error(415, 'unsupported_import_format');
 
+    for(var i = 0; i < data.length; ++i) {
+      row =  data[i];
+      var name = get('First Name') + ' ' + get('Last Name');
+      if (name in climbers)
+        ++climbers[name];
+      else
+        climbers[name] = 1;
+    }
 
     AppModel.beginWaitFor('x', -1, function () {
       for(var i = 0; i < data.length; ++i) {
@@ -55,10 +63,8 @@ Meteor.methods({
     function importCompetitor() {
       var name = get('First Name') + ' ' + get('Last Name');
 
-      if (name in climbers)
-        throw 'Name: "' + name + '" registered more than once';
-
-      climbers[name] = true;
+      if (climbers[name] > 1)
+        throw 'Name: "' + name + '" registered ' + climbers[name] + ' times';
 
       var meta = get('Fee level');
 
