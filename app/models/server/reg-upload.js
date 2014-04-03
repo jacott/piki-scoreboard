@@ -37,16 +37,19 @@ Meteor.methods({
       throw new Meteor.Error(415, 'unsupported_import_format');
 
 
-    for(var i = 0; i < data.length; ++i) {
-      try {
-        row =  data[i];
-        importCompetitor();
-      } catch(ex) {
-        errors.push([i+1, data[i], ex.toString()]);
-      }
-    };
+    AppModel.beginWaitFor('x', -1, function () {
+      for(var i = 0; i < data.length; ++i) {
+        try {
+          row =  data[i];
+          importCompetitor();
+        } catch(ex) {
+          errors.push([i+1, data[i], ex.toString()]);
+        }
+      };
 
-    AppModel.Event.fencedUpdate(event._id, {$set: {errors: errors}});
+      AppModel.Event.docs.update(event._id, {$set: {errors: errors}});
+      AppModel.endWaitFor('x', -1);
+    });
 
     function importCompetitor() {
       var name = get('First Name') + ' ' + get('Last Name');
