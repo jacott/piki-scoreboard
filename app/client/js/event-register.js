@@ -22,10 +22,13 @@ App.require('Bart.Event', function (Event) {
     }
   });
 
-
   Tpl.$helpers({
     competitors: function (callback) {
-      callback.render({model: AppModel.Competitor});
+      callback.render({
+        model: AppModel.Competitor,
+        sort: function (a, b) {
+          return Apputil.compareByName(a.climber, b.climber);
+        }});
     },
   });
 
