@@ -77,14 +77,14 @@
       },
 
       "test missing email": function () {
-        var res = Meteor.call('User.forgotPassword', '  ');
+        var res = App.rpc('User.forgotPassword', '  ');
 
         assert.equals(res, {email: 'is_required'});
         refute.called(Accounts.sendResetPasswordEmail);
       },
 
       "test invalid email": function () {
-        var res = Meteor.call('User.forgotPassword', ' xyz ');
+        var res = App.rpc('User.forgotPassword', ' xyz ');
 
         assert.equals(res, {email: 'is_invalid'});
         refute.called(Accounts.sendResetPasswordEmail);
@@ -93,7 +93,7 @@
       "test user without meteor account": function () {
         var user = TH.Factory.createUser({email: 'foo@bar.com'});
         Meteor.users.remove(user._id);
-        var res = Meteor.call('User.forgotPassword', 'foo@bar.com  ');
+        var res = App.rpc('User.forgotPassword', 'foo@bar.com  ');
 
         assert.equals(res, {success: true});
 
@@ -102,7 +102,7 @@
 
       "test success": function () {
         var user = TH.Factory.createUser({email: 'foo@bar.com'});
-        var res = Meteor.call('User.forgotPassword', 'foo@bar.com  ');
+        var res = App.rpc('User.forgotPassword', 'foo@bar.com  ');
 
         assert.equals(res, {success: true});
 

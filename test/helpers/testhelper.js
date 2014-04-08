@@ -205,7 +205,7 @@ TH = (function () {
     call: function () {
       var args = arguments;
       return TH.login(function () {
-        return Meteor.call.apply(Meteor, args);
+        return App.rpc.apply(Meteor, args);
       });
     },
 

@@ -12,11 +12,11 @@
     "test setScore": function () {
       var result = TH.Factory.createResult({scores: [1]});
 
-      test.stub(Meteor, 'call');
+      test.stub(App, 'rpc');
 
       result.setScore(1, '23.5+');
 
-      assert.calledWith(Meteor.call, 'Result.setScore', result._id, 1, '23.5+');
+      assert.calledWith(App.rpc, 'Result.setScore', result._id, 1, '23.5+');
     },
 
     "test index": function () {

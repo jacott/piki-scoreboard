@@ -46,7 +46,7 @@
       TestSubClass.afterRemove(v.afterRemove = test.stub());
 
       var doc = TestSubClass.create({name: 'foo'});
-      var spy = test.spy(Meteor,'call');
+      var spy = test.spy(App, "rpc");
 
       doc.$remove();
 
@@ -113,21 +113,21 @@
 
         assert.equals(sut.$reload().foo_ids, [1,2,3]);
 
-        test.stub(Meteor, 'call');
+        test.stub(App, 'rpc');
 
         assert.same(sut.$push('foo_ids', 2), sut);
 
-        assert.calledWith(Meteor.call, 'TestSubClass.push.foo_ids', sut._id, 2);
+        assert.calledWith(App.rpc, 'TestSubClass.push.foo_ids', sut._id, 2);
 
         TH.call('TestSubClass.pull.foo_ids', sut._id, 3);
 
         assert.equals(sut.$reload().foo_ids, [1,2,3]);
 
-        Meteor.call.reset();
+        App.rpc.reset();
 
         assert.same(sut.$pull('foo_ids', 2), sut);
 
-        assert.calledWith(Meteor.call, 'TestSubClass.pull.foo_ids', sut._id, 2);
+        assert.calledWith(App.rpc, 'TestSubClass.pull.foo_ids', sut._id, 2);
       },
     },
   });

@@ -36,8 +36,8 @@ Package.on_use(function(api) {
 
   api.add_files(validators, ['server', 'client']);
 
-  api.add_files(['client/app.js', 'client/base-model.js', 'client/base-model-observer.js'], 'client');
-  api.add_files(['server/app.js', 'server/apputil.js', 'server/oplog.js', 'server/base-model.js', 'server/observer.js', 'server/observe-id.js', 'server/observe-any.js', 'server/observe-field.js'], 'server');
+  api.add_files(['client/app.js', 'client/rpc.js', 'client/base-model.js', 'client/base-model-observer.js'], 'client');
+  api.add_files(['server/app.js', 'server/rpc.js', 'server/apputil.js', 'server/oplog.js', 'server/base-model.js', 'server/observer.js', 'server/observe-id.js', 'server/observe-any.js', 'server/observe-field.js'], 'server');
 });
 
 Package.on_test(function(api) {

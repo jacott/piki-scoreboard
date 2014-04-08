@@ -18,7 +18,7 @@
       var file = {name: 'foo.csv', slice: test.stub().returns("abcd")};
       var frStub = window.FileReader = TH.MockFileReader(v);
 
-      test.stub(Meteor, 'call');
+      test.stub(App, 'rpc');
 
       App.Reg.upload(v.event._id, file, function (error, result) {
         v.callResultError = error;
@@ -34,7 +34,7 @@
       fr.result = ['a','b','c'];
       var u8result = new Uint8Array(fr.result);
       fr.onload();
-      assert.calledWithExactly(Meteor.call, 'Reg.upload', v.event._id, u8result, sinon.match(function (func) {
+      assert.calledWithExactly(App.rpc, 'Reg.upload', v.event._id, u8result, sinon.match(function (func) {
         v.callResultFunc = func;
         return typeof func === 'function';
       }));

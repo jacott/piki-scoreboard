@@ -505,7 +505,7 @@
             assert.same(doc.user_id, undefined);
             // but the saveRpc does
             var id;
-            Meteor.call('TestSubClass.save', id = Random.id(), {name: 'testing'} );
+            App.rpc('TestSubClass.save', id = Random.id(), {name: 'testing'} );
             assert.same(TestSubClass.findOne(id).user_id, TH.userId());
           } else {
             assert.same(doc.user_id, TH.userId());
@@ -538,7 +538,7 @@
         this.spy(AppModel.TestSubClass.docs,'insert');
         var attrs = {name: 'testing'};
 
-        this.spy(Meteor,'call');
+        this.spy(App, "rpc");
         doc = TestSubClass.create(attrs);
         refute.same(doc.changes,doc.attributes);
         assert.equals(doc.changes,{});
@@ -547,9 +547,9 @@
         assert.calledOnceWith(AppModel.TestSubClass.fencedInsert,attrs);
         assert.calledOnceWith(AppModel.TestSubClass.docs.insert,attrs);
         if(Meteor.isClient)
-          assert.calledOnceWith(Meteor.call,'TestSubClass.save', doc._id,{_id: doc._id, name: "testing"});
+          assert.calledOnceWith(App.rpc,'TestSubClass.save', doc._id,{_id: doc._id, name: "testing"});
         else
-          refute.called(Meteor.call);
+          refute.called(App.rpc);
 
       },
 
@@ -570,7 +570,7 @@
 
         this.spy(AppModel.TestSubClass,'fencedUpdate');
         this.spy(AppModel.TestSubClass.docs,'update');
-        this.spy(Meteor,'call');
+        this.spy(App, "rpc");
 
         doc.name = 'new';
         doc.$save();
@@ -583,9 +583,9 @@
         assert.calledOnceWith(AppModel.TestSubClass.fencedUpdate, doc._id, {$set: {name: 'new'}});
         assert.calledOnceWith(AppModel.TestSubClass.docs.update,doc._id,{$set: {name: 'new'}});
         if(Meteor.isClient)
-          assert.calledOnceWith(Meteor.call,'TestSubClass.save', doc._id,{name: "new"});
+          assert.calledOnceWith(App.rpc,'TestSubClass.save', doc._id,{name: "new"});
         else
-          refute.called(Meteor.call);
+          refute.called(App.rpc);
       },
 
       'test afterCreate callback': function () {

@@ -10,11 +10,11 @@
     },
 
     "test forgotPassword": function () {
-      test.stub(Meteor, 'call');
+      test.stub(App, 'rpc');
 
       AppModel.User.forgotPassword('foo@bar.com', 'callback');
 
-      assert.calledWith(Meteor.call, 'User.forgotPassword', 'foo@bar.com', 'callback');
+      assert.calledWith(App.rpc, 'User.forgotPassword', 'foo@bar.com', 'callback');
     },
   });
 })();

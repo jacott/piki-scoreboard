@@ -5,11 +5,11 @@ TH.assertRemoveRpc = function (model) {
     _id: Random.id(),
   };
   var $remove = test.stub(model.docs, 'remove');
-  test.spy(Meteor, 'call');
+  test.spy(App, 'rpc');
   test.stub(model, 'findOne').returns(doc);
   model.prototype.$remove.call(doc);
 
-  assert.calledWith(Meteor.call, model.modelName+'.remove', doc._id);
+  assert.calledWith(App.rpc, model.modelName+'.remove', doc._id);
 
   assert.calledWith($remove, doc._id);
   assert.same($remove.thisValues[0], model.docs);

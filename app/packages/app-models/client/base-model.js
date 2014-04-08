@@ -27,13 +27,13 @@ function save(doc) {
 
   if(_id == null) {
     _id = (doc.changes && doc.changes._id) || Random.id();
-    Meteor.call(remoteName(doc,'save'), _id, App.extend(doc.attributes,doc.changes),
+    App.rpc(remoteName(doc,'save'), _id, App.extend(doc.attributes,doc.changes),
                 logError);
     doc.attributes._id = _id;
   } else for(var noop in doc.changes) {
     // only call if at least one change
     // copy changes in case they are modified
-    Meteor.call(remoteName(doc,'save'), doc._id, App.extend({},doc.changes), logError);
+    App.rpc(remoteName(doc,'save'), doc._id, App.extend({},doc.changes), logError);
     break;
   }
 
@@ -74,7 +74,7 @@ AppModel._support.setupExtras.push(function (model) {
 
 function removeFunc(method) {
   return function () {
-    Meteor.call(method, this._id);
+    App.rpc(method, this._id);
   };
 }
 
@@ -112,7 +112,7 @@ App.extend(_support, {
 
   bumpVersion: function () {
     var doc = this;
-    Meteor.call(remoteName(doc,'bumpVersion'), doc._id, doc._version);
+    App.rpc(remoteName(doc,'bumpVersion'), doc._id, doc._version);
   },
 
   bumpVersionRpc: function (modelName) {
@@ -169,7 +169,7 @@ function logError(err, result) {
 function addPushField(model) {
   if (model.prototype.$push) return;
   model.prototype.$push = function (field, value) {
-    Meteor.call(model.modelName+'.push.'+field, this._id, value, logError);
+    App.rpc(model.modelName+'.push.'+field, this._id, value, logError);
     return this;
   };
 }
@@ -177,7 +177,7 @@ function addPushField(model) {
 function addPullField(model) {
   if (model.prototype.$pull) return;
   model.prototype.$pull = function (field, value) {
-    Meteor.call(model.modelName+'.pull.'+field, this._id, value, logError);
+    App.rpc(model.modelName+'.pull.'+field, this._id, value, logError);
     return this;
   };
 }

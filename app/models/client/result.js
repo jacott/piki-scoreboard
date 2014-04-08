@@ -3,7 +3,7 @@ App.require('AppModel.Result', function (model) {
 
   App.extend(model.prototype, {
     setScore: function (index, score) {
-      Meteor.call('Result.setScore', this._id, index, score);
+      App.rpc('Result.setScore', this._id, index, score);
     },
   });
 });

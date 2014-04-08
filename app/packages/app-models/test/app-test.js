@@ -45,6 +45,12 @@
         assert.equals(App.deleteNestedHash(hash, 'a', 'c', 'd'), 456);
 
         assert.equals(hash, {});
+
+        var hash = {a: {b: 123, c: {d: 456}}};
+
+        assert.equals(App.deleteNestedHash(hash, 'a', 'c', 'd'), 456);
+
+        assert.equals(hash, {a: {b: 123}});
       },
     },
 

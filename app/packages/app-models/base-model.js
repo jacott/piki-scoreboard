@@ -516,7 +516,7 @@ function definePrototype(name, func) {
       var curr = arguments[i];
       if (curr && curr._id) arguments[i] = curr._id;
     }
-    return Meteor.apply(fullname, [this._id].concat(Apputil.slice(arguments)));
+    return App.rpc.apply(App, [fullname, this._id].concat(Apputil.slice(arguments)));
   };
   var methods = {};
   methods[fullname] = func;
