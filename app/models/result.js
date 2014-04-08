@@ -6,7 +6,10 @@ App.require('AppModel.Competitor', function (Competitor) {
 
     displayTimeTaken: function () {
       if (this.time == null) return '';
-      return Math.floor(this.time / 60) + ':' + (this.time % 60);
+      var minutes = this.time % 60;
+      if (minutes < 10)
+        minutes = '0' + minutes;
+      return Math.floor(this.time / 60) + ':' + minutes;
     },
   },{saveRpc: true});
 

@@ -69,6 +69,7 @@
       assert.same(heat.scoreToNumber(' dnc '    ),      -1);
       assert.same(heat.scoreToNumber(' 4:33 '   ),   false);
       assert.same(heat.scoreToNumber(' 4:33 ',99),     273);
+      assert.same(heat.scoreToNumber(' 1:09 ',99),      69);
     },
 
     "test lead numberToScore": function () {

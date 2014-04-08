@@ -83,6 +83,9 @@
       result.time = 5*60 + 59;
       assert.same(result.displayTimeTaken(), "5:59");
 
+      result.time = 69;
+      assert.same(result.displayTimeTaken(), "1:09");
+
     },
 
     "test unscoredHeat": function () {
