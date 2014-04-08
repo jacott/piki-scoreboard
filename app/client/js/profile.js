@@ -25,6 +25,11 @@ Tpl.$events({
     Bart.stopEvent();
     Meteor.logout();
   },
+
+  'click [name=signOutOthers]': function (event) {
+    Bart.stopEvent();
+    Meteor.logoutOtherClients();
+  },
 });
 
 Tpl.$extend({

@@ -13,6 +13,7 @@
   <template name="Index">
     <div>
       <button name="signOut" class="link">Sign out</button>
+      <button name="signOutOthers" class="link">Sign out other web browsers</button>
       {{pageLink value="Change password" template="Profile.ChangePassword"}}
     </div>
   </template>

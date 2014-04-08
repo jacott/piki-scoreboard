@@ -18,6 +18,22 @@
         AppRoute.gotoPage(Bart.Profile);
       },
 
+      "test signOut": function () {
+        test.stub(Meteor, 'logout');
+
+        TH.click('[name=signOut]');
+
+        assert.called(Meteor.logout);
+      },
+
+      "test signOut other clients": function () {
+        test.stub(Meteor, 'logoutOtherClients');
+
+        TH.click('[name=signOutOthers]');
+
+        assert.called(Meteor.logoutOtherClients);
+      },
+
 
       "test rendering": function () {
         assert.dom('#Profile', function () {
