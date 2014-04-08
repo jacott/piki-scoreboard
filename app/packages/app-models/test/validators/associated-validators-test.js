@@ -1,5 +1,5 @@
 (function (test) {
-  buster.testCase('packages/app-models/validators/associated-validators:', {
+  buster.testCase('packages/app-models/test/validators/associated-validators:', {
     setUp: function () {
       test = this;
       AppModel.Foo = {find: test.findStub = test.stub()};
@@ -51,6 +51,14 @@
 
       assert(doc._errors);
       assert.equals(doc._errors['foo_ids'],[["not_found"]]);
+    },
+
+    "test changes only": function () {
+      var doc = {foo_ids: ["xyz"], changes: {}};
+
+      AppVal.validators('associated')(doc,'foo_ids', {changesOnly: true});
+
+      refute(doc._errors);
     },
 
     "test wrong type": function () {

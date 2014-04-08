@@ -27,11 +27,14 @@ function save(doc) {
 
   if(_id == null) {
     _id = (doc.changes && doc.changes._id) || Random.id();
-    Meteor.call(remoteName(doc,'save'), _id, _.extend(doc.attributes,doc.changes), logError);
+    Meteor.call(remoteName(doc,'save'), _id, App.extend(doc.attributes,doc.changes),
+                logError);
     doc.attributes._id = _id;
-  } else if (! _.isEmpty(doc.changes)) {
+  } else for(var noop in doc.changes) {
     // only call if at least one change
-    Meteor.call(remoteName(doc,'save'), doc._id, doc.changes, logError);
+    // copy changes in case they are modified
+    Meteor.call(remoteName(doc,'save'), doc._id, App.extend({},doc.changes), logError);
+    break;
   }
 
   return doc.$reload();
@@ -80,7 +83,7 @@ App.extend(AppModel, {
     return func();
   },
 
-  endWaitFor: function (colName, id) {},
+  endWaitFor: function (wf) {},
 });
 
 

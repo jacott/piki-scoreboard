@@ -9,7 +9,9 @@ Package.on_use(function(api) {
 
   api.use(['mongo-livedata'], ['server']);
 
-  api.export(['App', 'Apputil', 'AppVal', 'AppOplog', 'AppModel']);
+  api.export(['App', 'Apputil', 'AppVal', 'AppModel']);
+
+  api.export(['AppOplog'], 'server');
 
   api.add_files([
     'apputil.js',

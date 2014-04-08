@@ -46,7 +46,7 @@ Meteor.methods({
         climbers[name] = 1;
     }
 
-    AppModel.beginWaitFor('x', -1, function () {
+    AppModel.beginWaitFor('x', -1, function (wf) {
       for(var i = 0; i < data.length; ++i) {
         try {
           row =  data[i];
@@ -57,7 +57,7 @@ Meteor.methods({
       };
 
       AppModel.Event.docs.update(event._id, {$set: {errors: errors}});
-      AppModel.endWaitFor('x', -1);
+      AppModel.endWaitFor(wf);
     });
 
     function importCompetitor() {

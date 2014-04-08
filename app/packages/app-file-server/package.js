@@ -7,7 +7,7 @@ Npm.depends({
 });
 
 Package.on_use(function(api) {
-  api.export(['AppFS']);
+  api.export(['AppFS'], 'server');
 
   api.use(['webapp', 'routepolicy'], 'server');
 

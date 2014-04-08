@@ -9,6 +9,53 @@ if (typeof deprecateWarning === 'undefined') {
 var timeWarp = 0;
 
 App = {
+  setTimeout: setTimeout,
+  clearTimeout: clearTimeout,
+
+  setNestedHash: function (value, hash /*, keys */) {
+    var last = arguments.length-1;
+    for(var i = 2; i < last; ++i) {
+      var key = arguments[i];
+      hash = hash[key] || (hash[key] = {});
+    }
+
+    return hash[arguments[last]] = value;
+  },
+
+  getNestedHash: function (hash /*, keys */) {
+    var last = arguments.length-1;
+    for(var i = 1; i < last; ++i) {
+      var key = arguments[i];
+      hash = hash[key];
+      if (! hash) return undefined;
+    }
+
+    return hash[arguments[last]];
+  },
+
+  deleteNestedHash: function (hash /*, keys */) {
+    var last = arguments.length-1;
+    var prevs = [];
+    for(var i = 1; i < last; ++i) {
+      var key = arguments[i];
+      prevs.push(hash);
+      hash = hash[key];
+      if (! hash) return undefined;
+    }
+    prevs.push(hash);
+
+    var value = hash[arguments[last]];
+    delete hash[arguments[last]];
+
+    for(var i = prevs.length - 1; i >0; --i) {
+      for (var noop in prevs[i]) {
+        return value;
+      }
+      delete prevs[i-1][arguments[--last]];
+    }
+    return value;
+  },
+
   log: function (/* arguments */) {
     console.log.apply(console, arguments);
   },

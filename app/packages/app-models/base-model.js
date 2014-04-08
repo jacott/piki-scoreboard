@@ -41,9 +41,9 @@ var _support = AppModel._support = {
   modelName: modelName,
 
   performBumpVersion: function(model, _id, _version) {
-    AppModel.beginWaitFor(model.modelName, _id, function () {
+    AppModel.beginWaitFor(model.modelName, _id, function (wf) {
       model.docs.update({_id: _id, _version: _version}, {$inc: {_version: 1}}) ||
-        AppModel.endWaitFor(model.modelName, _id);
+        AppModel.endWaitFor(wf);
     });
   },
 

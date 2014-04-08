@@ -2,7 +2,7 @@ sinon.stub(App, 'log');
 
 AppModel._origBeginWaitFor = AppModel.beginWaitFor;
 AppModel.beginWaitFor = function (name, id, func) {
-  func();
+  func(-1);
 };
 
 geddon.onTestStart(function () {

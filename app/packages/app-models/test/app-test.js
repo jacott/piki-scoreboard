@@ -9,6 +9,45 @@
       delete AppModel.TModel;
     },
 
+    "test setTimeout, clearTimeout": function () {
+      assert.same(App.setTimeout, setTimeout);
+      assert.same(App.clearTimeout, clearTimeout);
+    },
+
+    "nestedHash": {
+      "test setNestedHash": function () {
+        var hash = {};
+
+        App.setNestedHash(123, hash, 'a', 'b');
+        assert.same(App.setNestedHash(456, hash, 'a', 'c'), 456);
+
+        assert.equals(hash, {a: {b: 123, c: 456}});
+      },
+
+      "test getNestedHash": function () {
+        var hash = {a: {b: 123, c: 456}};
+
+        assert.equals(App.getNestedHash(hash, 'a', 'b'), 123);
+        assert.equals(App.getNestedHash(hash, 'a'), {b: 123, c: 456});
+        assert.equals(App.getNestedHash(hash, 'b'), undefined);
+        assert.equals(App.getNestedHash(hash, 'a', 'd'), undefined);
+      },
+
+      "test deleteNestedHash": function () {
+        var hash = {a: {b: 123, c: 456}};
+
+        assert.equals(App.deleteNestedHash(hash, 'a', 'b'), 123);
+        assert.equals(App.deleteNestedHash(hash, 'a'), {c: 456});
+        assert.equals(hash, {});
+
+        var hash = {a: {c: {d: 456}}};
+
+        assert.equals(App.deleteNestedHash(hash, 'a', 'c', 'd'), 456);
+
+        assert.equals(hash, {});
+      },
+    },
+
     'test extend': function () {
       var item = 5,
           sub={a: 1, b: 2},

@@ -11,6 +11,8 @@
       v.timeout = setTimeout(function () {
         v.future.throw('Timed out');
       }, 500);
+      test.stub(App, 'setTimeout').returns('toKey');
+      test.stub(App, 'clearTimeout');
       v.beginWaitFor = AppModel.beginWaitFor;
       v.oplog_timeout = AppOplog.timeout;
       AppOplog.timeout = 2000;
@@ -122,14 +124,17 @@
       },
 
       "test exception when wrapped": function () {
+        var wfTimeout;
         assert.exception(function () {
           AppModel.beginWaitFor('TestSubClass', '123', function () {
+            wfTimeout = Fiber.current._beginWaitFor.timeout;
             throw new Error("something went wrong");
           });
         });
 
-        assert.equals(AppOplog._private.wait, [null, null]);
-        assert.called(v.lastFuture.return);
+        assert.equals(AppOplog._private.waitFors, {});
+
+        assert.calledWith(App.clearTimeout, wfTimeout);
       },
 
       "test observe before future return": function () {
@@ -144,31 +149,63 @@
 
       "test ignores subsequent calls": function () {
         AppModel.beginWaitFor('TestSubClass', '123', function () {
-          AppModel.beginWaitFor('TestSubClass', '456', function () {
+          AppModel.beginWaitFor('TestSubClass', '456', function (wf) {
+            assert.same(wf, -1);
+
             v.insert('TestSubClass',  {_id: '456',   name: 'fred', age: 5});
-            assert.equals(AppOplog._private.wait, ['TestSubClass', '123']);
+            AppModel.endWaitFor(-1);
+
+            // both lines above do not trigger;
+            refute.equals(AppOplog._private.waitFors, {});
+
             v.insert('TestSubClass', {_id: '123', name: 'fred', age: 5});
-            assert.equals(AppOplog._private.wait, [-1, null]);
+            assert.equals(AppOplog._private.waitFors, {});
           });
         });
         assert.called(v.lastFuture.return);
       },
 
+      "test endWaitFor": function () {
+        var res = AppModel.beginWaitFor('TestSubClass', '123', function (wf) {
+          AppModel.endWaitFor(-1);
+          assert.same(Fiber.current._beginWaitFor, wf);
+          refute.called(App.clearTimeout);
+          AppModel.endWaitFor(wf);
+          AppModel.endWaitFor(wf);
+          assert.calledOnce(App.clearTimeout);
+        });
+      },
+
       "test beginWaitFor": function () {
         v.waitFunc = function () {
           refute.called(v.lastFuture.return);
-          AppModel.endWaitFor('TestSubClass', '123');
+          AppModel.endWaitFor(Fiber.current._beginWaitFor);
           v.ranWaitFunc = true;
         };
-        var res = AppModel.beginWaitFor('TestSubClass', '123', function () {
-          assert.equals(AppOplog._private.wait, ['TestSubClass', '123']);
+        var wfKey = AppOplog._private.wfKey;
+        var res = AppModel.beginWaitFor('TestSubClass', '123', function (wf) {
+          var keys = Fiber.current._beginWaitFor;
+          assert.same(keys, wf);
+
+          assert.same(keys.model, 'TestSubClass');
+          assert.same(keys.id, '123');
+          assert.same(keys.timeout, 'toKey');
+          assert.same(keys.token, wfKey+1);
+
+          assert.same(AppOplog._private.wfKey, wfKey+1);
+
+          assert.same(App.getNestedHash(AppOplog._private.waitFors, 'TestSubClass', '123',
+                                        wfKey+1), keys);
+
           return "success";
         });
         assert.same(res, "success");
 
         assert.isTrue(v.ranWaitFunc);
 
-        assert.equals(AppOplog._private.wait, [null, null]);
+        assert.equals(AppOplog._private.waitFors, {});
+        assert.same(Fiber.current._beginWaitFor, null);
+
         assert.calledOnce(v.lastFuture.return);
       },
 
@@ -177,14 +214,14 @@
           AppModel.beginWaitFor('TestSubClass', '123', function () {
             v.insert('TestSubClass',  {_id: '1',   name: 'fred', age: 5});
             v.insert('TestSubClassx', {_id: '123', name: 'fred', age: 5});
-            assert.equals(AppOplog._private.wait, ['TestSubClass', '123']);
+            assert(Fiber.current._beginWaitFor);
 
             refute.called(v.lastFuture.return);
 
             v.insert('TestSubClass', {_id: '123', name: 'fred', age: 5});
             assert.called(v.lastFuture.return);
 
-            assert.equals(AppOplog._private.wait, [-1, null]);
+            assert.equals(AppOplog._private.waitFors, {});
             return 'okay';
           }),
           "okay");
@@ -194,8 +231,7 @@
         var future = AppModel.beginWaitFor('TestSubClass', '222', function () {
           v.update('TestSubClass',  '1',   {name: 'fred'});
           v.update('TestSubClassx', '222', {name: 'fred'});
-          assert.equals(AppOplog._private.wait, ['TestSubClass', '222']);
-
+          assert(Fiber.current._beginWaitFor);
           refute.called(v.lastFuture.return);
 
           v.update('TestSubClass', '222', {name: 'fred'});
@@ -207,7 +243,7 @@
         var future = AppModel.beginWaitFor('TestSubClass', '222', function () {
           v.remove('TestSubClass',  '1');
           v.remove('TestSubClassx', '222');
-          assert.equals(AppOplog._private.wait, ['TestSubClass', '222']);
+          assert(Fiber.current._beginWaitFor);
 
           refute.called(v.lastFuture.return);
 

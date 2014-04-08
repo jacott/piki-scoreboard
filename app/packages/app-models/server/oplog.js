@@ -1,3 +1,4 @@
+var Fiber = Npm.require('fibers');
 var Future = Npm.require('fibers/future');
 
 var replSetName = '', collNameIndex = 0;
@@ -6,7 +7,8 @@ var observers = {};
 var key = 1;
 var meteorOplogHandle;
 
-var waitCollName = null, waitId = null, future = null, timeout = null;
+var waitFors = {};
+var wfKey = 1;
 
 AppOplog = {
   timeout: 60000,
@@ -33,7 +35,8 @@ AppOplog = {
   },
 
   _private: {
-    get wait() {return [waitCollName, waitId]},
+    get waitFors() {return waitFors},
+    get wfKey() {return wfKey},
     get collNameIndex() {return collNameIndex},
 
     processEntry: processEntry,
@@ -49,34 +52,33 @@ AppOplog = {
 
 
 App.extend(AppModel, {
-  beginWaitFor: function (collname, id, func) {
-    if (waitCollName) {
-      func();
+  beginWaitFor: function (collName, id, func) {
+    if (Fiber.current._beginWaitFor) {
+      func(-1);
       return;
     }
-    waitCollName = collname;
-    waitId = id;
-    timeout = setTimeout(function () {
-      if (future) {
-        var error = new Error('wait for "' + collname + '":"' + id + '" timed out');
-        if (waitCollName === collname && waitId === id)
-          resetFuture().throw(error);
-      }
+
+
+    var wf = Fiber.current._beginWaitFor = {
+      model: collName, id: id,
+      future: new Future(),
+    };
+    wf.token = ++wfKey;
+    App.setNestedHash(wf, waitFors, collName, id, wf.token);
+
+    wf.timeout = App.setTimeout(function () {
+      var error = new Error('wait for "' + collName + '":"' + id + '" timed out');
+      resetFuture(wf).throw(error);
     }, AppOplog.timeout);
 
-    future = new Future();
-
     try {
-      var result = func();
-      future && future.wait();
-
+      var result = func(wf);
+      wf.future && wf.future.wait();
       return result;
 
-    } catch(ex) {
-      endWaitFor(collname, id);
-      throw ex;
     } finally {
-      waitCollName = null;
+      Fiber.current._beginWaitFor = null;
+      resetFuture(wf);
     }
   },
 
@@ -84,19 +86,20 @@ App.extend(AppModel, {
 });
 
 
-function endWaitFor(collname, id) {
-  if (future && waitCollName === collname && waitId === id) {
-    resetFuture().return();
-  }
+function endWaitFor(wf) {
+  if (wf === -1 || (wf && ! wf.future)) return;
+  resetFuture(wf).return();
 }
 
-function resetFuture() {
-  if (timeout) clearTimeout(timeout);
-  if (waitCollName) waitCollName = -1;
-  timeout = null;
-  waitId = null;
-  var f = future;
-  future = null;
+function resetFuture(wf) {
+  if (! wf)
+    return;
+
+  App.clearTimeout(wf.timeout);
+  wf.timeout = null;
+  var f = wf.future;
+  wf.future = null;
+  App.deleteNestedHash(waitFors, wf.model, wf.id, wf.token);
   return f;
 }
 
@@ -147,9 +150,13 @@ function processEntry(notification) {
       }
     }
   } finally {
-    if (future !== null &&
-        waitCollName === collName && waitId === (result.op === 'u' ? result.o2._id : result.o._id)) {
-      endWaitFor(waitCollName, waitId);
+    var tokens = App.getNestedHash(waitFors, collName, (result.op === 'u' ? result.o2._id : result.o._id));
+    if (tokens) for (var key in tokens) {
+      var wf = tokens[key];
+      if (wf.model === collName &&
+          wf.id === (result.op === 'u' ? result.o2._id : result.o._id)) {
+        endWaitFor(wf);
+      }
     }
   }
 }

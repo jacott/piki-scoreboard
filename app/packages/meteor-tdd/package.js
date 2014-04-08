@@ -14,6 +14,3 @@ Package.on_use(function(api) {
     'meteor-tdd.js'
   ], 'server');
 });
-
-Package.on_test(function(api) {
-});

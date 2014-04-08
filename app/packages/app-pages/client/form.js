@@ -375,14 +375,10 @@ function field(doc, name, options) {
   }
 
   switch(options.type || 'text') {
-  case 'text':
-  case 'hidden':
-  case 'password':
-    return Tpl.TextInput.$autoRender({type: options.type || 'text', name: name, doc: doc, options: options});
   case 'onOff':
     return Tpl.OnOff.$autoRender({name: name, doc: doc, options: options});
   default:
-    throw new Error('unknown type: ' + options.type);
+    return Tpl.TextInput.$autoRender({type: options.type || 'text', name: name, doc: doc, options: options});
   }
 
 }

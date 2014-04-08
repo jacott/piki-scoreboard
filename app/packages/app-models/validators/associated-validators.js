@@ -1,4 +1,5 @@
 AppVal.register('associated', function (doc,field,options) {
+  if (options.changesOnly && ! (field in doc.changes)) return;
   var value = doc[field];
   if (! value) return;
 

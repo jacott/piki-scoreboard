@@ -36,7 +36,6 @@ function startTest() {
 
   geddon.sinon.spy(Meteor.Collection.prototype,'_ensureIndex');
   geddon.sinon.spy(Meteor,'publish');
-  geddon.sinon.spy(Accounts,'registerLoginHandler');
 
   Meteor.startup(function () {
     var net = Npm.require('net');
