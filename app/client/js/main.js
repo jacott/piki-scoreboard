@@ -12,6 +12,8 @@ App._startup = function () {
 
   document.head.appendChild(Tpl.Head.$render({}));
 
+  Bart.Spinner.init();
+
   pathname = AppClient.getLocation();
 
   var handle = App.Ready.onReady(whenReady);
@@ -49,14 +51,19 @@ App._startup = function () {
 
     var newUserId = Meteor.userId();
 
-    if (Accounts.loginServicesConfigured() && connected) {
-      Deps.nonreactive(function stateChange() {
-        if (userId !== newUserId) {
-          userId = newUserId;
-          Bart.getCtx(header).updateAllTags();
-          setAccess();
-        }
-      });
+    if (Accounts.loginServicesConfigured()) {
+      Bart.removeId('Disconnected');
+      if (connected) {
+        Deps.nonreactive(function stateChange() {
+          if (userId !== newUserId) {
+            userId = newUserId;
+            Bart.getCtx(header).updateAllTags();
+            setAccess();
+          }
+        });
+      } else {
+        document.body.appendChild(Bart.Disconnected.$autoRender({}));
+      }
     }
   });
 };

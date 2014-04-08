@@ -1,0 +1,108 @@
+/*
+  Icon Font: obeya
+*/
+
+@font-face {
+  font-family: "iconFont";
+  src: url(/icon-font.woff) format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
+[data-icon]:before { content: attr(data-icon); }
+
+[data-icon]:before,
+.icon-add:before,
+.icon-add-bin:before,
+.icon-arrow-down:before,
+.icon-arrow-left:before,
+.icon-arrow-right:before,
+.icon-arrow-up:before,
+.icon-avatar:before,
+.icon-back-track:before,
+.icon-cog:before,
+.icon-copy:before,
+.icon-cross:before,
+.icon-dbl-line-arrow-left:before,
+.icon-dbl-line-arrow-right:before,
+.icon-design-mode:before,
+.icon-edit:before,
+.icon-exit:before,
+.icon-flip:before,
+.icon-graph-crop:before,
+.icon-hand:before,
+.icon-hand-cuff:before,
+.icon-help:before,
+.icon-image:before,
+.icon-key:before,
+.icon-line-arrow-down:before,
+.icon-line-arrow-left:before,
+.icon-line-arrow-right:before,
+.icon-lock:before,
+.icon-maximize:before,
+.icon-minimize:before,
+.icon-move:before,
+.icon-notifications:before,
+.icon-pause:before,
+.icon-pencil:before,
+.icon-revert:before,
+.icon-search:before,
+.icon-small-menu:before,
+.icon-spinner:before,
+.icon-tick:before,
+.icon-trash-can:before,
+.icon-two-avatars:before,
+.icon-wip-limit:before {
+  display: inline-block;
+  font-family: "obeya";
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  line-height: 1;
+  text-decoration: inherit;
+  text-transform: none;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}
+
+.icon-add:before { content: "\f100"; }
+.icon-add-bin:before { content: "\f101"; }
+.icon-arrow-down:before { content: "\f102"; }
+.icon-arrow-left:before { content: "\f103"; }
+.icon-arrow-right:before { content: "\f104"; }
+.icon-arrow-up:before { content: "\f105"; }
+.icon-avatar:before { content: "\f106"; }
+.icon-back-track:before { content: "\f107"; }
+.icon-cog:before { content: "\f108"; }
+.icon-copy:before { content: "\f109"; }
+.icon-cross:before { content: "\f10a"; }
+.icon-dbl-line-arrow-left:before { content: "\f10b"; }
+.icon-dbl-line-arrow-right:before { content: "\f10c"; }
+.icon-design-mode:before { content: "\f10d"; }
+.icon-edit:before { content: "\f10e"; }
+.icon-exit:before { content: "\f10f"; }
+.icon-flip:before { content: "\f110"; }
+.icon-graph-crop:before { content: "\f111"; }
+.icon-hand:before { content: "\f112"; }
+.icon-hand-cuff:before { content: "\f113"; }
+.icon-help:before { content: "\f114"; }
+.icon-image:before { content: "\f115"; }
+.icon-key:before { content: "\f116"; }
+.icon-line-arrow-down:before { content: "\f117"; }
+.icon-line-arrow-left:before { content: "\f118"; }
+.icon-line-arrow-right:before { content: "\f119"; }
+.icon-lock:before { content: "\f11a"; }
+.icon-maximize:before { content: "\f11b"; }
+.icon-minimize:before { content: "\f11c"; }
+.icon-move:before { content: "\f11d"; }
+.icon-notifications:before { content: "\f11e"; }
+.icon-pause:before { content: "\f11f"; }
+.icon-pencil:before { content: "\f120"; }
+.icon-revert:before { content: "\f121"; }
+.icon-search:before { content: "\f122"; }
+.icon-small-menu:before { content: "\f123"; }
+.icon-spinner:before { content: "\f124"; }
+.icon-tick:before { content: "\f125"; }
+.icon-trash-can:before { content: "\f126"; }
+.icon-two-avatars:before { content: "\f127"; }
+.icon-wip-limit:before { content: "\f128"; }

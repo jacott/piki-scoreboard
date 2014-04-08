@@ -1,0 +1,6 @@
+<template name="Spinner">
+  <div id="Spinner">
+    <i>
+    </i>
+  </div>
+</template>

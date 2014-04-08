@@ -6,6 +6,13 @@
       test.stub(AppRoute, 'replacePath');
       test.stub(Meteor, 'status').returns({connected: true});
       test.stub(window, 'addEventListener');
+      test.stub(Bart.Spinner, 'init');
+    },
+
+    "test inits spinner": function () {
+      App._startup();
+
+      assert.called(Bart.Spinner.init);
     },
 
     tearDown: function () {
