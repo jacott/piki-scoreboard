@@ -20,8 +20,15 @@
     'test standard validators': function () {
       var validators = AppModel.Club._fieldValidators;
 
-      assert.validators(validators.name, {maxLength: [200], required: [true], trim: [true], unique: [{score: 'org_id'}]});
-      assert.validators(validators.shortName, {maxLength: [10], required: [true], trim: [true], normalize: ['upcase']});
+      assert.validators(validators.name, {
+        maxLength: [200], required: [true], trim: [true],
+        unique: [{scope: 'org_id'}],
+      });
+      assert.validators(validators.shortName, {
+        maxLength: [10], required: [true], trim: [true],
+        normalize: ['upcase'],
+        unique: [{scope: 'org_id'}],
+      });
     },
 
     "test removeRpc": function () {

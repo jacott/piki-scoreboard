@@ -59,7 +59,7 @@ model.ROLE = ROLE;
 
 model.defineFields({
   name: {type:  'text', trim: true, required: true, maxLength: 200},
-  email: {type:  'text', trim: true, required: true, maxLength: 200, inclusion: {allowBlank: true, matches: Apputil.EMAIL_RE },  normalize: 'downcase'},
+  email: {type:  'text', trim: true, required: true, maxLength: 200, inclusion: {allowBlank: true, matches: Apputil.EMAIL_RE },  normalize: 'downcase' , unique: true},
   initials: {type: 'text', trim: true, required: true, maxLength: 3},
   org_id: {type: 'belongs_to', required: function () {return this.role !== ROLE.superUser}},
   role: {type: 'text', inclusion: {in: _.values(ROLE)}},

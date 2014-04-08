@@ -15,7 +15,7 @@ App.require('AppModel.Org', function () {
 
 
   model.defineFields({
-    name: {type:  'text', trim: true, required: true, maxLength: 200},
+    name: {type:  'text', trim: true, required: true, maxLength: 200, unique: {scope: 'org_id'}},
     org_id: 'belongs_to',
     heats: 'has-many',
     date: {type: 'date', inclusion: {matches: /^\d{4}-[01]\d-[0-3]\d$/}},

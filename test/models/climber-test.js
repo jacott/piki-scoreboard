@@ -24,7 +24,7 @@
     'test standard validators': function () {
       var validators = AppModel.Climber._fieldValidators;
 
-      assert.validators(validators.name, {maxLength: [200], required: [true], trim: [true], unique: [{score: 'org_id'}]});
+      assert.validators(validators.name, {maxLength: [200], required: [true], trim: [true], unique: [{scope: 'org_id'}]});
       assert.validators(validators.gender, {inclusion: [{allowBlank: true, matches: /^[mf]$/ }]});
       assert.validators(validators.club_id, {required: [true]});
       assert.validators(validators.dateOfBirth, {inclusion: [{matches: /^\d{4}-[01]\d-[0-3]\d$/ }]});
