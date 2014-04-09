@@ -16,7 +16,7 @@
     },
 
     "test rankIndex": function () {
-      var heat = new AppModel.Heat(1, 'LQQF26F26F8');
+      var heat = new AppModel.Heat(1, 'LQ:8QF26F26F8');
       assert.same(heat.rankIndex, 2);
 
       var heat = new AppModel.Heat(1, 'LQQQF8');
@@ -29,6 +29,40 @@
 
       heat.number = 5;
       assert.isTrue(heat.isFinalRound());
+    },
+
+    "problem count": {
+      setUp: function () {
+        v.assert = function (heatNum, expect) {
+          v.heat = new AppModel.Heat(heatNum, v.format);
+          assert.same(v.heat.problems, expect);
+        };
+      },
+
+      "test mixed count": function () {
+        v.format = 'BQQ:3QF26F26:2F8';
+
+        v.assert(1, 5);
+        v.assert(2, 3);
+        v.assert(3, 3);
+        v.assert(4, 4);
+        v.assert(5, 2);
+        v.assert(6, 2);
+      },
+
+      "test defaults": function () {
+        v.format = 'BQF';
+
+        v.assert(1, 5);
+        v.assert(2, 4);
+      },
+
+      "test all set": function () {
+        v.format = 'BQ:8F6:3';
+
+        v.assert(1, 8);
+        v.assert(2, 3);
+      },
     },
 
     "test name": function () {

@@ -2,18 +2,40 @@ AppModel.Heat = Heat;
 
 function Heat(number, format) {
   this.number = number;
+
+  var rounds = format.split(/[QF]/);
+  format = format.replace(/:\d+/g, '');
   this.cutoffs = format.split('F').slice(1);
+
   format = format.replace(/\d+/g,'');
   this.type = format[0];
   format = format.slice(1);
   this.total = format.length;
   this.rankIndex = format.indexOf('F');
+
+  var pnum = 5;
+  for(var i = 1; i <= this.total; ++i) {
+    var p = rounds[i];
+    if (p) p = p.replace(/^\d*:?/, '');
+    if (p)
+      pnum = +p;
+
+    rounds[i] = pnum;
+    if (i === this.rankIndex)
+      pnum = 4;
+  }
+
+  this._rounds = rounds;
 };
 
 var FINAL_NAMES = ['Final', 'Semi final', 'Quarter final'];
 
 Heat.prototype = {
   constructor: Heat,
+
+  get problems() {
+    return this._rounds[this.number];
+  },
 
   get name() {
     return this.getName(this.number);

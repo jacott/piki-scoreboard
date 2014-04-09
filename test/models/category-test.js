@@ -28,7 +28,9 @@
                                                normalize: ['upcase']});
       assert.validators(validators.minAge, {number: [{integer: true, $gt: 0, $lt: 100}]});
       assert.validators(validators.maxAge, {number: [{integer: true, $gt: 0, $lt: 100}]});
-      assert.validators(validators.heatFormat, {inclusion: [{matches: /^Q{0,3}(F\d+){1,3}$/}]});
+      assert.validators(validators.heatFormat, {inclusion: [{
+        matches: /^Q{0,3}(:\d+)?(F\d+(:\d+)?){1,3}$/,
+      }]});
     },
 
     "test removeRpc": function () {

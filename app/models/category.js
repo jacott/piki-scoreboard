@@ -2,7 +2,7 @@ App.require('AppModel.Org', function () {
   var model = AppModel.Base.defineSubclass('Category',{
   },{saveRpc: true});
 
-  model.HEAT_FORMAT_REGEX = /^Q{0,3}(F\d+){1,3}$/;
+  model.HEAT_FORMAT_REGEX = /^Q{0,3}(:\d+)?(F\d+(:\d+)?){1,3}$/;
 
   model.defineFields({
     org_id: 'belongs_to',
