@@ -10,7 +10,13 @@
     },
 
     "test try now": function () {
+      test.stub(Meteor, 'reconnect');
 
+      document.body.appendChild(Bart.Disconnected.$autoRender({}));
+
+      TH.click('#Disconnected [name=connect]');
+
+      assert.called(Meteor.reconnect);
     },
   });
 })();
