@@ -113,9 +113,11 @@
 
     "boulder category": {
       setUp: function () {
-        v.category = TH.Factory.createCategory({type: 'B', heatFormat: 'FF6'});
+        v.category = TH.Factory.createCategory({type: 'B', heatFormat: 'QF6'});
         v.event = TH.Factory.createEvent();
-        v.result = TH.Factory.createResult({scores: [0.1]});
+        v.result = TH.Factory.createResult({
+          scores: [0.1, 3830485], problems: [[302, 0, 1, 101, 1210]],
+        });
 
         TH.login();
 
@@ -132,10 +134,50 @@
             assert.dom('thead>tr', function () {
               assert.dom('th:first-child', 'Climber');
               assert.dom('th:nth-child(2)', 'Result');
-              assert.dom('th:nth-child(3)', 'Previous heat');
+              assert.dom('th:nth-child(3)', 'Sum');
+              assert.dom('th:nth-child(4)', 'Previous heat');
             });
 
             refute.dom('td.heat99');
+          });
+        });
+      },
+
+      "test rendering qual round": function () {
+        TH.change('select[name=selectHeat]', 1);
+
+        assert.dom('#Event #Category', function () {
+          assert.dom('.rank table.results', function () {
+            assert.dom('thead>tr', function () {
+              assert.dom('th:first-child', 'Climber');
+              assert.dom('th:nth-child(2)', 'Result');
+              assert.dom('th:nth-child(3)', 'Sum');
+              refute.dom('th:nth-child(4)');
+            });
+            assert.dom('tbody>tr:first-child', function () {
+              assert.dom('td:nth-child(2).BoulderScore.score', function () {
+                assert.dom('>div', {count: 5});
+                assert.dom('>.top', {count: 3});
+                assert.dom('>.bonus', {count: 1});
+                assert.dom('.top>:nth-child(1)', '2');
+                assert.dom('.top>:nth-child(2)', '3');
+
+                assert.dom('>:not(.bonus):not(.top):nth-child(2)', '');
+
+                assert.dom('>.bonus:nth-child(3)>:first-child', '1');
+                assert.dom('>.bonus:nth-child(3)>:last-child', '');
+
+                assert.dom('>.top:nth-child(4)>:first-child', '1');
+                assert.dom('>.top:nth-child(4)>:last-child', '1');
+
+                assert.dom('>.top:nth-child(5)>:first-child', '10');
+                assert.dom('>.top:nth-child(5)>:last-child', '12');
+              });
+              assert.dom('td:nth-child(3).score', function () {
+                assert.dom('i', '1');
+                assert.dom('span', '3t16 4b14');
+              });
+            });
           });
         });
       },
@@ -147,9 +189,19 @@
           });
           assert.dom('h1', 'Final - Start order');
           assert.dom('tr#Result_'+ v.result._id, function () {
-            assert.dom('td:nth-child(2)>input[placeholder="nta nba"]', function () {
-              TH.change(this, '3t4 3x');
-              assert.className(this, 'error');
+            assert.dom('td:nth-child(2).BoulderScore', function () {
+              assert.dom('>div', {count: 4});
+              assert.dom('>div>input:last-child', {count: 4});
+              assert.dom('>div>input:first-child', {count: 4});
+              assert.dom('>div:first-child>:first-child', function () {
+                TH.change(this, '4');
+                refute.className(this.parentNode, 'error');
+              });
+              assert.dom('>div:first-child>:last-child', function () {
+                TH.change(this, '3');
+                assert.className(this.parentNode, 'error');
+                assert.dom(this.parentNode.nextElementSibling, 'Invalid input');
+              });
             });
           });
         });
@@ -196,7 +248,6 @@
           TH.change(this, "3.44");
         });
         assert.equals(v.result.$reload().time, 3*60+44);
-        assert.dom('tr#Result_'+ v.result._id + '>td:nth-child(2)>span', '3:44');
       });
     },
 
@@ -224,17 +275,12 @@
       });
 
       assert.dom('#Result_'+ v.result._id, function () {
-        assert.dom('td:last-child.input>input', function () {
+        assert.dom('td:last-child>input', function () {
           TH.change(this, "23.5+");
         });
       });
 
       assert.equals(v.result.$reload().scores, [0.1, 235005]);
-
-
-      assert.dom('#Result_'+ v.result._id, function () {
-        assert.dom('td>input~span', '23.5+');
-      });
     },
   });
 })();

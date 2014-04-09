@@ -29,13 +29,15 @@
           </tr>
         </template>
         <template name="Score">
-          <td class="{{classes}}">
+          <td class="score" {{heatClass}}>
             {{rank}}
-            <span>{{score}}</span>
+            {{score}}
           </td>
         </template>
-        <template name="ScoreInput">
-          <input id="ScoreInput" type="text" name="score" placeholder="{{placeholder}}" value="{{score}}">
+        <template name="BoulderScore">
+          <td class="BoulderScore score">
+            {{problems}}
+          </td>
         </template>
         <template name="InvalidInput">
           <span class="errorMsg">

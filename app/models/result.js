@@ -19,7 +19,8 @@ App.require('AppModel.Competitor', function (Competitor) {
     climber_id: 'belongs_to',
     category_id: 'belongs_to',
     time: 'number',
-    scores: 'number',
+    scores: 'has-many',
+    problems: 'has-many',
   });
 
   model.remote({

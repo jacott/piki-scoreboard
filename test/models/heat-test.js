@@ -352,11 +352,12 @@
       },
 
       "test Final boulder": function () {
-        v.format = "BFF6";
+        v.format = "BQF6";
 
         assert.equals(v.call(2), [
           {number: 2, name: 'Result'},
-          {number: 1, name: 'Previous heat'},
+          {number: 2, name: 'Sum'},
+          {number: -2, name: 'Previous heat'},
         ]);
       },
 

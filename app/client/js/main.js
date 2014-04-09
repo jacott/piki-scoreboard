@@ -66,6 +66,16 @@ App._startup = function () {
       }
     }
   });
+
+  if (!( 'settings' in Meteor)) {
+    document.addEventListener("keydown", function(event) {
+      if (event.which === 120) {
+        Meteor.disconnect();
+        document.head.removeChild(document.querySelector('head link'));
+        document.head.appendChild(Bart.html('<link rel="stylesheet" href="/quick.css">'));
+      }
+    }, true);
+  }
 };
 
 Tpl.Header.$helpers({

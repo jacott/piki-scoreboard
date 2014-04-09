@@ -306,6 +306,7 @@ Heat.prototype = {
       if (this.type === 'L' && num === this.total)
         callback(99, 'Time taken');
       callback(num, "Result");
+      if (this.type === 'B') callback(num, "Sum");
       if (num <= this.rankIndex) return;
       --num;
       callback(num === this.rankIndex ? -2 : num, 'Previous heat');
