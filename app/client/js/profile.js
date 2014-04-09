@@ -28,7 +28,22 @@ Tpl.$events({
 
   'click [name=signOutOthers]': function (event) {
     Bart.stopEvent();
-    Meteor.logoutOtherClients();
+
+    var elm = Tpl.SignOutOthers.$autoRender({});
+
+    Bart.Dialog.open(elm);
+
+    Meteor.logoutOtherClients(function (error) {
+      elm.firstChild.textContent = error ? 'Unexpected error.' :
+        'You have been signed out of any other sessions.';
+    });
+  },
+});
+
+Tpl.SignOutOthers.$events({
+  'click [name=close]': function (event) {
+    Bart.stopEvent();
+    Bart.Dialog.close('SignOutOthers');
   },
 });
 

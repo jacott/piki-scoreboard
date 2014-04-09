@@ -13,8 +13,17 @@
   <template name="Index">
     <div>
       <button name="signOut" class="link">Sign out</button>
-      <button name="signOutOthers" class="link">Sign out other web browsers</button>
+      <button name="signOutOthers" class="link">Sign out my other sessions</button>
       {{pageLink value="Change password" template="Profile.ChangePassword"}}
+    </div>
+  </template>
+
+  <template name="SignOutOthers">
+    <div id="SignOutOthers">
+      <p>Signing you out of any other sessions...</p>
+      <fieldset class="actions">
+        <button name="close">Close</button>
+      </fieldset>
     </div>
   </template>
 

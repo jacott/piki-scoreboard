@@ -31,7 +31,24 @@
 
         TH.click('[name=signOutOthers]');
 
+        assert.dom('#SignOutOthers>p', 'Signing you out of any other sessions...');
+
         assert.called(Meteor.logoutOtherClients);
+
+        Meteor.logoutOtherClients.yield('error');
+
+        assert.dom('#SignOutOthers>p', 'Unexpected error.');
+
+        Meteor.logoutOtherClients.yield();
+
+        assert.dom('#SignOutOthers', function () {
+          assert.dom('>p', 'You have been signed out of any other sessions.');
+          TH.click('[name=close]');
+        });
+
+        refute.dom('#SignOutOthers');
+
+
       },
 
 
