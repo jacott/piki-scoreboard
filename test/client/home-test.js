@@ -42,7 +42,7 @@
           TH.click('button.link', 'Events');
           assert.calledWith(AppRoute.gotoPath, Bart.Event);
 
-          TH.click('button.link', 'Event categories');
+          TH.click('button.link', 'Competitor categories');
           assert.calledWith(AppRoute.gotoPath, Bart.Category);
         });
       },

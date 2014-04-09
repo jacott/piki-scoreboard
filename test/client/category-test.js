@@ -19,7 +19,7 @@
 
       assert.dom('#Category', function () {
         assert.dom('.categories', function () {
-          assert.dom('h1', 'Categories');
+          assert.dom('h1', 'Competitor categories');
           assert.dom('h1+table', function () {
             assert.dom('tr>td', categories[0].name, function () {
               assert.domParent('td', categories[0].shortName);
