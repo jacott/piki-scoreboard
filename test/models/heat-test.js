@@ -120,13 +120,18 @@
 
       "test final tie": function () {
         v.heat = new AppModel.Heat(3, 'LQF8F2');
-        var results = [v.r1 = {scores: [0.2, 300, 300]}, v.r2 = {scores: [0.4, 400, 300]}, v.r3 = {scores: [0.3, 300, 300]}, v.r4 = {scores: [0.1, 50, 300, 500]}];
+        var results = [v.r1 = {scores: [0.21, 300, 300]}, v.r2 = {scores: [0.42, 400, 300]}, v.r3 = {scores: [0.33, 300, 300]}, v.r4 = {scores: [0.14, 50, 300, 500]}];
 
-        results = v.heat.sortByStartOrder(results);
+        var r2 = v.heat.sortByStartOrder(results.slice(0));
 
-        assert.same(results.length, 3);
-        assert.equals(results, [v.r3, v.r1, v.r2]);
+        assert.same(r2.length, 3);
+        assert.equals(r2, [v.r3, v.r1, v.r2]);
 
+        v.r1.scores[0] = 0.25;
+
+        r2 = v.heat.sortByStartOrder(results.slice(0));
+
+        assert.equals(r2, [v.r1, v.r3, v.r2]);
       },
 
       "test final no tie": function () {

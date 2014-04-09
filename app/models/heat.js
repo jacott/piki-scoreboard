@@ -130,7 +130,13 @@ Heat.prototype = {
     if (x <= 0) x = 1;
 
     if (x > this.rankIndex) {
-      this.sort(results, x - 1);
+      this.sort(results, x - 1, function rso(a, b) {
+        a = a * 10;
+        a = a - Math.floor(a);
+        b= b * 10;
+        b = b - Math.floor(b);
+        return a == b ? 0 : a > b ? 1 : -1;
+      });
       (x-1) === this.rankIndex && results.sort(function (a, b) {
         return a.rankMult === b.rankMult ? 0 :
           a.rankMult < b.rankMult ? -1 : 1; // lower rank is better
@@ -167,7 +173,7 @@ Heat.prototype = {
     return results;
   },
 
-  sort: function (results, number) {
+  sort: function (results, number, rso) {
     if (results.length === 0) return results;
     if (number == null) number = this.number;
     var rankIndex = this.rankIndex;
@@ -195,7 +201,7 @@ Heat.prototype = {
       results.sort(sortByHeat);
 
     } else {
-      results.sort(this.compareResults(0, x));
+      results.sort(this.compareResults(rso ? 1 : 0, x, rso));
     }
     return results;
 
@@ -218,7 +224,7 @@ Heat.prototype = {
     }
   },
 
-  compareResults: function (min, max) {
+  compareResults: function (min, max, rso) {
     // FIXME if min zero then need to to a pseduo random sort for ties
     if (min == null) min = 1;
     if (max == null) max = this.number;
@@ -236,7 +242,7 @@ Heat.prototype = {
             if (max == last && a.time != b.time ) { // final by time
               return (a.time || 0) < (b.time || 0) ? -1 : 1; // lower time is better
             } else
-              return 0;
+              return rso ? rso(aScores[0], bScores[0]) : 0;
           } else {
             as = a.rankMult;
             bs = b.rankMult;
@@ -257,7 +263,7 @@ Heat.prototype = {
         }
       }
 
-      return 0;
+      return rso ? rso(aScores[0], bScores[0]) : 0;
     };
   },
 
