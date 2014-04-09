@@ -118,14 +118,25 @@
         };
       },
 
-      "test final": function () {
-        v.heat = new AppModel.Heat(2, 'LQF2');
-        var results = [v.r1 = {scores: [0.2, 300, 300]}, v.r2 = {scores: [0.4, 400, 100]}, v.r3 = {scores: [0.3, 300, 300]}, v.r4 = {scores: [0.1, 50, 300]}];
+      "test final tie": function () {
+        v.heat = new AppModel.Heat(3, 'LQF8F2');
+        var results = [v.r1 = {scores: [0.2, 300, 300]}, v.r2 = {scores: [0.4, 400, 300]}, v.r3 = {scores: [0.3, 300, 300]}, v.r4 = {scores: [0.1, 50, 300, 500]}];
 
         results = v.heat.sortByStartOrder(results);
 
         assert.same(results.length, 3);
         assert.equals(results, [v.r3, v.r1, v.r2]);
+
+      },
+
+      "test final no tie": function () {
+        v.heat = new AppModel.Heat(3, 'LQF8F2');
+        var results = [v.r1 = {scores: [0.2, 400, 300]}, v.r2 = {scores: [0.4, 400, 100]}, v.r3 = {scores: [0.3, 300, 300]}, v.r4 = {scores: [0.1, 50, 300, 500]}];
+
+        results = v.heat.sortByStartOrder(results);
+
+        assert.same(results.length, 2);
+        assert.equals(results, [v.r3, v.r1]);
 
       },
 

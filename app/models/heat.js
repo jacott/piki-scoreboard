@@ -139,7 +139,7 @@ Heat.prototype = {
       var cutoff = +this.cutoffs[x - this.rankIndex - 1];
 
       var prev, row, rank = 0;
-      var compareResults = this.compareResults();
+      var compareResults = this.compareResults(1, x - 1);
       for(var i = 0; i < results.length; ++i, prev = row) {
         row = results[i];
         if (! prev || compareResults(prev, row) !== 0)
@@ -195,7 +195,7 @@ Heat.prototype = {
       results.sort(sortByHeat);
 
     } else {
-      results.sort(this.compareResults(0));
+      results.sort(this.compareResults(0, x));
     }
     return results;
 
@@ -218,19 +218,22 @@ Heat.prototype = {
     }
   },
 
-  compareResults: function (min) {
+  compareResults: function (min, max) {
     // FIXME if min zero then need to to a pseduo random sort for ties
     if (min == null) min = 1;
+    if (max == null) max = this.number;
     var rankIndex = this.rankIndex;
+    var last = this.total;
+
     return function (a, b) {
       var aScores = a.scores, bScores = b.scores;
-      var mLen = Math.max(aScores.length, bScores.length);
+      var mLen = max < 0 ? Math.max(aScores.length, bScores.length) - 1 : max;
       var as, bs;
 
-      for(--mLen; mLen >= min; --mLen) {
+      for(; mLen >= min; --mLen) {
         if (mLen === rankIndex) {
           if (a.rankMult == b.rankMult) {
-            if (a.time != b.time ) {
+            if (max == last && a.time != b.time ) { // final by time
               return (a.time || 0) < (b.time || 0) ? -1 : 1; // lower time is better
             } else
               return 0;
