@@ -39,7 +39,8 @@ App.require('AppModel.User', function (model) {
   });
 
   model.afterCreate(function (doc) {
-    Accounts.createUser({email: doc.email, password: "changeme", profile: {id: doc._id}});
+    Accounts.createUser({email: doc.email, password: Random.id(), profile: {id: doc._id}});
+    Accounts.sendResetPasswordEmail(doc._id);
   });
 
   App.extend(model.prototype, {

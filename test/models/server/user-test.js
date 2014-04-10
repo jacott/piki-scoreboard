@@ -11,6 +11,7 @@
     },
 
     "test createUser": function () {
+      test.stub(Accounts, 'sendResetPasswordEmail');
       TH.loginAs(TH.Factory.createUser('su'));
       var user = TH.Factory.buildUser();
       user.$$save();
@@ -20,6 +21,8 @@
       assert(mUser);
 
       assert.equals(mUser.emails, [{address: user.email, verified: false}]);
+
+      assert.calledWith(Accounts.sendResetPasswordEmail, user._id);
     },
 
     "test authorize": function () {
