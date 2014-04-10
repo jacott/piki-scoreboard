@@ -23,6 +23,10 @@
       assert.equals(mUser.emails, [{address: user.email, verified: false}]);
 
       assert.calledWith(Accounts.sendResetPasswordEmail, user._id);
+
+      // and remove
+      user.$remove();
+      refute(Meteor.users.findOne(user._id));
     },
 
     "test authorize": function () {

@@ -43,6 +43,10 @@ App.require('AppModel.User', function (model) {
     Accounts.sendResetPasswordEmail(doc._id);
   });
 
+  model.afterRemove(function (user) {
+    Meteor.users.remove(user._id);
+  });
+
   App.extend(model.prototype, {
     authorize: function (userId) {
       var role = AppModel.User.ROLE;
