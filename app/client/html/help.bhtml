@@ -14,20 +14,62 @@
       <h1>Topics</h1>
       {{contents}}
     </nav>
+    
+    <section name="disclaimer">
+      <h1>Disclaimer</h1>
+      <p>
+        Piki is developed by volunteers on an as-they-can basis. Piki, its developers, testers and sponsors make no undertakings. Specifically but not exclusively, we do not undertake:
+        <ul>
+          <li>That Piki will be available at a specific time or that it will continue to be available.</li>
+          <li>That Piki will include a desired feature, even a feature considered essential to the running of a competition, or will continue to include existing features.</li>
+          <li>That Piki will be free of significant defects at any time.</li>
+          <li>To endeavour to fix known defects in a timely manner.</li>
+          <li>That Piki will function as described in this <i>Help</i> document or in other communications.</li>
+          <li>That Piki Organizations and Users will continue to have access to their Piki accounts.</li>
+          <li>That data entered into the Piki system will be kept private. We will endeavour but do not undertake to ensure that only Piki's developers and the Organization's Users with Admin status can access:
+            <ul>
+              <li>Competitors' birth dates</li>
+              <li>Users' email addresses</li>
+            </ul>
+          </li>
+          <li>That data entered into Piki will not be lost and will continue to be available to the Organization. We will endeavour but do not undertake to ensure that data entered into Piki will be stored and backed up.</li>
+          <li>To accept applications to register as an Organization.</li>
+          <li>To provide training, help or support.</li>
+        </ul>
+      </p>
+      <p>
+        Piki's developers, testers and sponsors take no responsibility for Piki's content, entered by ourselves or by users. In particular, we take no responsibility for the accuracy or offensiveness of any content.
+      </p>
+    </section>
+    
+    <section name="general-info">
+      <h1>General Information</h1>
+      <ul>
+        <li>Piki is in beta indefinitely: 
+          <ul>
+            <li>New features are being added which may change the way parts of the system are used.</li>
+            <li>Users can expect defects and issues to arise as the system is used in real events.</li>
+          </ul>
+        </li>
+        <li>Piki is developed and tested only for use with the <a href="https://www.google.com/intl/en/chrome/browser/">Google Chrome web browser</a>. Piki may or may not work with other web browsers.</li>
+        <li>Piki is currently available as a web application, requiring hosting.</li>
+        <li>It is the developers' intention to release <i>Piki</i> under the <a href="http://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public Licence</a> in 2015, making the system available at <a href="https://github.com/">GitHub</a>.</li>
+      </ul>
+    </section>
 
     <section name="view-and-print">
       <h1>View and print event details, start lists and results</h1>
       <p>
-        To view details of an organization’s events, including results
+        To view details of an Organization’s events, including results
         and start lists, a login is not required.
       </p>
       <ol>
         <li>At {{pageLink value="Piki's home page" template="Home"}},
-          click on the desired organization in the list. This takes you to
-          the organization’s Piki home page.</li>
-        <li>Click on <i>Events</i> in the main menu.</li>
+          click on the desired Organization in the list. This takes you to
+          the Organization’s Piki home page.</li>
+        <li>Click <i>Events</i> in the main menu.</li>
         <li>Check that the relevant event is highlighted; if not, click on the event.</li>
-        <li>Click on <i>Results</i> in the main menu.</li>
+        <li>Click <i>Results</i> in the main menu.</li>
         <li>Browse results and start lists.</li>
       </ol>
       <p>
@@ -36,48 +78,83 @@
     </section>
 
     <section name="org-reg">
-      <h1>Register as an organization</h1>
-      <p>
-        Piki is currently in beta. Climbing New Zealand (CNZ) is the
-        sole organization using the system; Piki is not currently
-        available to other organizations.
+      <h1>Apply to register as an Organization</h1>
+      <ol>
+        <li>Please read the <a href="#disclaimer">Disclaimer</a> and <a href="#general-info">General information</a> above.</li>
+        <li>Please <a target="_blank" href="mailto:piki@obeya.co?subject=Application%20to%20register%20as%20an%20Organization%20on%20Piki&body=Organization%20name:%20%0a%0aOrganization%20website:%20%0a%0aOrganization%20email%20address:%20%0a%0aName%20of%20person%20to%20be%20my%20Organization's%20Piki%20Admin:%20%0a%0aThe%20email%20address%20that%20person%20wishes%20to%20use%20to%20sign%20in:%20%0a%0aName%20and%20date%20of%20the%20first%20event%20where%20we%20would%20like%20to%20test%20Piki:%20%0a%0aHow%20we%20heard%20about%20Piki:%20%0a%0aAny%20further%20information:%20">apply to register as an Organization</a>.
+        </li>
+      </ol>
     </section>
 
     <section name="user-reg">
-      <h1>Register and sign in as a user</h1>
+      <h1>Register as a User</h1>
       <p>
-        To manage your organization’s events, contact your
-        organization’s Piki Administrator (CNZ: Treefrog), providing the
+        To manage your Organization’s events, contact your
+        Organization’s Piki Admin, providing the
         email address you wish to use as your login and requesting to be
-        added as a Piki user.
+        added as a Piki User.
       <p>
-        To sign in, click on the "Sign in" link at the top of the page.
+        When you have been added as a User, a <i>Reset password</i> link will be sent to the email address entered for you.
+      </p>
+    </section>
+    
+    <section name="user-sign-in">
+      <h1>Sign in as a User</h1>
+      <p>
+        To sign in, click <i>Sign in</i> (top right-hand of page).
+      </p>
+      <p>
+        If you do not know your password, click <i>Sign in</i>, then click <i>Forgot password</i>.
+      </p>
     </section>
 
     <section name="user-add">
-      <h1>Add and remove users</h1>
+      <h1>Add Users</h1>
       <p>
-        Organization Administrators only.
+        Organization Admins only.
       <p>
         You must be signed in.
       </p>
       <ol>
-        <li>Click on your user name (top right-hand of page).</li>
-        <li>Click on <i>System setup</i>.</li>
-        <li>Add new user.</li>
+        <li>Click your user name (top right-hand of page).</li>
+        <li>Click <i>System setup</i>.</li>
+        <li>Add new User.</li>
+      </ol>
+      <p>
+        Once the new User is added, a <i>Reset password</i> email will be sent to the email address entered for the new User.
+      </p>
+    </section>
+    
+    <section name="user-edit">
+      <h1>Edit and remove Users</h1>
+      <p>
+        Including changing a User's email address.
+      <p>
+        Organization Admins only.
+      </p>
+      <p>
+        You must be signed in.
+      </p>
+      <ol>
+        <li>Click your user name (top right-hand of page).</li>
+        <li>Click <i>System setup</i>.</li>
+        <li>Select the User's name.</li>
+        <li>Edit the User's details and click <i>Save</i>.<br>
+          Or, to remove the User: click <i>Delete</i> and confirm in the pop-up box.</li>
       </ol>
     </section>
 
     <section name="event-add">
       <h1>Add events</h1>
       <p>
+        Organization Admins only.
+      </p>
+      <p>
         You must be signed in.
       </p>
       <ol>
-        <li>Click on your organization’s name (top left-hand of page) to go
-          to your organization’s Piki home page.</li>
-        <li>Click on <i>Events</i> in the main menu.</li>
-        <li>Click on <i>Add new event</i>.</li>
+        <li>Click <i>Events</i> in the main menu.</li>
+        <li>Click <i>Add new event</i>.</li>
         <li>Add event.</li>
       </ol>
     </section>
@@ -85,14 +162,15 @@
     <section name="event-edit">
       <h1>Edit an event’s name or date</h1>
       <p>
+        Organization Admins only.
+      </p>
+      <p>
         You must be signed in.
       </p>
       <ol>
-        <li>Click on your organization’s name (top left-hand of page) to
-          go to your organization’s Piki home page.</li>
-        <li>Click on <i>Events</i> in the main menu.</li>
+        <li>Click <i>Events</i> in the main menu.</li>
         <li>Check that the event to be edited is highlighted; if not, click on the event.</li>
-        <li>Click on <i>Edit event</i> in the main menu.</li>
+        <li>Click <i>Edit event</i> in the main menu.</li>
         <li>Edit the event’s name or date.</li>
       </ol>
     </section>
@@ -100,37 +178,82 @@
     <section name="comp-cat">
       <h1>Add and edit competitor categories</h1>
       <p>
-        You must be signed in.
+        Organization Admins only.
       </p>
-      <ol>
-        <li>Click on your organization’s name (top left-hand of page) to
-          go to your organization’s Piki home page.</li>
-        <li>Click on <i>Competitor categories</i> (currently <i>Event
-            categories</i>) in the main menu.</li>
-        <li>Add and edit competitor categories.<br>
-          Under <i>Heat format</i>, enter:
-          <ul>
-            <li>“Q” for every open heat, followed by</li>
-            <li>“Fn” for every restricted heat, where n = the number of competitors in the heat.</li>
-          </ul>
-          For example, for a competition with two qualification heats, a
-          semifinal heat limited to 26 competitors, and a final heat limited to 8
-          competitors, enter “QQF26F8”.</li>
-      </ol>
       <p>
-        Yet to be set up:<br> Change the heat format for a specific
-        instance of a category, that is, change the heat format for a
-        category for one event, without changing the heat format for that
-        category for all future events.
+        You must be signed in.
+      </p> 
+      <ol>
+        <li>Click <i>Competitor categories</i> in the main menu.</li>
+        <li>Click <i>Add new category</i>.<br>
+          Or, to edit an existing category, select the category from the list.<br>
+          <b>Note:</b> editing an existing category will change that category for all events in which it is used, past, present and future.<br>
+          Instructions:<br>
+          <ol>
+            <li>Enter the category name, e.g. Female Youth A Lead.</li>
+            <li>Enter the category code (currently called "short name"), e.g. FYAL. If your Organization will be uploading registrations from a file then the category code used here must be the same as the category code used in the upload file.</li>
+            <li>Enter the group name, e.g. Youth Lead. Where a climber may compete in more than one category at an event, those categories must be allocated to separate groups.</li>
+            <li>Select the <i>Type</i> from the dropdown menu.</li>
+            <li>Enter the Heat format:
+              <ul>
+                <li>
+                  For Lead categories, enter:
+                  <ul>
+                    <li>“Q” for every qualification heat, followed by</li>
+                    <li>“Fn” for every restricted heat, where n = the number of competitors in the heat.</li>
+                  </ul>
+                  For example, for a competition with:
+                  <ul>
+                    <li>Two qualification heats</li>
+                    <li>A semifinal heat limited to 26 competitors</li>
+                    <li>A final heat limited to 8 competitors</li>
+                  </ul>
+                  Enter “QQF26F8”.
+                </li>
+                <li>
+                  For Boulder categories, enter:
+                  <ul>
+                    <li>“Q:b” for every qualification heat, where b = the number of boulders in the course for that heat, followed by</li>
+                    <li>“Fn:b” for every restricted heat, where n = the number of competitors in the heat, and b = the number of boulders in the course for that heat.</li>
+                  </ul>
+                  For example, for a competition with:
+                  <ul>
+                    <li>One qualification heat of 5 boulders</li>
+                    <li>A semifinal heat of 4 boulders limited to 20 competitors</li>
+                    <li>A final heat of 4 boulders limited to 6 competitors</li>
+                  </ul>
+                  Enter “QQF20F6”.
+                </li>
+              </ul>
+          </ol>
+          <p>
+            To change the heat format for a specific
+            instance of a category, that is, change the heat format for a
+            category for one event, without changing the heat format for that
+            category for all past, current and future events: 
+            <ol>
+              <li>Go to the event's main <i>Results page</i>:
+                <ol>
+                  <li>Click <i>Events</i> in the main menu.</li>
+                  <li>Select the desired event from the list.</li>
+                </ol>
+              <li>Click the heat format you wish to change.</li>
+              <li>Enter the new heat format.</li>
+              <li>Press <i>Enter</i> to confirm the change.</li>
+            </ol>
+            <ol>
     </section>
 
     <section name="comp-cat-allow">
       <h1>Allow or disallow competitor categories for an event</h1>
       <p>
-        Yet to be set up:</br>
+        Organization Admins only.
+      </p>
+      <p>
+        Yet to be set up:<br>
         Designate for an individual event which competitor categories are available to entrants.
       <p>
-        Currently, organizations should only enter into the system
+        Currently, Organizations should only enter into the system
         registrations in categories that it wishes to allow for the
         event. Categories will be automatically added to an event when a
         registration in that category is entered in the system.
@@ -139,12 +262,13 @@
     <section name="clubs">
       <h1>Add and edit clubs</h1>
       <p>
+        Organization Admins only.
+      </p>
+      <p>
         You must be signed in.
       </p>
       <ol>
-        <li>Click on your organization’s name (top left-hand of page) to
-          go to your organization’s Piki home page.</li>
-        <li>Click on <i>Clubs</i> in the main menu.</li>
+        <li>Click <i>Clubs</i> in the main menu.</li>
         <li>Add and edit clubs.</li>
       </ol>
     </section>
@@ -152,12 +276,13 @@
     <section name="climbers">
       <h1>Add and edit climbers</h1>
       <p>
+        Organization Admins only.
+      </p>
+      <p>
         You must be signed in.
       </p>
       <ol>
-        <li>Click on your organization’s name (top left-hand of page) to
-          go to your organization’s Piki home page.</li>
-        <li>Click on <i>Climbers</i> in the main menu.</li>
+        <li>Click <i>Climbers</i> in the main menu.</li>
         <li>Add and edit climbers.</li>
       </ol>
     </section>
@@ -165,19 +290,20 @@
     <section name="registration">
       <h1>Register climbers for an event</h1>
       <p>
+        Organization Admins only.
+      </p>
+      <p>
         You must be signed in.
       </p>
       <ol>
-        <li>Click on your organization’s name (top left-hand of page) to
-          go to your organization’s Piki home page.</li>
-        <li>Click on <i>Events</i> in the main menu.</li>
+        <li>Click <i>Events</i> in the main menu.</li>
         <li>Check that the relevant event is highlighted; if not, click on the event.</li>
-        <li>Click on <i>Registrations</i> in the main menu.</li>
-	<li>Yet to be set up:<br>
-	  To register multiple climbers for the event, upload a CSV file of stated format.</li>
+        <li>Click <i>Registrations</i> in the main menu.</li>
+        <li>Yet to be set up:<br>
+          To register multiple climbers for the event, upload a CSV file of stated format.</li>
         <li>To register an individual climber for the event:
           <ol>
-            <li>Begin entering the climber’s name in the box provided.</li>
+            <li>Begin entering the climber’s name in the cell provided.</li>
             <li>Select the climber’s name from the dropdown list.<br>
               If the climber’s name does not appear in the dropdown
               list, the climber has not been entered into the Piki
@@ -187,7 +313,7 @@
               under <span>{{pageLink value="Climber page" template="Climber"}}<span>
                   and then return to the event’s <i>Registrations</i> page.</li>
             <li>Follow the instructions to choose the categories the climber is entering. </li>
-            <li>Click on <i>Register</i> to confirm registration.</li>
+            <li>Click <i>Register</i> to confirm registration.</li>
           </ol>
       </ol>
     </section>
@@ -195,14 +321,15 @@
     <section name="reg-change">
       <h1>Change or remove a competitor’s registration</h1>
       <p>
+        Organization Admins only.
+      </p>
+      <p>
         You must be signed in.
       </p>
       <ol>
-        <li>Click on your organization’s name (top left-hand of page)
-          to go to your organization’s Piki home page.</li>
-        <li>Click on <i>Events</i> in the main menu.</li>
+        <li>Click <i>Events</i> in the main menu.</li>
         <li>Check that the relevant event is highlighted; if not, click on the event.</li>
-        <li>Click on <i>Registrations</i> in the main menu.</li>
+        <li>Click <i>Registrations</i> in the main menu.</li>
         <li>Click on the competitor’s name.</li>
         <li>Change the categories the competitor is registered in using the dropdown options, or deregister the competitor.</li>
       </ol>
@@ -211,14 +338,15 @@
     <section name="results">
       <h1>Enter and edit results</h1>
       <p>
+        Organization Admins and Judges only.
+      </p>
+      <p>
         You must be signed in.
       </p>
       <ol>
-        <li>Click on your organization’s name (top left-hand of page) to
-          go to your organization’s Piki home page.</li>
-        <li>Click on <i>Events</i> in the main menu.</li>
+        <li>Click <i>Events</i> in the main menu.</li>
         <li>Check that the relevant event is highlighted; if not, click on the event.</li>
-        <li>Click on <i>Results</i> in the main menu.</li>
+        <li>Click <i>Results</i> in the main menu.</li>
         <li>Click on the relevant category.</li>
         <li>Select the relevant heat from the dropdown menu at the top right of the page.</li>
         <li>Use the button near the top
@@ -228,7 +356,10 @@
           table and begin to type the result. If in <i>Results</i>
           view, the screen will automatically switch to <i>Start order</i>
           view of the heat being edited so that competitors are listed in
-          the order in which they climbed.<br>  Lead scores permitted:
+          the order in which they climbed.<br>  
+          Press <i>Tab</i> to save the score entered and move to the next cell.<br>
+          To save the score entered, it is necessary to press <i>Tab</i> or <i>Enter</i> or click outside the cell.<br>
+          Lead scores permitted:
           <ul>
             <li><tt>n</tt> (e.g. 23)</li>
             <li><tt>n+</tt> (e.g. 23+)</li>
@@ -253,6 +384,9 @@
           </ul>
         </li>
       </ol>
+      <p>
+        Coming soon:<br>
+        Enter bouldering scores for each individual boulder. Piki will add each competitor's scores for all of the boulders in a heat together and display the total score for the heat as well as a breakdown by boulder.
     </section>
 
     <section name="trouble-shooting">
