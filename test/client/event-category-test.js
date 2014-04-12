@@ -159,19 +159,19 @@
                 assert.dom('>div', {count: 5});
                 assert.dom('>.top', {count: 3});
                 assert.dom('>.bonus', {count: 1});
-                assert.dom('.top>:nth-child(1)', '2');
-                assert.dom('.top>:nth-child(2)', '3');
+                assert.dom('>.top .top', '3');
+                assert.dom('>.top .bonus', '2');
 
                 assert.dom('>:not(.bonus):not(.top):nth-child(2)', '');
 
-                assert.dom('>.bonus:nth-child(3)>:first-child', '1');
-                assert.dom('>.bonus:nth-child(3)>:last-child', '');
+                assert.dom('>.bonus:nth-child(3)>.bonus', '1');
+                assert.dom('>.bonus:nth-child(3)>.top', '');
 
-                assert.dom('>.top:nth-child(4)>:first-child', '1');
-                assert.dom('>.top:nth-child(4)>:last-child', '1');
+                assert.dom('>.top:nth-child(4)>.bonus', '1');
+                assert.dom('>.top:nth-child(4)>.top', '1');
 
-                assert.dom('>.top:nth-child(5)>:first-child', '10');
-                assert.dom('>.top:nth-child(5)>:last-child', '12');
+                assert.dom('>.top:nth-child(5)>.bonus', '10');
+                assert.dom('>.top:nth-child(5)>.top', '12');
               });
               assert.dom('td:nth-child(3).score', function () {
                 assert.dom('i', '1');
@@ -191,17 +191,20 @@
           assert.dom('tr#Result_'+ v.result._id, function () {
             assert.dom('td:nth-child(2).BoulderScore', function () {
               assert.dom('>div', {count: 4});
-              assert.dom('>div>input:last-child', {count: 4});
-              assert.dom('>div>input:first-child', {count: 4});
-              assert.dom('>div:first-child>:first-child', function () {
+              assert.dom('>div>input.top', {count: 4});
+              assert.dom('>div>input.bonus', {count: 4});
+              assert.dom('>div:first-child>.bonus', function () {
                 TH.change(this, '4');
-                refute.className(this.parentNode, 'error');
               });
-              assert.dom('>div:first-child>:last-child', function () {
-                TH.change(this, '3');
-                assert.className(this.parentNode, 'error');
-                assert.dom(this.parentNode.nextElementSibling, 'Invalid input');
+            });
+          });
+          assert.dom('tr#Result_'+ v.result._id, function () {
+            assert.dom('td:nth-child(2).BoulderScore', function () {
+              assert.dom('>div:first-child>.top', function () {
+                TH.change(this, '5');
               });
+
+              assert.equals(v.result.$reload().problems, [[302, 0, 1, 101, 1210], [504]]);
             });
           });
         });

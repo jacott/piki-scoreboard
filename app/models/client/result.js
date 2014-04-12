@@ -5,5 +5,9 @@ App.require('AppModel.Result', function (model) {
     setScore: function (index, score) {
       App.rpc('Result.setScore', this._id, index, score);
     },
+
+    setBoulderScore: function (index, problem, bonus, top) {
+      App.rpc('Result.setBoulderScore', this._id, index, problem, bonus, top);
+    },
   });
 });

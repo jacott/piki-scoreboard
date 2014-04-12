@@ -115,9 +115,9 @@ App.require('Bart.Event', function (Event) {
     },
 
     'change td.score input': function (event) {
-      if (! saveScore(event.target)) {
+      if (! saveScore(this)) {
         Bart.stopEvent();
-        event.target.focus();
+        getFocusElm().focus();
         return;
       }
     },
@@ -130,8 +130,12 @@ App.require('Bart.Event', function (Event) {
       switch(event.which) {
       case 27:
         focusField = null;
-        event.target.value = $.data(event.target).score;
-        Bart.remove(this.parentNode.querySelector('.errorMsg'));
+        if (Bart.hasClass(this, 'score')) {
+          event.target.value = $.data(this).score || '';
+          Bart.remove(this.parentNode.querySelector('.errorMsg'));
+        } else {
+          Bart.getCtx(this).updateAllTags();
+        }
         document.activeElement.blur();
         break;
 
@@ -145,8 +149,15 @@ App.require('Bart.Event', function (Event) {
       case 9:
         var oldFocus = focusField;
         focusField = nextField(document.activeElement, event.shiftKey ? -1 : 1);
+
         if (! saveScore(event.target)) {
+          if (oldFocus.id === focusField.id) {
+            return;
+          }
+
           focusField = oldFocus;
+          Bart.stopEvent();
+          document.activeElement.select();
           return;
         }
         if (document.activeElement === event.target) {
@@ -178,6 +189,8 @@ App.require('Bart.Event', function (Event) {
 
       var scoreData = $.data(this);
       var heat = scoreData.heat;
+      if (typeof heat === 'object')
+        heat = heat.number;
       if (heat < 1) return;
 
 
@@ -253,6 +266,9 @@ App.require('Bart.Event', function (Event) {
                       score: heat.numberToScore(scores[i], i),
                       rank: scores[i] == null ? '' : result['rank'+i]};
 
+      if (typeof data.heat === 'object')
+        debugger;
+
         frag.appendChild(Score.$render(data));
       }
 
@@ -302,8 +318,8 @@ App.require('Bart.Event', function (Event) {
         var prob = problems[i] || 0;
         var elm = document.createElement('div');
         if (prob > 0) elm.className = prob >= 100 ? 'top' : 'bonus';
-        elm.appendChild(createAttempts('bonus', prob % 100, i, canInput));
         elm.appendChild(createAttempts('top', Math.floor(prob / 100), i, canInput));
+        elm.appendChild(createAttempts('bonus', prob % 100, i, canInput));
         frag.appendChild(elm);
       }
       return frag;
@@ -334,7 +350,7 @@ App.require('Bart.Event', function (Event) {
 
   function updateResults(ctx) {
     if (focusField) {
-      var input = document.querySelector('#' + focusField.id + ' td.score>input[tabIndex="'+focusField.tabIndex+'"].'+focusField.name);
+      var input = getFocusElm();
       if (input === document.activeElement) {
         var start = input.selectionStart;
         var end = input.selectionEnd;
@@ -347,7 +363,7 @@ App.require('Bart.Event', function (Event) {
     ctx.updateAllTags();
 
     if (focusField) {
-      var elm = document.querySelector('#' + focusField.id + ' td.score>input[tabIndex="'+focusField.tabIndex+'"].'+focusField.name);
+      var elm = getFocusElm();
       if (elm) {
         elm.focus();
         if (input) {
@@ -362,6 +378,10 @@ App.require('Bart.Event', function (Event) {
     document.activeElement.blur();
   }
 
+  function getFocusElm() {
+    return document.querySelector('#' + focusField.id + ' td.score input[tabIndex="'+focusField.tabIndex+'"].'+focusField.name);
+  }
+
   function saveScore(elm) {
     var ctx = Bart.getCtx(elm);
     var heat = $.data(document.getElementById('Category')).heat;
@@ -373,18 +393,28 @@ App.require('Bart.Event', function (Event) {
         data.result.setScore(data.heat, data.score = elm.value);
         return true;
       }
-    } else {
-      return true;
+
+      Bart.addClass(elm, 'error');
+      elm.parentNode.insertBefore(InvalidInput, elm.nextSibling);
+      return false;
     }
 
-    Bart.addClass(elm, 'error');
-    elm.parentNode.insertBefore(InvalidInput, elm.nextSibling);
+    var parent = elm.parentNode;
+    var top = +(parent.querySelector('input.top').value || 0);
+    var bonus = +(parent.querySelector('input.bonus').value || 0);
+    if (top && ! bonus) return null;
+    if (! top || (bonus && bonus <= top)) {
+      Bart.removeClass(parent, 'error');
+      data.result.setBoulderScore(data.heat.number, +elm.getAttribute('tabIndex'), bonus, top);
+      return true;
+    }
+    Bart.addClass(parent, 'error');
     return false;
   }
 
   function setFocusField(input) {
     focusField = {
-      id: input.parentNode.parentNode.id,
+      id: Bart.getClosest(input, 'tr').id,
       tabIndex: +input.getAttribute('tabIndex'),
       name: input.className,
     };
@@ -395,23 +425,44 @@ App.require('Bart.Event', function (Event) {
 
     var row = elm.parentNode.parentNode;
 
-    row = direction > 0 ? row.nextElementSibling : row.previousElementSibling;
+    if (Bart.hasClass(row, 'BoulderScore')) {
+      row = row.parentNode;
 
-    if (!row) {
-      elm = document.querySelector('.results tr:'+
-                                   (direction > 0 ? 'first' : 'last')+'-child>td.score>input'+
-                                   '[tabIndex="'+(tabIndex+direction)+'"]') ||
-        document.querySelector('.results tr:'+
-                               (direction > 0 ? 'first' : 'last')+'-child>td.score>input'+
-                               ':not([tabIndex="'+tabIndex+'"])');
+      var name = elm.className === 'top' ? 'bonus' : 'top';
+      if (direction > 0 && name === 'top')
+        row = row.nextElementSibling;
+      else if (direction < 0 && name === 'bonus')
+        row = row.previousElementSibling;
 
-      if (! elm) return;
+      if (! row) {
+        elm = document.querySelector('.results tr:'+
+                                     (direction > 0 ? 'first' : 'last')+'-child>td.score input'+
+                                     '[tabIndex="'+(tabIndex+direction)+'"]');
+        if (! elm) return;
 
-      tabIndex = +elm.getAttribute('tabIndex');
+        tabIndex = +elm.getAttribute('tabIndex');
 
-      row = elm.parentNode.parentNode;
+        row = elm.parentNode.parentNode.parentNode;
+      }
+
+    } else {
+      var name = 'score';
+      row = direction > 0 ? row.nextElementSibling : row.previousElementSibling;
+
+      if (!row) {
+        elm =
+          document.querySelector('.results tr:'+
+                                 (direction > 0 ? 'first' : 'last')+'-child>td.score>input'+
+                                 ':not([tabIndex="'+tabIndex+'"])');
+
+        if (! elm) return;
+
+        tabIndex = +elm.getAttribute('tabIndex');
+
+        row = elm.parentNode.parentNode;
+      }
     }
 
-    if (row) return {id: row.id, tabIndex: tabIndex, name: elm.className};
+    if (row) return {id: row.id, tabIndex: tabIndex, name: name};
   }
 });

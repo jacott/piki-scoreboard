@@ -131,11 +131,15 @@ Heat.prototype = {
         var t = +m[1], ta = +(m[2]||0);
         var b = +(m[3]||0), ba = +(m[4]||0);
         if (t > ta || b > ba) return false;
-        return t*1000000 + (99-ta)*10000 + b*100 + (99 - ba);
+        return this.boulderScoreToNumber(b, ba, t, ta);
       }
       if (score.match(/^\s*0\s*$/)) return 0;
     }
     return false;
+  },
+
+  boulderScoreToNumber: function (b, ba, t, ta) {
+    return t*1000000 + (99-ta)*10000 + b*100 + (99 - ba);
   },
 
   list: function () {

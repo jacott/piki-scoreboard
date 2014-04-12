@@ -19,6 +19,16 @@
       assert.calledWith(App.rpc, 'Result.setScore', result._id, 1, '23.5+');
     },
 
+    "test setBoulderScore": function () {
+      var result = TH.Factory.createResult({scores: [1]});
+
+      test.stub(App, 'rpc');
+
+      result.setBoulderScore(1, 2, 3, 4);
+
+      assert.calledWith(App.rpc, 'Result.setBoulderScore', result._id, 1, 2, 3, 4);
+    },
+
     "test index": function () {
       var result = TH.Factory.createResult();
 

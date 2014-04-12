@@ -43,12 +43,65 @@ App.require('AppModel.Competitor', function (Competitor) {
         return;
       }
 
-      AppVal.allowAccessIf(index >=0 && index <= heat.total);
+      AppVal.allowAccessIf(heat.type === 'L' && index >=0 && index <= heat.total);
 
 
       var changes = {};
 
       changes['scores.' + index] = heat.scoreToNumber(score);
+
+      model.fencedUpdate(id, {$set: changes});
+    },
+
+    setBoulderScore: function (id, index, problem, bonus, top) {
+      check(id, String);
+      check([index, problem, bonus, top], [Number]);
+
+      var user = AppModel.User.findOne(this.userId);
+      var result = AppModel.Result.findOne(id);
+      var event = result.event;
+
+      AppVal.allowAccessIf(user && (user.isSuperUser() || user.org_id === event.org_id));
+
+      var heat = new AppModel.Heat(index, event.heats[result.category_id]);
+
+      --problem;
+
+      if (top && bonus > top) {
+        top = bonus;
+      } else if (! bonus && top) {
+        bonus = top;
+      }
+
+      AppVal.allowAccessIf(heat.type === 'B' && top < 100 && bonus < 100 && index >=0 && index <= heat.total &&
+                           (top === 0 || top >= bonus) && (bonus !== 0 || top === 0) &&
+                           problem >= 0 && problem < heat.problems );
+
+      var changes = {};
+
+      var problems = result.problems || {};
+      var round = problems[index-1] || [];
+
+      round[problem] = bonus+top*100;
+
+      var b = 0, ba = 0, t = 0, ta = 0, score;
+
+      for(var i = 0; i < round.length; ++i) {
+        var row = round[i];
+        if (row) {
+          if (score = row % 100) {
+            ba += score;
+            ++b;
+          }
+          if (score = Math.floor(row / 100)) {
+            ta += score;
+            ++t;
+          }
+        }
+      }
+
+      changes['problems.' + (index-1)] = round;
+      changes['scores.' + index] = heat.boulderScoreToNumber(b, ba, t, ta);
 
       model.fencedUpdate(id, {$set: changes});
     },

@@ -16,7 +16,7 @@
 
     "Result.setScore": {
       setUp: function () {
-        v.category = TH.Factory.createCategory({heatFormat: "QQF26F8"});
+        v.category = TH.Factory.createCategory({heatFormat: "QQF26F8", type: 'L'});
         v.event = TH.Factory.createEvent({heats: [v.category._id]});
         v.result = TH.Factory.createResult({scores: [1]});
       },
@@ -29,6 +29,14 @@
 
         assert.accessDenied(function () {
           TH.call("Result.setScore", v.result._id, 1, '23.5+');
+        });
+      },
+
+      "test can't call setBoulderScore": function () {
+        if (Meteor.isClient) return assert(true);
+
+        assert.accessDenied(function () {
+          TH.call("Result.setBoulderScore", v.result._id, 1, 2, 3, 4);
         });
       },
 
@@ -72,6 +80,77 @@
         assert.calledWith(check, [v.result._id, '23.5+'], [String]);
 
         assert.equals(v.result.$reload().scores, [1, 235005]);
+      },
+    },
+
+    "Result.setBoulderScore": {
+      setUp: function () {
+        v.category = TH.Factory.createCategory({heatFormat: "Q:3F8:2", type: 'B'});
+        v.event = TH.Factory.createEvent({heats: [v.category._id]});
+        v.result = TH.Factory.createResult({scores: [1]});
+      },
+
+      "test authorized": function () {
+        if (Meteor.isClient) return assert(true);
+
+        v.otherOrg = TH.Factory.createOrg();
+        TH.loginAs(v.user = TH.Factory.createUser());
+
+        assert.accessDenied(function () {
+          TH.call("Result.setBoulderScore", v.result._id, 1, 1, 3, 7);
+        });
+      },
+
+      "test can't call setScore": function () {
+        if (Meteor.isClient) return assert(true);
+
+        assert.accessDenied(function () {
+          TH.call("Result.setScore", v.result._id, 1, '23.5+');
+        });
+      },
+
+      "test index out of range": function () {
+        if (Meteor.isClient) return assert(true);
+
+        assert.accessDenied(function () {
+          TH.call("Result.setBoulderScore", v.result._id, -1, 1, 2, 3);
+        });
+
+        assert.accessDenied(function () {
+          TH.call("Result.setBoulderScore", v.result._id, 1, 4, 4, 5);
+        });
+      },
+
+      "test top,  bonus range": function () {
+        if (Meteor.isClient) return assert(true);
+
+        // top < bonus
+        TH.call("Result.setBoulderScore", v.result._id, 1, 1, 4, 3);
+        assert.equals(v.result.$reload().scores, [1, 1950195]);
+
+        // top > 0, bonus 0
+        TH.call("Result.setBoulderScore", v.result._id, 1, 1, 0, 3);
+        assert.equals(v.result.$reload().scores, [1, 1960196]);
+      },
+
+      "test updates": function () {
+        test.spy(Meteor.isServer ? global : window, 'check');
+
+        TH.call("Result.setBoulderScore", v.result._id, 1, 2, 3, 4);
+
+        assert.calledWith(check, [1, 2, 3, 4], [Number]);
+        assert.calledWith(check, v.result._id, String);
+
+        assert.equals(v.result.$reload().scores, [1, 1950196]);
+        assert.equals(v.result.problems[0][1], 403);
+
+        TH.call("Result.setBoulderScore", v.result._id, 1, 1, 1, 1);
+        assert.equals(v.result.$reload().scores, [1, 2940295]);
+        assert.equals(v.result.problems[0], [101, 403]);
+
+        TH.call("Result.setBoulderScore", v.result._id, 1, 2, 5, 0);
+        assert.equals(v.result.$reload().scores, [1, 1980293]);
+        assert.equals(v.result.problems[0], [101, 5]);
       },
     },
 
