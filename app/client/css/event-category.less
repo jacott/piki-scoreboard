@@ -23,7 +23,7 @@
     padding: 4px;
   }
 
-  table.results {
+  .results {
     clear: both;
     td, th {
       cursor: initial;
@@ -147,6 +147,37 @@
       content: counter(line-number) ".";
       counter-increment: line-number;
       padding-right: 0.3em;
+    }
+  }
+}
+
+@media print {
+  #Category {
+    .results {
+      width: 100%;
+
+      thead {
+        background-color: #fff;
+        color: #aaa;
+      }
+    }
+
+    &.start.B .results {
+      th:not(:first-child) {
+        font-size: 0px;
+      }
+
+      th:first-child, td:first-child {
+        border-right: 1px solid fade(#000, 20%);
+      }
+
+      td:not(:first-child) {
+        border: none;
+
+        >* {
+          display: none;
+        }
+      }
     }
   }
 }

@@ -32,7 +32,7 @@ App.require('Bart.Event', function (Event) {
 
   Tpl.$helpers({
     classes: function () {
-      return (this.showingResults ? "rank " : "start ") + this.heat.className();
+      return (this.showingResults ? "rank " : "start ") + this.heat.className() + ' ' + this.heat.type;
     },
     modeSwitchLabel: function () {
       return this.showingResults ? "Show start order" : "Show results";
