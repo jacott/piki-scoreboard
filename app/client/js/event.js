@@ -169,6 +169,12 @@ Tpl.CatList.$helpers({
                                           search: listType() + "&heat="+i}));
       frag.appendChild(elm);
     }
+    if (i < 7) {
+      var elm = document.createElement('td');
+      elm.setAttribute('colspan', 7 - i);
+      frag.appendChild(elm);
+    }
+
 
     return frag;
   },
@@ -212,11 +218,35 @@ Tpl.Show.$events({
   'click .select': function (event) {
     Bart.stopEvent();
     var me = Bart.getClosest(this, 'tr');
-    Bart.toggleClass(me, 'selected');
-
     var parent = event.currentTarget;
     var selected = parent.getElementsByClassName('selected');
     var action = parent.getElementsByClassName('action')[0];
+
+    if (event.ctrlKey) {
+      var on = ! Bart.hasClass(me, 'selected');
+      while(selected.length) {
+        Bart.removeClass(selected[0], 'selected');
+      }
+      Bart.setClass('selected', on, me);
+    } else if (event.shiftKey) {
+      var elm = me.nextSibling;
+      while(elm && ! Bart.hasClass(elm, 'selected'))
+        elm = elm.nextSibling;
+
+      if (elm) for(elm = elm.previousSibling;elm !== me; elm = elm.previousSibling) {
+        Bart.addClass(elm, 'selected');
+      }
+      var elm = me.previousSibling;
+      while(elm && ! Bart.hasClass(elm, 'selected'))
+        elm = elm.previousSibling;
+
+      if (elm) for(elm = elm.nextSibling;elm !== me; elm = elm.nextSibling) {
+        Bart.addClass(elm, 'selected');
+      }
+      Bart.addClass(me, 'selected');
+    } else {
+      Bart.toggleClass(me, 'selected');
+    }
 
     me = (Bart.hasClass(me, 'selected') ? me : selected[0]);
 

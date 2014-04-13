@@ -55,7 +55,7 @@
     </section>
   </template>
   <template name="CatList">
-    <tr>
+    <tr class="{{type}}">
       <td><span class="select"></span></td>
       <td>{{pageLink value=name template="Event.Category" append=_id search=listType}}</td>
       {{heats}}

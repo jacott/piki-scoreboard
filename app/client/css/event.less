@@ -38,7 +38,9 @@
 
   table.categories {
     tr {
-      border-bottom: 1px solid fade(#000, 10%);
+      &:not(:last-child) {
+        border-bottom: 1px solid fade(#000, 10%);
+      }
       .select {
         display: inline-block;
         width: 1.2em;
@@ -52,6 +54,9 @@
         .select {
           .icon(@icon-tick);
         }
+      }
+      &.B+.L {
+        border-top: 1em solid fade(#fff, 0%);
       }
     }
   }
