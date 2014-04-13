@@ -9,7 +9,7 @@ Tpl.$helpers({
       var elm = sections[i];
       var name = elm.getAttribute('name');
       if (name)
-        ol.appendChild(Tpl.ContentLine.$render({tag: name, desc: elm.firstChild.textContent}));
+        ol.appendChild(Tpl.ContentLine.$render({tag: '#'+name, desc: elm.firstChild.textContent}));
     }
     return ol;
   },
@@ -21,23 +21,25 @@ Tpl.$events({
     Bart.Dialog.close();
   },
 
-  'click .topics': function (event) {
+  'click a': function (event) {
+    var href = this.getAttribute('href') || '';
+    if (href[0] === '#' || href.match(/^https?:\/\//))
+      return;
+
     Bart.stopEvent();
-    var elm = document.querySelector('#Help section[name="'+$.data(this).tag + '"]');
-    Bart.removeClass(document.querySelector('#Help section.current'), 'current');
-    Bart.addClass(elm, 'current');
-    elm.scrollIntoView(true);
+    AppRoute.gotoPath(href);
   },
 });
 
 Tpl.$extend({
   $created: function (ctx, elm) {
     document.addEventListener('click', clicked, true);
+    window.addEventListener('hashchange', scrollToTag);
   },
 
   $destroyed: function (ctx, elm) {
+    window.removeEventListener('hashchange', scrollToTag);
     document.removeEventListener('click', clicked, true);
-
   },
 });
 
@@ -45,4 +47,19 @@ Tpl.$extend({
 function clicked(event) {
   if (Bart.hasClass(event.target, 'link') && ! Bart.hasClass(event.target, 'topics'))
     Meteor.defer(Bart.Dialog.close);
+}
+
+function scrollToTag() {
+  var tag = AppClient.getLocation().hash.slice(1);
+
+  Bart.removeClass(document.querySelector('#Help section.current'), 'current');
+
+  if (tag) {
+    var elm = document.querySelector('#Help section[name="'+ tag + '"]');
+    Bart.addClass(elm, 'current');
+    elm.scrollIntoView(true);
+  } else {
+    document.getElementById('Help').parentNode.scrollIntoView(true);
+
+  }
 }

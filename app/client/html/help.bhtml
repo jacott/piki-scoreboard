@@ -1,6 +1,6 @@
 <template name="Help">
   <template name="ContentLine">
-    <li><button class="link topics">{{desc}}</button></li>
+    <li><a class="link topics" href="{{tag}}">{{desc}}</a></li>
   </template>
   <div id="Help">
     <button name="close">Close help</button>
@@ -14,7 +14,7 @@
       <h1>Topics</h1>
       {{contents}}
     </nav>
-    
+
     <section name="disclaimer">
       <h1>Disclaimer</h1>
       <p>
@@ -41,11 +41,11 @@
         Piki's developers, testers and sponsors take no responsibility for Piki's content, entered by ourselves or by users. In particular, we take no responsibility for the accuracy or offensiveness of any content.
       </p>
     </section>
-    
+
     <section name="general-info">
       <h1>General Information</h1>
       <ul>
-        <li>Piki is in beta indefinitely: 
+        <li>Piki is in beta indefinitely:
           <ul>
             <li>New features are being added which may change the way parts of the system are used.</li>
             <li>Users can expect defects and issues to arise as the system is used in real events.</li>
@@ -97,7 +97,7 @@
         When you have been added as a User, a <i>Reset password</i> link will be sent to the email address entered for you.
       </p>
     </section>
-    
+
     <section name="user-sign-in">
       <h1>Sign in as a User</h1>
       <p>
@@ -124,7 +124,7 @@
         Once the new User is added, a <i>Reset password</i> email will be sent to the email address entered for the new User.
       </p>
     </section>
-    
+
     <section name="user-edit">
       <h1>Edit and remove Users</h1>
       <p>
@@ -182,7 +182,7 @@
       </p>
       <p>
         You must be signed in.
-      </p> 
+      </p>
       <ol>
         <li>Click <i>Competitor categories</i> in the main menu.</li>
         <li>Click <i>Add new category</i>.<br>
@@ -230,7 +230,7 @@
             To change the heat format for a specific
             instance of a category, that is, change the heat format for a
             category for one event, without changing the heat format for that
-            category for all past, current and future events: 
+            category for all past, current and future events:
             <ol>
               <li>Go to the event's main <i>Results page</i>:
                 <ol>
@@ -356,7 +356,7 @@
           table and begin to type the result. If in <i>Results</i>
           view, the screen will automatically switch to <i>Start order</i>
           view of the heat being edited so that competitors are listed in
-          the order in which they climbed.<br>  
+          the order in which they climbed.<br>
           Press <i>Tab</i> to save the score entered and move to the next cell.<br>
           To save the score entered, it is necessary to press <i>Tab</i> or <i>Enter</i> or click outside the cell.<br>
           Lead scores permitted:
