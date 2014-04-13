@@ -2,7 +2,8 @@
   <section id="Event" class="body">
     <div>
       <nav class="menu">
-        {{pageLink name="show" value="Results" template="Event.Show"}}
+        {{pageLink name="show" value="Results" template="Event.Show" search="type=results"}}
+        {{pageLink name="show" value="Start lists" template="Event.Show" search="type=startlists"}}
         {{pageLink class="adminAccess" name="register" value="Registrations" template="Event.Register"}}
         {{pageLink class="adminAccess" name="edit" value="Edit event" template="Event.Edit"}}
         {{pageLink class="adminAccess" name="edit" value="Upload registrations" template="Event.RegUpload"}}
@@ -39,7 +40,7 @@
   <template name="Show">
     <section id="Show">
       <div>
-        <h1>{{name}} - Category Results</h1>
+        <h1>{{name}} - Category {{listType}}</h1>
         <table class="categories">
           {{each "categories" template="Event.CatList"}}
         </table>
@@ -56,7 +57,7 @@
   <template name="CatList">
     <tr>
       <td><span class="select"></span></td>
-      <td>{{pageLink value=name template="Event.Category" append=_id}}</td>
+      <td>{{pageLink value=name template="Event.Category" append=_id search=listType}}</td>
       {{heats}}
     </tr>
   </template>

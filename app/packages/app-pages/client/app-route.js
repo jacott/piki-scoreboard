@@ -110,7 +110,7 @@ App.extend(AppRoute, {
         Bart.setTitle && Bart.setTitle(page.title);
 
         if (pageState &&
-            (pageState !== 'pushState' || currentPageRoute.pathname !== pageRoute.pathname) &&
+            (pageState !== 'pushState' || currentHref !== href) &&
             ! ('noPageHistory' in page)) {
           currentHref = href;
           currentTitle = title;

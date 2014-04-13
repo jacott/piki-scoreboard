@@ -70,20 +70,25 @@ base.addTemplate(Tpl.Add, {
   }
 });
 
-var selectedEvent = {
+base.addTemplate(Tpl.Show, {
+  focus: true,
+  data: function (page, pageRoute) {
+    if (! Tpl.event) AppRoute.abortPage();
+
+    Tpl.Show.results = AppRoute.searchParams(pageRoute).type !== 'startlists';
+
+    return Tpl.event;
+  }
+});
+
+base.addTemplate(Tpl.Edit, {
   focus: true,
   data: function (page, pageRoute) {
     if (! Tpl.event) AppRoute.abortPage();
 
     return Tpl.event;
   }
-};
-
-['Show', 'Edit'].forEach(function (name) {
-  base.addTemplate(Tpl[name], selectedEvent);
 });
-
-selectedEvent = null;
 
 Tpl.Add.$events({
   'click [name=cancel]': cancel,
@@ -160,16 +165,27 @@ Tpl.CatList.$helpers({
 
     for(var i = 1; counts[i]; ++i) {
       var elm = document.createElement('td');
-      elm.appendChild(Bart.Form.pageLink({value: heat.getName(i), template: "Event.Category", append: this._id, search: "heat="+i}));
+      elm.appendChild(Bart.Form.pageLink({value: heat.getName(i), template: "Event.Category", append: this._id,
+                                          search: listType() + "&heat="+i}));
       frag.appendChild(elm);
     }
 
     return frag;
   },
+
+  listType: listType,
 });
+
+function listType() {
+  return "type=" + (Tpl.Show.results ? "results" : "startlists");
+}
 
 
 Tpl.Show.$helpers({
+  listType: function () {
+    return Tpl.Show.results ? "results" : "start lists";
+  },
+
   categories: function (callback) {
     var cats = AppModel.Category.attrDocs();
     var eventCats = Object.keys(AppModel.Result.eventCatIndex({event_id: Tpl.event._id})||{})
@@ -226,7 +242,7 @@ Tpl.Show.$events({
 
     var elm = document.createElement('section');
     for(var i = 0; i < selected.length; ++i) {
-      elm.appendChild(Tpl.Category.$render({showingResults: true, heatNumber: heatNumber, category_id: $.data(selected[i])._id}));
+      elm.appendChild(Tpl.Category.$render({showingResults: Tpl.Show.results, heatNumber: heatNumber, category_id: $.data(selected[i])._id}));
     }
     parent.parentNode.appendChild(elm);
     Bart.addClass(parent, 'no-print');
@@ -252,18 +268,22 @@ Tpl.Show.Action.$helpers({
       elm.textContent = "Print ";
       frag.appendChild(elm);
 
-      new AppModel.Heat(-1, this.fmt).headers(function (number, name) {
-        if (number < -1 || number === 99) return;
-        var elm = document.createElement('button');
-        elm.textContent = name;
-        elm.setAttribute('data-heat', number);
-        elm.className = "link printResults";
-        frag.appendChild(elm);
-      });
+      Tpl.Show.results && heat(-1, 'General');
+
+      new AppModel.Heat(-1, this.fmt).headers(heat);
 
       return frag;
     } else
       return "Select categories to print";
+
+    function heat(number, name) {
+      if (number < -1 || number === 99) return;
+      var elm = document.createElement('button');
+      elm.textContent = name;
+      elm.setAttribute('data-heat', number);
+      elm.className = "link printResults";
+      frag.appendChild(elm);
+    }
   },
 });
 
