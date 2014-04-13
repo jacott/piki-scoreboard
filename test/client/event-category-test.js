@@ -22,7 +22,7 @@
     },
 
     "test rendering": function () {
-      assert.dom('#Event #Category', function () {
+      assert.dom('#Event .Category', function () {
         assert.dom('h1', v.category.name);
         assert.dom('.rank table.results', function () {
           assert.dom('thead>tr', function () {
@@ -92,7 +92,7 @@
       v.result2.$update({$set: {scores: [2, 210000, 320000, 230000]}});
       TH.login();
 
-      assert.dom('#Category', function () {
+      assert.dom('.Category', function () {
         TH.click('[name=toggleStartOrder]', 'Show start order');
 
         assert.dom('h1', 'General - Start order');
@@ -129,7 +129,7 @@
       "test no time column": function () {
         TH.change('select[name=selectHeat]', 2);
 
-        assert.dom('#Event #Category', function () {
+        assert.dom('#Event .Category', function () {
           assert.dom('.rank table.results', function () {
             assert.dom('thead>tr', function () {
               assert.dom('th:first-child', 'Climber');
@@ -146,7 +146,7 @@
       "test rendering qual round": function () {
         TH.change('select[name=selectHeat]', 1);
 
-        assert.dom('#Event #Category', function () {
+        assert.dom('#Event .Category', function () {
           assert.dom('.rank table.results', function () {
             assert.dom('thead>tr', function () {
               assert.dom('th:first-child', 'Climber');
@@ -183,7 +183,7 @@
       },
 
       "test entering finals": function () {
-        assert.dom('#Event #Category', function () {
+        assert.dom('#Event .Category', function () {
           assert.dom('tr#Result_'+ v.result._id, function () {
             TH.trigger('td:nth-child(3)', 'mousedown');
           });
@@ -235,7 +235,7 @@
 
     "test entering finals": function () {
       TH.login();
-      assert.dom('#Event #Category', function () {
+      assert.dom('#Event .Category', function () {
         assert.dom('tr#Result_'+ v.result._id, function () {
           TH.trigger('td:nth-child(3)', 'mousedown');
         });
@@ -271,7 +271,7 @@
 
     "test selecting score": function () {
       TH.login();
-      assert.dom('#Event #Category', function () {
+      assert.dom('#Event .Category', function () {
         assert.dom('tr#Result_'+ v.result._id,  function() {
           TH.trigger('td:last-child', 'mousedown');
         });

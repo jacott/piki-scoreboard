@@ -1,5 +1,5 @@
 <template name="Event.Category">
-  <div id="Category" class="{{classes}}">
+  <div class="{{classes}}">
     <h1>{{category.name}}</h1>
     <nav class="viewMenu">
       <button name="toggleStartOrder">{{modeSwitchLabel}}</button>

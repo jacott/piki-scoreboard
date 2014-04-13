@@ -149,7 +149,7 @@
       "test selecting category": function () {
         TH.click('.categories .link', v.cats[0].name);
 
-        assert.dom('#Event #Category', function () {
+        assert.dom('#Event .Category', function () {
           assert.dom('h1', v.cats[0].name);
         });
       },

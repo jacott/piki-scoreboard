@@ -8,31 +8,16 @@ App.require('Bart.Event', function (Event) {
   var focusField;
 
   Event.route.addTemplate(Tpl, {
-    focus: '#Category [name=selectHeat]',
+    focus: '.Category [name=selectHeat]',
     data: function (page,pageRoute) {
       if (! Event.event) AppRoute.abortPage();
-      var showingResults = true;
-      return {
-        category: AppModel.Category.findOne(pageRoute.append),
-        heat: new AppModel.Heat(-1,  Event.event.heats[pageRoute.append]),
-        get selectHeat() {return this.heat.number},
-        set selectHeat(value) {return this.heat.number = value},
-        get showingResults() {return showingResults},
-        set showingResults(value) {
-          showingResults = value;
-          if (showingResults)
-            focusField = null;
-          this.canInput = ! value && Bart.hasClass(document.body, 'jAccess');
-          return value;
-        },
-        canInput: false,
-      };
+      return {showingResults: true, category_id: pageRoute.append, heatNumber: -1};
     }
   });
 
   Tpl.$helpers({
     classes: function () {
-      return (this.showingResults ? "rank " : "start ") + this.heat.className() + ' ' + this.heat.type;
+      return (this.showingResults ? "Category rank " : "Category start ") + this.heat.className() + ' ' + this.heat.type;
     },
     modeSwitchLabel: function () {
       return this.showingResults ? "Show start order" : "Show results";
@@ -81,8 +66,26 @@ App.require('Bart.Event', function (Event) {
 
   Tpl.$extend({
     $created: function (ctx, elm) {
+      var data = ctx.data;
+      var showingResults = data.showingResults;
+      App.extend(data, {
+        category: AppModel.Category.findOne(data.category_id),
+        heat: new AppModel.Heat(data.heatNumber,  Event.event.heats[data.category_id]),
+        get selectHeat() {return this.heat.number},
+        set selectHeat(value) {return this.heat.number = value},
+        get showingResults() {return showingResults},
+        set showingResults(value) {
+          showingResults = value;
+          if (showingResults)
+            focusField = null;
+          this.canInput = ! value && Bart.hasClass(document.body, 'jAccess');
+          return value;
+        },
+        canInput: false,
+      });
+
       Bart.autoUpdate(ctx, {
-        subject: ctx.data.category,
+        subject: data.category,
         removed: function () {AppRoute.replacePath(Bart.Event)},
       });
       ctx.onDestroy(AppModel.Result.Index.observe(function (doc, old) {
@@ -384,7 +387,7 @@ App.require('Bart.Event', function (Event) {
 
   function saveScore(elm) {
     var ctx = Bart.getCtx(elm);
-    var heat = $.data(document.getElementById('Category')).heat;
+    var heat = Tpl.$ctx(ctx).data.heat;
     var data = ctx.data;
     if (elm.className === 'score') {
       var number = heat.scoreToNumber(elm.value, data.heat);
