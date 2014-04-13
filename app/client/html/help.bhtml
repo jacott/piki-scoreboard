@@ -54,6 +54,7 @@
         <li>Piki is developed and tested only for use with the <a href="https://www.google.com/intl/en/chrome/browser/">Google Chrome web browser</a>. Piki may or may not work with other web browsers.</li>
         <li>Piki is currently available as a web application, requiring hosting.</li>
         <li>It is the developers' intention to release <i>Piki</i> under the <a href="http://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public Licence</a> in 2015, making the system available at <a href="https://github.com/">GitHub</a>.</li>
+        <li>Piki is designed for use managing results in climbing competitions run according to the <a href="https://www.ifsc-climbing.org">IFSC</a> rules. There is some flexibility, such as the ability to set the quota of competitors for each round after the qualification round, and the ability to set the number of boulders for each round in a Boulder competition. But Piki is unlikely to meet the requirements of competitions using scoring systems different to that set out in the IFSC rules.</li>
       </ul>
     </section>
 
@@ -174,6 +175,23 @@
         <li>Edit the event’s name or date.</li>
       </ol>
     </section>
+    
+    <section name="event-delete">
+      <h1>Delete events</h1>
+      <p>
+        Organization Admins only.
+      </p>
+      <p>
+        You must be signed in.
+      </p>
+      <ol>
+        <li>Click <i>Events</i> in the main menu.</li>
+        <li>Check that the event to be edited is highlighted; if not, click on the event.</li>
+        <li>Click <i>Edit event</i> in the main menu.</li>
+        <li>Click <i>Delete</i>.</li>
+        <li>Confirm in the pop-up box.</li>
+      </ol>
+    </section>
 
     <section name="comp-cat">
       <h1>Add and edit competitor categories</h1>
@@ -190,9 +208,9 @@
           <b>Note:</b> editing an existing category will change that category for all events in which it is used, past, present and future.<br>
           Instructions:<br>
           <ol>
-            <li>Enter the category name, e.g. Female Youth A Lead.</li>
-            <li>Enter the category code (currently called "short name"), e.g. FYAL. If your Organization will be uploading registrations from a file then the category code used here must be the same as the category code used in the upload file.</li>
-            <li>Enter the group name, e.g. Youth Lead. Where a climber may compete in more than one category at an event, those categories must be allocated to separate groups.</li>
+            <li>Enter the category name, e.g. <i>Female Youth A Lead</i>.</li>
+            <li>Enter the category code ("short name"), e.g. <i>FYAL</i>. If your Organization will be uploading registrations from a file then the category code used here must be the same as the category code used in the upload file.</li>
+            <li>Enter the group name, e.g. <i>Youth Lead</i>. Where a climber may compete in more than one category at an event, those categories must be allocated to separate Groups. For example, if climbers may compete in a Lead category and a Boulder category, then you might choose to have two Groups: <i>Lead</i> and <i>Boulder</i>. If some competitors are permitted to enter a Youth category and an Open category (in both Lead and Boulder), then you might have four Groups: <i>Youth Lead</i>, <i>Youth Boulder</i>, <i>Open Lead</i> and <i>Open Boulder</i>.</li>
             <li>Select the <i>Type</i> from the dropdown menu.</li>
             <li>Enter the Heat format:
               <ul>
@@ -214,15 +232,15 @@
                   For Boulder categories, enter:
                   <ul>
                     <li>“Q:b” for every qualification heat, where b = the number of boulders in the course for that heat, followed by</li>
-                    <li>“Fn:b” for every restricted heat, where n = the number of competitors in the heat, and b = the number of boulders in the course for that heat.</li>
+                    <li>“Fn:b” for every restricted heat, where n = the quota of competitors qualifying for the round, and b = the number of boulders in the course for that heat.</li>
                   </ul>
                   For example, for a competition with:
                   <ul>
                     <li>One qualification heat of 5 boulders</li>
-                    <li>A semifinal heat of 4 boulders limited to 20 competitors</li>
-                    <li>A final heat of 4 boulders limited to 6 competitors</li>
+                    <li>A semifinal round of 4 boulders limited to 20 competitors</li>
+                    <li>A final round of 3 boulders limited to 6 competitors</li>
                   </ul>
-                  Enter “QQF20F6”.
+                  Enter “Q:5F20:4F6:3”.
                 </li>
               </ul>
           </ol>
@@ -241,22 +259,9 @@
               <li>Enter the new heat format.</li>
               <li>Press <i>Enter</i> to confirm the change.</li>
             </ol>
-            <ol>
-    </section>
-
-    <section name="comp-cat-allow">
-      <h1>Allow or disallow competitor categories for an event</h1>
-      <p>
-        Organization Admins only.
-      </p>
-      <p>
-        Yet to be set up:<br>
-        Designate for an individual event which competitor categories are available to entrants.
-      <p>
-        Currently, Organizations should only enter into the system
-        registrations in categories that it wishes to allow for the
-        event. Categories will be automatically added to an event when a
-        registration in that category is entered in the system.
+          </p>
+        </li>
+      </ol>
     </section>
 
     <section name="clubs">
@@ -271,10 +276,13 @@
         <li>Click <i>Clubs</i> in the main menu.</li>
         <li>Add and edit clubs.</li>
       </ol>
+      <p>
+        <b>Note:</b> if your Organization will be uploading registrations from a file then the club name or code ("short name") used here must be the same as the club name or code used in the upload file. 
+      </p>
     </section>
 
     <section name="climbers">
-      <h1>Add and edit climbers</h1>
+      <h1>Add climbers to your Organization's <i>Climbers</i> list, and edit climbers</h1>
       <p>
         Organization Admins only.
       </p>
@@ -285,6 +293,9 @@
         <li>Click <i>Climbers</i> in the main menu.</li>
         <li>Add and edit climbers.</li>
       </ol>
+      <p>
+        Once added, a climber can be registered for events. Climbers not on the Organization's <i>Climbers</i> list are automatically added to the list when they are registered for an event.
+      </p>
     </section>
 
     <section name="registration">
@@ -298,28 +309,55 @@
       <ol>
         <li>Click <i>Events</i> in the main menu.</li>
         <li>Check that the relevant event is highlighted; if not, click on the event.</li>
-        <li>Click <i>Registrations</i> in the main menu.</li>
-        <li>Yet to be set up:<br>
-          To register multiple climbers for the event, upload a CSV file of stated format.</li>
-        <li>To register an individual climber for the event:
+        <li>To register climbers:<br>
+          <br>
+          <b>Upload multiple registrations from file:</b><br>
+          The current <i>Upload registrations</i> feature works only for Climbing NZ. Climbing NZ users, please contact your Piki Admin for instructions.<br>
+          The Piki developers intend (depending on their availability) to create a generalized <i>Upload registrations</i> feature <i>if requested</i>, to work as follows:
           <ol>
+            <li>Click <i>Upload registrations</i> in the main menu.</li>
+            <li>Click <i>Choose file</i> and select your registration file to upload.<br>
+              Files to upload must be CSV format, with the following fields:
+              <ul>
+                <li>last-name</li>
+                <li>first-name</li>
+                <li>birth-date (yyyy-mm-dd)</li>
+                <li>gender (m, f)</li>
+                <li>club (club names must match those used by your Organization in Piki)</li>
+                <li>competitor-category-codes (codes must match those used by your Organization in Piki)</li>
+              </ul>
+            </li>
+          </ol>
+          <!--Geoff, I'd like to force a small indent here so this line starts at the same point as the "1." and "2." in the list above but have failed to find out how-->It is intended to include a <i>View sample CSV file</i> feature.<br>
+          <br>
+          Or <b>register an individual climber</b> for the event:
+          <ol>
+            <li>Click <i>Registrations</i> in the main menu.</li>
             <li>Begin entering the climber’s name in the cell provided.</li>
             <li>Select the climber’s name from the dropdown list.<br>
-              If the climber’s name does not appear in the dropdown
-              list, the climber has not been entered into the Piki
-              system. In the future, there will be an <i>Add climber</i> button here.
-              Currently, it is necessary to go to
-              <span>{{pageLink value="Add climber" template="Climber.Add"}}</span>
-              under <span>{{pageLink value="Climber page" template="Climber"}}<span>
-                  and then return to the event’s <i>Registrations</i> page.</li>
-            <li>Follow the instructions to choose the categories the climber is entering. </li>
-            <li>Click <i>Register</i> to confirm registration.</li>
+              Or, if the climber's name is not in the dropdown list (that is, has not been added to your Organization's <i>Climbers</i> list):
+              <ol>
+                <li>Click <i>Add [climber's name]</i>
+                <li>Enter the climber's details in the pop-up form.</li>
+                <li>Click <i>Create</i> to confirm the climber's details.<br>
+                  This adds the climber to your Organization's <i>Climbers</i> list. The climber can now be registered for the event.
+                </li>
+                </li>
+                <li>Enter a competitor number if desired.</li>
+                <li>Select the competitor's categories from the dropdown lists.</li>
+                <li>Click <i>Register</i> to confirm registration.</li>
+              </ol>
+            </li>
           </ol>
+        </li>
       </ol>
     </section>
 
     <section name="reg-change">
       <h1>Change or remove a competitor’s registration</h1>
+      <p>
+        Including changing the categories a competitor is registered for.
+      </p>
       <p>
         Organization Admins only.
       </p>
@@ -331,7 +369,7 @@
         <li>Check that the relevant event is highlighted; if not, click on the event.</li>
         <li>Click <i>Registrations</i> in the main menu.</li>
         <li>Click on the competitor’s name.</li>
-        <li>Change the categories the competitor is registered in using the dropdown options, or deregister the competitor.</li>
+        <li>Change the competitor's registration, or deregister the competitor.</li>
       </ol>
     </section>
 
@@ -363,7 +401,7 @@
           <ul>
             <li><tt>n</tt> (e.g. 23)</li>
             <li><tt>n+</tt> (e.g. 23+)</li>
-            <li><tt>top</tt></li>
+            <li><tt>t</tt> (top)</li>
             <li><tt>dnc</tt> (did not climb)</li>
           </ul>
           To record time taken in a Lead Final (to use in scoring in case
@@ -394,7 +432,7 @@
 
       <section>
         <h1>I can't make changes</h1>
-        <p>Ensure you are signed in with the appropriate access rights:
+        <p>Ensure you are signed in with the appropriate access status:
           Admin or Judge.
         </p>
 
@@ -403,6 +441,12 @@
           results</h1>
 
         <p>Enter "<tt>dnc</tt>" (did not climb) as the competitor's score for the heat(s) in which they did not climb.
+        </p>
+        
+        <h1>I don't understand how the rankings are calculated</h1>
+        
+        <p>
+          Piki calculates rankings as set out in the <a href="https://www.ifsc-climbing.org">IFSC</a> rules. If you wish to run a competition using a different scoring system to that set out in the IFSC rules, Piki is unlikely to meet your requirements.
         </p>
       </section>
     </section>
