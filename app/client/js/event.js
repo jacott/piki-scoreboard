@@ -136,14 +136,14 @@ Tpl.Edit.$helpers({
     var eventCats = Object.keys(AppModel.Result.eventCatIndex({event_id: Tpl.event._id})||{})
           .map(function (cat_id) {
             return cats[cat_id];
-          }).sort(Apputil.compareByName)
+          }).sort(compareCategories)
           .forEach(function (doc) {callback(doc)});
 
     $.ctx.onDestroy(AppModel.Result.Index.observe(function (doc, old) {
       if (doc && old) return;
       doc = doc && cats[doc.category_id];
       old = old && cats[old.category_id];
-      (doc || old) && callback(doc && new AppModel.Category(doc), old && new AppModel.Category(old), Apputil.compareByName);
+      (doc || old) && callback(doc && new AppModel.Category(doc), old && new AppModel.Category(old), compareCategories);
     }));
   },
 });
@@ -175,14 +175,14 @@ Tpl.Show.$helpers({
     var eventCats = Object.keys(AppModel.Result.eventCatIndex({event_id: Tpl.event._id})||{})
           .map(function (cat_id) {
             return cats[cat_id];
-          }).sort(Apputil.compareByName)
+          }).sort(compareCategories)
           .forEach(function (doc) {callback(doc)});
 
     $.ctx.onDestroy(AppModel.Result.Index.observe(function (doc, old) {
       if (doc && old) return;
       doc = doc && cats[doc.category_id];
       old = old && cats[old.category_id];
-      (doc || old) && callback(doc && new AppModel.Category(doc), old && new AppModel.Category(old), Apputil.compareByName);
+      (doc || old) && callback(doc && new AppModel.Category(doc), old && new AppModel.Category(old), compareCategories);
     }));
 
     $.ctx.onDestroy(Tpl.scoreCounts.onChange(function (cat_id) {
@@ -192,9 +192,78 @@ Tpl.Show.$helpers({
   },
 });
 
+Tpl.Show.$events({
+  'click .select': function (event) {
+    Bart.stopEvent();
+    var me = Bart.getClosest(this, 'tr');
+    Bart.toggleClass(me, 'selected');
+
+    var parent = event.currentTarget;
+    var selected = parent.getElementsByClassName('selected');
+    var action = parent.getElementsByClassName('action')[0];
+
+    me = (Bart.hasClass(me, 'selected') ? me : selected[0]);
+
+    var firstFormat = me && Tpl.event.heatTypes($.data(me)._id);
+
+    if (firstFormat) {
+      for(var i = 0; i < selected.length; ) {
+        if (Tpl.event.heatTypes($.data(selected[i])._id) !== firstFormat)
+          Bart.removeClass(selected[i], 'selected');
+        else
+          ++i;
+      }
+    }
+    Bart.getCtx(action).updateAllTags({fmt: firstFormat});
+  },
+
+  'click .printResults': function (event) {
+    Bart.stopEvent();
+    var heatNumber = +this.getAttribute('data-heat');
+    var parent = event.currentTarget;
+    var selected = parent.getElementsByClassName('selected');
+
+
+    var elm = document.createElement('section');
+    for(var i = 0; i < selected.length; ++i) {
+      elm.appendChild(Tpl.Category.$render({showingResults: true, heatNumber: heatNumber, category_id: $.data(selected[i])._id}));
+    }
+    parent.parentNode.appendChild(elm);
+    Bart.addClass(parent, 'no-print');
+
+    window.print();
+
+    Bart.remove(elm);
+    Bart.removeClass(parent, 'no-print');
+  },
+});
+
 Tpl.Show.$extend({
   $created: function (ctx) {
     Bart.autoUpdate(ctx);
+  },
+});
+
+Tpl.Show.Action.$helpers({
+  content: function () {
+    if (this.fmt) {
+      var frag = document.createDocumentFragment();
+      var elm = document.createElement('span');
+      elm.textContent = "Print ";
+      frag.appendChild(elm);
+
+      new AppModel.Heat(-1, this.fmt).headers(function (number, name) {
+        if (number < -1 || number === 99) return;
+        var elm = document.createElement('button');
+        elm.textContent = name;
+        elm.setAttribute('data-heat', number);
+        elm.className = "link printResults";
+        frag.appendChild(elm);
+      });
+
+      return frag;
+    } else
+      return "Select categories to print";
   },
 });
 
@@ -246,6 +315,17 @@ function observeScores() {
       counts.notify(res.category_id);
     }
   }
+}
+
+function compareCategories(a, b) {
+  if (a._id === b._id) return 0;
+  var ac, bc;
+  if (((ac = Tpl.event.heatTypes(a._id)) === (bc = Tpl.event.heatTypes(b._id))) &&
+      ((ac = a.group) === (bc = b.group)) &&
+      ((ac = a.name) === (bc = b.name)))
+    return 0;
+
+  return ac < bc ? -1 : 1;
 }
 
 App.loaded('Bart.Event', Bart.Event);

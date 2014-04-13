@@ -118,12 +118,11 @@
     thead {
       background-color: #08a;
       color: #fff;
-      th {
-        min-width: 6.5em;
+      th.score {
+        width: 6.5em;
       }
       th.climber {
         width: 20em;
-        max-width: 100%;
       }
     }
     &+.note {
@@ -153,12 +152,15 @@
 
 @media print {
   #Event .Category {
+    page-break-inside: avoid;
     .results {
-      width: 100%;
-
       thead {
         background-color: #fff;
         color: #aaa;
+      }
+
+      tr {
+        page-break-inside: avoid;
       }
     }
 

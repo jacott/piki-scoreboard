@@ -213,6 +213,12 @@ App.require('Bart.Event', function (Event) {
     },
   });
 
+  HeatHeader.$helpers({
+    heatClass: function () {
+      Bart.addClass($.element, this.heat > 0 ? (this.name === 'Result' ? 'problem' : 'score') : 'other');
+    },
+  });
+
   Tpl.Result.$extend({
     $created: function (ctx) {
       Bart.autoUpdate(ctx, {subject: ctx.data.climber});

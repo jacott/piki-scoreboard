@@ -37,17 +37,25 @@
     </div>
   </template>
   <template name="Show">
-    <section id="ShowEvent">
+    <section id="Show">
       <div>
         <h1>{{name}} - Category Results</h1>
         <table class="categories">
           {{each "categories" template="Event.CatList"}}
         </table>
+
+        {{>Action ""}}
+        <template name="Action">
+          <div class="action">
+            {{content}}
+          </div>
+        </template>
       </div>
     </section>
   </template>
   <template name="CatList">
     <tr>
+      <td><span class="select"></span></td>
       <td>{{pageLink value=name template="Event.Category" append=_id}}</td>
       {{heats}}
     </tr>

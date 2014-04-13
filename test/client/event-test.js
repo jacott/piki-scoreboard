@@ -110,7 +110,7 @@
           assert.dom('.link[name=register]');
           assert.dom('.link[name=edit]');
         });
-        assert.dom('#Event #ShowEvent', function () {
+        assert.dom('#Event #Show', function () {
           assert.dom('h1', v.event.name + ' - Category Results');
           assert.dom('.categories', function () {
             assert.dom('.link', {text: v.cats[0].name, parent: 2}, function () {

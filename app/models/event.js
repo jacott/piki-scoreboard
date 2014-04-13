@@ -11,6 +11,11 @@ App.require('AppModel.Org', function () {
         }
       }
     },
+
+    heatTypes: function (cat_id) {
+      var fmt = this.attributes.heats[cat_id];
+      return fmt && fmt.replace(/[^A-Z]*/g, '');
+    },
   },{saveRpc: true});
 
 

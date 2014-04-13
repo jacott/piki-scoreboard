@@ -12,7 +12,7 @@
           <th class="climber">Climber</th>
           {{headers}}
           <template name="HeatHeader">
-            <th>{{name}}</th>
+            <th {{heatClass}}>{{name}}</th>
           </template>
         </tr>
       </thead>

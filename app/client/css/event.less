@@ -1,6 +1,8 @@
 @import "global.lessimport";
+@import "icon-font-codes.lessimport";
 
 #Event {
+  .user-select(none);
   table th:first-child {
     width: 60%;
   }
@@ -37,13 +39,27 @@
   table.categories {
     tr {
       border-bottom: 1px solid fade(#000, 10%);
+      .select {
+        display: inline-block;
+        width: 1.2em;
+        height: 1.2em;
+        cursor: pointer;
+        border: 1px solid fade(#000, 20%);
+      }
+      &.selected {
+        background-color: #aff;
+
+        .select {
+          .icon(@icon-tick);
+        }
+      }
     }
   }
 
 }
 
 
-#ShowEvent {
+#Event #Show {
   form {
     display: inline-block;
 
