@@ -107,43 +107,9 @@
           assert.dom('h1', v.event.name);
           assert.dom('.categories', function () {
             assert.dom('h1', 'Categories');
-            assert.dom('.link', {text: v.cats[0].name, parent: function () {
-              assert.dom('.link.adminAccess', 'QQF8');
-            }});
             assert.dom('.link', v.cats[1].name);
           });
         });
-      },
-
-      "test changing format": function () {
-        assert.dom('.link', {text: v.cats[0].name, parent: function () {
-          TH.click('.link.adminAccess', 'QQF8');
-          assert.dom('form+.link.adminAccess');
-          assert.dom('form>input[name=changeFormat]', {value: "QQF8"}, function () {
-            TH.input(this, 'QQF8F2');
-            TH.trigger(this.parentNode, 'submit');
-          });
-          refute.dom('form+.link.adminAccess');
-          assert.dom('.link.adminAccess', 'QQF8F2');
-        }});
-
-        assert.equals(v.event.$reload().heats[v.cats[0]._id], 'LQQF8F2');
-      },
-
-      "test format error": function () {
-        assert.dom('.link', {text: v.cats[0].name, parent: function () {
-          TH.click('.link.adminAccess', 'QQF8');
-          assert.dom('form+.link.adminAccess');
-          assert.dom('form>input[name=changeFormat]', {value: "QQF8"}, function () {
-            TH.input(this, 'QQF8FX');
-            TH.trigger(this.parentNode, 'submit');
-          });
-          assert.dom('form+.link.adminAccess', 'QQF8');
-          assert.dom('form>input.error+.errorMsg', 'not valid');
-        }});
-
-        assert.equals(Bart.Event.event.heats[v.cats[0]._id], 'LQQF8'); // ensure reverted
-        assert.equals(v.event.$reload().heats[v.cats[0]._id], 'LQQF8');
       },
 
       "test selecting category": function () {
@@ -160,41 +126,64 @@
         assert.dom('#Event #Register');
       },
 
-      "test change name": function () {
-        TH.click('[name=edit]');
-        assert.dom('#EditEvent', function () {
-          assert.dom('h1', 'Edit ' + v.event.name);
-          TH.input('[name=name]', {value: v.event.name}, 'new name');
-          TH.click('[type=submit]');
-        });
+      "Edit": {
+        setUp: function () {
+          TH.click('[name=edit]');
+        },
 
-        assert.dom('#Event td', 'new name');
-      },
+        "test changing format": function () {
+          assert.dom('.categories input[name=changeFormat]', {value: "QQF8"}, function () {
+            TH.change(this, 'QQF8F2');
+          });
 
-      "test delete": function () {
-        TH.click('[name=edit]');
-        assert.dom('#EditEvent', function () {
-          TH.click('[name=delete]');
-        });
+          assert.equals(v.event.$reload().heats[v.cats[0]._id], 'LQQF8F2');
+        },
 
-        assert.dom('.Dialog.Confirm', function () {
-          assert.dom('h1', 'Delete ' + v.event.name + '?');
-          TH.click('[name=cancel');
-        });
+        "test format error": function () {
+          assert.dom('.categories input[name=changeFormat]', {value: "QQF8"}, function () {
+            TH.change(this, 'QQF8FX');
+          });
+          assert.dom('input.error+.errorMsg', 'not valid');
 
-        refute.dom('.Dialog');
+          assert.equals(Bart.Event.event.heats[v.cats[0]._id], 'LQQF8'); // ensure reverted
+          assert.equals(v.event.$reload().heats[v.cats[0]._id], 'LQQF8');
+        },
 
-        assert(AppModel.Event.exists(v.event._id));
 
-        TH.click('#EditEvent [name=delete]');
+        "test change name": function () {
+          assert.dom('#EditEvent', function () {
+            assert.dom('h1', 'Edit ' + v.event.name);
+            TH.input('[name=name]', {value: v.event.name}, 'new name');
+            TH.click('[type=submit]');
+          });
 
-        assert.dom('.Dialog', function () {
-          TH.click('[name=okay]', 'Delete');
-        });
+          assert.dom('#Event td', 'new name');
+        },
 
-        refute.dom('#EditEvent');
+        "test delete": function () {
+          assert.dom('#EditEvent', function () {
+            TH.click('[name=delete]');
+          });
 
-        refute(AppModel.Event.exists(v.event._id));
+          assert.dom('.Dialog.Confirm', function () {
+            assert.dom('h1', 'Delete ' + v.event.name + '?');
+            TH.click('[name=cancel');
+          });
+
+          refute.dom('.Dialog');
+
+          assert(AppModel.Event.exists(v.event._id));
+
+          TH.click('#EditEvent [name=delete]');
+
+          assert.dom('.Dialog', function () {
+            TH.click('[name=okay]', 'Delete');
+          });
+
+          refute.dom('#EditEvent');
+
+          refute(AppModel.Event.exists(v.event._id));
+        },
       },
     },
   });

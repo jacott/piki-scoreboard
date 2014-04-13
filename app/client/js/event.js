@@ -1,6 +1,5 @@
 var $ = Bart.current;
 var Tpl = Bart.Event;
-var ShowCat = Tpl.Show.Cat;
 var Index = Tpl.Index;
 var eventSub;
 
@@ -112,7 +111,46 @@ Tpl.Edit.$events({
 
   },
   'click [type=submit]': Bart.Form.submitFunc('EditEvent', Tpl),
+
+  'change [name=changeFormat]': function (event) {
+    var cat = $.data(this);
+    var ev = Tpl.event;
+
+    ev.$change('heats')[cat._id] = cat.type + this.value;
+    if (ev.$save()) {
+      Bart.Form.clearErrors(this.parentNode);
+    } else {
+      Bart.stopEvent();
+      this.focus();
+      this.select();
+      Bart.Form.renderError(this.parentNode, 'changeFormat', AppVal.Error.msgFor(ev, 'heats'));
+      ev.$reload();
+    }
+  },
 });
+
+Tpl.Edit.$helpers({
+  categories: function (callback) {
+    var cats = AppModel.Category.attrDocs();
+    var eventCats = Object.keys(AppModel.Result.eventCatIndex({event_id: Tpl.event._id})||{})
+          .map(function (cat_id) {
+            return cats[cat_id];
+          }).sort(Apputil.compareByName)
+          .forEach(function (doc) {callback(doc)});
+
+    $.ctx.onDestroy(AppModel.Result.Index.observe(function (doc, old) {
+      if (doc && old) return;
+      doc = doc && cats[doc.category_id];
+      old = old && cats[old.category_id];
+      (doc || old) && callback(doc && new AppModel.Category(doc), old && new AppModel.Category(old), Apputil.compareByName);
+    }));
+  },
+});
+
+Tpl.Edit.Cat.$helpers({
+  eventFormat: eventFormat,
+});
+
 
 Tpl.Show.$helpers({
   categories: function (callback) {
@@ -137,41 +175,6 @@ Tpl.Show.$extend({
     Bart.autoUpdate(ctx);
   },
 });
-
-ShowCat.$helpers({
-  eventFormat: eventFormat,
-});
-
-ShowCat.$events({
-  'click [name=format]': function (event) {
-    Bart.stopEvent();
-
-    this.parentNode.insertBefore(ShowCat.ChangeFormat.$autoRender($.ctx.data, $.ctx.parentCtx), this);
-  },
-});
-
-ShowCat.ChangeFormat.$helpers({
-  format: eventFormat,
-});
-
-ShowCat.ChangeFormat.$events({
-  'submit': function (event) {
-    Bart.stopEvent();
-
-    var cat = $.data(this);
-
-    var ev = $.ctx.parentCtx.data;
-
-    ev.$change('heats')[cat._id] = cat.type + this.querySelector('input').value;
-    if (ev.$save())
-      Bart.remove(this);
-    else {
-      Bart.Form.renderError(this, 'changeFormat', AppVal.Error.msgFor(ev, 'heats'));
-      ev.$reload();
-    }
-  },
-});
-
 
 function cancel(event) {
   Bart.stopEvent();

@@ -46,13 +46,7 @@
           <template name="Cat">
             <div>
               {{pageLink value=name template="Event.Category" append=_id}}
-              <button class="link adminAccess" name="format">{{eventFormat}}</button>
             </div>
-            <template name="ChangeFormat">
-              <form>
-                <input name="changeFormat" value="{{format}}">
-              </form>
-            </template>
           </template>
         </div>
       </div>
@@ -70,15 +64,28 @@
   </template>
 
   <template name="Edit">
-    <form id="EditEvent">
+    <div id="EditEvent">
       <h1>Edit {{name}}</h1>
-      {{> /Event.Form}}
-      <fieldset class="actions">
-        <button type="submit" name="update">Save</button>
-        <button type="button" name="delete">Delete</button>
-        <button type="button" name="cancel">Cancel</button>
-      </fieldset>
-    </form>
+      <form>
+        {{> /Event.Form}}
+        <fieldset class="actions">
+          <button type="submit" name="update">Save</button>
+          <button type="button" name="delete">Delete</button>
+          <button type="button" name="cancel">Cancel</button>
+        </fieldset>
+      </form>
+
+      <div class="categories">
+        <h1>Category formats</h1>
+        {{each "categories" template="Cat"}}
+        <template name="Cat">
+          <label>
+            <span class="name">{{name}}</span>
+            <input name="changeFormat" value="{{eventFormat}}">
+          </label>
+        </template>
+      </div>
+    </div>
   </template>
 
   <template name="ConfirmDelete">
