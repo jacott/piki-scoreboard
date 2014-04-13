@@ -130,6 +130,18 @@
         assert.calledWith(AppRoute.gotoPage, v.RootBar, {bazId: "diff-id", pathname: '/baz/diff-id/root-bar'});
       },
 
+      "test search and tag reset": function () {
+        AppRoute.gotoPath('/baz/an-id/root-bar?search=data#tag');
+        assert.calledWith(v.RootBar.onEntry, v.RootBar, {bazId: "an-id", pathname: '/baz/an-id/root-bar',
+                                                         search: '?search=data', hash: '#tag'});
+
+        assert.calledWith(AppRoute.history.pushState, null, "TestTitle", "/baz/an-id/root-bar?search=data#tag");
+        v.RootBar.onEntry.reset();
+
+        AppRoute.gotoPath(v.RootBar);
+        assert.calledWith(v.RootBar.onEntry, v.RootBar, {bazId: "an-id", pathname: '/baz/an-id/root-bar'});
+      },
+
       "test gotoPage, pushCurrent": function () {
         var orig = Bart.setTitle;
         Bart.setTitle = test.stub();

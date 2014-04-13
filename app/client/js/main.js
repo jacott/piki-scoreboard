@@ -14,7 +14,7 @@ App._startup = function () {
 
   Bart.Spinner.init();
 
-  pathname = AppClient.getLocation();
+  pathname = [AppClient.getLocation()];
 
   var handle = App.Ready.onReady(whenReady);
   var header = Tpl.Header.$autoRender({});
@@ -35,7 +35,7 @@ App._startup = function () {
     window.addEventListener('popstate', function (event) {
       App.Ready.isReady && AppRoute.pageChanged();
     });
-    AppRoute.replacePath(pathname || document.location);
+    AppRoute.replacePath(pathname[0] || document.location, pathname[1]);
     return false;
   }
 
@@ -101,11 +101,6 @@ AppRoute.root.routeVar = 'orgSN';
 AppRoute.root.onBaseEntry = function (page, pageRoute) {
   if (pageRoute.orgSN !== orgShortName) {
     subscribeOrg(pageRoute.orgSN);
-    if (pageRoute.orgSN) {
-      pathname = pageRoute.pathname;
-    }
-  } else if (orgSub) {
-    pathname = pageRoute.pathname;
   }
 };
 
@@ -144,14 +139,14 @@ function subscribeOrg(shortName) {
       if (pathname) {
         var pn = pathname;
         pathname = null;
-        AppRoute.replacePath(pn);
+        AppRoute.replacePath(pn[0], pn[1]);
       }
     });
 
     Bart.Flash.loading();
 
     if (AppRoute.loadingArgs) {
-      pathname = AppRoute.loadingArgs[1].pathname;
+      pathname = AppRoute.loadingArgs;
       AppRoute.abortPage();
     }
 

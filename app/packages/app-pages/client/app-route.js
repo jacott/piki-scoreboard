@@ -60,7 +60,7 @@ var currentPage = null;
 var currentPageRoute = {};
 var currentTitle, currentHref;
 var pageState = 'pushState';
-var excludes = {append: 1, href: 1, hash: 1};
+var excludes = {append: 1, href: 1, hash: 1, search: 1};
 App.extend(AppRoute, {
   root: new AppRoute(),
 
@@ -105,7 +105,7 @@ App.extend(AppRoute, {
         pageRoute = {};
       } else {
         page = page.Index || page;
-        var href = page.onEntry(page, pageRoute) || pageRoute.pathname;
+        var href = page.onEntry(page, pageRoute) || pageRoute.pathname+(pageRoute.search||'')+(pageRoute.hash||'');
         var title = document.title = page.title || AppRoute.title;
         Bart.setTitle && Bart.setTitle(page.title);
 
