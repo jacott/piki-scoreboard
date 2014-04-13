@@ -1,6 +1,6 @@
 var $ = Bart.current;
 var Tpl = Bart.Form.PageLink;
-var IGNORE = {append: true, value: true, link: true, template: true};
+var IGNORE = {append: true, search: true, value: true, link: true, template: true};
 
 Tpl.$helpers({
   attrs: function () {
@@ -26,9 +26,10 @@ Tpl.$events({
     Bart.stopEvent();
     var data = $.data();
 
-    if (data.append) {
-      var location = {append: data.append};
-    }
+    var location = {};
+
+    if (data.append) location.append = data.append;
+    if (data.search) location.search = '?' + data.search;
     AppRoute.gotoPath(data.link, location);
   },
 });

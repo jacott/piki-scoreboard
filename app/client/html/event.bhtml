@@ -39,18 +39,18 @@
   <template name="Show">
     <section id="ShowEvent">
       <div>
-        <h1>{{name}}</h1>
-        <div class="categories">
-          <h1>Categories</h1>
-          {{each "categories" template="Cat"}}
-          <template name="Cat">
-            <div>
-              {{pageLink value=name template="Event.Category" append=_id}}
-            </div>
-          </template>
-        </div>
+        <h1>{{name}} - Category Results</h1>
+        <table class="categories">
+          {{each "categories" template="Event.CatList"}}
+        </table>
       </div>
     </section>
+  </template>
+  <template name="CatList">
+    <tr>
+      <td>{{pageLink value=name template="Event.Category" append=_id}}</td>
+      {{heats}}
+    </tr>
   </template>
   <template name="Add">
     <form id="AddEvent">

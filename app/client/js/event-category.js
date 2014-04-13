@@ -11,7 +11,8 @@ App.require('Bart.Event', function (Event) {
     focus: '.Category [name=selectHeat]',
     data: function (page,pageRoute) {
       if (! Event.event) AppRoute.abortPage();
-      return {showingResults: true, category_id: pageRoute.append, heatNumber: -1};
+      var params = AppRoute.searchParams(pageRoute);
+      return {showingResults: true, category_id: pageRoute.append, heatNumber: +(params.heat || -1)};
     }
   });
 

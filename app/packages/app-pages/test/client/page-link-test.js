@@ -1,5 +1,5 @@
 (function (test, v) {
-  buster.testCase('lib/client/form/page-link:', {
+  buster.testCase('packages/app-pages/test/client/page-link:', {
     setUp: function () {
       test = this;
       v = {};
@@ -37,6 +37,20 @@
       });
 
       assert.calledWith(AppRoute.gotoPath, Bart.Foo.Bar, {append: "1234"});
+    },
+
+    "test search": function () {
+      Bart.newTemplate({name: "Foo.Bar"});
+
+      test.stub(AppRoute, 'gotoPath');
+      document.body.appendChild(Bart._helpers.pageLink({id: "foo", value: "foo bar", template: "Foo.Bar", search: "foo=bar"}));
+
+      assert.dom('#foo', function () {
+        refute(this.getAttribute('search'));
+        TH.click(this);
+      });
+
+      assert.calledWith(AppRoute.gotoPath, Bart.Foo.Bar, {search: "?foo=bar"});
     },
 
     "test template": function () {

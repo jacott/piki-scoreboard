@@ -1,7 +1,7 @@
 var $ = Bart.current;
 var Tpl = Bart.Event;
 var Index = Tpl.Index;
-var eventSub;
+var eventSub, resultOb;
 
 Tpl.$extend({
   onBaseEntry: function (page, pageRoute) {
@@ -11,6 +11,7 @@ Tpl.$extend({
     if (pageRoute.eventId) {
       if (! Tpl.event || Tpl.event._id !== pageRoute.eventId) {
         if (Tpl.event =  AppModel.Event.findOne(pageRoute.eventId)) {
+          observeScores();
 
           eventSub && eventSub.stop();
           eventSub = App.subscribe('Event', pageRoute.eventId, function () {
@@ -151,6 +152,22 @@ Tpl.Edit.Cat.$helpers({
   eventFormat: eventFormat,
 });
 
+Tpl.CatList.$helpers({
+  heats: function () {
+    var frag = document.createDocumentFragment();
+    var counts = Tpl.scoreCounts[this._id];
+    var heat = new AppModel.Heat(-1,  Tpl.event.heats[this._id]);
+
+    for(var i = 1; counts[i]; ++i) {
+      var elm = document.createElement('td');
+      elm.appendChild(Bart.Form.pageLink({value: heat.getName(i), template: "Event.Category", append: this._id, search: "heat="+i}));
+      frag.appendChild(elm);
+    }
+
+    return frag;
+  },
+});
+
 
 Tpl.Show.$helpers({
   categories: function (callback) {
@@ -166,6 +183,11 @@ Tpl.Show.$helpers({
       doc = doc && cats[doc.category_id];
       old = old && cats[old.category_id];
       (doc || old) && callback(doc && new AppModel.Category(doc), old && new AppModel.Category(old), Apputil.compareByName);
+    }));
+
+    $.ctx.onDestroy(Tpl.scoreCounts.onChange(function (cat_id) {
+      var doc = AppModel.Category.quickFind(cat_id);
+      callback(doc, doc, Apputil.compareByName);
     }));
   },
 });
@@ -184,6 +206,46 @@ function cancel(event) {
 function eventFormat() {
   var event = $.ctx.parentCtx.data;
   return event.heats[this._id].slice(1);
+}
+
+function observeScores() {
+  resultOb && resultOb.stop();
+
+  var counts = Tpl.scoreCounts = {};
+
+  App.makeSubject(counts);
+
+  resultOb = AppModel.Result.Index.observe(calcScores);
+
+  var docs = AppModel.Result.attrDocs();
+  for(var id in docs)
+    calcScores(docs[id], null);
+
+  function calcScores(doc, old) {
+    var res = doc || old;
+    if (res.event_id !== Tpl.event._id) return;
+
+    var oldScores = (old && old.scores) || [];
+    var newScores = (doc && doc.scores) || [];
+
+    var len = Math.max(oldScores.length, newScores.length);
+    var scores = counts[res.category_id] || (counts[res.category_id]  = []);
+    var changed = false;
+
+    for(var i = 0; i < len; ++i) {
+      var count = (newScores[i] != null ?
+         (oldScores[i] == null ? 1 : 0) :
+         (oldScores[i] != null ? -1 : 0));
+      if (count) {
+        changed = true;
+        scores[i] = (scores[i] || 0) + count;
+      }
+    }
+
+    if (changed) {
+      counts.notify(res.category_id);
+    }
+  }
 }
 
 App.loaded('Bart.Event', Bart.Event);

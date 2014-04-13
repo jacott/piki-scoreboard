@@ -47,6 +47,12 @@
       });
     },
 
+    "test searchParams": function () {
+      assert.equals(AppRoute.searchParams(), {});
+
+      assert.equals(AppRoute.searchParams({search: "?foo=bar&baz=12"}), {foo: "bar", baz: "12"});
+    },
+
     "with routeVar": {
       setUp: function () {
         v.Baz = {

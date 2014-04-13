@@ -79,16 +79,17 @@
 
     "select": {
       setUp: function () {
+        TH.login();
         v.event = TH.Factory.createEvent();
 
         v.cats = TH.Factory.createList(3, 'createCategory', function (index, options) {
           options.shortName = 'YA ' + index;
           options.name = 'Youth A ' + index;
         });
-        var c1 = TH.Factory.buildCompetitor({category_ids: [v.cats[0]._id]});
-        var c2 = TH.Factory.buildCompetitor({category_ids: [v.cats[1]._id]});
-        c1.$$save();
-        c2.$$save();
+        v.c1 = TH.Factory.buildCompetitor({category_ids: [v.cats[0]._id]});
+        v.c2 = TH.Factory.buildCompetitor({category_ids: [v.cats[1]._id]});
+        v.c1.$$save();
+        v.c2.$$save();
 
         v.event2 = TH.Factory.createEvent();
 
@@ -99,16 +100,34 @@
       },
 
       "test rendering": function () {
+        var result = AppModel.Result.findOne({event_id: v.event._id, category_id: v.cats[0]._id, climber_id: v.c1.climber_id});
+
+        result.setScore(1, '13');
+        result.setScore(2, '23+');
+        result.setScore(3, '');
+
         assert.dom('#Event:not(.noEvent) .menu', function () {
           assert.dom('.link[name=register]');
           assert.dom('.link[name=edit]');
         });
         assert.dom('#Event #ShowEvent', function () {
-          assert.dom('h1', v.event.name);
+          assert.dom('h1', v.event.name + ' - Category Results');
           assert.dom('.categories', function () {
-            assert.dom('h1', 'Categories');
-            assert.dom('.link', v.cats[1].name);
+            assert.dom('.link', {text: v.cats[0].name, parent: 2}, function () {
+              assert.dom('.link', {count: 3});
+              assert.dom('.link', "Qual 1");
+              assert.dom('.link', "Qual 2");
+            });
+            assert.dom('.link', {text: v.cats[1].name, parent: 2}, function () {
+              assert.dom('.link', {count: 1});
+            });
+
+            TH.click('.link', "Qual 2");
           });
+        });
+
+        assert.dom('#Event .Category', function () {
+          assert.dom('h1.selectedHeat', 'Qual 2 - Results');
         });
       },
 

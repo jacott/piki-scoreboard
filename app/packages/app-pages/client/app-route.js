@@ -218,6 +218,21 @@ App.extend(AppRoute, {
 
     this.gotoPage(page, pageRoute);
   },
+
+  searchParams: function (pageRoute) {
+    var result = {};
+
+    var search = pageRoute && pageRoute.search;
+    if (! search) return result;
+
+
+    search.slice(1).split('&').forEach(function (pair) {
+      var items = pair.split('=');
+      result[items[0]] = items[1];
+    });
+
+    return result;
+  },
 });
 
 function exitEntry(exit, oldSymbols, entry, pageRoute, page) {
