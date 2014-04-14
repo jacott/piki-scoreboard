@@ -6,7 +6,7 @@
     </section>
 
     <template name="Add">
-      <form class="add">
+      <form class="add no-print">
         <h1>Add competitor</h1>
         <fieldset>
           {{labelField "name" class="autoComplete" autocomplete="off"}}

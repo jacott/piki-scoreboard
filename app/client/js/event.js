@@ -271,6 +271,7 @@ Tpl.Show.$events({
 
 
     var elm = document.createElement('section');
+    elm.className = 'print-only';
     for(var i = 0; i < selected.length; ++i) {
       elm.appendChild(Tpl.Category.$render({showingResults: Tpl.Show.results, heatNumber: heatNumber, category_id: $.data(selected[i])._id}));
     }
