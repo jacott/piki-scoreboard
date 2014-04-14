@@ -159,16 +159,22 @@ Tpl.Edit.Cat.$helpers({
 
 Tpl.CatList.$helpers({
   heats: function () {
+    var cat = this;
     var frag = document.createDocumentFragment();
-    var counts = Tpl.scoreCounts[this._id];
-    var heat = new AppModel.Heat(-1,  Tpl.event.heats[this._id]);
+    var counts = Tpl.scoreCounts[cat._id];
+    var heat = new AppModel.Heat(-1,  Tpl.event.heats[cat._id]);
+    var total = heat.total;
+    if (Tpl.Show.results) ++total;
 
-    for(var i = 1; counts[i]; ++i) {
-      var elm = document.createElement('td');
-      elm.appendChild(Bart.Form.pageLink({value: heat.getName(i), template: "Event.Category", append: this._id,
-                                          search: listType() + "&heat="+i}));
-      frag.appendChild(elm);
+    for(var i = 1; i < total && counts[i]; ++i) {
+      addHeat(i);
     }
+    if (! Tpl.Show.results) {
+      addHeat(i);
+      var link = $.data($.element.previousElementSibling.firstChild);
+      link.search += "&heat="+i;
+    }
+
     if (i < 7) {
       var elm = document.createElement('td');
       elm.setAttribute('colspan', 7 - i);
@@ -177,6 +183,15 @@ Tpl.CatList.$helpers({
 
 
     return frag;
+
+    function addHeat(i) {
+      var elm = document.createElement('td');
+      elm.appendChild(Bart.Form.pageLink({
+        value: heat.getName(i), template: "Event.Category", append: cat._id,
+        search: listType() + "&heat="+i,
+      }));
+      frag.appendChild(elm);
+    }
   },
 
   listType: listType,

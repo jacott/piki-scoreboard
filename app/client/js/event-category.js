@@ -12,7 +12,7 @@ App.require('Bart.Event', function (Event) {
     data: function (page,pageRoute) {
       if (! Event.event) AppRoute.abortPage();
       var params = AppRoute.searchParams(pageRoute);
-      return {showingResults: params.type !== 'startlists', category_id: pageRoute.append, heatNumber: +(params.heat || -1)};
+      return {showingResults: params.type === 'results', category_id: pageRoute.append, heatNumber: +(params.heat || -1)};
     }
   });
 
@@ -82,8 +82,8 @@ App.require('Bart.Event', function (Event) {
           this.canInput = ! value && Bart.hasClass(document.body, 'jAccess');
           return value;
         },
-        canInput: false,
       });
+      data.showingResults = showingResults; // set canInput
 
       Bart.autoUpdate(ctx, {
         subject: data.category,

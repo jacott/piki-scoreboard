@@ -13,7 +13,7 @@
       v.result2 = TH.Factory.createResult({scores: [0.3]});
       TH.setOrg(v.org);
       v.eventSub = App.subscribe.withArgs('Event').returns({stop: v.stop = test.stub()});
-      AppRoute.gotoPage(Bart.Event.Category, {eventId: v.event._id, append: v.category._id});
+      AppRoute.gotoPage(Bart.Event.Category, {eventId: v.event._id, append: v.category._id, search: '&type=results'});
       v.eventSub.yield();
     },
 
@@ -122,7 +122,7 @@
         TH.login();
 
         v.eventSub.reset();
-        AppRoute.gotoPage(Bart.Event.Category, {eventId: v.event._id, append: v.category._id});
+        AppRoute.gotoPage(Bart.Event.Category, {eventId: v.event._id, append: v.category._id, search: '&type=results'});
         v.eventSub.yield();
       },
 
