@@ -396,7 +396,7 @@ App.require('Bart.Event', function (Event) {
     var ctx = Bart.getCtx(elm);
     var heat = Tpl.$ctx(ctx).data.heat;
     var data = ctx.data;
-    if (elm.className === 'score') {
+    if (Bart.hasClass(elm, 'score')) {
       var number = heat.scoreToNumber(elm.value, data.heat);
 
       if (number !== false) {
@@ -426,7 +426,7 @@ App.require('Bart.Event', function (Event) {
     focusField = {
       id: Bart.getClosest(input, 'tr').id,
       tabIndex: +input.getAttribute('tabIndex'),
-      name: input.className,
+      name: input.className.replace(/ .*$/, ''),
     };
   };
 
@@ -438,7 +438,7 @@ App.require('Bart.Event', function (Event) {
     if (Bart.hasClass(row, 'BoulderScore')) {
       row = row.parentNode;
 
-      var name = elm.className === 'top' ? 'bonus' : 'top';
+      var name = Bart.hasClass(elm, 'top') ? 'bonus' : 'top';
       if (direction > 0 && name === 'top')
         row = row.nextElementSibling;
       else if (direction < 0 && name === 'bonus')
