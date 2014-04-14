@@ -38,6 +38,7 @@ Tpl.$extend({
   },
 
   $destroyed: function (ctx, elm) {
+    AppClient.getLocation().hash='';
     window.removeEventListener('hashchange', scrollToTag);
     document.removeEventListener('click', clicked, true);
   },
