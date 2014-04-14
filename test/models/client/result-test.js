@@ -9,24 +9,53 @@
       v = null;
     },
 
-    "test setScore": function () {
+    "test setScore number": function () {
+      TH.login();
       var result = TH.Factory.createResult({scores: [1]});
 
-      test.stub(App, 'rpc');
+      test.spy(App, 'rpc');
 
       result.setScore(1, '23.5+');
 
       assert.calledWith(App.rpc, 'Result.setScore', result._id, 1, '23.5+');
+
+      App.rpc.reset();
+
+      result.$reload().setScore(1, '23.5+'); // setting again
+      refute.msg('should not update').called(App.rpc);
+    },
+
+    "test setScore time": function () {
+      TH.login();
+      var result = TH.Factory.createResult({scores: [1]});
+
+      test.spy(App, 'rpc');
+
+      result.setScore(99, '1:02');
+
+      assert.calledWith(App.rpc, 'Result.setScore', result._id, 99, '1:02');
+
+      App.rpc.reset();
+
+      result.$reload().setScore(99, '1:02'); // setting again
+      refute.msg('should not update').called(App.rpc);
     },
 
     "test setBoulderScore": function () {
+      TH.login();
+      var category = TH.Factory.createCategory({type: 'B'});
       var result = TH.Factory.createResult({scores: [1]});
 
-      test.stub(App, 'rpc');
+      test.spy(App, 'rpc');
 
       result.setBoulderScore(1, 2, 3, 4);
 
       assert.calledWith(App.rpc, 'Result.setBoulderScore', result._id, 1, 2, 3, 4);
+
+      App.rpc.reset();
+
+      result.$reload().setBoulderScore(1, 2, 3, 4); // setting again
+      refute.msg('should not update').called(App.rpc);
     },
 
     "test index": function () {

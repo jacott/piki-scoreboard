@@ -154,8 +154,9 @@ App.require('Bart.Event', function (Event) {
         var oldFocus = focusField;
         focusField = nextField(document.activeElement, event.shiftKey ? -1 : 1);
 
-        if (! saveScore(event.target)) {
-          if (oldFocus.id === focusField.id) {
+        var res  = saveScore(event.target);
+        if (! res) {
+          if (res === null && oldFocus.id === focusField.id) {
             return;
           }
 
@@ -412,11 +413,13 @@ App.require('Bart.Event', function (Event) {
     var parent = elm.parentNode;
     var top = +(parent.querySelector('input.top').value || 0);
     var bonus = +(parent.querySelector('input.bonus').value || 0);
-    if (top && ! bonus) return null;
-    if (! top || (bonus && bonus <= top)) {
-      Bart.removeClass(parent, 'error');
-      data.result.setBoulderScore(data.heat.number, +elm.getAttribute('tabIndex'), bonus, top);
-      return true;
+    if (top === top && bonus === bonus) {
+      if (top && ! bonus) return null;
+      if (! top || (bonus && bonus <= top)) {
+        Bart.removeClass(parent, 'error');
+        data.result.setBoulderScore(data.heat.number, +elm.getAttribute('tabIndex'), bonus, top);
+        return true;
+      }
     }
     Bart.addClass(parent, 'error');
     return false;

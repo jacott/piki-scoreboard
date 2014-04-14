@@ -193,14 +193,24 @@
               assert.dom('>div', {count: 4});
               assert.dom('>div>input.top', {count: 4});
               assert.dom('>div>input.bonus', {count: 4});
-              assert.dom('>div:first-child>.bonus', function () {
-                TH.change(this, '4');
+              assert.dom('>div:first-child', function () {
+                assert.dom('.top', function () {
+                  TH.trigger(this, 'focus');
+                  TH.change(this, 'a');
+                  assert.className(this.parentNode, 'error');
+                  assert.same(document.activeElement, this);
+                });
+                assert.dom('.bonus', function () {
+                  TH.trigger(this, 'focus');
+                  TH.change(this, '4');
+                });
               });
             });
           });
           assert.dom('tr#Result_'+ v.result._id, function () {
             assert.dom('td:nth-child(2).BoulderScore', function () {
               assert.dom('>div:first-child>.top', function () {
+                TH.trigger(this, 'focus');
                 TH.change(this, '5');
               });
 
@@ -211,79 +221,81 @@
       },
     },
 
-    "test clicking on time in results mode": function () {
-      TH.login();
+    "lead category": {
+      "test clicking on time in results mode": function () {
+        TH.login();
 
-      TH.change('select[name=selectHeat]', 3);
-      assert.dom('tr#Result_'+ v.result._id, function () {
-        TH.trigger('td.heat99', 'mousedown');
-      });
-
-      assert.dom('.start table.results', function () {
-        assert.dom('thead>tr', function () {
-          assert.dom('th:first-child', 'Climber');
-          assert.dom('th:nth-child(2)', 'Time taken');
-          assert.dom('th:nth-child(3)', 'Result');
-          assert.dom('th:nth-child(4)', 'Previous heat');
-        });
-        assert.dom('tbody', function () {
-          assert.dom('tr:first-child>td.climber>.name', v.result2.climber.name);
-          assert.dom('tr:last-child>td.climber>.name', v.result.climber.name);
-        });
-      });
-    },
-
-    "test entering finals": function () {
-      TH.login();
-      assert.dom('#Event .Category', function () {
+        TH.change('select[name=selectHeat]', 3);
         assert.dom('tr#Result_'+ v.result._id, function () {
-          TH.trigger('td:nth-child(3)', 'mousedown');
+          TH.trigger('td.heat99', 'mousedown');
         });
-        assert.dom('h1', 'Final - Start order');
-        assert.dom('tr#Result_'+ v.result._id, function () {
-          assert.dom('td:nth-child(3)>input[placeholder="n+"]');
-          assert.dom('td:nth-child(2)', function () {
-            TH.trigger(this, 'mousedown');
+
+        assert.dom('.start table.results', function () {
+          assert.dom('thead>tr', function () {
+            assert.dom('th:first-child', 'Climber');
+            assert.dom('th:nth-child(2)', 'Time taken');
+            assert.dom('th:nth-child(3)', 'Result');
+            assert.dom('th:nth-child(4)', 'Previous heat');
+          });
+          assert.dom('tbody', function () {
+            assert.dom('tr:first-child>td.climber>.name', v.result2.climber.name);
+            assert.dom('tr:last-child>td.climber>.name', v.result.climber.name);
           });
         });
-        assert.dom('tr#Result_'+ v.result._id + '>td:nth-child(2)>input[placeholder="m:ss"]', function () {
-          assert.same(document.activeElement, this);
-          TH.change(this, "3.44");
+      },
+
+      "test entering finals": function () {
+        TH.login();
+        assert.dom('#Event .Category', function () {
+          assert.dom('tr#Result_'+ v.result._id, function () {
+            TH.trigger('td:nth-child(3)', 'mousedown');
+          });
+          assert.dom('h1', 'Final - Start order');
+          assert.dom('tr#Result_'+ v.result._id, function () {
+            assert.dom('td:nth-child(3)>input[placeholder="n+"]');
+            assert.dom('td:nth-child(2)', function () {
+              TH.trigger(this, 'mousedown');
+            });
+          });
+          assert.dom('tr#Result_'+ v.result._id + '>td:nth-child(2)>input[placeholder="m:ss"]', function () {
+            assert.same(document.activeElement, this);
+            TH.change(this, "3.44");
+          });
+          assert.equals(v.result.$reload().time, 3*60+44);
         });
-        assert.equals(v.result.$reload().time, 3*60+44);
-      });
-    },
+      },
 
-    "test selecting heat": function () {
-      TH.login();
+      "test selecting heat": function () {
+        TH.login();
 
-      assert.dom('select[name=selectHeat]', function () {
-        assert.dom('option[selected]', {value: "-1", text: 'General'});
-        assert.dom('option:not([selected])', {value: "1", text: 'Qual 1'});
-        TH.change(this, "2");
-      });
-
-      assert.dom('h1', 'Qual 2 - Results');
-
-      assert.dom('.results>thead', 'Climber Result');
-      assert.dom('.results>tbody>tr:first-child>td', {count: 2});
-    },
-
-    "test selecting score": function () {
-      TH.login();
-      assert.dom('#Event .Category', function () {
-        assert.dom('tr#Result_'+ v.result._id,  function() {
-          TH.trigger('td:last-child', 'mousedown');
+        assert.dom('select[name=selectHeat]', function () {
+          assert.dom('option[selected]', {value: "-1", text: 'General'});
+          assert.dom('option:not([selected])', {value: "1", text: 'Qual 1'});
+          TH.change(this, "2");
         });
-      });
 
-      assert.dom('#Result_'+ v.result._id, function () {
-        assert.dom('td:last-child>input', function () {
-          TH.change(this, "23.5+");
+        assert.dom('h1', 'Qual 2 - Results');
+
+        assert.dom('.results>thead', 'Climber Result');
+        assert.dom('.results>tbody>tr:first-child>td', {count: 2});
+      },
+
+      "test selecting score": function () {
+        TH.login();
+        assert.dom('#Event .Category', function () {
+          assert.dom('tr#Result_'+ v.result._id,  function() {
+            TH.trigger('td:last-child', 'mousedown');
+          });
         });
-      });
 
-      assert.equals(v.result.$reload().scores, [0.1, 235005]);
+        assert.dom('#Result_'+ v.result._id, function () {
+          assert.dom('td:last-child>input', function () {
+            TH.change(this, "23.5+");
+          });
+        });
+
+        assert.equals(v.result.$reload().scores, [0.1, 235005]);
+      },
     },
   });
 })();
