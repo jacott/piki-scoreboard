@@ -82,7 +82,7 @@
       <h1>Apply to register as an Organization</h1>
       <ol>
         <li>Please read the <a href="#disclaimer">Disclaimer</a> and <a href="#general-info">General information</a> above.</li>
-        <li>Please <a target="_blank" href="mailto:piki@obeya.co?subject=Application%20to%20register%20as%20an%20Organization%20on%20Piki&body=Organization%20name:%20%0a%0aOrganization%20website:%20%0a%0aOrganization%20email%20address:%20%0a%0aName%20of%20person%20to%20be%20my%20Organization's%20Piki%20Admin:%20%0a%0aThe%20email%20address%20that%20person%20wishes%20to%20use%20to%20sign%20in:%20%0a%0aName%20and%20date%20of%20the%20first%20event%20where%20we%20would%20like%20to%20test%20Piki:%20%0a%0aHow%20we%20heard%20about%20Piki:%20%0a%0aAny%20further%20information:%20">apply to register as an Organization</a>.
+        <li>Please <a href="mailto:piki@obeya.co?subject=Application%20to%20register%20as%20an%20Organization%20on%20Piki&body=Organization%20name:%20%0a%0aOrganization%20website:%20%0a%0aOrganization%20email%20address:%20%0a%0aName%20of%20person%20to%20be%20my%20Organization's%20Piki%20Admin:%20%0a%0aThe%20email%20address%20that%20person%20wishes%20to%20use%20to%20sign%20in:%20%0a%0aName%20and%20date%20of%20the%20first%20event%20where%20we%20would%20like%20to%20test%20Piki:%20%0a%0aHow%20we%20heard%20about%20Piki:%20%0a%0aAny%20further%20information:%20">apply to register as an Organization</a>.
         </li>
       </ol>
     </section>
@@ -175,7 +175,7 @@
         <li>Edit the event’s name or date.</li>
       </ol>
     </section>
-    
+
     <section name="event-delete">
       <h1>Delete events</h1>
       <p>
@@ -277,7 +277,7 @@
         <li>Add and edit clubs.</li>
       </ol>
       <p>
-        <b>Note:</b> if your Organization will be uploading registrations from a file then the club name or code ("short name") used here must be the same as the club name or code used in the upload file. 
+        <b>Note:</b> if your Organization will be uploading registrations from a file then the club name or code ("short name") used here must be the same as the club name or code used in the upload file.
       </p>
     </section>
 
@@ -442,9 +442,9 @@
 
         <p>Enter "<tt>dnc</tt>" (did not climb) as the competitor's score for the heat(s) in which they did not climb.
         </p>
-        
+
         <h1>I don't understand how the rankings are calculated</h1>
-        
+
         <p>
           Piki calculates rankings as set out in the <a href="https://www.ifsc-climbing.org">IFSC</a> rules. If you wish to run a competition using a different scoring system to that set out in the IFSC rules, Piki is unlikely to meet your requirements.
         </p>

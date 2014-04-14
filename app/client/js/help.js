@@ -1,5 +1,6 @@
 var $ = Bart.current;
 var Tpl = Bart.Help;
+var clickCount = 0;
 
 Tpl.$helpers({
   contents: function () {
@@ -23,23 +24,27 @@ Tpl.$events({
 
   'click a': function (event) {
     var href = this.getAttribute('href') || '';
-    if (href[0] === '#' || href.match(/^https?:\/\//))
+    if (href.match(/:/))
       return;
 
     Bart.stopEvent();
+
+    if (href[0] === '#') {
+      scrollToTag(href.slice(1));
+      return;
+    }
+
     AppRoute.gotoPath(href);
   },
 });
 
 Tpl.$extend({
   $created: function (ctx, elm) {
+    clickCount = 0;
     document.addEventListener('click', clicked, true);
-    window.addEventListener('hashchange', scrollToTag);
   },
 
   $destroyed: function (ctx, elm) {
-    AppClient.getLocation().hash='';
-    window.removeEventListener('hashchange', scrollToTag);
     document.removeEventListener('click', clicked, true);
   },
 });
@@ -50,9 +55,7 @@ function clicked(event) {
     Meteor.defer(Bart.Dialog.close);
 }
 
-function scrollToTag() {
-  var tag = AppClient.getLocation().hash.slice(1);
-
+function scrollToTag(tag) {
   Bart.removeClass(document.querySelector('#Help section.current'), 'current');
 
   if (tag) {
