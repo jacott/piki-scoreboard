@@ -2,7 +2,7 @@
   <template name="ContentLine">
     <li><a class="link topics" href="{{tag}}">{{desc}}</a></li>
   </template>
-  <div id="Help">
+  <div id="Help" class="document">
     <button name="close">Close help</button>
     <h1>Piki Help</h1>
 

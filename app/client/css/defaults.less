@@ -104,14 +104,16 @@ th.sort {
   }
 }
 
-ol, ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-  &>li {
-    margin: 0;
+:not (.document) {
+  ol, ul {
+    list-style-type: none;
     padding: 0;
-  }
+    margin: 0;
+    &>li {
+      margin: 0;
+      padding: 0;
+    }
+}
 
 }
 
