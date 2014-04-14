@@ -1,6 +1,11 @@
 var $ = Bart.current;
 var Tpl = Bart.Climber;
 var Index = Tpl.Index;
+var sortField = 'name';
+var asc = 1;
+var sortFunc;
+
+setSortFunc();
 
 var elm;
 
@@ -16,11 +21,42 @@ Tpl.$extend({
 
 Index.$helpers({
   climbers: function (callback) {
-    callback.render({model: AppModel.Climber, sort: Apputil.compareByName});
+    callback.render({
+      model: AppModel.Climber,
+      sort: function (a, b) {
+        return sortFunc(a, b) * asc;
+      },
+    });
+  },
+
+  sortOrder: function () {
+    var parent = $.element.parentNode;
+    var ths = parent.getElementsByTagName('th');
+    for(var i = 0; i < ths.length; ++i) {
+      Bart.removeClass(ths[i], 'sort');
+      Bart.removeClass(ths[i], 'desc');
+    }
+
+    var elm = parent.querySelector('[data-sort="'+sortField+'"]');
+    Bart.addClass(elm, 'sort');
+    asc === -1 &&  Bart.addClass(elm, 'desc');
   },
 });
 
 Index.$events({
+  'click th': function (event) {
+    Bart.stopEvent();
+    var sort = this.getAttribute('data-sort');
+    if (sortField === sort)
+      asc = asc * -1;
+    else {
+      sortField = sort;
+      asc = 1;
+    }
+    setSortFunc();
+    $.ctx.updateAllTags();
+  },
+
   'click .climbers tr': function (event) {
     if (! Bart.hasClass(document.body, 'aAccess')) return;
     Bart.stopEvent();
@@ -89,4 +125,15 @@ base.addTemplate(Tpl.Edit, {
 function cancel(event) {
   Bart.stopEvent();
   AppRoute.history.back();
+}
+
+function setSortFunc() {
+  switch (sortField) {
+  case 'club':
+    return sortFunc = function (a, b) {
+      return Apputil.compareByName(a.club, b.club);
+    };
+  default:
+    return sortFunc = Apputil.compareByField(sortField);
+  }
 }

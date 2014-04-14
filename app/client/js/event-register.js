@@ -8,7 +8,12 @@ App.require('Bart.Event', function (Event) {
   var Groups = Tpl.Groups;
   var AddClimber = Tpl.AddClimber;
   var competitor;
+  var sortField = 'name';
+  var asc = 1;
+  var sortClimber = true;
+  var sortFunc;
 
+  setSortFunc();
 
   var base = Event.route.addBase(Tpl);
   base.addTemplate(Add, {
@@ -27,8 +32,22 @@ App.require('Bart.Event', function (Event) {
       callback.render({
         model: AppModel.Competitor,
         sort: function (a, b) {
-          return Apputil.compareByName(a.climber, b.climber);
-        }});
+          return (sortClimber ? sortFunc(a.climber, b.climber) : sortFunc(a, b)) * asc;
+        }
+      });
+    },
+
+    sortOrder: function () {
+      var parent = $.element.parentNode;
+      var ths = parent.getElementsByTagName('th');
+      for(var i = 0; i < ths.length; ++i) {
+        Bart.removeClass(ths[i], 'sort');
+        Bart.removeClass(ths[i], 'desc');
+      }
+
+      var elm = parent.querySelector('[data-sort="'+sortField+'"]');
+      Bart.addClass(elm, 'sort');
+      asc === -1 &&  Bart.addClass(elm, 'desc');
     },
   });
 
@@ -42,7 +61,39 @@ App.require('Bart.Event', function (Event) {
       Bart.stopEvent();
       AppRoute.replacePath(Tpl);
     },
+
+    'click th': function (event) {
+      Bart.stopEvent();
+      var sort = this.getAttribute('data-sort');
+      if (sortField === sort)
+        asc = asc * -1;
+      else {
+        sortField = sort;
+        asc = 1;
+      }
+      setSortFunc();
+      $.ctx.updateAllTags();
+    },
   });
+
+  function setSortFunc() {
+    sortClimber = true;
+    switch (sortField) {
+    case 'club':
+      return sortFunc = function (a, b) {
+        return Apputil.compareByName(a.club, b.club);
+      };
+    case 'cat':
+      sortClimber = false;
+      return sortFunc = Apputil.compareByField('category_ids');
+    case 'createdAt':
+      sortClimber = false;
+      return sortFunc = Apputil.compareByField('createdAt');
+    default:
+      return sortFunc = Apputil.compareByField(sortField);
+    }
+  }
+
 
   Tpl.$extend({
     onBaseEntry: function (page, pageRoute) {

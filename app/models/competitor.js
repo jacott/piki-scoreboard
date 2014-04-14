@@ -6,6 +6,7 @@ App.require('AppModel.Event', function () {
     event_id: 'belongs_to',
     climber_id: 'belongs_to',
     category_ids: 'has_many',
+    createdAt: 'timestamp',
   });
 
   model.addRemoveRpc();

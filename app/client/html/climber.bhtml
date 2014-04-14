@@ -15,11 +15,12 @@
         <table class="select">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>DOB</th>
-              <th>m/f</th>
-              <th>Number</th>
-              <th>Club</th>
+              <th data-sort="name">Name</th>
+              <th data-sort="dateOfBirth">DOB</th>
+              <th data-sort="gender">m/f</th>
+              <th data-sort="number">Number</th>
+              <th data-sort="club">Club</th>
+              {{sortOrder}}
             </tr>
           </thead>
           <tbody>

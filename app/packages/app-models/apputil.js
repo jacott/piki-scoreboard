@@ -159,13 +159,24 @@ Apputil = {
   },
 
   compareByName: function (a, b) {
-    return a.name === b.name ? 0 : a.name < b.name ? -1 : 1;
+    var afield = a.name, bfield = b.name;
+    if (afield == bfield) return 0;
+    if (! afield) return -1;
+    if (! bfield) return 1;
+    return afield.toLowerCase() < bfield.toLowerCase() ? -1 : 1;
   },
 
   compareByField: function (field) {
     return function (a, b) {
       var afield = a[field], bfield = b[field];
-      return a[field] === b[field] ? 0 : a[field] < b[field] ? -1 : 1;
+      if (afield == bfield) return 0;
+      if (! afield) return -1;
+      if (! bfield) return 1;
+      if (typeof afield === 'string')
+        afield = afield.toLowerCase();
+      if (typeof bfield === 'string')
+        bfield = bfield.toLowerCase();
+      return afield < bfield ? -1 : 1;
     };
   },
 

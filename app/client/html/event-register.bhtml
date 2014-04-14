@@ -21,7 +21,7 @@
     <template name="Edit">
       <form class="edit">
         <fieldset class="actions">
-          <button type="submit">Change Categories</button>
+          <button type="submit">Save</button>
           <button name="delete">Deregister</button>
           <button name="cancel">Cancel</button>
         </fieldset>
@@ -62,11 +62,14 @@
 
     <table class="select">
       <thead><tr>
-          <th>Competitor</th>
-          <th>DOB</th>
-          <th>M/F</th>
-          <th>Club</th>
-          <th>Number</th><th>Categories</th>
+          <th data-sort="name">Competitor</th>
+          <th data-sort="dateOfBirth">DOB</th>
+          <th data-sort="gender">M/F</th>
+          <th data-sort="club">Club</th>
+          <th data-sort="number">Number</th>
+          <th data-sort="createdAt">Reg. Date</th>
+          <th data-sort="cat">Categories</th>
+          {{sortOrder}}
       </tr></thead>
       <tbody>
         {{each "competitors" template="Row"}}
@@ -77,6 +80,7 @@
             <td>{{climber.gender}}</td>
             <td><abbr title="{{climber.club.name}}">{{climber.club.shortName}}</abbr></td>
             <td>{{climber.number}}</td>
+            <td>{{date createdAt}}</td>
             <td>{{categories}}</td>
           </tr>
         </template>

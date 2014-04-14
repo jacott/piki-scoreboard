@@ -1,4 +1,5 @@
 @import "global.lessimport";
+@import "icon-font-codes.lessimport";
 
 @-moz-keyframes spin {
   0% {
@@ -79,6 +80,17 @@ textarea, input, select {
 
 table {
   border-collapse: collapse;
+}
+
+th.sort {
+  .user-select(none);
+  &:after {
+    .inline-icon(@icon-arrow-down);
+    margin-left: 4px;
+  }
+  &.desc:after {
+    .inline-icon(@icon-arrow-up);
+  }
 }
 
 .body>div {

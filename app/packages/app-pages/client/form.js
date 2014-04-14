@@ -339,6 +339,11 @@ Bart.registerHelpers({
     });
   },
 
+  date: function (date) {
+    if (date)
+      return date.getFullYear()+'-'+twoDigit(date.getMonth())+'-'+twoDigit(date.getDate());
+  },
+
   genderList: function () {
     return [['', ''], ["m", "Male"], ["f", "Female"]];
   },
@@ -363,6 +368,10 @@ Tpl.OnOff.$events({
     data.doc[data.name] = ! data.doc[data.name];
   },
 });
+
+function twoDigit(d) {
+  return d < 10 ? '0'+d : d;
+}
 
 function helpers(name, funcs) {
   Tpl[name].$helpers(App.reverseExtend(funcs, DEFAULT_HELPERS));
