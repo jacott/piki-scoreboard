@@ -28,11 +28,15 @@
 
       App.rpc._private.setCount(1);
 
-      assert.same(window.addEventListener.args[0][1](), "You have unsaved changes.");
+      window.addEventListener.yield(v.ev = {});
+
+      assert.same(v.ev.returnValue, "You have unsaved changes.");
 
       App.rpc._private.setCount(0);
 
-      assert.same(window.addEventListener.args[0][1](), undefined);
+      window.addEventListener.yield(v.ev = {});
+
+      assert.same(v.ev.returnValue, undefined);
     },
   });
 })();
