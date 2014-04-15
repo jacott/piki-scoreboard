@@ -12,7 +12,7 @@ App.require('Bart.Event', function (Event) {
     data: function (page,pageRoute) {
       if (! Event.event) AppRoute.abortPage();
       var params = AppRoute.searchParams(pageRoute);
-      return {showingResults: params.type !== 'startlists', category_id: pageRoute.append, heatNumber: +(params.heat || -1)};
+      return {showingResults: params.type === 'results', category_id: pageRoute.append, heatNumber: +(params.heat || -1)};
     }
   });
 
@@ -82,8 +82,8 @@ App.require('Bart.Event', function (Event) {
           this.canInput = ! value && Bart.hasClass(document.body, 'jAccess');
           return value;
         },
-        canInput: false,
       });
+      data.showingResults = showingResults; // set canInput
 
       Bart.autoUpdate(ctx, {
         subject: data.category,
@@ -154,8 +154,9 @@ App.require('Bart.Event', function (Event) {
         var oldFocus = focusField;
         focusField = nextField(document.activeElement, event.shiftKey ? -1 : 1);
 
-        if (! saveScore(event.target)) {
-          if (oldFocus.id === focusField.id) {
+        var res  = saveScore(event.target);
+        if (! res) {
+          if (res === null && oldFocus.id === focusField.id) {
             return;
           }
 
@@ -396,7 +397,7 @@ App.require('Bart.Event', function (Event) {
     var ctx = Bart.getCtx(elm);
     var heat = Tpl.$ctx(ctx).data.heat;
     var data = ctx.data;
-    if (elm.className === 'score') {
+    if (Bart.hasClass(elm, 'score')) {
       var number = heat.scoreToNumber(elm.value, data.heat);
 
       if (number !== false) {
@@ -412,11 +413,13 @@ App.require('Bart.Event', function (Event) {
     var parent = elm.parentNode;
     var top = +(parent.querySelector('input.top').value || 0);
     var bonus = +(parent.querySelector('input.bonus').value || 0);
-    if (top && ! bonus) return null;
-    if (! top || (bonus && bonus <= top)) {
-      Bart.removeClass(parent, 'error');
-      data.result.setBoulderScore(data.heat.number, +elm.getAttribute('tabIndex'), bonus, top);
-      return true;
+    if (top === top && bonus === bonus) {
+      if (top && ! bonus) return null;
+      if (! top || (bonus && bonus <= top)) {
+        Bart.removeClass(parent, 'error');
+        data.result.setBoulderScore(data.heat.number, +elm.getAttribute('tabIndex'), bonus, top);
+        return true;
+      }
     }
     Bart.addClass(parent, 'error');
     return false;
@@ -426,7 +429,7 @@ App.require('Bart.Event', function (Event) {
     focusField = {
       id: Bart.getClosest(input, 'tr').id,
       tabIndex: +input.getAttribute('tabIndex'),
-      name: input.className,
+      name: input.className.replace(/ .*$/, ''),
     };
   };
 
@@ -438,7 +441,7 @@ App.require('Bart.Event', function (Event) {
     if (Bart.hasClass(row, 'BoulderScore')) {
       row = row.parentNode;
 
-      var name = elm.className === 'top' ? 'bonus' : 'top';
+      var name = Bart.hasClass(elm, 'top') ? 'bonus' : 'top';
       if (direction > 0 && name === 'top')
         row = row.nextElementSibling;
       else if (direction < 0 && name === 'bonus')
