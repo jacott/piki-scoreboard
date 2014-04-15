@@ -10,9 +10,9 @@ Tpl.$extend({
       Bart.setClass('show', show, spinner);
     });
 
-    window.addEventListener('beforeunload', function () {
+    window.addEventListener('beforeunload', function (ev) {
       if (App.rpc.count > 0)
-        return "You have unsaved changes.";
+        ev.returnValue = "You have unsaved changes.";
     });
   },
 });
