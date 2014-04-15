@@ -59,7 +59,7 @@ function scrollToTag(tag) {
   Bart.removeClass(document.querySelector('#Help section.current'), 'current');
 
   if (tag) {
-    var elm = document.querySelector('#Help section[name="'+ tag + '"]');
+    var elm = document.querySelector('#Help [name="'+ tag + '"]');
     Bart.addClass(elm, 'current');
     elm.scrollIntoView(true);
   } else {
