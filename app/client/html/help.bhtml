@@ -2,6 +2,7 @@
   <template name="ContentLine">
     <li><a class="link topics" href="{{tag}}">{{desc}}</a></li>
   </template>
+  
   <div id="Help">
     <button name="close">Close help</button>
     <h1>Piki Help</h1>
@@ -53,7 +54,7 @@
         </li>
         <li>Piki is developed and tested only for use with the <a href="https://www.google.com/intl/en/chrome/browser/">Google Chrome web browser</a>. Piki may or may not work with other web browsers.</li>
         <li>Piki is currently available as a web application, requiring hosting.</li>
-        <li>It is the developers' intention to release <i>Piki</i> under the <a href="http://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public Licence</a> in 2015, making the system available at <a href="https://github.com/">GitHub</a>.</li>
+        <li>It is the developers' intention to release Piki under the <a href="http://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public Licence</a> in 2015, making the system available at <a href="https://github.com/">GitHub</a>.</li>
         <li>Piki is designed for use managing results in climbing competitions run according to the <a href="https://www.ifsc-climbing.org">IFSC</a> rules. There is some flexibility, such as the ability to set the quota of competitors for each round after the qualification round, and the ability to set the number of boulders for each round in a Boulder competition. But Piki is unlikely to meet the requirements of competitions using scoring systems different to that set out in the IFSC rules.</li>
       </ul>
     </section>
@@ -70,12 +71,12 @@
           the Organization’s Piki home page.</li>
         <li>Click <i>Events</i> in the main menu.</li>
         <li>Check that the relevant event is highlighted; if not, click on the event.</li>
-        <li>Click <i>Results</i> in the main menu.</li>
-        <li>Browse results and start lists.</li>
+        <li>Click <i>Results</i> or <i>Start lists</i> in the main menu.</li>
+        <li>Browse results and start lists.<br>
+          Or, select categories to print. <b>Note:</b> only categories consisting of the same number of qualification and final heats can be selected together; categories consisting of different numbers of qualification and final heats must be selected and printed separately.<br>
+          Alternatively, from the page showing a specific category result or start list, use your browser's commands or menus to print.
+        </li>
       </ol>
-      <p>
-        To print a start list or results list, use your browser’s
-        commands or menus to print.
     </section>
 
     <section name="org-reg">
@@ -127,7 +128,7 @@
     </section>
 
     <section name="user-edit">
-      <h1>Edit and remove Users</h1>
+      <h1>Edit and delete Users</h1>
       <p>
         Including changing a User's email address.
       <p>
@@ -141,7 +142,7 @@
         <li>Click <i>System setup</i>.</li>
         <li>Select the User's name.</li>
         <li>Edit the User's details and click <i>Save</i>.<br>
-          Or, to remove the User: click <i>Delete</i> and confirm in the pop-up box.</li>
+          Or, to delete the User: click <i>Delete</i> and confirm in the pop-up box.</li>
       </ol>
     </section>
 
@@ -161,7 +162,8 @@
     </section>
 
     <section name="event-edit">
-      <h1>Edit an event’s name or date</h1>
+      <h1>Edit and remove events</h1>
+      <p>Including editing the heat format of competitor categories for an event.
       <p>
         Organization Admins only.
       </p>
@@ -172,24 +174,9 @@
         <li>Click <i>Events</i> in the main menu.</li>
         <li>Check that the event to be edited is highlighted; if not, click on the event.</li>
         <li>Click <i>Edit event</i> in the main menu.</li>
-        <li>Edit the event’s name or date.</li>
-      </ol>
-    </section>
-    
-    <section name="event-delete">
-      <h1>Delete events</h1>
-      <p>
-        Organization Admins only.
-      </p>
-      <p>
-        You must be signed in.
-      </p>
-      <ol>
-        <li>Click <i>Events</i> in the main menu.</li>
-        <li>Check that the event to be edited is highlighted; if not, click on the event.</li>
-        <li>Click <i>Edit event</i> in the main menu.</li>
-        <li>Click <i>Delete</i>.</li>
-        <li>Confirm in the pop-up box.</li>
+        <li>Edit the event’s name or date or the <a href="#heat-format">heat format</a> of any of the categories, and click <i>Save</i> to confirm. <b>Note:</b> only categories in which a competitor has been registered will show in the list for editing.<br>
+          Or, to delete the event, click <i>Delete</i> and confirm in the pop-up box.
+        </li>
       </ol>
     </section>
 
@@ -205,20 +192,20 @@
         <li>Click <i>Competitor categories</i> in the main menu.</li>
         <li>Click <i>Add new category</i>.<br>
           Or, to edit an existing category, select the category from the list.<br>
-          <b>Note:</b> editing an existing category will change that category for all events in which it is used, past, present and future.<br>
+          <b>Note:</b> editing an existing category will change that category only for events not yet created. To edit a category for an existing event, <a href="#event-edit">go to the <i>Edit event</i> page</a> for that event.<br>
           Instructions:<br>
-          <ol>
-            <li>Enter the category name, e.g. <i>Female Youth A Lead</i>.</li>
-            <li>Enter the category code ("short name"), e.g. <i>FYAL</i>. If your Organization will be uploading registrations from a file then the category code used here must be the same as the category code used in the upload file.</li>
-            <li>Enter the group name, e.g. <i>Youth Lead</i>. Where a climber may compete in more than one category at an event, those categories must be allocated to separate Groups. For example, if climbers may compete in a Lead category and a Boulder category, then you might choose to have two Groups: <i>Lead</i> and <i>Boulder</i>. If some competitors are permitted to enter a Youth category and an Open category (in both Lead and Boulder), then you might have four Groups: <i>Youth Lead</i>, <i>Youth Boulder</i>, <i>Open Lead</i> and <i>Open Boulder</i>.</li>
+          <ol class="a">
+            <li>Enter the <b>category name</b>, e.g. <i>Female Youth A Lead</i>.</li>
+            <li>Enter the <b>category code</b> ("short name"), e.g. <i>FYAL</i>. If your Organization will be uploading registrations from a file then the category code used here must be the same as the category code used in the upload file.</li>
+            <li>Enter the <b>group</b> name, e.g. <i>Youth Lead</i>. Where a climber may compete in more than one category at an event, those categories must be allocated to separate Groups. For example, if climbers may compete in a Lead category and a Boulder category, then you might choose to have two Groups: <i>Lead</i> and <i>Boulder</i>. If some competitors are permitted to enter a Youth category and an Open category (in both Lead and Boulder), then you might have four Groups: <i>Youth Lead</i>, <i>Youth Boulder</i>, <i>Open Lead</i> and <i>Open Boulder</i>.</li>
             <li>Select the <i>Type</i> from the dropdown menu.</li>
-            <li>Enter the Heat format:
+            <li><a id="heat-format">Enter the <b>Heat format</b></a>:
               <ul>
                 <li>
-                  For Lead categories, enter:
+                  For <b>Lead categories</b>, enter:
                   <ul>
-                    <li>“Q” for every qualification heat, followed by</li>
-                    <li>“Fn” for every restricted heat, where n = the number of competitors in the heat.</li>
+                    <li>“<b>Q</b>” for every qualification heat, followed by</li>
+                    <li>“<b>Fn</b>” for every restricted heat, where n = the number of competitors in the heat.</li>
                   </ul>
                   For example, for a competition with:
                   <ul>
@@ -229,10 +216,10 @@
                   Enter “QQF26F8”.
                 </li>
                 <li>
-                  For Boulder categories, enter:
+                  For <b>Boulder categories</b>, enter:
                   <ul>
-                    <li>“Q:b” for every qualification heat, where b = the number of boulders in the course for that heat, followed by</li>
-                    <li>“Fn:b” for every restricted heat, where n = the quota of competitors qualifying for the round, and b = the number of boulders in the course for that heat.</li>
+                    <li>“<b>Q:b</b>” for every qualification heat, where b = the number of boulders in the course for that heat, followed by</li>
+                    <li>“<b>Fn:b</b>” for every restricted heat, where n = the quota of competitors qualifying for the round, and b = the number of boulders in the course for that heat.</li>
                   </ul>
                   For example, for a competition with:
                   <ul>
@@ -244,22 +231,6 @@
                 </li>
               </ul>
           </ol>
-          <p>
-            To change the heat format for a specific
-            instance of a category, that is, change the heat format for a
-            category for one event, without changing the heat format for that
-            category for all past, current and future events:
-            <ol>
-              <li>Go to the event's main <i>Results page</i>:
-                <ol>
-                  <li>Click <i>Events</i> in the main menu.</li>
-                  <li>Select the desired event from the list.</li>
-                </ol>
-              <li>Click the heat format you wish to change.</li>
-              <li>Enter the new heat format.</li>
-              <li>Press <i>Enter</i> to confirm the change.</li>
-            </ol>
-          </p>
         </li>
       </ol>
     </section>
@@ -372,6 +343,23 @@
         <li>Change the competitor's registration, or deregister the competitor.</li>
       </ol>
     </section>
+    
+    <section name="comp-number">
+      <h1>Designate or change a competitor number</h1>
+       <p>
+        Organization Admins only.
+      </p>
+      <p>
+        You must be signed in.
+      </p>
+      <ol>
+        <li><a href="#climbers">Go to your Organization's <i>Climbers</i> list</a>, or <a href="#reg-change">go to the <i>Registrations</i> page</a> for an event in which the competitor is registered.</li>
+        <li>Select the climber from the list.</li>
+        <li>Enter the competitor number in the cell provided.</li>
+        <li>Click <i>Save</i> to confirm.</li>
+      </ol>     
+      
+    </section>
 
     <section name="results">
       <h1>Enter and edit results</h1>
@@ -384,63 +372,90 @@
       <ol>
         <li>Click <i>Events</i> in the main menu.</li>
         <li>Check that the relevant event is highlighted; if not, click on the event.</li>
-        <li>Click <i>Results</i> in the main menu.</li>
-        <li>Click on the relevant category.</li>
-        <li>Select the relevant heat from the dropdown menu at the top right of the page.</li>
-        <li>Use the button near the top
-          right of the page to <i>Show start order</i> or <i>Show
-            results</i>. There is no <i>Start order</i> option for <i>General results</i>.</li>
-        <li>To enter or edit results, click on the relevant cell in the
-          table and begin to type the result. If in <i>Results</i>
-          view, the screen will automatically switch to <i>Start order</i>
-          view of the heat being edited so that competitors are listed in
-          the order in which they climbed.<br>
-          Press <i>Tab</i> to save the score entered and move to the next cell.<br>
-          To save the score entered, it is necessary to press <i>Tab</i> or <i>Enter</i> or click outside the cell.<br>
-          Lead scores permitted:
+        <li>Click <i>Start lists</i> in the main menu.</li>
+        <li>To go to the start list for the desired heat:<br>
+          Click on the desired heat, or if the desired heat is not displayed, click on the relevant category and then select the desired heat from the dropdown menu at the top right of the page.<br>
+          Alternatively, if you are on the <i>Results</i> page for the desired heat, clicking <i>Show start order</i> at the top right of the page, or clicking in one of the <i>score</i> cells for the heat, will take you to the start list.
+        </li>
+        <li>Click in the desired cell in the
+          table and type the score.</li>
+        <li>
+          To save scores entered and move from cell to cell:
           <ul>
-            <li><tt>n</tt> (e.g. 23)</li>
-            <li><tt>n+</tt> (e.g. 23+)</li>
-            <li><tt>t</tt> (top)</li>
-            <li><tt>dnc</tt> (did not climb)</li>
+            <li>Press <i>Tab</i> to save the score entered and move to the next cell.</li>
+            <li>To save the score entered, it is necessary to press <i>Tab</i> or <i>Enter</i> or click outside the cell.</li>
+          </ul>
+        </li>
+      </ol>
+      
+      <p>
+        <b>Lead scores permitted:</b>
+          <ul>
+            <li><tt><b>n</b></tt> (e.g. 23)</li>
+            <li><tt><b>n+</b></tt> (e.g. 23+)</li>
+            <li><tt><b>t</b></tt> (indicates "top")</li>
+            <li><tt><b>dnc</b></tt> (indicates "did not climb")</li>
           </ul>
           To record time taken in a Lead Final (to use in scoring in case
           of a tie after countback), enter the time taken in the format:
           <ul>
-            <li><tt>m:ss (e.g. 7:33)</li>
+            <li><tt><b>m:ss</b> (e.g. 7:33)</li>
           </ul>
-          Boulder scores permitted:
-          <ul>
-            <li><tt>nta nba</tt> (n = the number of tops or bonus holds achieved; a
-              = the number of attempts taken to achieve those tops or
-              bonus holds;<br> e.g. 2t5 3b4 is a score indicating 2 tops
-              achieved in 5 attempts and 3 bonus holds achieved in 4
-              attempts)</li>
-            <li><tt>0t nba</tt> (no tops achieved)</li>
-            <li><tt>0t 0b</tt> (no tops or bonus holds achieved)</li>
-            <li><tt>dnc</tt> (did not climb)</li>
-          </ul>
-        </li>
-      </ol>
+      </p>
       <p>
-        Coming soon:<br>
-        Enter bouldering scores for each individual boulder. Piki will add each competitor's scores for all of the boulders in a heat together and display the total score for the heat as well as a breakdown by boulder.
+        <b>Boulder scores:</b><br>
+        Beside each competitor's name, in the <i>Result</i> column, is a box for each boulder in the course.
+        <ul>
+          <li>Enter the <b>number of attempts to top</b> (the number of attempts it took the competitor to achieve the top) in the cell in the <b>top left</b> corner of the box.</li>
+          <li>Enter the <b>number of attempts to bonus</b> (the number of attempts it took the competitor to achieve the bonus) in the cell in the <b>lower right</b> corner of the box.</li>
+          <li>If the climber did not climb or did not achieve a given top or bonus, enter nothing in the relevant cell.</li>
+        </ul>
+        <b>Note:</b> If a figure for attempts to bonus is entered which is greater than the attempts to top, the score will not be saved and the cell will be highlighted to indicate an invalid score, because it is not possible for a competitor to take more attempts to achieve the bonus than to achieve the top.<br>
+        <b>Piki totals the boulder scores entered and displays the sum</b> in the format:
+        <ul>
+          <li><tt>nta nba</tt> (n = the number of tops or bonus holds achieved; a
+            = the number of attempts taken to achieve those tops or
+            bonus holds;<br> e.g. 2t5 3b4 is a score indicating 2 tops
+            achieved in 5 attempts and 3 bonus holds achieved in 4
+            attempts)</li>
+          <li><tt>0t nba</tt> (no tops achieved)</li>
+          <li><tt>0t 0b</tt> (no tops or bonus holds achieved)</li>
+        </ul>
+      </p>
     </section>
 
     <section name="trouble-shooting">
       <h1>Trouble shooting</h1>
 
       <section>
+        <h1>I can't see a menu item or page I'm looking for</h1>
+        <p>Ensure you are signed in with the appropriate access status:
+          Admin or Judge.
+        </p>
+        
         <h1>I can't make changes</h1>
         <p>Ensure you are signed in with the appropriate access status:
           Admin or Judge.
+        </p>
+        
+        <h1>I can't select all of the categories I want to print</h1>
+        <p>Only categories consisting of the same number of qualification and final heats can be selected together; categories consisting of different numbers of qualification and final heats must be selected and printed separately.
         </p>
 
         <h1>A competitor did not climb in a qualification heat, and I
           would like their qualification rank to be displayed in the
           results</h1>
 
-        <p>Enter "<tt>dnc</tt>" (did not climb) as the competitor's score for the heat(s) in which they did not climb.
+        <p><b>Lead</b><br>
+          Enter "<tt>dnc</tt>" (did not climb) as the competitor's score for the heat(s) in which they did not climb.
+        </p>
+        
+        <p><b>Bouldering</b><br>
+          Enter a score of "0t 0b":
+          <ol>
+            <li>Click in a cell for entering a score for the climber.</li>
+            <li>To save the score as zero, it is necessary to press <i>Tab</i> or <i>Enter</i>.</li>
+          </ol>
         </p>
         
         <h1>I don't understand how the rankings are calculated</h1>
