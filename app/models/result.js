@@ -55,7 +55,10 @@ App.require('AppModel.Competitor', function (Competitor) {
 
     setBoulderScore: function (id, index, problem, bonus, top) {
       check(id, String);
-      check([index, problem, bonus, top], [Number]);
+      if (bonus === "dnc" || bonus == null)
+        check([index, problem], [Number]);
+      else
+        check([index, problem, bonus, top], [Number]);
 
       var user = AppModel.User.findOne(this.userId);
       var result = AppModel.Result.findOne(id);
@@ -66,29 +69,42 @@ App.require('AppModel.Competitor', function (Competitor) {
       var heat = new AppModel.Heat(index, event.heats[result.category_id]);
 
       --problem;
-
-      if (top && bonus > top) {
-        top = bonus;
-      } else if (! bonus && top) {
-        bonus = top;
-      }
-
-      AppVal.allowAccessIf(heat.type === 'B' && top < 100 && bonus < 100 && index >=0 && index <= heat.total &&
-                           (top === 0 || top >= bonus) && (bonus !== 0 || top === 0) &&
-                           problem >= 0 && problem < heat.problems );
-
       var changes = {};
 
       var problems = result.problems || {};
       var round = problems[index-1] || [];
 
-      round[problem] = bonus+top*100;
+      AppVal.allowAccessIf(heat.type === 'B'  &&
+                           index >=0 && index <= heat.total &&
+                           problem >= 0 && problem < heat.problems );
 
-      var b = 0, ba = 0, t = 0, ta = 0, score;
+      if (typeof bonus === "number") {
+        if (top && bonus > top) {
+          top = bonus;
+        } else if (! bonus && top) {
+          bonus = top;
+        }
 
+        AppVal.allowAccessIf(top < 100 && bonus < 100 &&
+                             (top === 0 || top >= bonus) &&
+                             (bonus !== 0 || top === 0));
+
+        round[problem] = bonus+top*100;
+      } else {
+        round[problem] = bonus === "dnc" ? -1 : null;
+      }
+
+      var b = null, ba = 0, t = 0, ta = 0, score;
+      var dnc = null;
       for(var i = 0; i < round.length; ++i) {
         var row = round[i];
-        if (row) {
+        if (row === -1 && dnc === null)
+          dnc = "dnc";
+        else if (row === 0) {
+          if (b == null) b = 0;
+          dnc = false;
+        } else if (row > 0) {
+          dnc = false;
           if (score = row % 100) {
             ba += score;
             ++b;
@@ -101,7 +117,7 @@ App.require('AppModel.Competitor', function (Competitor) {
       }
 
       changes['problems.' + (index-1)] = round;
-      changes['scores.' + index] = heat.boulderScoreToNumber(b, ba, t, ta);
+      changes['scores.' + index] = dnc === "dnc" ? -1 : heat.boulderScoreToNumber(b, ba, t, ta);
 
       model.fencedUpdate(id, {$set: changes});
     },

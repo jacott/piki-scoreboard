@@ -41,21 +41,45 @@
       refute.msg('should not update').called(App.rpc);
     },
 
-    "test setBoulderScore": function () {
-      TH.login();
-      var category = TH.Factory.createCategory({type: 'B'});
-      var result = TH.Factory.createResult({scores: [1]});
+    "setBoulderScore": {
+      setUp: function () {
+        TH.login();
+        TH.Factory.createCategory({type: 'B'});
+        v.result = TH.Factory.createResult({scores: [1]});
 
-      test.spy(App, 'rpc');
+        test.spy(App, 'rpc');
+      },
 
-      result.setBoulderScore(1, 2, 3, 4);
+      "test dnc": function () {
+        v.result.setBoulderScore(1, 2, "dnc");
+        assert.calledWith(App.rpc, 'Result.setBoulderScore', v.result._id, 1, 2, "dnc");
 
-      assert.calledWith(App.rpc, 'Result.setBoulderScore', result._id, 1, 2, 3, 4);
+         App.rpc.reset();
 
-      App.rpc.reset();
+        v.result.$reload().setBoulderScore(1, 2, "dnc"); // setting again
+        refute.msg('should not update').called(App.rpc);
+      },
 
-      result.$reload().setBoulderScore(1, 2, 3, 4); // setting again
-      refute.msg('should not update').called(App.rpc);
+      "test clear": function () {
+        v.result.setBoulderScore(1, 2);
+        assert.calledWith(App.rpc, 'Result.setBoulderScore', v.result._id, 1);
+
+        App.rpc.reset();
+
+        v.result.$reload().setBoulderScore(1, 2); // setting again
+        refute.msg('should not update').called(App.rpc);
+      },
+
+      "test set attempts": function () {
+        v.result.setBoulderScore(1, 2, 3, 4);
+
+        assert.calledWith(App.rpc, 'Result.setBoulderScore', v.result._id, 1, 2, 3, 4);
+
+        App.rpc.reset();
+
+        v.result.$reload().setBoulderScore(1, 2, 3, 4); // setting again
+        refute.msg('should not update').called(App.rpc);
+      },
     },
 
     "test index": function () {

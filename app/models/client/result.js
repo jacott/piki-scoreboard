@@ -13,7 +13,7 @@ App.require('AppModel.Result', function (model) {
     setBoulderScore: function (index, problem, bonus, top) {
       if (this.problems) {
         var round = this.problems[index-1];
-        if (round && round[problem-1] === bonus+top*100)
+        if (round && round[problem-1] === (bonus === "dnc" ? -1 : bonus === undefined ? null : bonus+top*100))
           return;
       }
       App.rpc('Result.setBoulderScore', this._id, index, problem, bonus, top);

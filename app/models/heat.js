@@ -108,7 +108,7 @@ Heat.prototype = {
       return m ? (m[1]||0)*60 + +m[2] : false;
     }
 
-    if (score.match(/^\s*dnc/i)) {
+    if (score.match(/^\s*d?nc/i)) {
       return -1;
     }
 
@@ -139,6 +139,7 @@ Heat.prototype = {
   },
 
   boulderScoreToNumber: function (b, ba, t, ta) {
+    if (b == null) return null;
     return t*1000000 + (99-ta)*10000 + b*100 + (99 - ba);
   },
 

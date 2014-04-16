@@ -326,11 +326,21 @@ App.require('Bart.Event', function (Event) {
 
       var frag = document.createDocumentFragment();
       for(var i = 0; i < len; ++i) {
-        var prob = problems[i] || 0;
+        var prob = problems[i];
         var elm = document.createElement('div');
-        if (prob > 0) elm.className = prob >= 100 ? 'top' : 'bonus';
-        elm.appendChild(createAttempts('top', Math.floor(prob / 100), i, canInput));
-        elm.appendChild(createAttempts('bonus', prob % 100, i, canInput));
+        if (prob === -1) {
+          elm.className = "dnc";
+          elm.appendChild(createAttempts('top', "nc", i, canInput));
+          elm.appendChild(createAttempts('bonus', "", i, canInput));
+        } else if (prob == null) {
+          elm.appendChild(createAttempts('top', "", i, canInput));
+          elm.appendChild(createAttempts('bonus', "", i, canInput));
+        } else {
+          if (prob > 0) elm.className = prob >= 100 ? 'top' : 'bonus';
+          else elm.className = "ns";
+          elm.appendChild(createAttempts('top', Math.floor(prob / 100), i, canInput));
+          elm.appendChild(createAttempts('bonus', (prob % 100) || "-", i, canInput));
+        }
         frag.appendChild(elm);
       }
       return frag;
@@ -411,13 +421,28 @@ App.require('Bart.Event', function (Event) {
     }
 
     var parent = elm.parentNode;
-    var top = +(parent.querySelector('input.top').value || 0);
-    var bonus = +(parent.querySelector('input.bonus').value || 0);
-    if (top === top && bonus === bonus) {
+    var top = parent.querySelector('input.top');
+    var onTop = top === elm;
+    top = top.value.trim();
+    var bonus = parent.querySelector('input.bonus').value.trim();
+    if (top === "-") top = "0";
+    if (bonus === "-") bonus = "0";
+    var tabIndex = +elm.getAttribute('tabIndex');
+    if (! top && ! bonus) {
+      data.result.setBoulderScore(data.heat.number, tabIndex);
+      return true;
+    }
+    if (top.match(/nc/i) || bonus.match(/nc/i)) {
+      data.result.setBoulderScore(data.heat.number, tabIndex, "dnc");
+      return true;
+    }
+    top = +(top || 0);
+    bonus = +(bonus || 0);
+    if (! isNaN(top) && ! isNaN(bonus) && top >=0 && bonus >= 0) {
       if (top && ! bonus) return null;
       if (! top || (bonus && bonus <= top)) {
         Bart.removeClass(parent, 'error');
-        data.result.setBoulderScore(data.heat.number, +elm.getAttribute('tabIndex'), bonus, top);
+        data.result.setBoulderScore(data.heat.number, tabIndex, bonus, top);
         return true;
       }
     }

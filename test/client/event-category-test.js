@@ -162,7 +162,7 @@
                 assert.dom('>.top .top', '3');
                 assert.dom('>.top .bonus', '2');
 
-                assert.dom('>:not(.bonus):not(.top):nth-child(2)', '');
+                assert.dom('>:not(.bonus):not(.top):nth-child(2)', '-');
 
                 assert.dom('>.bonus:nth-child(3)>.bonus', '1');
                 assert.dom('>.bonus:nth-child(3)>.top', '');

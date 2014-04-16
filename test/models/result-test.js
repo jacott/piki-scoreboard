@@ -133,7 +133,41 @@
         assert.equals(v.result.$reload().scores, [1, 1960196]);
       },
 
-      "test updates": function () {
+      "test dnc": function () {
+        test.spy(Meteor.isServer ? global : window, 'check');
+
+        TH.call("Result.setBoulderScore", v.result._id, 1, 2, "dnc");
+
+        assert.calledWith(check, [1, 2], [Number]);
+        assert.calledWith(check, v.result._id, String);
+
+        assert.equals(v.result.$reload().scores, [1, -1]);
+        assert.equals(v.result.problems[0][1], -1);
+
+        TH.call("Result.setBoulderScore", v.result._id, 1, 1, 0, 0);
+
+        assert.equals(v.result.$reload().scores, [1, 990099]);
+        assert.equals(v.result.problems[0], [0, -1]);
+      },
+
+      "test clear": function () {
+        test.spy(Meteor.isServer ? global : window, 'check');
+
+        TH.call("Result.setBoulderScore", v.result._id, 1, 2);
+
+        assert.calledWith(check, [1, 2], [Number]);
+        assert.calledWith(check, v.result._id, String);
+
+        assert.equals(v.result.$reload().scores, [1, null]);
+        assert.equals(v.result.problems[0][1], null);
+
+        TH.call("Result.setBoulderScore", v.result._id, 1, 1);
+
+        assert.equals(v.result.$reload().scores, [1, null]);
+        assert.equals(v.result.problems[0], [null, null]);
+      },
+
+      "test update attempts": function () {
         test.spy(Meteor.isServer ? global : window, 'check');
 
         TH.call("Result.setBoulderScore", v.result._id, 1, 2, 3, 4);
