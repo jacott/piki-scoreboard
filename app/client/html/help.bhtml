@@ -61,18 +61,27 @@
     <section name="view-and-print">
       <h1>View and print start lists, results and other event details</h1>
       <p>
-        To view details of an Organization’s events, including results
-        and start lists, a login is not required.
+        A login is not required to view and print details of an Organization’s events, including results and start lists.
       </p>
-      <ol>
-        <li>Click <i>Events</i> in the main menu.</li>
-        <li>Check that the relevant event is highlighted; if not, click on the event.</li>
-        <li>Click <i>Results</i> or <i>Start lists</i> in the main menu.</li>
-        <li>Browse results and start lists.<br>
-          Or, select categories to print.<br>
-          <b>Note:</b> only categories consisting of the same number of qualification and final heats can be selected together; categories consisting of different numbers of qualification and final heats must be selected and printed separately.</li>
-      </ol>
-      <p>Alternatively, from the any page on Piki, including pages showing a specific category result or start list, use your browser's commands or menus to print.
+      <p>To go to the <i>Results</i> or <i>Start lists</i> page for a particular event:
+        <ul>
+          <li>If you are on a page relating to the event, click <i>Results</i> or <i>Start lists</i> in the main menu.</li>
+          <li>If the event name is displayed in the page header, click that, then click <i>Results</i> or <i>Start lists</i> in the main menu.</li>
+          <li>If neither of the above applies:
+            <ol>
+              <li>Go to your Organization's Piki home page (by clicking your Organizations name at the top left of page), and click <i>Events</i> in the main menu.</li>
+              <li>Click on the desired event in the list.</li>
+            </ol>
+          </li>
+        </ul>
+      </p>
+      <p>To print:
+        <ul>
+          <li>On the <i>Results</i> or <i>Start lists</i> page for an event, select categories to print.<br>
+            <b>Note:</b> only categories consisting of the same number of qualification and final heats can be selected together; categories consisting of different numbers of qualification and final heats must be selected and printed separately.
+          </li>
+          <li>From the any page on Piki, including a start list or results page, use your browser's commands or menus to print.</li>
+        </ul>
       </p>
       <p>
         <b>Note:</b> Printed start lists are intended for use as <b>judges' forms</b>, for entering results by hand during climbing (those results then to be entered into Piki). The Bouldering start lists contain a wide column to the right of the competitors' names for entering results tallies by hand, so that judges who are judging more than one boulder may rule lines by hand to create multiple columns: one column for each boulder the judge is judging. Be sure to label each column with the boulder number, so that when the data is entered into Piki it can be entered for the correct boulder!
@@ -93,7 +102,7 @@
       <p>
         To manage your Organization’s events: contact your
         Organization’s Piki Admin, providing the
-        email address you wish to use as your login and requesting to be
+        email address you wish to use as your login, and asking to be
         added as a Piki User.
       <p>
         When you have been added as a User, a <i>Reset password</i> link will be sent to the email address entered for you.
@@ -142,12 +151,12 @@
         <li>Click <i>System setup</i>.</li>
         <li>Select the User's name.</li>
         <li>Edit the User's details and click <i>Save</i>.<br>
-          Or, to delete the User: click <i>Delete</i> and confirm in the pop-up box.</li>
+          Or, to delete the User: click <i>Delete</i>, and confirm in the pop-up box.</li>
       </ol>
     </section>
 
-    <section name="event-add">
-      <h1>Add events</h1>
+    <section name="clubs">
+      <h1>Add and edit clubs</h1>
       <p>
         Organization Admins only.
       </p>
@@ -155,15 +164,17 @@
         You must be signed in.
       </p>
       <ol>
-        <li>Click <i>Events</i> in the main menu.</li>
-        <li>Click <i>Add new event</i>.</li>
-        <li>Add event.</li>
+        <li>Go to your Organization's Piki home page by clicking your Organization's name at the top left of the page.</li>
+        <li>Click <i>Clubs</i> in the main menu.</li>
+        <li>Add and edit clubs.</li>
       </ol>
+      <p>
+        <b>Note:</b> if your Organization will be uploading registrations from file then the club name or code ("short name") used here must be the same as the club name or code used in the upload file.
+      </p>
     </section>
 
-    <section name="event-edit">
-      <h1>Edit and remove events</h1>
-      <p>Including editing the <a href="#heat-format">heat format</a> of competitor categories for an event.
+    <section name="climbers">
+      <h1>Add climbers to your Organization's <i>Climbers</i> list, and edit climbers</h1>
       <p>
         Organization Admins only.
       </p>
@@ -171,14 +182,13 @@
         You must be signed in.
       </p>
       <ol>
-        <li>Click <i>Events</i> in the main menu.</li>
-        <li>Check that the event to be edited is highlighted; if not, click on the event.</li>
-        <li>Click <i>Edit event</i> in the main menu.</li>
-        <li>Edit the event’s name or date or the <a href="#heat-format">heat format</a> of any of the categories, and click <i>Save</i> to confirm.<br>
-          <b>Note:</b> only categories in which there is a competitor registered will show in the list for editing heat format.<br>
-          Or, to delete the event, click <i>Delete</i> and confirm in the pop-up box.
-        </li>
+        <li>Go to your Organization's Piki home page by clicking your Organization's name at the top left of the page.</li>
+        <li>Click <i>Climbers</i> in the main menu.</li>
+        <li>Add and edit climbers.</li>
       </ol>
+      <p>
+        Once added, a climber can be registered for events. Climbers who are not on the Organization's <i>Climbers</i> list are automatically added to the list when they are registered for an event.
+      </p>
     </section>
 
     <section name="comp-cat">
@@ -190,6 +200,7 @@
         You must be signed in.
       </p>
       <ol>
+        <li>Go to your Organization's Piki home page by clicking your Organization's name at the top left of the page.</li>
         <li>Click <i>Competitor categories</i> in the main menu.</li>
         <li>Click <i>Add new category</i>.<br>
           Or, to edit an existing category, select the category from the list.<br>
@@ -238,8 +249,8 @@
       </ol>
     </section>
 
-    <section name="clubs">
-      <h1>Add and edit clubs</h1>
+    <section name="event-add">
+      <h1>Add events</h1>
       <p>
         Organization Admins only.
       </p>
@@ -247,16 +258,16 @@
         You must be signed in.
       </p>
       <ol>
-        <li>Click <i>Clubs</i> in the main menu.</li>
-        <li>Add and edit clubs.</li>
+        <li>Go to your Organization's Piki home page by clicking your Organization's name at the top left of the page.</li>
+        <li>Click <i>Events</i> in the main menu.</li>
+        <li>Click <i>Add new event</i>.</li>
+        <li>Add event.</li>
       </ol>
-      <p>
-        <b>Note:</b> if your Organization will be uploading registrations from file then the club name or code ("short name") used here must be the same as the club name or code used in the upload file.
-      </p>
     </section>
 
-    <section name="climbers">
-      <h1>Add climbers to your Organization's <i>Climbers</i> list, and edit climbers</h1>
+    <section name="event-edit">
+      <h1>Edit and remove events</h1>
+      <p>Including editing the <a href="#heat-format">heat format</a> of competitor categories for an event.
       <p>
         Organization Admins only.
       </p>
@@ -264,12 +275,15 @@
         You must be signed in.
       </p>
       <ol>
-        <li>Click <i>Climbers</i> in the main menu.</li>
-        <li>Add and edit climbers.</li>
+        <li>Go to your Organization's Piki home page by clicking your Organization's name at the top left of the page.</li>
+        <li>Click <i>Events</i> in the main menu.</li>
+        <li>Check that the event to be edited is highlighted; if not, click on the event.</li>
+        <li>Click <i>Edit event</i> in the main menu.</li>
+        <li>Edit the event’s name or date or the <a href="#heat-format">heat format</a> of any of the categories, and click <i>Save</i> to confirm.<br>
+          <b>Note:</b> only categories in which there is a competitor registered will show in the list for editing heat format.<br>
+          Or, to delete the event, click <i>Delete</i>, and confirm in the pop-up box.
+        </li>
       </ol>
-      <p>
-        Once added, a climber can be registered for events. Climbers not on the Organization's <i>Climbers</i> list are automatically added to the list when they are registered for an event.
-      </p>
     </section>
 
     <section name="registration">
@@ -280,18 +294,27 @@
       <p>
         You must be signed in.
       </p>
-      <ol>
-        <li>Click <i>Events</i> in the main menu.</li>
-        <li>Check that the relevant event is highlighted; if not, click on the event.</li>
-        <li>To register climbers:<br>
-          <br>
-          <b>Upload multiple registrations from file:</b><br>
-          The current <i>Upload registrations</i> feature works only for Climbing NZ.<br>
-          <b>Climbing NZ</b> users, please contact your Piki Admin for instructions.<br>
-          The Piki developers intend (depending on their availability) to create a generalized <i>Upload registrations</i> feature <i>if requested</i>, to work as follows:
+
+      <section>
+        <h1>Upload multiple registrations from file</h1>
+        <p>The current <i>Upload registrations</i> feature works only for Climbing NZ.
+        </p>
+        <p><b>Climbing NZ</b> users, please contact your Piki Admin for instructions.
+        </p>
+        <p>The Piki developers intend (depending on their availability) to create a generalized <i>Upload registrations</i> feature <i>if requested</i>, to work as follows:
           <ol>
-            <li>Click <i>Upload registrations</i> in the main menu.</li>
-            <li>Click <i>Choose file</i> and select your registration file to upload.<br>
+            <li>To go to the <i>Upload registrations</i> page for the desired event:
+              <ul>
+                <li>If you are on a page relating to the event, click <i>Upload registrations</i> in the main menu.</li>
+                <li>If the event name is displayed in the page header, click that, then click <i>Upload registrations</i> in the main menu.</li>
+                <li>If neither of the above applies:
+                  <ol>
+                    <li>Go to your Organization's Piki home page (by clicking your Organizations name at the top left of page), and click <i>Events</i> in the main menu.</li>
+                    <li>Click on the desired event in the list, then click <i>Upload registrations</i> in the main menu.</li>
+                  </ol>
+                </li>
+              </ul>
+            <li>On the <i>Upload registrations</i> page, click <i>Choose file</i> and select your registration file to upload.<br>
               Files to upload must be CSV format, with the following fields:
               <ul>
                 <li>last-name</li>
@@ -303,29 +326,42 @@
               </ul>
             </li>
           </ol>
-          It is intended to include a <i>View sample CSV file</i> feature.<br>
-          <br>
-          Or <b>register an individual climber</b> for the event:
-          <ol>
-            <li>Click <i>Registrations</i> in the main menu.</li>
-            <li>Begin entering the climber’s name in the cell provided.</li>
-            <li>Select the climber’s name from the dropdown list.<br>
-              Or, if the climber's name is not in the dropdown list (that is, has not been added to your Organization's <i>Climbers</i> list):
-              <ol>
-                <li>Click <i>Add [climber's name]</i>
-                <li>Enter the climber's details in the pop-up form.</li>
-                <li>Click <i>Create</i> to confirm the climber's details.<br>
-                  This adds the climber to your Organization's <i>Climbers</i> list. The climber can now be registered for the event.
-                </li>
-                </li>
-                <li>Enter a competitor number if desired.</li>
-                <li>Select the competitor's categories from the dropdown lists.</li>
-                <li>Click <i>Register</i> to confirm registration.</li>
-              </ol>
-            </li>
-          </ol>
-        </li>
-      </ol>
+          It is intended to include a <i>View sample CSV file</i> feature.
+        </p>
+      </section>
+
+      <section>
+        <h1>Register an individual climber for an event</h1>
+        <ol>
+          <li>To go to the <i>Registrations</i> page for the event:
+            <ul>
+              <li>If you are on a page relating to the event, click <i>Registrations</i> in the main menu.</li>
+              <li>If the event name is displayed in the page header, click that, then click <i>Registrations</i> in the main menu.</li>
+              <li>If neither of the above applies:
+                <ol>
+                  <li>Go to your Organization's Piki home page (by clicking your Organizations name at the top left of page), and click <i>Events</i> in the main menu.</li>
+                  <li>Click on the desired event in the list, then click <i>Registrations</i> in the main menu.</li>
+                </ol>
+              </li>
+            </ul>
+          </li>
+          <li>On the <i>Registrations</i> page, begin entering the climber’s name in the cell provided.</li>
+          <li>Select the climber’s name from the dropdown list.<br>
+            Or, if the climber's name is not in the dropdown list (that is, has not been added to your Organization's <i>Climbers</i> list):
+            <ol>
+              <li>Click <i>Add [climber's name]</i>
+              <li>Enter the climber's details in the pop-up form.</li>
+              <li>Click <i>Create</i> to confirm the climber's details.<br>
+                This adds the climber to your Organization's <i>Climbers</i> list. The climber can now be registered for the event.
+              </li>
+              </li>
+              <li>Enter a competitor number if desired.</li>
+              <li>Select the competitor's categories from the dropdown lists.</li>
+              <li>Click <i>Register</i> to confirm registration.</li>
+            </ol>
+          </li>
+        </ol>
+      </section>
     </section>
 
     <section name="reg-change">
@@ -340,14 +376,23 @@
         You must be signed in.
       </p>
       <ol>
-        <li>Click <i>Events</i> in the main menu.</li>
-        <li>Check that the relevant event is highlighted; if not, click on the event.</li>
-        <li>Click <i>Registrations</i> in the main menu.</li>
-        <li>Click on the competitor’s name.</li>
+        <li>To go to the <i>Registrations</i> page for the event:
+          <ul>
+            <li>If you are on a page relating to the event, click <i>Registrations</i> in the main menu.</li>
+            <li>If the event name is displayed in the page header, click that, then click <i>Registrations</i> in the main menu.</li>
+            <li>If neither of the above applies:
+              <ol>
+                <li>Go to your Organization's Piki home page (by clicking your Organizations name at the top left of page), and click <i>Events</i> in the main menu.</li>
+                <li>Click on the desired event in the list, then click <i>Registrations</i> in the main menu.</li>
+              </ol>
+            </li>
+          </ul>
+        </li>
+        <li>On the <i>Registrations</i> page, click on the competitor’s name.</li>
         <li>Change the competitor's registration, or deregister the competitor.</li>
       </ol>
     </section>
-    
+
     <section name="comp-number">
       <h1>Designate or change a competitor number</h1>
       <p>
@@ -361,14 +406,14 @@
         <li>Select the climber from the list.</li>
         <li>Enter the competitor number in the cell provided.</li>
         <li>Click <i>Save</i> to confirm.</li>
-      </ol>     
-      
+      </ol>
+
     </section>
 
     <section name="results">
       <h1>Enter and edit results</h1>
       <p>
-        <b>Note:</b> <a href="#view-and-print">Printed start lists</a> are intended for use as judges' forms, for entering scores by hand during climbing (those scores then to be entered into Piki). The Bouldering start lists contain a wide column to the right of the competitors' names for entering score tallies by hand, so that judges who are judging more than one boulder may rule lines by hand to create multiple columns: one column for each boulder the judge is judging. Be sure to label each column with the boulder number, so that when the data is entered into Piki it can be entered for the correct boulder!
+        <b>Note:</b> <a href="#view-and-print">Printed start lists</a> are intended for use as <b>judges' forms</b>, for entering scores by hand during climbing (those scores then to be entered into Piki). The Bouldering start lists contain a wide column to the right of the competitors' names for entering score tallies by hand, so that judges who are judging more than one boulder may rule lines by hand to create multiple columns: one column for each boulder the judge is judging. Be sure to label each column with the boulder number, so that when the data is entered into Piki it can be entered for the correct boulder!
       </p>
       <p>
         Organization Admins and Judges only.
@@ -377,20 +422,31 @@
         You must be signed in.
       </p>
       <ol>
-        <li>Click <i>Events</i> in the main menu.</li>
-        <li>Check that the relevant event is highlighted; if not, click on the event.</li>
-        <li>Click <i>Start lists</i> in the main menu.</li>
-        <li>To go to the start list for the desired heat:<br>
-          Click on the desired heat, or if the desired heat is not displayed, click on the relevant category and then select the desired heat from the dropdown menu at the top right of the page.<br>
-          Alternatively, if you are on the <i>Results</i> page for the desired heat, clicking <i>Show start order</i> at the top right of the page, or clicking in one of the <i>score</i> cells for the heat, will take you to the start list.
+        <li>To go to the <i>Start lists</i> page for an event:
+          <ul>
+            <li>If you are on a page relating to the event, click <i>Start lists</i> in the main menu.</li>
+            <li>If the event name is displayed in the page header, click that, then click <i>Start lists</i> in the main menu.</li>
+            <li>If neither of the above applies:
+              <ol>
+                <li>Go to your Organization's Piki home page (by clicking your Organizations name at the top left of page), and click <i>Events</i> in the main menu.</li>
+                <li>Click on the desired event in the list, then click <i>Start lists</i> in the main menu.</li>
+              </ol>
+            </li>
+          </ul>
         </li>
-        <li>Click in the desired cell in the
+        <li>On the <i>Start lists</i> page, to go to the start list for the desired heat:
+          <ul>
+            <li>Click on the desired heat, or if the desired heat is not displayed, click on the relevant category and then select the desired heat from the dropdown menu at the top right of the page.
+            </li>
+            <li>Alternatively, if you are on the <i>Results</i> page for the desired heat, clicking <i>Show start order</i> at the top right of the page, or clicking in one of the <i>score</i> cells for the heat, will take you to the start list.
+            </li>
+          </ul>
+        </li>
+        <li>On the start list for the desired heat, click in the desired cell in the
           table and type the score (see <i>Lead scores</i> and <i>Boulder scores</i> below for details).</li>
-        <li>Press <i>Tab</i> to save the score entered and move to the next cell.<br>
-          To save the score entered, it is necessary to press <i>Tab</i> or <i>Enter</i> or click outside the cell.
-        </li>
+        <li>Press <i>Tab</i> to move to the next cell.</li>
       </ol>
-      
+
       <section>
         <p>
           <h1>Lead scores</h1>
@@ -408,13 +464,41 @@
         </p>
         <p>
           <h1>Boulder scores</h1>
-          Beside each competitor's name, in the <i>Result</i> column, is a box for each boulder in the course.
-          <ul>
-            <li>Enter the <b>number of attempts to top</b> (the number of attempts it took the competitor to achieve the top) in the cell in the <b>top left</b> corner of the box.</li>
-            <li>Enter the <b>number of attempts to bonus</b> (the number of attempts it took the competitor to achieve the bonus) in the cell in the <b>lower right</b> corner of the box.</li>
-            <li>If the climber did not climb or did not achieve a given top or bonus, enter nothing in the relevant cell.</li>
-          </ul>
-          <b>Note:</b> If a number for attempts to bonus is entered which is greater than the attempts to top, the score will not be saved and the cell will be highlighted to indicate an invalid score, because it is not possible for a competitor to take more attempts to achieve the bonus than to achieve the top.<br>
+          Beside each competitor's name, in the <i>Result</i> column, is a score box for each boulder in the course.<br><br>
+          <table>
+            <tr>
+              <th>To show:</th>
+              <th>Enter:</th>
+              <th>In:</th>
+            </tr>
+            <tr>
+              <td>The competitor's <b>attempts to complete the boulder</b></td>
+              <td>The number of attempts it took the competitor to complete the boulder</td>
+              <td>The <b>top left cell</b> in the score box</td>
+            </tr>
+            <tr>
+              <td>The competitor's <b>attempts to achieve the bonus</b></td>
+              <td>The number of attempts it took the competitor to achieve the bonus</td>
+              <td>The <b>lower right cell</b> in the score box.</td>
+            </tr>
+            <tr>
+              <td>The competitor <b>did not complete the boulder</b></td>
+              <td>Nothing (leave blank) or "<b>-</b>" (dash)</td>
+              <td>The <b>top left cell</b> in the score box</td>
+            </tr>
+            <tr>
+              <td>The competitor attempted the boulder and <b>did not achieve the bonus</b></td>
+              <td>"<b>-</b>" (dash)</td>
+              <td>Either cell in the score box</td>
+            </tr>
+            <tr>
+              <td>The competitor <b>did not attempt the boulder</b></td>
+              <td>"<b>nc</b>" (did not climb)</td>
+              <td>Either cell in the score box</td>
+            <tr>
+          </table>
+          <br>
+          <b>Note:</b> If a number for attempts to achieve the bonus is entered which is greater than the attempts to complete the boulder, the score will not be saved and the cell will be highlighted to indicate an invalid score, because it is not possible for a competitor to take more attempts to achieve the bonus than to complete the boulder.<br><br>
           <b>Piki totals the boulder scores entered and displays the sum</b> in the format:
           <ul>
             <li><tt><b>nta nba</b></tt> (n = the number of tops or bonus holds achieved; a
@@ -433,16 +517,41 @@
       <h1>Trouble shooting</h1>
 
       <section>
-        <h1>I can't see a menu item or page I'm looking for</h1>
+
+        <h1>I can't see content I'm looking for</h1>
+        <p>Ensure you are at the Piki page of the correct Organization. When you are at the Piki page of a given Organization, you cannot see content that belongs to another Piki Organization.
+        </p>
         <p>Ensure you are signed in with the appropriate access status:
           Admin or Judge.
         </p>
-        
+
         <h1>I can't make changes</h1>
         <p>Ensure you are signed in with the appropriate access status:
           Admin or Judge.
         </p>
-        
+
+        <h1>The page doesn't look good</h1>
+        <p>Piki is developed and tested only for use with the <a href="https://www.google.com/intl/en/chrome/browser/">Google Chrome web browser</a>. Piki may or may not work with other web browsers.
+        </p>
+        <p>Some pages currently do not display well on tablet or phone. Piki's developers intend to address this issue.
+        </p>
+
+        <h1>Where are the judges' forms for entering scores by hand during climbing?</h1>
+        <p>Printed <a href="#view-and-print">start lists</a> are intended for use as judges' forms, for entering results by hand during climbing (those results then to be entered into Piki). The Bouldering start lists contain a wide column to the right of the competitors' names for entering results tallies by hand, so that judges who are judging more than one boulder may rule lines by hand to create multiple columns: one column for each boulder the judge is judging. Be sure to label each column with the boulder number, so that when the data is entered into Piki it can be entered for the correct boulder!
+        </p>
+
+        <h1>What does a score of <i>DNC</i> or <i>nc</i> mean?</h1>
+        <p>Did not climb.
+        </p>
+
+        <h1>What does a score of "<b>-</b>" (dash) mean?</h1>
+        <p>The competitor attempted the boulder and did not achieve the bonus.
+        </p>
+
+        <h1>I don't understand how the rankings are calculated</h1>
+        <p>Piki calculates rankings as set out in the <a href="https://www.ifsc-climbing.org">IFSC</a> rules. If you wish to run a competition using a different scoring system to that set out in the IFSC rules, Piki is unlikely to meet your requirements.
+        </p>
+
         <h1>I can't select all of the categories I want to print</h1>
         <p>Only categories consisting of the same number of qualification and final heats can be selected together; categories consisting of different numbers of qualification and final heats must be selected and printed separately.
         </p>
@@ -450,33 +559,13 @@
         <h1>A competitor did not climb in a qualification heat, and I
           would like their qualification rank to be displayed in the
           results</h1>
-
         <p><b>Lead</b><br>
           Enter "<tt>dnc</tt>" (did not climb) as the competitor's score for the heat(s) in which they did not climb.
         </p>
-        
         <p><b>Bouldering</b><br>
-          Enter a score of "0t 0b":
-          <ol>
-            <li>Click in a cell for entering a score for the climber.</li>
-            <li>To save the score as zero, it is necessary to press <i>Tab</i> or <i>Enter</i>.</li>
-          </ol>
+          Enter "<tt>nc</tt>" (did not climb) as the competitor's score in one of the cells for at least one of the boulders of the heat.
         </p>
 
-        <h1>I don't understand how the rankings are calculated</h1>
-
-        <p>
-          Piki calculates rankings as set out in the <a href="https://www.ifsc-climbing.org">IFSC</a> rules. If you wish to run a competition using a different scoring system to that set out in the IFSC rules, Piki is unlikely to meet your requirements.
-        </p>
-        
-        <h1>The page doesn't look right</h1>
-        
-        <p>Piki is developed and tested only for use with the <a href="https://www.google.com/intl/en/chrome/browser/">Google Chrome web browser</a>. Piki may or may not work with other web browsers.
-        </p>
-        
-        <p>Some pages currently do not display well on tablet or phone. Piki's developers intend to address this issue.
-        </p>
-        
       </section>
     </section>
   </div>
