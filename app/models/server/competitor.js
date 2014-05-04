@@ -1,4 +1,6 @@
 App.require('AppModel.Competitor', function (model) {
+  AppModel.ChangeLog.logChanges(model);
+
   App.extend(model.prototype, {
     authorize: function (userId) {
       var user = AppModel.User.findOne(userId);

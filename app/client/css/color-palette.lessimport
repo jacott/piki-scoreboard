@@ -1,5 +1,6 @@
 @colorBackground: #fff;
 @colorText: #444;
+@colorButtonText: @colorText;
 
 @colorHeaderBackground: #000;
 @colorHeaderText: #fff;

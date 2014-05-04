@@ -28,8 +28,8 @@ App.require('AppModel.Competitor', function (Competitor) {
       check([id, score], [String]);
       check(index, Number);
 
-      var user = AppModel.User.findOne(this.userId);
-      var result = AppModel.Result.findOne(id);
+      var user = AppModel.User.findById(this.userId);
+      var result = AppModel.Result.findById(id);
       var event = result.event;
 
       AppVal.allowAccessIf(user && (user.isSuperUser() || user.org_id === event.org_id));
@@ -39,6 +39,7 @@ App.require('AppModel.Competitor', function (Competitor) {
       if (index === 99) {
         var time =  heat.scoreToNumber(score, 99);
         AppVal.allowAccessIf(time !== false);
+        recordScoreChange(result, {time: result.time}, {time: time});
         model.docs.update(id, {$set: {time: time}});
         return;
       }
@@ -48,8 +49,9 @@ App.require('AppModel.Competitor', function (Competitor) {
 
       var changes = {};
 
-      changes['scores.' + index] = heat.scoreToNumber(score);
+      changes['scores.' + index] = score = heat.scoreToNumber(score);
 
+      recordScoreChange(result, {score: result.scores[index]}, {index: index, score: score});
       model.fencedUpdate(id, {$set: changes});
     },
 
@@ -60,8 +62,8 @@ App.require('AppModel.Competitor', function (Competitor) {
       else
         check([index, problem, bonus, top], [Number]);
 
-      var user = AppModel.User.findOne(this.userId);
-      var result = AppModel.Result.findOne(id);
+      var user = AppModel.User.findById(this.userId);
+      var result = AppModel.Result.findById(id);
       var event = result.event;
 
       AppVal.allowAccessIf(user && (user.isSuperUser() || user.org_id === event.org_id));
@@ -73,6 +75,7 @@ App.require('AppModel.Competitor', function (Competitor) {
 
       var problems = result.problems || {};
       var round = problems[index-1] || [];
+      var b4ProbScore = round[problem];
 
       AppVal.allowAccessIf(heat.type === 'B'  &&
                            index >=0 && index <= heat.total &&
@@ -117,8 +120,10 @@ App.require('AppModel.Competitor', function (Competitor) {
       }
 
       changes['problems.' + (index-1)] = round;
-      changes['scores.' + index] = dnc === "dnc" ? -1 : heat.boulderScoreToNumber(b, ba, t, ta);
+      changes['scores.' + index] = dnc === "dnc" ? -1 : score = heat.boulderScoreToNumber(b, ba, t, ta);
 
+      recordScoreChange(result, {score: result.scores[index], probScore: b4ProbScore},
+                        {index: index, problem: problem, score: score, probScore: round[problem]});
       model.fencedUpdate(id, {$set: changes});
     },
   });
@@ -153,6 +158,23 @@ App.require('AppModel.Competitor', function (Competitor) {
     ids.forEach(function (catId) {
       model.docs.remove({climber_id: doc.climber_id, category_id: catId, event_id: doc.event_id});
     });
+  }
+
+  function recordScoreChange(result, before, after) {
+    if (Meteor.isClient) return;
+
+    var params = {
+      user_id: App.userId(),
+      org_id: result.event.org_id,
+      parent: 'Event', parent_id: result.event_id,
+      model: 'Result', model_id: result._id,
+      type: 'update',
+      aux: 'score',
+      before: JSON.stringify(before),
+      after: JSON.stringify(after),
+    };
+
+    AppModel.ChangeLog.create(params);
   }
 
   App.loaded('AppModel.Result', model);

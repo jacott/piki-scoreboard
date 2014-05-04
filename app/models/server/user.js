@@ -2,6 +2,9 @@ App.require('AppModel.User', function (model) {
   var permitSpec = AppVal.permitSpec('name', 'email', 'initials', 'org_id', 'role');
 
   var guestUserId;
+
+  AppModel.ChangeLog.logChanges(model);
+
   App.extend(model, {
     _clearGuestUser: function () {
       guestUserId = null;

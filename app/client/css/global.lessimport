@@ -1,5 +1,7 @@
 @import "color-palette.lessimport";
 
+@import "icon-font-codes.lessimport";
+
 @import "geometry.lessimport";
 
 .spin()  {
