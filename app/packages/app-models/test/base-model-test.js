@@ -302,6 +302,17 @@
         },
       },
 
+      "test findById": function () {
+        test.spy(TestSubClass, 'attrFind');
+
+        var doc = TestSubClass.create({foo: {bar: {baz: 'orig'}}});
+
+        assert.equals(doc.attributes, TestSubClass.findById(doc._id).attributes);
+
+        assert.calledWith(TestSubClass.attrFind, doc._id);
+        assert.equals(TestSubClass.attrFind.returnValues[0], TestSubClass.findById(doc._id).attributes);
+      },
+
       "test validator passing function": function () {
         TestSubClass.defineFields({foo: {type: 'text', required: function (field, options) {
           assert.same(this, doc);
@@ -442,7 +453,7 @@
         test.onEnd(function () {delete AppModel.Foo});
         var findStub = test.stub();
         findStub.withArgs("abc").returns({name: "qux"});
-        AppModel.Foo = {findOne: findStub};
+        AppModel.Foo = {findById: findStub};
         TestSubClass.defineFields({foo_id: {type: 'belongs_to'}});
 
         var sut = TestSubClass.build({foo_id: "abc"});
@@ -457,7 +468,7 @@
         test.onEnd(function () {delete AppModel.Foo});
         var findStub = test.stub();
         findStub.withArgs("abc").returns({name: "qux"});
-        AppModel.Foo = {findOne: findStub};
+        AppModel.Foo = {findById: findStub};
         TestSubClass.defineFields({baz_id: {type: 'belongs_to', modelName: 'Foo'}});
 
         var sut = TestSubClass.build({baz_id: "abc"});

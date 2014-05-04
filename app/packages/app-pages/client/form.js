@@ -37,6 +37,7 @@ function modalizeCallback(event) {
       case 'TEXTAREA':
         return;
       }
+      if (event.target.getAttribute('contenteditable') === 'true') return;
       return modalize.func.call(this, event);
     }
   } else if (! Bart.parentOf(elm, event.target))
@@ -271,6 +272,7 @@ function buildSelectList(ctx, elm, optionFunc) {
   var value = data.doc[data.name];
   var options = data.options;
   var sl = options.selectList;
+  if (! sl) throw new Error('invalid selectList for ' + data.name);
   if ('fetch' in sl)
     sl = sl.fetch();
   if (sl.length === 0) return;
@@ -339,11 +341,6 @@ Bart.registerHelpers({
     });
   },
 
-  date: function (date) {
-    if (date)
-      return date.getFullYear()+'-'+twoDigit(date.getMonth())+'-'+twoDigit(date.getDate());
-  },
-
   genderList: function () {
     return [['', ''], ["m", "Male"], ["f", "Female"]];
   },
@@ -369,10 +366,6 @@ Tpl.OnOff.$events({
   },
 });
 
-function twoDigit(d) {
-  return d < 10 ? '0'+d : d;
-}
-
 function helpers(name, funcs) {
   Tpl[name].$helpers(App.reverseExtend(funcs, DEFAULT_HELPERS));
 }
@@ -384,6 +377,8 @@ function field(doc, name, options) {
   }
 
   switch(options.type || 'text') {
+  case 'markdownEditor':
+    return Bart.MarkdownEditor.$autoRender({content: doc[name], options: App.reverseExtend({"data-errorField": name}, options)});
   case 'onOff':
     return Tpl.OnOff.$autoRender({name: name, doc: doc, options: options});
   default:

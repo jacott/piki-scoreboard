@@ -7,6 +7,33 @@
     tearDown: function () {
     },
 
+    "test atHour": function () {
+      var date = Apputil.atHour(Date.UTC(2014,4,5), 6);
+      assert.same(date.toISOString(), '2014-05-05T06:00:00.000Z');
+
+      assert.same(Apputil.atHour(5 + +date, 5).toISOString(), '2014-05-06T05:00:00.005Z');
+    },
+
+    "test atDowHour (at day of week, hour)": function () {
+      var thu = 4;
+
+      var date = Apputil.atDowHour(Date.UTC(2014,4,5), thu, 9);
+      assert.same(date.toISOString(), '2014-05-08T09:00:00.000Z');
+
+      assert.same(Apputil.atDowHour(123 + +date, thu, 8).toISOString(), '2014-05-15T08:00:00.123Z');
+
+      var date = Apputil.atDowHour(Date.UTC(2014,4,10), thu, 9);
+      assert.same(date.toISOString(), '2014-05-15T09:00:00.000Z');
+    },
+
+    "test union": function () {
+      var a = [3, 4];
+      var b = [10, 3, "abc"];
+      var c = [5, 10, "def"];
+
+      assert.equals(Apputil.union(a,null,b,c), [3,4, 10, "abc", 5, "def"]);
+    },
+
     "test includesAttributes": function () {
       var doc = {a: '1', b: '2'};
       var other = {a: '1', b: '3'};
@@ -118,9 +145,10 @@
     "test toMap": function () {
       assert.equals(Apputil.toMap(), {});
       assert.equals(Apputil.toMap(['a', 'b']), {a: true, b: true});
-      assert.equals(Apputil.toMap([{foo: 'a'}, {foo: 'b'}], 'foo', true), {a: true, b: true});
-      assert.equals(Apputil.toMap([{foo: 'a'}, {foo: 'b'}], 'foo'), {a: {foo: 'a'}, b: {foo: 'b'}});
-      assert.equals(Apputil.toMap([{foo: 'a', baz: 1}, {foo: 'b', baz: 2}], 'foo', 'baz'), {a: 1, b: 2});
+      assert.equals(Apputil.toMap('foo', true, [{foo: 'a'}, {foo: 'b'}]), {a: true, b: true});
+      assert.equals(Apputil.toMap('foo', null, [{foo: 'a'}, {foo: 'b'}]), {a: {foo: 'a'}, b: {foo: 'b'}});
+      assert.equals(Apputil.toMap('foo', null, [{foo: 'a'}], [{foo: 'b'}]), {a: {foo: 'a'}, b: {foo: 'b'}});
+      assert.equals(Apputil.toMap('foo', 'baz', [{foo: 'a', baz: 1}, {foo: 'b', baz: 2}]), {a: 1, b: 2});
     },
 
     "test findBy": function () {
@@ -129,6 +157,13 @@
       assert.same(Apputil.findBy(list, 2), list[0]);
       assert.same(Apputil.findBy(list, 'a', 'foo'), list[0]);
       assert.same(Apputil.findBy(list, 'b', 'foo'), list[1]);
+    },
+
+    "test indexOfRegex": function () {
+      var list = [{foo: 'a'}, {foo: 'b'}];
+      assert.same(Apputil.indexOfRegex(list, /a/, 'foo'), 0);
+      assert.same(Apputil.indexOfRegex(list, /ab/, 'foo'), -1);
+      assert.same(Apputil.indexOfRegex(list, /b/, 'foo'), 1);
     },
 
     "test mapField": function () {
@@ -162,6 +197,10 @@
     'test intersectp': function () {
       assert(Apputil.intersectp([1,4],[4,5]));
       refute(Apputil.intersectp([1,2],['a']));
+    },
+
+    "test emailAddress": function () {
+      assert.same(Apputil.emailAddress('a@xyz.co', 'f<o>o <b<a>r>'), 'foo bar <a@xyz.co>');
     },
 
     "test parseEmailAddresses": function () {

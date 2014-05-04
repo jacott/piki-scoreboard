@@ -264,10 +264,20 @@
       assert.calledWith(AppRoute.history.replaceState, null, "baz bar", '/foo-bar');
     },
 
+    "test replacePage passes all args": function () {
+      test.stub(AppRoute, 'gotoPage');
+
+      AppRoute.replacePage(1, 2,3);
+      assert.same(AppRoute._private.pageState, 'replaceState');
+
+      assert.calledWith(AppRoute.gotoPage, 1, 2, 3);
+    },
+
     "test replacePath passes all args": function () {
       test.stub(AppRoute, 'gotoPath');
 
       AppRoute.replacePath(1, 2,3);
+      assert.same(AppRoute._private.pageState, 'replaceState');
 
       assert.calledWith(AppRoute.gotoPath, 1, 2, 3);
     },
@@ -383,6 +393,24 @@
       assert.calledWith(BazBar.onEntry, BazBar, {append: '12345', pathname: "/baz/baz/12345"});
     },
 
+    "test privatePage": function () {
+      var origSigninPage = AppRoute.SignPage;
+      AppRoute.SignPage = "mySign in page";
+      test.onEnd(function () {
+        AppRoute.SignPage = origSigninPage;
+      });
+      test.stub(AppRoute, 'replacePage');
+      App.userId.restore();
+
+      AppRoute.root.addTemplate(v.FooBar, {privatePage: true});
+
+      AppRoute.gotoPage(v.FooBar, {myArgs: '123'});
+
+      refute.called(v.FooBar.onEntry);
+
+      assert.calledWith(AppRoute.replacePage, AppRoute.SignPage, {returnTo: [v.FooBar, {myArgs: '123', pathname: '/foo-bar'}]});
+    },
+
     "test addTemplate": function () {
       var Baz = {
         name: 'Baz',
@@ -414,6 +442,33 @@
 
       AppRoute.gotoPath();
       assert.called(v.FooBar.onEntry);
+    },
+
+    "test addDialog gotoPath": function () {
+      AppRoute.root.addTemplate(v.FooBar);
+
+      var FooDialog = {
+        onEntry: test.stub(),
+      };
+
+      AppRoute.root.addDialog(FooDialog, {path: 'foo-dialog'});
+
+      AppRoute.gotoPath(v.loc = {pathname: '/foo-bar'});
+
+      AppRoute.gotoPath(v.loc = '/foo-dialog/append/string?abc=123#hash');
+
+      refute.called(v.FooBar.onExit);
+
+      assert.calledWith(FooDialog.onEntry, FooDialog, {pathname: '/foo-dialog/append/string',
+                                                       append: 'append/string',
+                                                       search: '?abc=123', hash: '#hash'});
+
+
+      AppRoute.gotoPath(v.loc = {pathname: '/foo-bar'});
+
+      assert.called(v.FooBar.onExit);
+      assert.calledTwice(v.FooBar.onEntry);
+
     },
 
     "test addTemplate gotoPath": function () {

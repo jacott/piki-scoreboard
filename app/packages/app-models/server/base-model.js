@@ -70,10 +70,6 @@ BaseModel.prototype.$$save = function() {
 var noTransform = {transform: null};
 
 App.extend(_support, {
-  attrFind: function (id) {
-    return this.docs.find(id, noTransform);
-  },
-
   pushRpc: function(model, field) {
     return function(_id, value) {
       check(_id, String);

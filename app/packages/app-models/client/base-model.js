@@ -53,6 +53,10 @@ AppModel._support.setupExtras.push(function (model) {
     });
   };
 
+  model.attrFind = function (id) {
+    return this.attrDocs()[id];
+  };
+
   model.attrDocs = function () {
     return model.docs._collection._docs._map;
   };
@@ -88,10 +92,6 @@ App.extend(AppModel, {
 
 
 App.extend(_support, {
-  attrFind: function (id) {
-    return this.attrDocs()[id];
-  },
-
   pushRpc: function(model, field) {
     addPushField(model);
     return function(_id, value) {

@@ -183,7 +183,7 @@ Meteor.isClient && (function (test, v) {
 
         var data = {me: true};
 
-        v.elm = Bart.html('<div></div>');
+        v.elm = Bart.html({});
         v.elm._bart = {data: data};
 
         var foo = Bart.Foo.$render(v.x = {x: 1});
@@ -197,6 +197,8 @@ Meteor.isClient && (function (test, v) {
 
       document.body.appendChild(elm);
 
+      document.body.appendChild(Bart.html({"class": 'bar', id: "s123", tag: 'section', span: {text: "Goodbye"}}));
+
       assert.dom('#top', function () {
         assert.same(elm, this);
 
@@ -204,6 +206,16 @@ Meteor.isClient && (function (test, v) {
           assert.dom('>.bar>button#sp', 'Hello');
         });
       });
+
+      assert.dom('body', function () {
+        assert.dom('section#s123.bar', 'Goodbye', function () {
+          assert.dom('span', 'Goodbye');
+        });
+      });
+    },
+
+    "test escapeHTML": function () {
+      assert.same(Bart.escapeHTML('<Testing>&nbsp;'), '&lt;Testing&gt;&amp;nbsp;');
     },
 
     "test setClassBySuffix": function () {
@@ -295,6 +307,21 @@ Meteor.isClient && (function (test, v) {
       assert.same(Bart.parentOf(elm.querySelector('.bar'), elm), null);
     },
 
+    "test searchUpFor": function () {
+      var top = Bart.html('<div id="top"><div class="foo"><div class="bar"><button type="button" id="sp">Hello</button></div></div></div>');
+
+      assert.isNull(Bart.searchUpFor(top.querySelector('button').firstChild, function (elm) {
+        return elm === top;
+      }, 'bar'));
+      assert.same(Bart.searchUpFor(top.querySelector('button').firstChild, function (elm) {
+        return Bart.hasClass(elm, 'bar');
+      }, 'bar'), top.firstChild.firstChild);
+
+      assert.same(Bart.searchUpFor(top.querySelector('button').firstChild, function (elm) {
+        return Bart.hasClass(elm, 'bar');
+      }), top.firstChild.firstChild);
+    },
+
     "test $getClosest": function () {
       document.body.appendChild(Bart.html('<div><div class="foo"><div class="bar"><button type="button" id="sp"></button></div></div></div>'));
 
@@ -324,8 +351,82 @@ Meteor.isClient && (function (test, v) {
       Bart.Foo._events[0][2](event);
 
       assert.calledWithExactly(v.one, event);
+    },
 
+    "test event calling": function () {
+      Bart.newTemplate({name: 'Foo', nodes: [{
+        name: 'div', children: [
+          {name: 'span'},
+          {name: 'button'},
+        ]
+      }]});
+      v.spanCall = test.stub();
+      Bart.Foo.$events({
+        'click div': v.divCall = test.stub(),
 
+        'click span': function (event) {
+          v.spanCall();
+          v.stop && Bart[v.stop].call(Bart);
+        },
+
+        'click button': v.buttonCall = test.stub(),
+      });
+
+      document.body.appendChild(Bart.Foo.$render({}));
+
+      assert.dom('body>div', function () {
+        var top = this;
+        test.onEnd(function () {Bart.remove(top)});
+        test.spy(top, 'addEventListener');
+        Bart.Foo.$attachEvents(top);
+        assert.calledOnce(top.addEventListener);
+        Bart.getCtx(top).onDestroy(function () {
+          Bart.Foo.$detachEvents(top);
+        });
+        assert.dom('span', function () {
+          top.addEventListener.yield({
+            currentTarget: top, target: this, type: 'click',
+            stopImmediatePropagation: v.sip = test.stub(),
+            preventDefault: v.pd = test.stub(),
+          });
+        });
+        assert.called(v.spanCall);
+        assert.called(v.divCall);
+        refute.called(v.sip);
+        refute.called(v.pd);
+
+        // stopEvent
+        v.spanCall.reset(); v.divCall.reset();
+        v.stop = 'stopEvent';
+
+        assert.dom('span', function () {
+          top.addEventListener.yield({
+            currentTarget: top, target: this, type: 'click',
+            stopImmediatePropagation: v.sip = test.stub(),
+            preventDefault: v.pd = test.stub(),
+          });
+        });
+        assert.called(v.spanCall);
+        refute.called(v.divCall);
+        assert.called(v.sip);
+        assert.called(v.pd);
+
+        // stopPropigation
+        v.spanCall.reset(); v.divCall.reset();
+        v.stop = 'stopPropigation';
+
+        assert.dom('span', function () {
+          top.addEventListener.yield({
+            currentTarget: top, target: this, type: 'click',
+            stopImmediatePropagation: v.sip = test.stub(),
+            preventDefault: v.pd = test.stub(),
+          });
+        });
+        assert.called(v.spanCall);
+        refute.called(v.divCall);
+        assert.called(v.sip);
+        refute.called(v.pd);
+      });
     },
 
     "newTemplate": {
@@ -730,6 +831,12 @@ Meteor.isClient && (function (test, v) {
 
         assert.dom(Bart.Foo.$render({user: {initials: 'fb'}}), 'fb');
       },
+    },
+
+    "test INPUT_SELECTOR, WIDGET_SELECTOR": function () {
+      assert.same(Bart.INPUT_SELECTOR, 'input,textarea,select,select>option,[contenteditable="true"]');
+      assert.same(Bart.WIDGET_SELECTOR, 'input,textarea,select,select>option,[contenteditable="true"],button,a');
+
     },
   });
 })();

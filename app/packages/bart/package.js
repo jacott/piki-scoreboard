@@ -28,11 +28,12 @@ Package._transitional_registerBuildPlugin({
 
 // This on_use describes the *runtime* implications of using this package.
 Package.on_use(function (api) {
-
+  api.use('app-models', 'client');
   api.export(['Bart', '_private'], 'client');
 
   api.add_files([
     'bart.js',
+    'window-resize.js',
   ], ['client']);
 
 });

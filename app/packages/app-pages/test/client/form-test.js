@@ -18,6 +18,7 @@
             '<div class="ta"><input type="text" id="os" value="outside txt"></div>' +
             '<div class="foo"><div class="bar">' +
             '<textarea id="sta">ta</textarea>' +
+            '<div id="sce" contenteditable="true">ce</div>' +
             '<button type="button" id="sb" value="notme">' +
             '<input type="password" id="sp" value="hidden">' +
             '<input type="text" id="st" value="txt">' +
@@ -78,6 +79,7 @@
         TH.trigger('.foo', 'keyup', {which: 26});
         TH.trigger('#st', 'keyup', {which: 27});
         TH.trigger('#sta', 'keyup', {which: 27});
+        TH.trigger('#sce', 'keyup', {which: 27});
         TH.trigger('#sp', 'keyup', {which: 27});
 
         refute.called(v.func);
@@ -93,6 +95,15 @@
 
         assert.same(v.func.callCount, 3);
       },
+    },
+
+    "test empty MarkdownEditor": function() {
+      document.body.appendChild(Bart.Test.Form.TestMarkdownEditor.$autoRender({}));
+
+      assert.dom('#TestMarkdownEditor>label', function () {
+        assert.dom('span.name', 'Name');
+        assert.dom('#nameId.mdEditor.bar.empty[data-errorfield="name"]:not([type])>.input');
+      });
     },
 
     "SelectList": {

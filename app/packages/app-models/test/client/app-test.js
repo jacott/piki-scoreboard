@@ -12,6 +12,17 @@
       v = null;
     },
 
+    "test setTimeout, clearTimeout": function () {
+      test.stub(window, 'setTimeout');
+      test.stub(window, 'clearTimeout');
+
+      App.setTimeout("a", 123);
+      App.clearTimeout(456);
+
+      assert.calledWithExactly(window.setTimeout, "a", 123);
+      assert.calledWithExactly(window.clearTimeout, 456);
+    },
+
     "test subscribe": function () {
       test.stub(Meteor, 'subscribe');
 

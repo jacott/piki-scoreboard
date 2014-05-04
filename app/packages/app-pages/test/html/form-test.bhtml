@@ -13,4 +13,10 @@
       {{labelField "foo_id" id="fooId" type="radio" selectList=fooList}}
     </div>
   </template>
+
+  <template name="TestMarkdownEditor">
+    <div id="TestMarkdownEditor">
+      {{labelField "name" id="nameId" type="markdownEditor" class="bar"}}
+    </div>
+  </template>
 </template>

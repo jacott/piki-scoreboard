@@ -16,12 +16,15 @@ var COMMENT_NODE = document.COMMENT_NODE;
 var TEXT_NODE = document.TEXT_NODE;
 var DOCUMENT_FRAGMENT_NODE = document.DOCUMENT_FRAGMENT_NODE;
 var DOCUMENT_NODE = document.DOCUMENT_NODE;
+var _disable_focusout = false;
 
 var bartEvent = null;
 
 var currentCtx, currentElement, currentEvent;
 
 Bart = {
+  set _disable_focusout(value) {return _disable_focusout = value},
+  get _disable_focusout() {return _disable_focusout},
   Ctx: BartCtx,
   current: {
     data: function (elm) {
@@ -38,15 +41,97 @@ Bart = {
 
   MOUSEWHEEL_EVENT: vendorFuncPrefix === 'moz' ? 'wheel' : 'mousewheel',
 
-  INPUT_SELECTOR: 'input,textarea,select,select>option',
-  WIDGET_SELECTOR:'input,textarea,select,select>option,button,a',
-
   _helpers: {},
 
-  html: function (html) {
-    var elm = document.createElement('div');
-    elm.innerHTML = html;
-    return elm.firstChild;
+  clonePosition: function (from, to, offsetParent, where) {
+    where = where || 'tl';
+
+    var bbox = this.offsetPosition(from, offsetParent || to.offsetParent);
+
+    var style = to.style;
+
+    if (where[0] === 't')
+      style.top  = bbox.top+'px';
+    else
+      style.top  = bbox.bottom+'px';
+
+    if (where[1] === 'l')
+      style.left = bbox.left+'px';
+    else
+      style.right = bbox.right+'px';
+
+    return bbox;
+  },
+
+  offsetPosition: function (from, offsetParent) {
+    if ('nodeType' in from) {
+      offsetParent = offsetParent || from.offsetParent;
+      var bbox = from.getBoundingClientRect();
+    } else {
+      var bbox = from;
+    }
+
+    var offset = offsetParent.getBoundingClientRect();
+
+    return {
+      top: bbox.top - offset.top - offsetParent.scrollTop,
+      bottom: bbox.bottom - offset.top - offsetParent.scrollTop,
+      left: bbox.left - offset.left - offsetParent.scrollLeft,
+      right: bbox.right - offset.left - offsetParent.scrollLeft,
+      width: bbox.width,
+      height: bbox.height,
+    };
+  },
+
+  html: function (html, tagName) {
+    tagName = tagName || 'div';
+    if (typeof html === 'string') {
+      var elm = document.createElement(tagName);
+      elm.innerHTML = html;
+      return elm.firstChild;
+    }
+
+    var id, className, content, attrs = {};
+
+    for(var key in html) {
+      var value = html[key];
+      switch(key) {
+      case "id": id = value; break;
+
+      case "class": case "className": className = value; break;
+      case "content": case "html": content = Bart.html(value); break;
+      case "textContent": case "text": content = value.toString(); break;
+
+      case "tag": case "tagName": tagName = value; break;
+      default:
+        if (typeof value === 'object') {
+          content = Bart.html(value, key);
+        } else {
+          attrs[key] = value;
+        }
+        break;
+      }
+    }
+
+    var elm = document.createElement(tagName);
+    className && (elm.className = className);
+    id && (elm.id = id);
+    for(var key in attrs) {
+      elm.setAttribute(key, attrs[key]);
+    }
+
+    if (typeof content === "string")
+      elm.textContent = content;
+    else
+      content && elm.appendChild(content);
+
+    return elm;
+  },
+
+  escapeHTML: function(text) {
+    var pre = document.createElement('pre');
+    pre.appendChild(document.createTextNode(text));
+    return pre.innerHTML;
   },
 
   hasClass: function (elm, name) {
@@ -147,6 +232,10 @@ Bart = {
 
   stopEvent: function () {
     currentEvent = null;
+  },
+
+  stopPropigation: function () {
+    currentEvent = 'propigation';
   },
 
   destroyData: function (elm) {
@@ -289,6 +378,16 @@ Bart = {
     }
   },
 
+  searchUpFor: function (elm, func, stopClass) {
+    if (! elm) return null;
+    while(elm && elm.nodeType !== DOCUMENT_NODE) {
+      if (func(elm)) return elm;
+      if (Bart.hasClass(elm, stopClass)) return null;
+      elm = elm.parentNode;
+    }
+    return null;
+  },
+
   getClosestClass: function (elm, className) {
     while(elm && elm.nodeType !== DOCUMENT_NODE) {
       if (Bart.hasClass(elm, className)) return elm;
@@ -340,7 +439,11 @@ Bart = {
   vendorPrefix: vendorFuncPrefix,
 
   hasPointerEvents: true,
+
+  INPUT_SELECTOR: 'input,textarea,select,select>option,[contenteditable="true"]',
 };
+
+Bart.WIDGET_SELECTOR = Bart.INPUT_SELECTOR+',button,a';
 
 if (! document.head.classList) {
   Bart.hasClass = function (elm, name) {
@@ -740,6 +843,7 @@ function nativeOn(parent, eventType, selector, func) {
 }
 
 function onEvent(event) {
+  if (_disable_focusout && event.type == 'focusout') return;
   currentEvent = event;
   currentCtx = event.currentTarget._bart;
   var eventTypes = currentCtx._events[event.type];
@@ -792,8 +896,8 @@ function onEvent(event) {
 }
 
 function fire(event, elm, func) {
-  if (func.call(elm, event) === false || currentEvent === null) {
-    event.preventDefault();
+  if (func.call(elm, event) === false || currentEvent !== event) {
+    currentEvent === 'propigation' || event.preventDefault();
     event.stopImmediatePropagation();
     return true;
   }

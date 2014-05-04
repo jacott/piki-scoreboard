@@ -233,8 +233,10 @@ BaseModel.defineSubclass = function (name,properties,options) {
     return !! model.findOne(condition, {transform: null, fields: {_id: 1}});
   };
 
-  model.attrFind = _support.attrFind;
-
+  model.findById = function (id) {
+    var attrs = model.attrFind.call(model, id);
+    return attrs && new model(attrs);
+  };
 
   if (options.saveRpc || Meteor.isClient) {
     model.remote({
@@ -476,7 +478,7 @@ var versionProperty = {
 function belongsTo(model, name, field) {
   return function () {
     var value = this[field];
-    return value && this.$cacheRef(name)[value] || (this.$cacheRef(name)[value] = model.findOne(value));
+    return value && this.$cacheRef(name)[value] || (this.$cacheRef(name)[value] = model.findById(value));
   };
 }
 

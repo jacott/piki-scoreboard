@@ -5,6 +5,12 @@ Package.describe({
 Package.on_use(function(api) {
   api.export(['AppRoute', '_Test'], 'client');
   api.use(['less', 'bart', 'app-models'], 'client');
+  api.use(['app-models'], 'server');
+
+   api.add_files([
+     'markdown.js',
+   ], ['client', 'server']);
+
 
   api.add_files([
     'client/app-route.js',
@@ -14,7 +20,12 @@ Package.on_use(function(api) {
     'html/form.bhtml',
     'html/in-place-form.bhtml',
     'html/page-link.bhtml',
+    'html/markdown-editor.bhtml',
+    'html/markdown-editor-mention.bhtml',
+    'html/markdown-editor-toolbar.bhtml',
     'html/dialog.bhtml',
+
+    'css/markdown-editor.less',
 
     'client/bart-ext.js',
     'client/form.js',
@@ -24,6 +35,10 @@ Package.on_use(function(api) {
     'client/in-place-form.js',
     'client/page-link.js',
     'client/select-list.js',
+    'client/markdown.js',
+    'client/markdown-editor.js',
+    'client/markdown-editor-mention.js',
+    'client/markdown-editor-toolbar.js',
     'client/dialog.js',
 
   ], 'client');
@@ -35,6 +50,7 @@ Package.on_use(function(api) {
       'test/html/button-menu-test.bhtml',
       'test/html/complete-list-test.bhtml',
       'test/html/select-list-test.bhtml',
+      'test/html/markdown-editor-test.bhtml',
     ], 'client');
   }
 });

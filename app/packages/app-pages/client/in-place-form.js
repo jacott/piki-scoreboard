@@ -7,24 +7,24 @@ Tpl.$helpers({
 
     if (options.editTpl) return options.editTpl.$autoRender(options);
 
-    switch (options.type) {
-    case 'textarea':
-      var elm = document.createElement('textarea');
-      break;
-    default:
-      var elm = document.createElement('input');
-      elm.setAttribute('type', options.type || 'text');
-      break;
-    }
-    if (options.value)
-      elm.value = options.value;
-    elm.setAttribute('name', options.name || 'name');
+    var fieldOptions = {
+      type: options.type,
+    };
+
     for(var key in options) {
       var m = /^html-(.*)$/.exec(key);
       if (m)
-        elm.setAttribute(m[1], options[key]);
+        fieldOptions[m[1]] = options[key];
     }
-    return elm;
+
+    var name = options.name || 'name';
+    var doc = options.doc;
+    if (! doc) {
+      doc = {};
+      doc[name] = options.value;
+    }
+
+    return Bart.Form.field(doc, name, fieldOptions);
   },
 
   deleteButton: function () {
@@ -71,7 +71,9 @@ Tpl.$events({
     var ctx = Bart.getCtx(this);
     var widget = ctx._widget;
 
-    var value = this.firstChild.value;
+    var input = this.firstChild;
+
+    var value = input.value;
 
     widget._onSubmit && widget._onSubmit(value, this);
   },
@@ -139,7 +141,7 @@ Tpl.$extend({
         var target = this;
         if (Bart.matches(target, '.readOnly *')) return;
         var ctx = Bart.getCtx(target);
-        ctx.options.value = ctx.data.doc[ctx.options.name];
+        ctx.options.value = (ctx.options.doc = ctx.data.doc)[ctx.options.name];
         var widget = Tpl.swapFor(target, ctx.options);
         widget.onSubmit(function (value, form) {
           var doc = ctx.data.doc;

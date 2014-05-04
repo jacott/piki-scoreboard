@@ -61,6 +61,12 @@ AppVal = {
     return truthy;
   },
 
+  allowIfFound: function (truthy) {
+     if (! truthy) {
+       throw new Meteor.Error(404, 'Not found');
+     }
+  },
+
   validateName: function (name, length) {
     if (typeof name !== 'string')
       return ['is_required'];

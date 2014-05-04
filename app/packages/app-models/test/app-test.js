@@ -9,11 +9,6 @@
       delete AppModel.TModel;
     },
 
-    "test setTimeout, clearTimeout": function () {
-      assert.same(App.setTimeout, setTimeout);
-      assert.same(App.clearTimeout, clearTimeout);
-    },
-
     "nestedHash": {
       "test setNestedHash": function () {
         var hash = {};

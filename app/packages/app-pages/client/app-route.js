@@ -12,22 +12,18 @@ AppRoute.prototype = {
   constructor: AppRoute,
 
   addTemplate: function (template, options) {
-    options = options || {};
-    var path = options.path;
-    if (path == null) path = templatePath(template);
-    if (path in this.routes) throw new Error('Path already exists! ', path + " for template " + this.path);
-    this.routes[path] = template;
-    template.route = this;
-    template.subPath = path;
-
-    if (options.defaultPage)
-      this.defaultPage = template;
-
+    options = addCommon(this, template, options);
     if (! ('onEntry' in template))
       template.onEntry = onEntryFunc(template, options);
 
     if (! ('onExit' in template))
       template.onExit = onExitFunc(template);
+  },
+
+  addDialog: function (template, options) {
+    options = addCommon(this, template, options);
+
+    template.isDialog = true;
   },
 
   addAlias: function (template, path) {
@@ -55,6 +51,22 @@ AppRoute.prototype = {
   },
 };
 
+function addCommon(route, template, options) {
+  options = options || {};
+  var path = options.path;
+  if (path == null) path = templatePath(template);
+  if (path in route.routes) throw new Error('Path already exists! ', path + " for template " + this.path);
+  route.routes[path] = template;
+  template.route = route;
+  template.subPath = path;
+  template.routeOptions = options;
+
+  if (options.defaultPage)
+    route.defaultPage = template;
+
+  return options;
+}
+
 var inGotoPage = false;
 var currentPage = null;
 var currentPageRoute = {};
@@ -63,6 +75,10 @@ var pageState = 'pushState';
 var excludes = {append: 1, href: 1, hash: 1, search: 1};
 App.extend(AppRoute, {
   root: new AppRoute(),
+
+  _private: {
+    get pageState() {return pageState},
+  },
 
   abortPage: function (location) {
     if (inGotoPage) {
@@ -77,6 +93,11 @@ App.extend(AppRoute, {
 
   pathname: pathname,
 
+  replacePage: function () {
+    pageState = 'replaceState';
+    return this.gotoPage.apply(this, arguments);
+  },
+
   gotoPage: function (page, pageRoute) {
     if (page && ! ('onEntry' in page)) {
       if ('route' in page)
@@ -90,7 +111,23 @@ App.extend(AppRoute, {
 
     AppRoute.loadingArgs = [page, pageRoute];
 
-    try {
+    if (page && page.routeOptions && page.routeOptions.privatePage && ! App.userId()) {
+      AppRoute.replacePage(AppRoute.SignPage, {returnTo: AppRoute.loadingArgs});
+      return;
+    }
+
+    if (page && page.isDialog) {
+      try {
+        page.onEntry(page, pageRoute);
+      }
+      catch(ex) {
+        if (ex.abortPage) {
+          ex.location && this.replacePath(ex.location);
+          return;
+        }
+        throw ex;
+      }
+    } else try {
       inGotoPage = true;
       if (currentPage) {
         currentPage.onExit && currentPage.onExit(page, pageRoute);
@@ -125,7 +162,6 @@ App.extend(AppRoute, {
         ex.location && this.replacePath(ex.location);
         return;
       }
-      console.log('Error', ex.stack);
       throw ex;
     }
     finally {
@@ -249,11 +285,13 @@ function exitEntry(exit, oldSymbols, entry, pageRoute, page) {
   }
 
   for(index = 0;index < diff; ++index) {
-    exit[index].onBaseExit(page, pageRoute);
+    var tpl = exit[index];
+    tpl.onBaseExit && tpl.onBaseExit(page, pageRoute);
   }
 
   for(;index <= exitLen; ++index) {
-    exit[index].onBaseExit(page, pageRoute);
+    var tpl = exit[index];
+    tpl.onBaseExit && tpl.onBaseExit(page, pageRoute);
   }
 
   currentPage = exit[index];
@@ -303,12 +341,8 @@ function templatePath(template) {
 }
 
 function onEntryFunc(template, options) {
-  return function (page, location) {
+  return function (page, pageRoute) {
     if (options) {
-      if (! App.userId() && options.privatePage) {
-        AppRoute.gotoPage(AppRoute.SignPage);
-        return false;
-      }
       if (typeof options.data ==='function') {
         var data = options.data.apply(template, arguments);
       } else {

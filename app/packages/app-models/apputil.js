@@ -1,5 +1,34 @@
+var backgroundColorOptions = {};
+var backgroundBorderColorOptions = {};
+
+var DAY = 24*60*60*1000;
+
 Apputil = {
   TwoIndex: TwoIndex,
+
+  atHour: function (date, hour) {
+    var orig = +date;
+    date = new Date(orig);
+
+    date.setUTCHours(hour);
+
+    if (orig > +date)
+      date = new Date(DAY + +date);
+
+    return date;
+  },
+
+  atDowHour: function (date, dow, hour) {
+    var orig = +date;
+    date = new Date(orig);
+
+    date.setUTCHours(hour);
+    var day = ((dow - date.getUTCDay() + 7) % 7);
+
+    date = DAY*day + +date;
+
+    return new Date( (orig > date ? 7*DAY : 0) + date);
+  },
 
   inspect: function (o) {
     return inspect(o, 4).toString();
@@ -7,6 +36,10 @@ Apputil = {
 
   regexEscape: function (s) {
     return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+  },
+
+  newEscRegex: function (s) {
+    return new RegExp(this.regexEscape(s));
   },
 
   niceFilename: function (name) {
@@ -23,6 +56,32 @@ Apputil = {
       if (list2[i] in set) return true;
     }
     return false;
+  },
+
+  backgroundColorStyle: Meteor.isClient ? function (color) {
+    color = color || '#ffffff';
+    var options = backgroundColorOptions[color];
+    if (options) return options;
+    return backgroundColorOptions[color] = Apputil.hashToCss({
+      'background-color': color,
+      color: Apputil.contrastColor(color, '#4d4d4d'),
+    });
+  } : function () {
+    return '';
+  },
+
+  backgroundAndBoarderColorStyle: Meteor.isClient ? function (color) {
+    color = color || '#ffffff';
+    var options = backgroundBorderColorOptions[color];
+    if (options) return options;
+    var contrast = Apputil.contrastColor(color, '#4d4d4d');
+    return backgroundBorderColorOptions[color] = Apputil.hashToCss({
+      'background-color': color,
+      color: contrast,
+      'border-color': Apputil.fade(contrast, 30),
+    });
+  } : function () {
+    return '';
   },
 
   colorOnLight: function (color) {
@@ -159,24 +218,13 @@ Apputil = {
   },
 
   compareByName: function (a, b) {
-    var afield = a.name, bfield = b.name;
-    if (afield == bfield) return 0;
-    if (! afield) return -1;
-    if (! bfield) return 1;
-    return afield.toLowerCase() < bfield.toLowerCase() ? -1 : 1;
+    return a.name === b.name ? 0 : a.name < b.name ? -1 : 1;
   },
 
   compareByField: function (field) {
     return function (a, b) {
       var afield = a[field], bfield = b[field];
-      if (afield == bfield) return 0;
-      if (! afield) return -1;
-      if (! bfield) return 1;
-      if (typeof afield === 'string')
-        afield = afield.toLowerCase();
-      if (typeof bfield === 'string')
-        bfield = bfield.toLowerCase();
-      return afield < bfield ? -1 : 1;
+      return a[field] === b[field] ? 0 : a[field] < b[field] ? -1 : 1;
     };
   },
 
@@ -209,16 +257,58 @@ Apputil = {
     return -1;
   },
 
-  toMap: function (list, keyName, valueName) {
-    var result = {};
-    if (!list) return result;
+  indexOfRegex: function (list, value, fieldName) {
+    if (!list) return;
+    fieldName = fieldName || '_id';
     for(var i=0; i < list.length; ++i) {
-      if (keyName) {
-        result[list[i][keyName]] = ( valueName ?
-                                     ( valueName === true ? true : list[i][valueName] ) :
-                                     list[i] );
-      } else {
-        result[list[i]] = true;
+      var row = list[i];
+      if (value.test(row[fieldName]))
+        return i;
+    }
+    return -1;
+  },
+
+  union: function () {
+    var result = [];
+    var mapped = {};
+    for(var i = 0; i < arguments.length; ++i) {
+      var row = arguments[i];
+      if (! row) continue;
+
+      for(var j = 0; j < row.length; ++j) {
+        var item = row[j].toString();
+
+        if (item in mapped) continue;
+        mapped[item] = true;
+
+        result.push(row[j]);
+      }
+    }
+
+    return result;
+  },
+
+  toMap: function (/* keyName, valueName, lists */) {
+    var result = {};
+    var lc = 2;
+    if (arguments.length === 1) {
+      lc = 0;
+    } else {
+      var keyName = arguments[0];
+      var valueName = arguments[1];
+    }
+    for(;lc < arguments.length; ++lc) {
+      var list = arguments[lc];
+      if (!list) continue;
+
+      for(var i=0; i < list.length; ++i) {
+        if (keyName) {
+          result[list[i][keyName]] = ( valueName ?
+                                       ( valueName === true ? true : list[i][valueName] ) :
+                                       list[i] );
+        } else {
+          result[list[i]] = true;
+        }
       }
     }
     return result;
@@ -277,6 +367,10 @@ Apputil = {
   },
 
   EMAIL_RE: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+
+  emailAddress: function (email, name) {
+    return name.replace(/[<>]/g, '') + " <" + email + ">";
+  },
 
   parseEmailAddresses: function (input) {
     input = input || "";

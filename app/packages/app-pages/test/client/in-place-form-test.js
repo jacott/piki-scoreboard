@@ -14,7 +14,7 @@
     },
 
     "test defaults": function () {
-      var sut = Bart.InPlaceForm.$render({});
+      var sut = Bart.InPlaceForm.$render({doc: {}});
 
       assert.dom(sut, function () {
         assert.dom('input[type=text][name=name]', function () {
@@ -26,8 +26,23 @@
       });
     },
 
+    "test no doc": function () {
+      var sut = Bart.InPlaceForm.$render({value: "foo"});
+
+      assert.dom(sut, function () {
+        assert.dom('input[type=text][name=name]', function () {
+          assert.same(this.value, 'foo');
+        });
+        assert.dom('fieldset', function () {
+          assert.dom('button[name=apply]', 'Apply');
+        });
+      });
+    },
+
     "test render": function () {
-      var sut = Bart.InPlaceForm.$render({applyName: 'Save', type: 'text', value: 'abc', name: 'foo', "html-id": 'My_foo', 'html-maxLength': 4});
+      var sut = Bart.InPlaceForm.$render({
+        doc: {foo: 'abc'}, applyName: 'Save', type: 'text',
+        name: 'foo', "html-id": 'My_foo', 'html-maxLength': 4});
 
       assert.dom(sut, function () {
         assert.dom('input#My_foo[type=text][name=foo][maxLength="4"]', function () {
@@ -41,7 +56,7 @@
     },
 
     "test apply event": function () {
-      var widget = Bart.InPlaceForm.newWidget({value: 'abc'});
+      var widget = Bart.InPlaceForm.newWidget({doc: {name: 'abc'}});
       widget.onSubmit(v.clickStub = function (arg) {
         assert.same(this, widget);
         v.arg = arg;
@@ -64,7 +79,7 @@
     },
 
     "test delete event": function () {
-      var widget = Bart.InPlaceForm.newWidget({value: 'abc', deleteName: 'Delete me', deleteConfirmMsg: 'Are you sure about it?'});
+      var widget = Bart.InPlaceForm.newWidget({doc: {name: 'abc'}, deleteName: 'Delete me', deleteConfirmMsg: 'Are you sure about it?'});
       widget.onDelete(v.clickStub = function () {
         assert.same(this, widget);
         v.arg = true;
@@ -116,7 +131,7 @@
     "test swap escape": function () {
       v.parent.appendChild(v.elm = document.createElement('span'));
 
-      var widget = Bart.InPlaceForm.swapFor(v.elm, {value: 'foo'});
+      var widget = Bart.InPlaceForm.swapFor(v.elm, {doc: {name: 'foo'}});
 
       assert.same(widget.swap, v.elm);
 

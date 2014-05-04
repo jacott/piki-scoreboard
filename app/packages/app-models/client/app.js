@@ -1,4 +1,11 @@
 App.extend(App, {
+  setTimeout: function (func, to) {
+    return window.setTimeout(func, to);
+  },
+  clearTimeout: function (handle) {
+    return window.clearTimeout(handle);
+  },
+
   userId: function () {
     return Meteor.userId();
   },

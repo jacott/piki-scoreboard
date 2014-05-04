@@ -9,9 +9,6 @@ if (typeof deprecateWarning === 'undefined') {
 var timeWarp = 0;
 
 App = {
-  setTimeout: setTimeout,
-  clearTimeout: clearTimeout,
-
   setNestedHash: function (value, hash /*, keys */) {
     var last = arguments.length-1;
     for(var i = 2; i < last; ++i) {
@@ -214,6 +211,8 @@ function initModule(func, curr) {
     else
       funcs.push(func);
   };
+
+  App.require._funcsFor = funcsFor;
 
   function nestedRequire(names, func) {
     return function (model) {

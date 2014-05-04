@@ -13,6 +13,27 @@ function fileServer() {
 
   WebApp.connectHandlers
     .use('/store', connect.static(process.env.APP_FS_DIR));
+
+
+  var url = Npm.require('url');
+
+  WebApp.connectHandlers
+    .use('/_', function (req, res, next) {
+      if ('GET' != req.method && 'HEAD' != req.method) return next();
+      var originalUrl = url.parse(req.originalUrl);
+
+      var m = /^\/_(\/\w\w\/\w\w\/\w+)\/.*(\.\w+)$/.exec(originalUrl.pathname);
+      if (! m) {
+        next();
+        return;
+      }
+
+      var target = '/store'+m[1]+m[2];
+
+      res.statusCode = 303;
+      res.setHeader('Location', target);
+      res.end('Redirecting to ' + target);
+    });
 }
 
 AppFS = {
@@ -44,7 +65,7 @@ function use(connection, root, func) {
       } catch(ex) {
         res.writeHead(503);
         res.end("");
-          console.log('ERROR ', ex.message, ex.stack);
+        console.log('ERROR ', ex.message, ex.stack);
       }
     }).run();
   });
