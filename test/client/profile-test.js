@@ -13,7 +13,7 @@
 
     "with user": {
       setUp: function () {
-        TH.login(v.user = TH.Factory.createUser());
+        TH.loginAs(v.user = TH.Factory.createUser());
 
         AppRoute.gotoPage(Bart.Profile);
       },
@@ -94,7 +94,7 @@
     },
 
     "test super user has system-setup link": function () {
-      TH.login(v.su);
+      TH.loginAs(v.su);
 
       AppRoute.gotoPage(Bart.Profile);
 

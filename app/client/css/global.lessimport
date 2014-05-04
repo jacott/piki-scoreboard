@@ -30,6 +30,38 @@
   }
 }
 
+.displayFlex() {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.flex(@rest) {
+  -webkit-box-flex: @rest;
+  -ms-flex: @rest;
+  flex: @rest;
+}
+
+.flexJustify(@pos) {
+  -webkit-justify-content: @pos;
+  -moz-justify-content: @pos;
+  justify-content: @pos;
+}
+
+.flexAlign(@pos) {
+  -webkit-align-items: @pos;
+  -moz-align-items: @pos;
+  align-items: @pos;
+}
+
+.flexFlow(@dir, @wrap: nowrap) {
+  .displayFlex();
+  -webkit-box-direction: @dir;
+  -webkit-box-wrap: @wrap;
+  -ms-flex-flow: @dir @wrap;
+  flex-flow: @dir @wrap;
+}
+
 .content-box() {
   -moz-box-sizing: content-box;
   box-sizing: content-box;

@@ -76,6 +76,12 @@ TH = (function () {
       return e;
     },
 
+    findBartEvent: function (template, type) {
+      return template._events.filter(function (event) {
+        return event[0] === type;
+      });
+    },
+
     setColor: function (node, value) {
       TH.click(node);
       assert(document.getElementById('ColorPicker'));
@@ -94,9 +100,34 @@ TH = (function () {
         };
         assert.dom.apply(assert, args);
       } else {
-        (node.nodeType ? node : node[0]).value = value;
+        if ('value' in node)
+          node.value = value;
+        else
+          node.textContent = value;
+
         this.trigger(node, 'input');
       }
+    },
+
+    keypress: function (elm, keycode, shift, ctrl, alt, meta) {
+      if (typeof keycode === 'string') keycode = keycode.charCodeAt(0);
+
+      var pressEvent = document.createEvent ("KeyboardEvent");  //https://developer.mozilla.org/en/DOM/event.initKeyEvent
+
+      if ('initKeyboardEvent' in pressEvent) {
+        pressEvent.initKeyboardEvent("keypress", true, true, window,
+                                     null, null,
+                                     ctrl, alt, shift, meta);
+        // Chromium Hack
+        Object.defineProperty(pressEvent, 'which', {get : function() {return keycode}});
+
+      } else {
+        // firefox
+        pressEvent.initKeyEvent ("keypress", true, true, window,
+                                 ctrl, alt, shift, meta,
+                                 keycode, keycode);
+      }
+      elm.dispatchEvent (pressEvent);
     },
 
     change: function (node, value) {
@@ -113,23 +144,19 @@ TH = (function () {
       }
     },
 
-    flushEvent: function (node, event, args) {
-      event = this.trigger(node, event, args);
-      Deps.flush();
-      return event;
-    },
-
     trigger: function (node, event, args) {
       if (typeof node === 'string') {
         assert.dom(node, function () {
           TH.trigger(this, event, args);
         });
       } else {
-        node = (node.nodeType ? node : node[0]);
         assert(node,'node not found');
 
-        if (typeof event === 'string')
+        if (typeof event === 'string') {
+         if (event === 'mousewheel')
+           event = Bart.MOUSEWHEEL_EVENT;
           event =  this.buildEvent(event, args);
+        }
 
         if (document.createEvent) {
           node.dispatchEvent(event);
@@ -140,29 +167,6 @@ TH = (function () {
       }
     },
 
-    focusElement: function(elem) {
-      // This sequence is for benefit of IE 8 and 9;
-      // test there before changing.
-      window.focus();
-      elem.focus();
-      elem.focus();
-
-      // focus() should set document.activeElement
-      if (document.activeElement !== elem)
-        throw new Error("focus() didn't set activeElement");
-    },
-
-    blurElement: function(elem) {
-      elem.blur();
-      if (document.activeElement === elem)
-        throw new Error("blur() didn't affect activeElement");
-    },
-
-    flushClick: function (node) {
-      this.click(node);
-      Deps.flush();
-    },
-
     click: function(node) {
       if (typeof node === 'string') {
         var args = Apputil.slice(arguments);
@@ -171,7 +175,10 @@ TH = (function () {
         });
         assert.dom.apply(assert, args);
       } else {
-        TH.trigger(node, 'click');
+        if (node.click)
+          node.click(); // supported by form controls cross-browser; most native way
+        else
+          TH.trigger(node, 'click');
       }
     },
 
@@ -209,11 +216,6 @@ TH = (function () {
       });
     },
 
-    subscriptionStub: function (ready) {
-      var subStub = {called: 0, ready: function () {return !! ready;}, stop: sinon.stub()};
-      return subStub;
-    },
-
     addStyles: function (styles) {
       var style = Bart.html('<style class="testStyle"></style>');
 
@@ -235,13 +237,6 @@ TH = (function () {
         node=node.parentNode;
       }
       return hierarchy;
-    },
-
-    addMain: function () {
-      var main = document.getElementById('main');
-      if (main) return main;
-      document.body.appendChild(Bart.html('<header></header><section id="main" style="width:1200px; height:800px"></section>'));
-      return document.getElementById('main');
     },
 
     user: function () {
@@ -284,15 +279,7 @@ TH = (function () {
       return DDP._CurrentInvocation.withValue(new MethodInvocation(TH.invocation = {userId: TH.userId()}), func);
     },
 
-    login: function (test, func) {
-      if (test !== geddon.test) {
-        if(arguments.length == 1) {
-          if (typeof test === 'function')
-            func = test;
-          else if (test != null) {
-          }
-        }
-      }
+    login: function (func) {
       return this.loginAs(user || TH.Factory.last.user || TH.Factory.createUser(), func);
     },
 
@@ -319,6 +306,18 @@ TH = (function () {
         },
       };
     },
+
+    nullfunc: nullfunc,
+
+    MethodInvocation: MethodInvocation,
+
+    match: {
+      model: function (expect) {
+        return sinon.match(function (actual) {
+          return actual._id === expect._id;
+        });
+      }
+    },
   };
 
   function MethodInvocation(options) {
@@ -327,7 +326,7 @@ TH = (function () {
     // call this function to allow other method invocations (from the
     // same client) to continue running without waiting for this one to
     // complete.
-    this._unblock = options.unblock || function () {};
+    this._unblock = options.unblock || nullfunc;
     this._calledUnblock = false;
 
     // current user id
@@ -335,7 +334,7 @@ TH = (function () {
 
     // sets current user id in all appropriate server contexts and
     // reruns subscriptions
-    this._setUserId = options.setUserId || function () {};
+    this.setUserId = options.setUserId || nullfunc;
 
     // Scratch data scoped to this connection (livedata_connection on the
     // client, livedata_session on the server). This is only used
@@ -343,6 +342,8 @@ TH = (function () {
     // sort of thing someday.
     this._sessionData = options.sessionData;
   }
+
+  function nullfunc() {}
 })();
 
 if (Meteor.isServer) {
