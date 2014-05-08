@@ -464,7 +464,12 @@
         </p>
         <p>
           <h1>Boulder scores</h1>
-          Beside each competitor's name, in the <i>Result</i> column, is a score box for each boulder in the course.<br><br>
+          Beside each competitor's name, in the <i>Result</i> column, is a score box for each boulder in the course. There are two cells in each score box:
+          <ol>
+            <li>At the <b>top left</b>: <img src="/images/boulder-score-attempts-to-top.png" alt="Enter attempts to complete"  width="32" height="32" style="padding:3px; vertical-align: middle; margin-bottom: 3px; margin-left: 1px;"></li>
+            <li>At the <b>bottom right</b>: <img src="/images/boulder-score-attempts-to-bonus.png" alt="Enter attempts to complete" width="32" height="32" style="padding:3px; vertical-align: middle; margin-bottom: 3px; margin-left: 1px;"></li>
+          </ol>
+          <br>
           <table>
             <tr>
               <th>To show:</th>
@@ -479,11 +484,11 @@
             <tr>
               <td>The competitor's <b>attempts to achieve the bonus</b></td>
               <td>The number of attempts it took the competitor to achieve the bonus</td>
-              <td>The <b>lower right cell</b> in the score box.</td>
+              <td>The <b>lower right cell</b> in the score box</td>
             </tr>
             <tr>
               <td>The competitor <b>did not complete the boulder</b></td>
-              <td>Nothing (leave blank) or "<b>-</b>" (dash)</td>
+              <td>"<b>-</b>" (dash)</td>
               <td>The <b>top left cell</b> in the score box</td>
             </tr>
             <tr>
