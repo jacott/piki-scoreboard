@@ -1,5 +1,0 @@
-<template name="Test">
-  <template name="TOne">
-    {{field "name" type="simple" count=2}}
-  </template>
-</template>

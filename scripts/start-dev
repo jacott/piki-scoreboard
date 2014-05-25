@@ -1,77 +1,15 @@
 #!/bin/bash
 set -em
 
-METEORDIR=~/github/meteor
-
 cd `dirname "$0"`/../app
 
 # export NODE_OPTIONS='--prof'
 # send SIGUSR1 to debug
 
-if [ "${1:-development}" = "test" ];then
-    cd ..
-    node_modules/karma/bin/karma start test/karma/karma.conf.js &
-    karma=$!
-    cd app
+type=${1:-demo}
+shift
 
-    mkdir -p /tmp/pikidb
-
-    export MONGO_URL="mongodb://localhost:3003/meteor"
-    export MONGO_OPLOG_URL="mongodb://localhost:3003/local?authSource=admin"
-    export PORT=3100
-    export METEOR_MODE=test
-
-    export APP_FS_DIR=/tmp/pikifs
-    rm -rf $APP_FS_DIR
-    mkdir -p $APP_FS_DIR
-
-    $METEORDIR/dev_bundle/mongodb/bin/mongod --quiet --nojournal --oplogSize 1 --replSet meteor --smallfiles --port 3003 --dbpath /tmp/pikidb >/tmp/pikidb.log 2>&1 &
-    mongo=$!
-    sleep 2
-    $METEORDIR/meteor run --port $PORT &
-    meteor=$!
-
-    function killKids {
-        kill $karma $mongo $meteor 2>/dev/null
-    }
-    trap "killKids" SIGCHLD
-    trap "killKids" 0
-
-    wait
-else
-    # export DISABLE_WEBSOCKETS=true
-    # export DDP_DEFAULT_CONNECTION_URL=http://localhost:3030
-    export METEOR_MODE=development
-
-    export APP_FS_DIR=$HOME/pikifs
-    mkdir -p $APP_FS_DIR
-
-    export MONGO_URL="mongodb://localhost:3003/meteor"
-    export MONGO_OPLOG_URL="mongodb://localhost:3003/local?authSource=admin"
-    PORT=3000
-
-    while getopts p: option
-    do
-        case "${option}"
-            in
-            p) PORT=${OPTARG};;
-        esac
-    done
-    export PORT
-
-    mkdir -p .meteor/local/db/
-
-
-    $METEORDIR/dev_bundle/mongodb/bin/mongod --quiet --nojournal --oplogSize 2 --replSet meteor --smallfiles --port 3003 --dbpath .meteor/local/db/ >../tmp/pikidb.log 2>&1 &
-    mongo=$!
-    exec $METEORDIR/meteor run --port $PORT &
-    meteor=$!
-
-    function killKids {
-        kill $mongo $meteor 2>/dev/null
-    }
-    trap "killKids" SIGCHLD
-    trap "killKids" 0
-
-    wait
+if [ $type = demo ];then
+    type="."
 fi
+exec node ${type}/server.js "$@"
