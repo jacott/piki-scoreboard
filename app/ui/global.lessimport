@@ -1,0 +1,132 @@
+@import "color-palette.lessimport";
+
+@import "icon-font-codes.lessimport";
+
+@import "geometry.lessimport";
+
+.spin()  {
+  -webkit-animation: spin 2s infinite linear;
+  -moz-animation: spin 2s infinite linear;
+  -o-animation: spin 2s infinite linear;
+  animation: spin 2s infinite linear;
+}
+
+.clearAfter() {
+  &:after {
+    content: " ";
+    display: table;
+    clear: both;
+  }
+}
+
+.inline-icon(@content) {
+  font-family: "iconFont";
+  content: @content;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1;
+}
+
+.icon(@content) {
+  &:before {
+    .inline-icon(@content);
+  }
+}
+
+.displayFlex() {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.flex(@rest) {
+  -webkit-box-flex: @rest;
+  -ms-flex: @rest;
+  flex: @rest;
+}
+
+.flexJustify(@pos) {
+  -webkit-justify-content: @pos;
+  -moz-justify-content: @pos;
+  justify-content: @pos;
+}
+
+.flexAlign(@pos) {
+  -webkit-align-items: @pos;
+  -moz-align-items: @pos;
+  align-items: @pos;
+}
+
+.flexFlow(@dir, @wrap: nowrap) {
+  .displayFlex();
+  -webkit-box-direction: @dir;
+  -webkit-box-wrap: @wrap;
+  -ms-flex-flow: @dir @wrap;
+  flex-flow: @dir @wrap;
+}
+
+.content-box() {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+
+
+.linear-gradient(@top,@bottom) {
+  background-color: @bottom;
+  background-image: -ms-linear-gradient(top,  @top 0%,@bottom 100%);
+  background-image: linear-gradient(to bottom,  @top 0%,@bottom 100%);
+}
+
+.angle-linear-gradient(@angle, @top,@bottom) {
+  background-image: linear-gradient(@angle, @top, @bottom);
+}
+
+
+.transform(@rest) {
+  -webkit-transform: @rest;
+  -moz-transform: @rest;
+  transform: @rest;
+}
+
+.transform-origin(@rest) {
+  -webkit-transform-origin: @rest;
+  -moz-transform-origin: @rest;
+  transform-origin: @rest;
+}
+
+.transition_transform(@rest) {
+  -webkit-transition: -webkit-transform @rest;
+  -moz-transition: -moz-transform @rest;
+  transition: transform @rest;
+}
+
+.preserve-3d() {
+  -webkit-transform-style: preserve-3d;
+  -moz-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+
+.transition(@rest...) {
+  -webkit-transition: @rest;
+  -moz-transition: @rest;
+  transition: @rest;
+}
+
+.box-shadow(@rest) {
+  -webkit-box-shadow: @rest;
+  -moz-box-shadow: @rest;
+  box-shadow: @rest;
+}
+
+.outline(@color: black) {
+  .box-shadow(0 0 0 1px fade(@color, 30%));
+  &:hover {
+    .box-shadow(0 0 0 2px fade(@color, 40%));
+  }
+}
+
+.user-select(@rest) {
+  -webkit-touch-callout: @rest;
+  -webkit-user-select: @rest;
+  -moz-user-select: @rest;
+  user-select: @rest;
+}

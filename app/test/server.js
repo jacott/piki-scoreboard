@@ -1,6 +1,6 @@
 var requirejs = require('requirejs');
 
-var koruPath = '../node_modules/koru/app/koru';
+var koruPath = '../../node_modules/koru/app/koru';
 
 requirejs.config({
   //Use node's special variable __dirname to
@@ -11,7 +11,9 @@ requirejs.config({
   baseUrl: __dirname,
 
   config: {
-    "koru/mongo/driver": {url: "mongodb://localhost:3004/piki"},
+    "koru/env": {appDir: __dirname+'/..'},
+
+    "koru/mongo/driver": {url: "mongodb://localhost:3014/demo"},
 
     "koru/web-server": {port: 3030},
   },
@@ -35,10 +37,7 @@ requirejs.config({
 //Now export a value visible to Node.
 module.exports = {};
 
-requirejs([
-  'koru/env', 'koru/file-watch',
-  'koru/css/less-watcher', 'koru/server', 'koru/server-rc'
-], function (env, fileWatch) {
+requirejs(['koru/env', 'koru/file-watch', 'koru/server' , 'koru/server-rc'], function (env, fileWatch) {
   env.Fiber(function () {
     fileWatch.watch(__dirname + '/' + koruPath, __dirname + '/' + koruPath.slice(0, -5));
     console.log('=> Ready');

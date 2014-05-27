@@ -1,0 +1,28 @@
+@colorBackground: #fff;
+@colorText: #444;
+@colorButtonText: @colorText;
+
+@colorHeaderBackground: #000;
+@colorHeaderText: #fff;
+
+@colorInputErrorBG: #fea;
+@colorErrorText: #974;
+
+@colorSelectedBackground: #8f8;
+
+@colorDialogBorder: @colorDialogText;
+
+@colorShadowMed: fade(black, 50%);
+
+@colorDialogText: @colorText;
+@colorDialogBackground: #f6f6f6;
+
+@colorWarn: #ba3e1d;
+@colorErrorHighlight: @colorWarn;
+@colorOkay: #00aa00;
+
+
+@colorButtonDangerTop: @colorWarn;
+@colorButtonDangerBottom: darken(@colorWarn, 50%);
+
+@colorButtonOkayTextShadow: #054863;

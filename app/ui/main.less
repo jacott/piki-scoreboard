@@ -1,0 +1,142 @@
+@import "global.lessimport";
+
+html {
+  .linear-gradient(#0ff, #eff);
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  overflow: hidden;
+  overflow-x: auto;
+  margin: 0;
+  padding: 0;
+  min-width: @bodyWidth / 2;
+  min-height: 300px;
+  font-family: Arial,Helvetica,sans-serif;
+  font-size: @defaultFontSize;
+  color: @colorText;
+  -webkit-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+  background: rgba(0,0,0,0) url(/images/jj.svg) no-repeat -1px @headerHeight - 1;
+  background-size: 25%;
+
+  &:not(.aAccess) .adminAccess {
+    display: none;
+  }
+
+  &:not(.sAccess) .suAccess {
+    display: none;
+  }
+}
+
+*, :after, :before {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+
+#Header {
+  body:not(.inOrg) &>div {
+    &:after {
+      content: "Piki";
+      margin-left: 10px;
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+    >nav {
+      display: none;
+    }
+  }
+
+  background-color: fade(@colorHeaderBackground, 60%);
+  max-width: 100%;
+  >div {
+    margin: auto;
+    width: @bodyWidth;
+    max-width: 100%;
+    min-width: @bodyWidth / 2;
+    background-color: @colorHeaderBackground;
+    color: @colorHeaderText;
+    height: @headerHeight;
+    line-height: @headerHeight;
+    font-size: 1.2em;
+
+    nav.left {
+      float: left;
+    }
+    nav.title {
+      position: absolute;
+      left: 50%;
+      #PageTitle {
+        position: relative;
+        left: -50%;
+      }
+    }
+    nav.right {
+      float: right;
+    }
+  }
+  &~section {
+    position: absolute;
+    top: @headerHeight;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    > div {
+      background-color: fade(#fff, 90%);
+      height: 100%;
+      overflow: auto;
+      margin: auto;
+      width: @bodyWidth;
+      max-width: 100%;
+      min-width: @bodyWidth / 2;
+    }
+  }
+}
+
+#Main {
+  width: 100%;
+}
+
+@media print {
+  html {
+    .linear-gradient(#0ff, #eff);
+    height: inherit;
+    background: none;
+  }
+
+  body {
+    height: inherit;
+    min-width: inherit;
+    min-height: inherit;
+    background: none;
+
+  }
+
+  #Header {
+    background: none;
+    color: #000;
+    >div {
+      height: 2em;
+      line-height: 2em;
+      background: none;
+      color: #000;
+    }
+  }
+
+  #Header~section {
+    position: static;
+    top: inherit;
+    bottom: inherit;
+    left: inherit;
+    right: inherit;
+    > div {
+      height: inherit;
+      overflow: inherit;
+      margin: auto;
+      width: inherit;
+      min-width: inherit;
+    }
+  }
+}
