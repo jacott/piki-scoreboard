@@ -11,7 +11,7 @@ requirejs.config({
   baseUrl: __dirname,
 
   config: {
-    "koru/mongo/driver": {url: "mongodb://localhost:3004/piki"},
+    "koru/mongo/driver": {url: "mongodb://localhost:3014/demo"},
 
     "koru/web-server": {port: 3030},
   },
@@ -36,10 +36,11 @@ requirejs.config({
 module.exports = {};
 
 requirejs([
-  'koru/env', 'koru/file-watch',
+  'koru/env', 'koru/file-watch', 'server/bootstrap',
   'koru/css/less-watcher', 'koru/server', 'koru/server-rc'
-], function (env, fileWatch) {
+], function (env, fileWatch, bootstrap) {
   env.Fiber(function () {
+    bootstrap();
     fileWatch.watch(__dirname + '/' + koruPath, __dirname + '/' + koruPath.slice(0, -5));
     console.log('=> Ready');
   }).run();

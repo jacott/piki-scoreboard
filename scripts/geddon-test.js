@@ -23,7 +23,7 @@ var WebSocket = require('ws');
 
 var typeCount = ARGV[0] === 'both' ? 2 : 1;
 
-var ws = new WebSocket('ws://localhost:3000/');
+var ws = new WebSocket('ws://localhost:3030/');
 ws.on('open', runTests);
 ws.on('message', function(data, flags) {
   // flags.binary will be set if a binary data is received

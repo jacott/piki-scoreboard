@@ -1,6 +1,6 @@
 var requirejs = require('requirejs');
 
-var koruPath = '../../node_modules/koru/app/koru';
+var koruPath = '../node_modules/koru/app/koru';
 
 requirejs.config({
   //Use node's special variable __dirname to
@@ -8,21 +8,21 @@ requirejs.config({
   //Useful if building a library that will
   //be used in node but does not require the
   //use of node outside
-  baseUrl: __dirname,
+  baseUrl: __dirname+'/..',
 
   config: {
-    "koru/env": {appDir: __dirname+'/..'},
+    "koru/mongo/driver": {url: "mongodb://localhost:3004/koru"},
 
-    "koru/mongo/driver": {url: "mongodb://localhost:3014/demo"},
+    "koru/web-server": {port: 3030, defaultPage: '/test/index.html'},
 
-    "koru/web-server": {port: 3030},
+    "koru/test/build-cmd": {testDirs: ['models', 'ui', 'server']}
   },
-
-  packages: ['koru/model'],
 
   paths: {
     koru: koruPath,
   },
+
+  packages: ['koru/model', 'koru/test'],
 
   //Pass the top-level main.js/index.js require
   //function to requirejs so that node modules
@@ -39,7 +39,7 @@ module.exports = {};
 
 requirejs(['koru/env', 'koru/file-watch', 'koru/server' , 'koru/server-rc'], function (env, fileWatch) {
   env.Fiber(function () {
-    fileWatch.watch(__dirname + '/' + koruPath, __dirname + '/' + koruPath.slice(0, -5));
+    fileWatch.watch(__dirname + '/../' + koruPath, __dirname + '/../' + koruPath.slice(0, -5));
     console.log('=> Ready');
   }).run();
 });

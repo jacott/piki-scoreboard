@@ -5,6 +5,9 @@ requirejs.config({
 define(function(require, exports, module) {
   var env = require('koru/env');
   var session = require('koru/session/client-main');
+
+  session.connect();
+
   require('koru/css/loader').loadAll('ui');
 
   env.onunload(module, function () {

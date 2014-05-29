@@ -1,14 +1,17 @@
 requirejs.config({
   packages: [
-    "koru/test",
+    "koru/test", "koru/model",
   ],
 
   baseUrl: '/',
 });
 
-window.history.replaceState(null, document.title = 'Koru Test Mode', '/');
+window.history.replaceState(null, document.title = 'Piki Test Mode', '/');
 
 
-define(['module', 'koru/env', 'koru/client'], function (module, env) {
+define(function(require, exports, module) {
+  var env = require('koru/env');
+  var client = require('koru/client');
+
   env.onunload(module, 'reload');
 });
