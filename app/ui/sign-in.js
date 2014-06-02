@@ -19,7 +19,7 @@ define(function(require, exports, module) {
   Tpl.$helpers({
     item: function () {
       var me = App.me();
-      if (me)
+      if (me && me.role !== 'g')
         return Tpl.ProfileLink.$autoRender(me);
       else
         return Tpl.SignInLink.$autoRender({});
@@ -35,10 +35,10 @@ define(function(require, exports, module) {
 
   util.extend(Tpl, {
     $created: function (ctx, elm) {
-      ctx.onDestroy(App.onReady(whenReady));
+      ctx.onDestroy(UserAccount.onChange(userChange));
 
-      function whenReady(isReady) {
-        ctx.updateAllTags();
+      function userChange(state) {
+        state === 'ready' && ctx.updateAllTags();
       }
     },
   });

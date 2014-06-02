@@ -1,7 +1,6 @@
 isClient && define(function (require, exports, module) {
   var test, v;
 
-  var App         = require('app');
   var Dom         = require('koru/dom');
   var env         = require('koru/env');
   var Route       = require('koru/ui/route');
@@ -27,7 +26,7 @@ isClient && define(function (require, exports, module) {
       document.body.appendChild(SignIn.$autoRender({}));
       TH.login();
 
-      App.notifyReady();
+      UserAccount.notify('ready');
       refute.dom('[name=signIn]');
       test.stub(Route, 'gotoPath');
       TH.click('#ProfileLink');
