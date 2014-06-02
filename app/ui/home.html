@@ -1,0 +1,30 @@
+<template name="Home">
+  <section id="Home" class="body">
+    <div>
+      <nav class="menu">
+        {{pageLink value="Clubs" template="Club"}}
+        {{pageLink value="Climbers" template="Climber"}}
+        {{pageLink value="Events" template="Event"}}
+        {{pageLink class="adminAccess" value="Competitor categories" template="Category"}}
+      </nav>
+      <section class="body">
+      </section>
+    </div>
+  </section>
+  <template name="ChooseOrg">
+    <section id="ChooseOrg" class="body">
+      <div>
+        <section class="body">
+          <h1>Choose Organization</h1>
+
+          <ul>
+            {{each "orgs" template="Row"}}
+            <template name="Row">
+              <li>{{pageLink value=name link=shortName}}</li>
+            </template>
+          </ul>
+        </section>
+      </div>
+    </section>
+  </template>
+</template>

@@ -1,0 +1,96 @@
+@import "global.lessimport";
+
+#Event {
+  .user-select(none);
+  table th:first-child {
+    width: 60%;
+  }
+
+  form {
+    margin: 10px;
+
+    font-size: 1.2em;
+    >h1 {
+      font-size: 1.4em;
+    }
+
+    [name=name] {
+      width: 50ex;
+    }
+    [name=date] {
+      width: 11ex;
+    }
+  }
+
+  &.noEvent>div>nav>.link {
+    display: none;
+  }
+
+  .events {
+    h1 {
+      font-size: 1.4em;
+    }
+    &>nav {
+      margin: 1em;
+    }
+  }
+
+  table.categories {
+    tr {
+      &:not(:last-child) {
+        border-bottom: 1px solid fade(#000, 10%);
+      }
+      .select {
+        display: inline-block;
+        width: 1.2em;
+        height: 1.2em;
+        cursor: pointer;
+        border: 1px solid fade(#000, 20%);
+      }
+      &.selected {
+        background-color: #aff;
+
+        .select {
+          .icon(@icon-tick);
+        }
+      }
+      &.B+.L {
+        border-top: 1em solid fade(#fff, 0%);
+      }
+    }
+  }
+
+}
+
+
+#Event #Show {
+  form {
+    display: inline-block;
+
+    +.link {
+      display: none;
+    }
+  }
+
+  .action {
+    margin-top: 1em;
+    color: #066;
+    >span {
+      font-weight: bold;
+    }
+  }
+}
+
+#EditEvent .categories {
+  label {
+    display: block;
+    &:nth-child(even) {
+      background-color: fade(#000, 10%);
+    }
+    .name {
+      display: inline-block;
+      width: 15em;
+      margin-right: 10px;
+    }
+  }
+}

@@ -1,0 +1,31 @@
+@import "global.lessimport";
+
+#Climber {
+  table {
+    th:first-child {
+      width: 20em;
+    }
+    th:last-child {
+      width: 20em;
+    }
+    body:not(.aAccess) & {
+      cursor: inherit;
+    }
+  }
+
+  form {
+    margin: 10px;
+
+    font-size: 1.2em;
+    >h1 {
+      font-size: 1.4em;
+    }
+
+    [name=name] {
+      width: 50ex;
+    }
+    [name=dateOfBirth] {
+      width: 11ex;
+    }
+  }
+}

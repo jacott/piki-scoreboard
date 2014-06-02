@@ -1,0 +1,90 @@
+@import "global.lessimport";
+
+.errorMsg {
+  display: none;
+  color: @colorErrorText;
+}
+
+.error+.errorMsg {
+  &:first-letter {
+    text-transform:uppercase;
+  }
+  display: inherit;
+}
+
+.error, .error:focus {
+  background-color: @colorInputErrorBG;
+}
+
+fieldset {
+  border: none;
+  label {
+    display: block;
+    >.name {
+      display: block;
+      font-size: 0.8em;
+      color: @colorText;
+    }
+    margin-top: 0.5em;
+  }
+  &.actions {
+    >button  {
+      margin-right: 1em;
+    }
+  }
+
+  [name=delete] {
+    color: #fff;
+    .linear-gradient(#a00, #800);
+  }
+
+}
+
+table.select {
+  width: 100%;
+  cursor: pointer;
+  thead {
+    border-bottom: 1px solid #000;
+    th {
+      text-align: left;
+    }
+  }
+  tr:nth-child(even) {
+    background-color: fade(#000, 10%);
+  }
+  table-layout:fixed;
+  th, td {
+    padding: 2px;
+  }
+  tbody tr:hover {
+    background-color: #0ff;
+  }
+}
+
+.autoComplete {
+  position: relative;
+  &+ul.complete {
+    position: absolute;
+    margin: 0;
+    border: 1px solid fade(#000, 80%);
+    .box-shadow(0 0 4px fade(#000, 60%));
+    border-bottom-right-radius: 4px;
+    background-color: #fff;
+    color: #444;
+    padding: 4px;
+    >li:hover, >li.selected {
+      color: #000;
+      background: #0ff;
+    }
+  }
+}
+
+@media print {
+  table.select {
+    tr {
+      page-break-inside: avoid;
+      border-bottom: 1px solid #ddd;
+      background: none !important;
+    }
+  }
+}

@@ -4,6 +4,8 @@ mkdir -p /tmp/testdb
 mongod --quiet --nojournal --smallfiles --port 3004 --dbpath /tmp/testdb >/tmp/testdb.log &
 mongod=$!
 
+sleep 0.1
+
 function killKids {
     kill $mongod 2>/dev/null
 }

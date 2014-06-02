@@ -1,0 +1,60 @@
+@import "global.lessimport";
+
+#Event #Register {
+  [name=name] {
+    width: 40ex;
+  }
+
+  [name=number] {
+    width: 7ex;
+  }
+
+  .add>h1 {
+    font-size: 1.4em;
+    margin: 5px;
+  }
+
+  .Groups {
+    .clearAfter();
+    margin-bottom: 1em;
+    >h1 {
+      font-size: 1.4em;
+      margin: 5px;
+    }
+    >.climber {
+      padding: 0;
+      margin-bottom: 1em;
+      text-align: bottom;
+      >label {
+        display: inline-block;
+      }
+      [name=editClimber] {
+        padding: 4px 8px;
+        margin-left: 1em;
+        font-size: .8em;
+      }
+    }
+    >label {
+      display: block;
+      float: left;
+      margin-right: 10px;
+      >.name {
+        display: block;
+      }
+    }
+  }
+
+  table {
+    tr>th:first-child {
+      width: 20em;
+    }
+
+    td abbr+abbr:before {
+      content: ", ";
+    }
+  }
+
+  fieldset+fieldset.actions {
+    display: none;
+  }
+}

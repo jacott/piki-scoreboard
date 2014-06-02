@@ -8,4 +8,6 @@ define(function(require, exports, module) {
             inclusion: {allowBlank: true, matches: util.EMAIL_RE },  normalize: 'downcase'},
     shortName: {type: 'text', trim: true, required: true, maxLength: 10, unique: true},
   });
+
+  return model;
 });

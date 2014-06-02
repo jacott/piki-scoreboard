@@ -1,0 +1,189 @@
+@import "global.lessimport";
+
+#Event .Category {
+  .viewMenu {
+    float: right;
+    button {
+      padding: 2px 4px;
+    }
+  }
+  >h1 {
+    font-size: 2em;
+    margin-left: 20px;
+    float: left;
+  }
+  h1.selectedHeat {
+    font-size: 1.4em;
+    color: #069;
+    display: block;
+    clear: both;
+    width: 100%;
+    text-align: center;
+    margin: 0;
+    padding: 4px;
+  }
+
+  .results {
+    clear: both;
+    td, th {
+      cursor: initial;
+    }
+    border: 1px solid fade(#000, 30%);
+    width: inherit;
+    margin: auto;
+    td.score {
+      body.jAccess &:not(.heat-2) {
+        cursor: pointer;
+      }
+      border-left: 1px solid fade(#000, 20%);
+      padding: 4px;
+      input {
+        width: 4em;
+        margin: 0;
+        border: none;
+        background: none;
+        padding: 1px;
+        ~span.errorMsg {
+          display: block;
+          position: absolute;
+          background-color: fade(@colorInputErrorBG, 80%);
+        }
+      }
+      >i {
+        font-style: normal;
+        float: right;
+        font-size: 0.9em;
+        color: #444;
+      }
+    }
+    td.BoulderScore {
+      >div {
+        margin-left: 1px;
+        float: left;
+        width: 30px;
+        height: 30px;
+        border-radius: 4px;
+        color: #fff;
+        background-color: #fff;
+        position: relative;
+        border: 1px solid #0aa;
+        &.ns {
+          background-color: #ddd;
+        }
+        &.top {
+          background-color: #0aa;
+        }
+        &.bonus {
+          background-image: linear-gradient(-45deg,  #0aa 0%, #0aa 50%, #fff 50%, #fff 100%);
+        }
+        &.error {
+          background-color: @colorInputErrorBG;
+          background-image: none;
+        }
+
+        >* {
+          position: absolute;
+          width: 20px;
+          font-size: 0.9em;
+          &.bonus {
+            bottom: 1px;
+            right: 1px;
+            text-align: right;
+          }
+          &.top {
+            top: 1px;
+            left: 1px;
+          }
+        }
+      }
+    }
+    td.climber {
+      .club {
+        display: block;
+        float: right;
+      }
+      .number {
+        margin-left: 5px;
+        font-size: 0.8em;
+      }
+    }
+    td.input {
+      body:not(.readOnlyAccess) & span:not(.errorMsg) {
+        display: none;
+      }
+    }
+    th {
+      padding: 4px;
+    }
+    tr {
+      height: 2.2em;
+    }
+    thead {
+      background-color: #08a;
+      color: #fff;
+      th.score {
+        width: 6.5em;
+      }
+      th.climber {
+        width: 20em;
+      }
+    }
+    &+.note {
+      color: #888;
+      display: block;
+      text-align: center;
+    }
+  }
+
+  &.rank table.results+.note {
+    display: none;
+  }
+
+  &.general .viewMenu [name=toggleStartOrder] {
+    visibility: hidden;
+  }
+
+  &.start table.results {
+    counter-reset: line-number;
+    td:first-child:before {
+      content: counter(line-number) ".";
+      counter-increment: line-number;
+      padding-right: 0.3em;
+    }
+  }
+}
+
+@media print {
+  #Event .Category {
+    page-break-inside: avoid;
+    .results {
+      thead {
+        background-color: #fff;
+        color: #aaa;
+      }
+
+      tr {
+        page-break-inside: avoid;
+      }
+    }
+
+    &.start.B .results {
+      width: 100%;
+      th:not(:first-child) {
+        font-size: 0px;
+      }
+
+      th:first-child, td:first-child {
+        border-right: 1px solid fade(#000, 20%);
+      }
+
+      td:not(:first-child) {
+        border: none;
+
+        >* {
+          display: none;
+        }
+      }
+    }
+  }
+}

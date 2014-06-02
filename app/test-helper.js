@@ -3,19 +3,28 @@ define(function(require, exports, module) {
   var TH = require('koru/test-helper');
   var util = require('koru/util');
   var Model = require('koru/model');
+  var Val = require('koru/model/validation');
 
   var geddon = TH.geddon;
 
   var user;
 
-  TH.Factory = require('../test/factory');
+  TH.Factory = require('test/factory');
 
   util.extend(TH, {
     showErrors: function (doc) {
       return {
         toString: function () {
-          return AppVal.inspectErrors(doc);
+          return Val.inspectErrors(doc);
         },
+      };
+    },
+
+    clearDB: function () {
+      TH.Factory.clear();
+      // if (isServer) Model.User._clearGuestUser();
+      if (isClient) for(var name in Model) {
+        Model[name].docs = {};
       };
     },
 
@@ -25,6 +34,10 @@ define(function(require, exports, module) {
 
     userId: function () {
       return user && user._id;
+    },
+
+    login: function (func) {
+      return this.loginAs(user || TH.Factory.last.user || TH.Factory.createUser(), func);
     },
 
     loginAs: function (newUser, func) {

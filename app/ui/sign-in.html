@@ -1,0 +1,59 @@
+<template name="SignIn">
+  <span id="SignIn">
+    <template name="SignInLink">
+      <button class="link" name="signIn">Sign in</button>
+    </template>
+    <template name="ProfileLink">
+      <span>
+        {{pageLink id="ProfileLink" value=name template="Profile"}}
+      </span>
+    </template>
+    {{item}}
+  </span>
+
+  <template name="Dialog">
+    <form id="SignInDialog">
+      <fieldset>
+        <label>
+          <span>Email</span>
+          <input type="text" name="email">
+        </label>
+        <label>
+          <span>Password</span>
+          <input type="password" name="password">
+        </label>
+      </fieldset>
+      <fieldset class="actions">
+        <button type="submit">Sign in</button>
+        <button type="button" name="cancel">Cancel</button>
+      </fieldset>
+      <button name="forgot" class="link">Forgot password?</button>
+      <template name="Progress">
+        <span id="SignInProgress" class="{{state}}">{{message}}</span>
+      </template>
+      {{> Progress}}
+    </form>
+  </template>
+
+  <template name="ForgotPassword">
+    <form id="ForgotPassword" action="/forgotpassword" method="post">
+      <h1>Forgot Password</h1>
+      <fieldset class="fields">
+        <label for="email">
+          <span>Email</span>
+          <input type="text" id="email" name="email" value="{{email}}" autocomplete="on">
+        </label>
+
+        <fieldset>
+          <button type="submit" name="submit">Submit</button>
+          <button type="button" name="cancel">Back to login</button>
+        </fieldset>
+      </fieldset>
+    </form>
+    <template name="EmailSent">
+      <span class="EmailSent">
+        If the supplied email address has access: then an email will have been sent with instructions to reset your password.
+      </span>
+    </template>
+  </template>
+</template>

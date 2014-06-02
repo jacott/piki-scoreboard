@@ -36,12 +36,15 @@ requirejs.config({
 module.exports = {};
 
 requirejs([
-  'koru/env', 'koru/file-watch', 'server/bootstrap',
-  'koru/css/less-watcher', 'koru/server', 'koru/server-rc'
-], function (env, fileWatch, bootstrap) {
+  'koru/env', 'koru/file-watch', 'server-startup',
+  'koru/css/less-watcher', 'koru/server-rc',
+], function (env, fileWatch, startup) {
   env.Fiber(function () {
-    bootstrap();
-    fileWatch.watch(__dirname + '/' + koruPath, __dirname + '/' + koruPath.slice(0, -5));
+    var file = __dirname + '/' + koruPath;
+    fileWatch.watch(file, file.replace(/\/koru$/, ''));
+
+    startup();
+
     console.log('=> Ready');
   }).run();
 });

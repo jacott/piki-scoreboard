@@ -1,0 +1,23 @@
+#Disconnected {
+  position: fixed;
+  top: 2px;
+  left: 50%;
+  z-index: 2000;
+
+
+  >div {
+    position: relative;
+    margin-left: -50%;
+    margin-right: 50%;
+
+    border: 1px solid #000;
+    padding: 4px 8px;
+    background-color: #f88;
+  }
+}
+
+@media print {
+  #Disconnected {
+    display: none;
+  }
+}

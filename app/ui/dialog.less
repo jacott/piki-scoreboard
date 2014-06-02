@@ -1,0 +1,59 @@
+@import "global.lessimport";
+
+.Dialog {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background: fade(#000, 60%);
+  z-index: 999;
+
+  .dialogContainer {
+    position: relative;
+    top: 50%;
+    .transform(translateY(-50%));
+    max-height: 100%;
+    max-width: 100%;
+    -webkit-perspective: 800px;
+    -moz-perspective: 800px;
+    perspective: 800px;
+    text-align: center;
+    .content-box();
+  }
+
+  .ui-dialog {
+    display: inline-block;
+    text-align: left;
+    margin:0 auto;
+    z-index: 1000;
+    border: 1px solid @colorDialogBorder;
+    border-radius: 6px;
+    padding: 10px;
+    color: @colorDialogText;
+    background-color: @colorDialogBackground;
+    .box-shadow(@colorShadowMed 4px 4px 2px);
+
+    &.small {
+      width: 200px;
+    }
+
+    >h1:first-child, div>h1:first-child {
+      font-size: 1.4em;
+      font-weight: bold;
+      margin-bottom: 0.5em;
+    }
+
+    &.warn {
+      fieldset.actions [name=okay] {
+        color: #fff;
+        .linear-gradient(@colorButtonDangerTop, @colorButtonDangerBottom);
+        text-shadow: 0px -2px @colorButtonOkayTextShadow;
+      }
+    }
+    >fieldset.actions {
+      text-align: center;
+    }
+  }
+}

@@ -18,11 +18,11 @@ requirejs.config({
     "koru/test/build-cmd": {testDirs: ['models', 'ui', 'server']}
   },
 
+  packages: ['koru/model', 'koru/test'],
+
   paths: {
     koru: koruPath,
   },
-
-  packages: ['koru/model', 'koru/test'],
 
   //Pass the top-level main.js/index.js require
   //function to requirejs so that node modules
@@ -37,9 +37,14 @@ requirejs.config({
 //Now export a value visible to Node.
 module.exports = {};
 
-requirejs(['koru/env', 'koru/file-watch', 'koru/server' , 'koru/server-rc'], function (env, fileWatch) {
+requirejs([
+  'koru/env', 'koru/file-watch', 'koru/server' , 'koru/server-rc',
+], function (env, fileWatch) {
+
   env.Fiber(function () {
-    fileWatch.watch(__dirname + '/../' + koruPath, __dirname + '/../' + koruPath.slice(0, -5));
+    var file = __dirname + '/../' + koruPath;
+    fileWatch.watch(file, file.replace(/\/koru$/, ''));
+
     console.log('=> Ready');
   }).run();
 });

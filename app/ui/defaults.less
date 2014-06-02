@@ -1,0 +1,133 @@
+@import "global.lessimport";
+
+@-moz-keyframes spin {
+  0% {
+    -moz-transform: rotate(0deg);
+  }
+  100% {
+    -moz-transform: rotate(359deg);
+  }
+}
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+  }
+}
+@-o-keyframes spin {
+  0% {
+    -o-transform: rotate(0deg);
+  }
+  100% {
+    -o-transform: rotate(359deg);
+  }
+}
+@-ms-keyframes spin {
+  0% {
+    -ms-transform: rotate(0deg);
+  }
+  100% {
+    -ms-transform: rotate(359deg);
+  }
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
+}
+
+button.link {
+  border: none;
+  background: none;
+  color: inherit;
+  &:hover, &:focus {
+    text-decoration: underline;
+    outline: 0;
+  }
+}
+
+button:not(.link), textarea, input, select {
+  font-size: inherit;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button:not(.link) {
+  border-radius: 6px;
+  padding: 0.5em 1em;
+  &:focus {
+    outline: 0;
+    .box-shadow(0 0 2px fade(#000, 60%));
+  }
+  &[type=submit] {
+    color: #fff;
+    .linear-gradient(#6d8, #0a2);
+  }
+}
+
+textarea, input, select {
+  &:focus {
+    outline: 1px solid fade(#000, 10%);
+    background-color: #eee;
+  }
+}
+
+table {
+  border-collapse: collapse;
+}
+
+th.sort {
+  .user-select(none);
+  &:after {
+    .inline-icon(@icon-arrow-down);
+    margin-left: 4px;
+  }
+  &.desc:after {
+    .inline-icon(@icon-arrow-up);
+  }
+}
+
+.body>div {
+  >nav.menu {
+    .linear-gradient(#fff, #ccc);
+    .box-shadow(-1px 0 0 #ccc);
+    border-bottom: 1px solid #888;
+  }
+  >section {
+    margin: 10px;
+  }
+}
+
+:not (.document) {
+  ol, ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    &>li {
+      margin: 0;
+      padding: 0;
+    }
+}
+
+}
+
+table>tbody>tr.selected {
+  background-color: fade(@colorSelectedBackground, 90%);
+}
+
+@media print {
+  select, button:not(.print), .no-print {
+    display: none;
+  }
+}
+
+@media screen {
+  .print-only {
+    display: none;
+  }
+}
