@@ -15,10 +15,10 @@ requirejs.config({
 
     "koru/web-server": {port: 3030, defaultPage: '/test/index.html'},
 
-    "koru/test/build-cmd": {testDirs: ['models', 'ui', 'server']}
+    "koru/test/build-cmd": {excludeDirs: ['koru']}
   },
 
-  packages: ['koru/model', 'koru/test'],
+  packages: ['koru/model', 'koru/test', 'koru/session'],
 
   paths: {
     koru: koruPath,

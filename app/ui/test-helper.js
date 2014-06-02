@@ -1,12 +1,13 @@
 define(function(require, exports, module) {
-  var TH = require('koru/ui/test-helper');
-  var util = require('koru/util');
-  require('app');
-  var Dom = require('koru/dom');
-  var Route = require('koru/ui/route');
-  var env = require('koru/env');
+  var TH =        require('koru/ui/test-helper');
+  var util =      require('koru/util');
+  var Dom =       require('koru/dom');
+  var Route =     require('koru/ui/route');
+  var env =       require('koru/env');
   var subscribe = require('koru/session/subscribe');
-  var Home = require('ui/home');
+                  require('app');
+  var startup =   require('../client-startup');
+  var Home =      require('ui/home');
 
   require('test-helper');
 

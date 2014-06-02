@@ -12,7 +12,6 @@ window.history.replaceState(null, document.title = 'Piki Test Mode', '/');
 define(function(require, exports, module) {
   var env = require('koru/env');
   var client = require('koru/client');
-  require('client-startup');
 
   env.onunload(module, 'reload');
 });

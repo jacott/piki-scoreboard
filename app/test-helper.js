@@ -22,9 +22,15 @@ define(function(require, exports, module) {
 
     clearDB: function () {
       TH.Factory.clear();
-      // if (isServer) Model.User._clearGuestUser();
-      if (isClient) for(var name in Model) {
-        Model[name].docs = {};
+      for(var name in Model) {
+        var model = Model[name];
+        if ('docs' in model) {
+          if (isClient)
+            Model[name].docs = {};
+          else {
+            Model[name].docs.remove({});
+          }
+        }
       };
     },
 
