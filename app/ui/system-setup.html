@@ -1,0 +1,94 @@
+<template name="SystemSetup">
+  <section id="SystemSetup">
+    <div>
+      <nav class="menu">
+      </nav>
+      <section class="body">
+      </section>
+
+      <h1>Organizations</h1>
+      <table class="orgs select">
+        <thead>
+          <tr>
+            <th>Name</th><th>email</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{each "orgList" template="OrgRow"}}
+          <template name="OrgRow">
+            <tr>
+              <td>{{name}}</td><td>{{email}}</td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+
+      <h1>{{org.name}} Users</h1>
+      <table class="users select">
+        <thead>
+          <tr>
+            <th>Name</th><th>email</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{each "userList" template="UserRow"}}
+          <template name="UserRow">
+            <tr>
+              <td>{{name}}</td><td>{{email}}</td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+
+    </div>
+  </section>
+  <template name="Index">
+    <div>
+      <nav class="menu">
+        {{pageLink class="suAccess" name="addOrg" value="Add new organization" template="SystemSetup.OrgForm"}}
+        {{pageLink name="addUser" value="Add new user" template="SystemSetup.UserForm"}}
+      </nav>
+    </div>
+  </template>
+  <template name="OrgForm">
+    <form id="OrgForm">
+      <h1>Org Form</h1>
+      <fieldset class="fields">
+        {{labelField "name"}}
+        {{labelField "shortName"}}
+        {{labelField "email"}}
+      </fieldset>
+      <fieldset class="actions">
+        <button type="submit">Save</button>
+        <button type="button" name="delete">Delete</button>
+        <button type="button" name="cancel">Cancel</button>
+      </fieldset>
+    </form>
+  </template>
+  <template name="ConfirmDelete">
+    <div>
+      <h1>Delete {{name}}?</h1>
+      <span>Are you sure you want to delete this?</span>
+    </div>
+  </template>
+
+  <template name="UserForm">
+    <form id="UserForm">
+      <h1>User Form</h1>
+      <fieldset class="fields">
+        <div class="suAccess">
+          {{labelField "org_id" selectList=orgList includeBlank="true"}}
+        </div>
+        {{labelField "name"}}
+        {{labelField "initials"}}
+        {{labelField "role" selectList=roleList includeBlank="true"}}
+        {{labelField "email"}}
+      </fieldset>
+      <fieldset class="actions">
+        <button type="submit">Save</button>
+        <button type="button" name="delete">Delete</button>
+        <button type="button" name="cancel">Cancel</button>
+      </fieldset>
+    </form>
+  </template>
+</template>

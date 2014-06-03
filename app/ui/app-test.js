@@ -2,10 +2,9 @@ isClient && define(function (require, exports, module) {
   var test, v;
   var TH      = require('ui/test-helper');
   var Route   = require('koru/ui/route');
-  var App     = require('app');
+  var App     = require('./app');
   var Dom     = require('koru/dom');
   var Spinner = require('ui/spinner');
-  var sut     = require('./client-startup');
   var session = require('koru/session');
   var subscribe = require('koru/session/subscribe');
   var env = require('koru/env');
@@ -22,20 +21,40 @@ isClient && define(function (require, exports, module) {
       v.subSelf = test.stub(subscribe, 'intercept').withArgs('Self');
     },
 
-    "test inits spinner": function () {
-      sut.start();
-
-      assert.called(Spinner.init);
-    },
-
     tearDown: function () {
-      sut.stop();
+      App.stop();
       TH.tearDown();
       v = null;
     },
 
+    "test inits spinner": function () {
+      App.start();
+
+      assert.called(Spinner.init);
+    },
+
+    "test Org": function () {
+      refute(App.org());
+
+      var org = TH.Factory.createOrg();
+      App.orgId = org._id;
+
+      assert.same(App.org(), org);
+    },
+
+    "test me": function () {
+      var user = TH.Factory.createUser();
+
+      refute(App.me());
+
+      env.util.thread.userId = user._id;
+
+      assert.same(App.me(), user);
+    },
+
     "test rendering": function () {
-      sut.start();
+      TH.loginAs(TH.Factory.createUser('guest'));
+      App.start();
 
       assert.dom('body.readOnlyAccess', function () {
         assert.dom('body>header', function () {
@@ -50,7 +69,7 @@ isClient && define(function (require, exports, module) {
     "test popstate": function () {
       test.stub(Route, 'pageChanged');
 
-      sut.start();
+      App.start();
 
       refute.called(window.addEventListener);
 
@@ -73,7 +92,7 @@ isClient && define(function (require, exports, module) {
 
       assert.same(Route.root.routeVar, 'orgSN');
 
-      sut.start();
+      App.start();
 
       assert.called(v.subSelf);
       refute.called(v.subOrg);

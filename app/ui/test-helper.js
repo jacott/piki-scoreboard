@@ -5,8 +5,7 @@ define(function(require, exports, module) {
   var Route =     require('koru/ui/route');
   var env =       require('koru/env');
   var subscribe = require('koru/session/subscribe');
-                  require('app');
-  var startup =   require('../client-startup');
+  var App =       require('./app');
   var Home =      require('ui/home');
 
   require('test-helper');
@@ -15,13 +14,19 @@ define(function(require, exports, module) {
 
   env.onunload(module, 'reload');
 
-  return util.reverseExtend({
+  return TH = util.reverseExtend({
+    setAccess: App.setAccess, // used by TH.loginAs
+
+    stubSubscribe: function (name) {
+      return (('restore' in subscribe.intercept) ?
+       subscribe.intercept :
+       geddon.test.stub(subscribe, 'intercept'))
+        .withArgs(name);
+    },
+
     setOrg: function (org) {
       org = org || TH.Factory.createOrg();
-      var orgSub = (('restore' in subscribe.intercept) ?
-                    subscribe.intercept :
-                    geddon.test.stub(subscribe, 'intercept'))
-            .withArgs('Org');
+      var orgSub = TH.stubSubscribe('Org');
 
       Route.replacePage(Home, {orgSN: org.shortName});
 
@@ -36,6 +41,7 @@ define(function(require, exports, module) {
       Route.replacePage();
       TH.domTearDown();
       TH.clearDB();
+      util.thread.userId = null;
     },
   }, TH);
 });

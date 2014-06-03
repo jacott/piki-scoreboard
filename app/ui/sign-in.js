@@ -2,7 +2,7 @@ define(function(require, exports, module) {
   var Dom    = require('koru/dom');
   var Route = require('koru/ui/route');
   var Form = require('koru/ui/form');
-  var App = require('app');
+  var App = require('./app');
   var User = require('models/user');
   var Val = require('koru/model/validation');
   var UserAccount = require('koru/user-account/client-main');
@@ -56,6 +56,7 @@ define(function(require, exports, module) {
       }
 
       function userChange(doc) {
+        App.setAccess();
         ctx.updateAllTags(doc || {});
       }
     },

@@ -24,6 +24,14 @@ define(function(require, exports, module) {
       return list;
     },
 
+    createListNotify: function () {
+      var result = this.createList.apply(this, arguments);
+      result.forEach(function (doc) {
+        doc.constructor.notify(doc);
+      });
+      return result;
+    },
+
     get last () {
       return last;
     },
@@ -127,7 +135,7 @@ define(function(require, exports, module) {
         .addRef('event')
         .addRef('climber')
         .addRef('category')
-        .addField('scores', [options.scores || Model.Result.find({}).count()]);
+        .addField('scores', [options.scores || Model.Result.query.count()]);
     },
 
     Event: function (options) {

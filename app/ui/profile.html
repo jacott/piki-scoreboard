@@ -1,0 +1,43 @@
+<template name="Profile">
+  <section id="Profile" class="body">
+    <div>
+      <nav>
+        {{pageLink class="adminAccess" value="System setup" template="SystemSetup"}}
+      </nav>
+      <h1>{{name}}</h1>
+      <section class="body">
+      </section>
+    </div>
+  </section>
+
+  <template name="Index">
+    <div>
+      <button name="signOut" class="link">Sign out</button>
+      <button name="signOutOthers" class="link">Sign out my other sessions</button>
+      {{pageLink value="Change password" template="Profile.ChangePassword"}}
+    </div>
+  </template>
+
+  <template name="SignOutOthers">
+    <div id="SignOutOthers">
+      <p>Signing you out of any other sessions...</p>
+      <fieldset class="actions">
+        <button name="close">Close</button>
+      </fieldset>
+    </div>
+  </template>
+
+  <template name="ChangePassword">
+    <form id="ChangePassword">
+      <fieldset>
+        {{labelField "oldPassword" type="password"}}
+        {{labelField "newPassword" type="password"}}
+        {{labelField "confirm" type="password"}}
+      </fieldset>
+      <fieldset class="actions">
+        <button type="submit" disabled="disabled">Apply</button>
+        {{cancelButton}}
+      </fieldset>
+    </form>
+  </template>
+</template>

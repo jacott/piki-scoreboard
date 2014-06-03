@@ -5,12 +5,12 @@ requirejs.config({
 define(function(require, exports, module) {
                 require('koru/css/loader').loadAll('ui');
   var env =     require('koru/client');
-  var startup = require('client-startup');
+  var App = require('ui/app');
 
   env.onunload(module, function () {
-    startup.stop();
+    App.stop();
     require([module.id], function () {});
   });
 
-  startup.start();
+  App.start();
 });

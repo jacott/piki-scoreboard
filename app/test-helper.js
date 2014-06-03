@@ -4,6 +4,7 @@ define(function(require, exports, module) {
   var util = require('koru/util');
   var Model = require('koru/model');
   var Val = require('koru/model/validation');
+  var session = require('koru/session');
 
   var geddon = TH.geddon;
 
@@ -11,7 +12,17 @@ define(function(require, exports, module) {
 
   TH.Factory = require('test/factory');
 
+  var testCase = TH.testCase;
+  var sendP;
+
   util.extend(TH, {
+    testCase: function () {
+      var tc = testCase.apply(TH, arguments);
+      tc.onStartTestCase(stubSendP);
+      tc.onEndTestCase(unstubSendP);
+      return tc;
+    },
+
     showErrors: function (doc) {
       return {
         toString: function () {
@@ -67,8 +78,7 @@ define(function(require, exports, module) {
         }
       }
 
-      // if (typeof Bart !== 'undefined')
-      //   Bart.Main.setAccess();
+      TH.setAccess && TH.setAccess();
 
       if (! func) return user;
 
@@ -76,6 +86,20 @@ define(function(require, exports, module) {
     },
 
   });
+
+  function stubSendP() {
+    if (session.hasOwnProperty('sendP')) {
+      sendP = session.sendP;
+      session.sendP = env.nullFunc;
+    }
+  }
+
+  function unstubSendP() {
+    if (sendP) {
+      session.sendP = sendP;
+      sendP = null;
+    }
+  }
 
   return TH;
 });

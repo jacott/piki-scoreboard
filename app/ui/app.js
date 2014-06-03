@@ -1,43 +1,62 @@
 define(function(require, exports, module) {
   require('koru/user-account/client-main');
   var subscribe = require('koru/session/subscribe');
-  var env = require('koru/env');
-  var User = require('models/user');
-  var Dom = require('koru/dom');
-  var App = require('app');
-  var header = require('ui/header');
-  var Org = require('models/org');
-  var Route = require('koru/ui/route');
-  require('ui/home');
-  var Flash = require('ui/flash');
+  var env =       require('koru/env');
+  var User =      require('models/user');
+  var Dom =       require('koru/dom');
+  var header =    require('ui/header');
+  var Org =       require('models/org');
+  var Route =     require('koru/ui/route');
+  var Flash =     require('ui/flash');
   require('publish/client-publish-self');
   require('publish/client-publish-org');
-  var Spinner = require('ui/spinner');
+  var Spinner =   require('ui/spinner');
+  var util = require('koru/util');
 
   var selfSub, orgSub, orgShortName, pathname;
 
-  exports.stop = function () {
-    orgSub && orgSub.stop();
-    selfSub && selfSub.stop();
-    selfSub = orgSub = orgShortName = pathname = null;
+  var App = util.extend(exports, {
+    org: function () {
+      return App.orgId && Org.findById(App.orgId);
+    },
 
-    window.removeEventListener('popstate', pageChanged);
-  };
+    me: function () {
+      return User.me();
+    },
 
-  exports.start = function () {
-    exports.stop();
-    Spinner.init();
-    pathname = [env.getLocation()];
-    setAccess();
-    selfSub = subscribe('Self', function (err) {
-      Dom.removeClass(document.body, 'loading');
-      window.addEventListener('popstate', pageChanged);
-      pathname && Route.replacePath(pathname[0] || document.location, pathname[1]);
-    });
-    header.show();
-  };
+    setAccess: function() {
+      var _id = env.userId();
+      var user = _id && User.findById(_id);
+      Dom.setClassBySuffix(user ? user.accessClasses(App.orgId) : 'readOnly', 'Access', document.body);
+    },
 
-  env.onunload(module, exports.stop);
+    stop: function () {
+      orgSub && orgSub.stop();
+      selfSub && selfSub.stop();
+      selfSub = orgSub = orgShortName = pathname = null;
+
+      window.removeEventListener('popstate', pageChanged);
+    },
+
+    start: function () {
+      App.stop();
+      Spinner.init();
+      pathname = [env.getLocation()];
+      App.setAccess();
+      selfSub = subscribe('Self', function (err) {
+        Dom.removeClass(document.body, 'loading');
+        window.addEventListener('popstate', pageChanged);
+        pathname && Route.replacePath(pathname[0] || document.location, pathname[1]);
+      });
+      header.show();
+    },
+
+    _setOrgShortName: function (value) {
+      orgShortName = value;
+    }
+  });
+
+  env.onunload(module, App.stop);
 
   Route.root.routeVar = 'orgSN';
   Route.root.onBaseEntry = function (page, pageRoute) {
@@ -55,7 +74,7 @@ define(function(require, exports, module) {
   }
 
   function subscribeOrg(shortName) {
-    setAccess();
+    App.setAccess();
     orgSub && orgSub.stop();
     if (shortName) {
       orgShortName = shortName;
@@ -74,7 +93,7 @@ define(function(require, exports, module) {
           return;
         }
         App.orgId = doc._id;
-        setAccess();
+        App.setAccess();
         Dom.addClass(document.body, 'inOrg');
         var orgLink = document.getElementById('OrgHomeLink');
         if (orgLink) orgLink.textContent = doc.name;
@@ -100,9 +119,5 @@ define(function(require, exports, module) {
     }
   }
 
-  function setAccess() {
-    var _id = env.userId();
-    var user = _id && User.findById(_id);
-    Dom.setClassBySuffix(user ? user.accessClasses(App.orgId) : 'readOnly', 'Access', document.body);
-  }
+  return App;
 });
