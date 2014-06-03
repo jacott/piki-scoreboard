@@ -1,5 +1,5 @@
 define(function(require, exports, module) {
-  var App   = require('./app');
+  var App   = require('./app-base');
   var Dom   = require('koru/dom');
   var Org   = require('models/org');
   var Route = require('koru/ui/route');
@@ -11,7 +11,8 @@ define(function(require, exports, module) {
   var ChooseOrg = Tpl.ChooseOrg;
 
   env.onunload(module, function () {
-    Route.root.removeTemplate(Tpl);
+    Route.root.removeTemplate(Tpl, {path: ""});
+    Route.root.removeTemplate(ChooseOrg);
     Route.root.defaultPage = null;
   });
 

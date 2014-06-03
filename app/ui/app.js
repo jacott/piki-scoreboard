@@ -1,5 +1,5 @@
 define(function(require, exports, module) {
-  require('koru/user-account/client-main');
+                  require('koru/user-account/client-main');
   var subscribe = require('koru/session/subscribe');
   var env =       require('koru/env');
   var User =      require('models/user');
@@ -8,28 +8,16 @@ define(function(require, exports, module) {
   var Org =       require('models/org');
   var Route =     require('koru/ui/route');
   var Flash =     require('ui/flash');
-  require('publish/client-publish-self');
-  require('publish/client-publish-org');
+                  require('./home');
+                  require('publish/client-publish-self');
+                  require('publish/client-publish-org');
   var Spinner =   require('ui/spinner');
-  var util = require('koru/util');
+  var util =      require('koru/util');
+  var App =       require('./app-base');
 
   var selfSub, orgSub, orgShortName, pathname;
 
-  var App = util.extend(exports, {
-    org: function () {
-      return App.orgId && Org.findById(App.orgId);
-    },
-
-    me: function () {
-      return User.me();
-    },
-
-    setAccess: function() {
-      var _id = env.userId();
-      var user = _id && User.findById(_id);
-      Dom.setClassBySuffix(user ? user.accessClasses(App.orgId) : 'readOnly', 'Access', document.body);
-    },
-
+  util.extend(App, {
     stop: function () {
       orgSub && orgSub.stop();
       selfSub && selfSub.stop();

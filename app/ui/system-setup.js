@@ -4,7 +4,7 @@ define(function(require, exports, module) {
   var Form = require('koru/ui/form');
   var User = require('models/user');
   var Org = require('models/org');
-  var App = require('./app');
+  var App = require('./app-base');
   var util = require('koru/util');
   var env = require('koru/env');
 

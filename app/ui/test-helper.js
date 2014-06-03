@@ -26,15 +26,11 @@ define(function(require, exports, module) {
 
     setOrg: function (org) {
       org = org || TH.Factory.createOrg();
-      var orgSub = TH.stubSubscribe('Org');
+      App.orgId = org._id;
+      Dom.addClass(document.body, 'inOrg');
+      App._setOrgShortName(org.shortName);
 
       Route.replacePage(Home, {orgSN: org.shortName});
-
-      assert.calledWith(subscribe.intercept, 'Org', TH.match(function (handle) {
-        handle.callback();
-        return true;
-      }));
-      return orgSub;
     },
 
     tearDown: function () {

@@ -7,7 +7,7 @@ isClient && define(function (require, exports, module) {
   var UserAccount = require('koru/user-account/client-main');
   var Org = require('models/org');
   var User = require('models/user');
-  var App = require('./app');
+  var App = require('./app-base');
 
   TH.testCase(module, {
     setUp: function () {

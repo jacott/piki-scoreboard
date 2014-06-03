@@ -1,5 +1,5 @@
 define(function(require, exports, module) {
-  var App    = require('./app');
+  var App    = require('./app-base');
   var Dom    = require('koru/dom');
   var Dialog = require('koru/ui/dialog');
   var Help   = require('ui/help');
