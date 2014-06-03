@@ -18,9 +18,8 @@ define(function(require, exports, module) {
 
   Tpl.$helpers({
     item: function () {
-      var me = App.me();
-      if (me && me.role !== 'g')
-        return Tpl.ProfileLink.$autoRender(me);
+      if (this && this.role !== 'g')
+        return Tpl.ProfileLink.$autoRender(this);
       else
         return Tpl.SignInLink.$autoRender({});
     },
@@ -35,10 +34,29 @@ define(function(require, exports, module) {
 
   util.extend(Tpl, {
     $created: function (ctx, elm) {
-      ctx.onDestroy(UserAccount.onChange(userChange));
+      var userOb;
+      ctx.onDestroy(UserAccount.onChange(function (state) {
+        if (state !== 'ready') return;
+        observeUserId();
+      }));
 
-      function userChange(state) {
-        state === 'ready' && ctx.updateAllTags();
+      ctx.onDestroy(function () {
+        userOb && userOb.stop();
+        userOb = null;
+      });
+
+      observeUserId();
+
+      function observeUserId() {
+        userOb && userOb.stop();
+        if (env.userId())
+          userOb = User.observeId(env.userId(), userChange);
+
+        userChange(User.me());
+      }
+
+      function userChange(doc) {
+        ctx.updateAllTags(doc || {});
       }
     },
   });

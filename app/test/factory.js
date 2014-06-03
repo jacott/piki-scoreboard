@@ -40,6 +40,13 @@ define(function(require, exports, module) {
 
   var traits = {
     User: {
+      guest: function (options) {
+        util.reverseExtend(options, {
+          _id: 'guest',
+          name: undefined, initials: undefined,
+          email: undefined, role: 'g', org_id: null
+        });
+      },
       su: function (options) {
         util.reverseExtend(options, {
           name: "Super User", initials: "SU",

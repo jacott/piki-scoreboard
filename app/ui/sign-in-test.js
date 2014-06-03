@@ -7,7 +7,7 @@ isClient && define(function (require, exports, module) {
   var SignIn      = require('./sign-in');
   var TH          = require('./test-helper');
   var UserAccount = require('koru/user-account/client-main');
-  var User        = require('koru/env!models/user');
+  var User        = require('models/client-user');
                     require('koru/ui/page-link');
 
   TH.testCase(module, {
@@ -98,8 +98,11 @@ isClient && define(function (require, exports, module) {
     },
 
     "test signing in": function () {
+      TH.loginAs(TH.Factory.createUser('guest'));
       document.body.appendChild(SignIn.$autoRender({}));
-      TH.click('[name=signIn]');
+      assert.dom('#SignIn', function () {
+        TH.click('[name=signIn]');
+      });
 
       assert.dom('.Dialog #SignInDialog', function () {
         assert.dom('form>fieldset:first-child', function () {
