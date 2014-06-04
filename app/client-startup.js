@@ -1,8 +1,9 @@
 define(function(require, exports, module) {
-  var userAccount = require('koru/user-account/client-main');
-  var session = require('koru/session/client-main');
+  var userAccount = require('koru/user-account');
+  var session = require('koru/session');
   var client = require('koru/client');
   var App = require('ui/app');
+  require('ui/profile');
 
   return {
     start: function () {
@@ -13,7 +14,7 @@ define(function(require, exports, module) {
 
     stop: function () {
       App.stop();
-      session.disconnect();
+      session.stop();
       userAccount.stop();
     },
   };

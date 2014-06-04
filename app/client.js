@@ -1,5 +1,7 @@
 requirejs.config({
-  packages: ['koru/model', 'koru/session', 'koru/user-account'],
+  packages: [
+    "koru/model", "koru/session", "koru/user-account",
+  ],
 });
 
 define(function(require, exports, module) {

@@ -16,7 +16,9 @@ requirejs.config({
     "koru/web-server": {port: 3030},
   },
 
-  packages: ['koru/model'],
+  packages: [
+    "koru/model", "koru/session", "koru/user-account",
+  ],
 
   paths: {
     koru: koruPath,
