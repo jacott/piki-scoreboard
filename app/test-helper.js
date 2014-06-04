@@ -1,6 +1,6 @@
 define(function(require, exports, module) {
   var env = require('koru/env');
-  var TH = require('koru/test-helper');
+  var TH = require('koru/session/test-helper');
   var util = require('koru/util');
   var Model = require('koru/model');
   var Val = require('koru/model/validation');
@@ -51,6 +51,19 @@ define(function(require, exports, module) {
 
     userId: function () {
       return user && user._id;
+    },
+
+    mockRpc: function (sessId) {
+      if (isServer) {
+        var ws = TH.mockWs();
+        var conn;
+        var id = 'koru/session/server-connection';
+        conn = new (require(id)({}))(ws, sessId, geddon.test.stub());
+        return function (method /*, args */) {
+          conn.userId = env.userId();
+          return session._rpcs[method].apply(conn, util.slice(arguments, 1));
+        };
+      }
     },
 
     login: function (func) {

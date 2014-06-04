@@ -1,5 +1,5 @@
 define(function(require, exports, module) {
-  var TH =        require('koru/ui/test-helper');
+  var koruTH =    require('koru/ui/test-helper');
   var util =      require('koru/util');
   var Dom =       require('koru/dom');
   var Route =     require('koru/ui/route');
@@ -7,6 +7,7 @@ define(function(require, exports, module) {
   var subscribe = require('koru/session/subscribe');
   var App =       require('./app');
   var Home =      require('ui/home');
+  var TH =        require('test-helper');
 
   require('test-helper');
 
@@ -14,7 +15,7 @@ define(function(require, exports, module) {
 
   env.onunload(module, 'reload');
 
-  return TH = util.reverseExtend({
+  TH = util.reverseExtend({
     setAccess: App.setAccess, // used by TH.loginAs
 
     stubSubscribe: function (name) {
@@ -40,4 +41,6 @@ define(function(require, exports, module) {
       util.thread.userId = null;
     },
   }, TH);
+
+  return util.reverseExtend(TH, koruTH);
 });
