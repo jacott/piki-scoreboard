@@ -53,7 +53,7 @@ isClient && define(function (require, exports, module) {
 
       setOrg();
 
-      var users = TH.Factory.createListNotify(2, 'createUser');
+      var users = TH.Factory.createList(2, 'createUser');
 
       assert.dom('h1', 'org1 Users');
       assert.dom('table.users', function () {

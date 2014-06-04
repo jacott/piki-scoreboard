@@ -13,13 +13,13 @@ define(function(require, exports, module) {
   TH.Factory = require('test/factory');
 
   var testCase = TH.testCase;
-  var sendP;
+  var sendP, sendM;
 
-  util.extend(TH, {
+  TH = util.reverseExtend({
     testCase: function () {
       var tc = testCase.apply(TH, arguments);
-      tc.onStartTestCase(stubSendP);
-      tc.onEndTestCase(unstubSendP);
+      tc.onStartTestCase(tcStart);
+      tc.onEndTestCase(tcEnd);
       return tc;
     },
 
@@ -54,6 +54,7 @@ define(function(require, exports, module) {
     },
 
     mockRpc: function (sessId) {
+      sessId = (sessId || "1").toString();
       if (isServer) {
         var ws = TH.mockWs();
         var conn;
@@ -62,6 +63,10 @@ define(function(require, exports, module) {
         return function (method /*, args */) {
           conn.userId = env.userId();
           return session._rpcs[method].apply(conn, util.slice(arguments, 1));
+        };
+      } else {
+        return function (method /*, args */) {
+          return session._rpcs[method].apply(util.thread, util.slice(arguments, 1));
         };
       }
     },
@@ -82,12 +87,13 @@ define(function(require, exports, module) {
           test.stub(TH,'user',function () {return user});
           var restore = TH.user.restore;
           TH.user.restore = function () {
-            env.userId.restore && env.userId.restore();
             restore.call(TH.user);
             user = null;
+            util.thread.userId = null;
           };
 
           user = newUser._id ? newUser : Model.User.findById(newUser);
+          util.thread.userId = user && user._id;
         }
       }
 
@@ -98,19 +104,27 @@ define(function(require, exports, module) {
       return func();
     },
 
-  });
+  }, TH);
 
-  function stubSendP() {
+  function tcStart() {
     if (session.hasOwnProperty('sendP')) {
       sendP = session.sendP;
       session.sendP = env.nullFunc;
     }
+    if (session.hasOwnProperty('sendM')) {
+      sendM = session.sendM;
+      session.sendM = env.nullFunc;
+    }
   }
 
-  function unstubSendP() {
+  function tcEnd() {
     if (sendP) {
       session.sendP = sendP;
       sendP = null;
+    }
+    if (sendM) {
+      session.sendM = sendM;
+      sendM = null;
     }
   }
 

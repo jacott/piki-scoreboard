@@ -11,6 +11,7 @@ define(function (require, exports, module) {
     },
 
     tearDown: function () {
+      TH.clearDB();
       v = null;
     },
 

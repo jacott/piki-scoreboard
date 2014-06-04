@@ -1,14 +1,13 @@
 define(function(require, exports, module) {
   var util = require('koru/util');
+  var User = require('./user');
   var Val = require('koru/model/validation');
-  var Model = require('koru/model');
 
-  return function(model){
-    // FIXME ChangeLog.logChanges(model);
-
+  return function (model) {
     util.extend(model.prototype, {
       authorize: function (userId) {
-        Val.allowAccessIf(Model.User.query.where({_id: userId, role: Model.User.ROLE.superUser}).count(1));
+        var user = User.findById(userId);
+        Val.allowAccessIf(user && user.org_id === this.org_id || user.role.indexOf(User.ROLE.superUser) >= 0);
       },
     });
   };

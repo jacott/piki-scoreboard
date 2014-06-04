@@ -24,14 +24,6 @@ define(function(require, exports, module) {
       return list;
     },
 
-    createListNotify: function () {
-      var result = this.createList.apply(this, arguments);
-      result.forEach(function (doc) {
-        doc.constructor.notify(doc);
-      });
-      return result;
-    },
-
     get last () {
       return last;
     },
@@ -147,7 +139,7 @@ define(function(require, exports, module) {
       if (options.heats && 'forEach' in options.heats) {
         var heats = {};
         options.heats.forEach(function (heat) {
-          var category = Model.Category.attrFind(heat);
+          var category = Model.Category.findById(heat);
           heats[heat] = category.type + category.heatFormat;
         });
         options.heats = heats;
@@ -236,6 +228,7 @@ define(function(require, exports, module) {
 
   function Builder(modelName, options, default_opts) {
     this.model = Model[modelName];
+    if (! this.model) throw new Error('Model: "'+modelName+'" not found');
     this.options = options || {};
     this.default_opts = util.extend({}, this.model._defaults, default_opts || {});
   }
@@ -293,7 +286,9 @@ define(function(require, exports, module) {
     },
 
     insert: function () {
-      return this.model.findById(this.model._insertAttrs(this.attributes()));
+      var doc = this.model.findById(this.model._insertAttrs(this.attributes()));
+      this.model.notify(doc);
+      return doc;
     },
 
     build: function () {
