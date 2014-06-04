@@ -78,6 +78,7 @@ define(function(require, exports, module) {
     role: {type: 'text', inclusion: {in: util.values(ROLE)}},
   });
 
+  require('koru/env!./user')(model);
 
   return model;
 });

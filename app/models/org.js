@@ -9,5 +9,7 @@ define(function(require, exports, module) {
     shortName: {type: 'text', trim: true, required: true, maxLength: 10, unique: true},
   });
 
+  require('koru/env!./org')(model);
+
   return model;
 });

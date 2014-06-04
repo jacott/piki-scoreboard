@@ -2,7 +2,7 @@ define(function(require, exports, module) {
   var publish = require('koru/session/publish');
   var Query = require('koru/model/query');
   var Org = require('models/org');
-  var User = require('models/server-user');
+  var User = require('models/user');
   var env = require('koru/env');
 
   env.onunload(module, function () {

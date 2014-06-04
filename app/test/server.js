@@ -18,7 +18,9 @@ requirejs.config({
     "koru/test/build-cmd": {excludeDirs: ['koru']}
   },
 
-  packages: ['koru/model', 'koru/test', 'koru/session'],
+  packages: [
+    "koru/test", "koru/model", "koru/session", "koru/user-account",
+  ],
 
   paths: {
     koru: koruPath,

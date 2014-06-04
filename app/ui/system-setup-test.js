@@ -4,7 +4,7 @@ isClient && define(function (require, exports, module) {
   var SystemSetup = require('./system-setup');
   var Route = require('koru/ui/route');
   var Dom = require('koru/dom');
-  var UserAccount = require('koru/user-account/client-main');
+  var UserAccount = require('koru/user-account');
   var Org = require('models/org');
   var User = require('models/user');
   var App = require('./app-base');

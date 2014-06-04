@@ -1,16 +1,16 @@
 requirejs.config({
-  packages: ['koru/model', 'koru/session'],
+  packages: ['koru/model', 'koru/session', 'koru/user-account'],
 });
 
 define(function(require, exports, module) {
+  var env =     require('koru/env');
+  var startup = require('client-startup');
                 require('koru/css/loader').loadAll('ui');
-  var env =     require('koru/client');
-  var App = require('ui/app');
 
   env.onunload(module, function () {
-    App.stop();
+    startup.stop();
     require([module.id], function () {});
   });
 
-  App.start();
+  startup.start();
 });

@@ -4,7 +4,7 @@ isClient && define(function (require, exports, module) {
   var Profile = require('./profile');
   var Route = require('koru/ui/route');
   var Dom = require('koru/dom');
-  var UserAccount = require('koru/user-account/client-main');
+  var UserAccount = require('koru/user-account');
   var session = require('koru/session');
 
   TH.testCase(module, {

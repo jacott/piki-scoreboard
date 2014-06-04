@@ -1,7 +1,7 @@
 define(function (require, exports, module) {
   var test, v;
   var TH = require('./test-helper');
-  require('./client-publish-self');
+  require('./publish-self');
   var publish = require('koru/session/publish');
 
   TH.testCase(module, {

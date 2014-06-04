@@ -6,8 +6,8 @@ isClient && define(function (require, exports, module) {
   var Route       = require('koru/ui/route');
   var SignIn      = require('./sign-in');
   var TH          = require('./test-helper');
-  var UserAccount = require('koru/user-account/client-main');
-  var User        = require('models/client-user');
+  var UserAccount = require('koru/user-account');
+  var User        = require('models/user');
                     require('koru/ui/page-link');
 
   TH.testCase(module, {

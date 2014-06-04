@@ -5,7 +5,7 @@ define(function(require, exports, module) {
   var App = require('./app-base');
   var User = require('models/user');
   var Val = require('koru/model/validation');
-  var UserAccount = require('koru/user-account/client-main');
+  var UserAccount = require('koru/user-account');
   var util = require('koru/util');
   var env = require('koru/env');
 

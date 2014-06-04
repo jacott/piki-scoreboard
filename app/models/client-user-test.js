@@ -2,7 +2,7 @@ define(function (require, exports, module) {
   var test, v;
   var TH = require('test-helper');
   var session = require('koru/session');
-  var User = require('./client-user');
+  var User = require('./user');
 
   TH.testCase(module, {
     setUp: function () {

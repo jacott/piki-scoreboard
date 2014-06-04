@@ -1,7 +1,7 @@
 define(function(require, exports, module) {
   var Dom    = require('koru/dom');
   var Route = require('koru/ui/route');
-  var UserAccount = require('koru/user-account/client-main');
+  var UserAccount = require('koru/user-account');
   var Form = require('koru/ui/form');
   var User = require('models/user');
   var Home = require('ui/home');

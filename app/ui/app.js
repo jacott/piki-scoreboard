@@ -1,5 +1,4 @@
 define(function(require, exports, module) {
-                  require('koru/user-account/client-main');
   var subscribe = require('koru/session/subscribe');
   var env =       require('koru/env');
   var User =      require('models/user');
@@ -9,8 +8,8 @@ define(function(require, exports, module) {
   var Route =     require('koru/ui/route');
   var Flash =     require('ui/flash');
                   require('./home');
-                  require('publish/client-publish-self');
-                  require('publish/client-publish-org');
+                  require('publish/publish-self');
+                  require('publish/publish-org');
   var Spinner =   require('ui/spinner');
   var util =      require('koru/util');
   var App =       require('./app-base');

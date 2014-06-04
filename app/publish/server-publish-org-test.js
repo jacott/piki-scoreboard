@@ -1,7 +1,7 @@
 define(function (require, exports, module) {
   var test, v;
   var TH = require('./test-helper');
-  var sut = require('./server-publish-org');
+  var sut = require('./publish-org');
   var publish = require('koru/session/publish');
   var Model = require('koru/model');
   var env = require('koru/env');

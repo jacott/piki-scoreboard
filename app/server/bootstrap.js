@@ -1,6 +1,6 @@
 define(function(require, exports, module) {
   var User = require('models/user');
-  var UserAccount = require('koru/user-account/server-main');
+  var UserAccount = require('koru/user-account');
   var Org = require('models/org');
 
   return function () {
