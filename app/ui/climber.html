@@ -1,0 +1,81 @@
+<template name="Climber">
+    <section id="Climber">
+    <div>
+      <section class="body">
+      </section>
+    </div>
+  </section>
+  <template name="Index">
+    <div>
+      <nav>
+        {{pageLink class="adminAccess" name="addClimber" value="Add new climber" template="Climber.Add"}}
+      </nav>
+      <section class="climbers">
+        <h1>Climbers</h1>
+        <table class="select">
+          <thead>
+            <tr>
+              <th data-sort="name">Name</th>
+              <th data-sort="dateOfBirth">DOB</th>
+              <th data-sort="gender">m/f</th>
+              <th data-sort="number">Number</th>
+              <th data-sort="club">Club</th>
+              {{sortOrder}}
+            </tr>
+          </thead>
+          <tbody>
+            {{each "climbers" template="Row"}}
+          </tbody>
+          <template name="Row">
+            <tr>
+              <td>{{name}}</td>
+              <td>{{dateOfBirth}}</td>
+              <td>{{gender}}</td>
+              <td>{{number}}</td>
+              <td>{{club.name}}</td>
+            </tr>
+          </template>
+        </table>
+      </section>
+    </div>
+  </template>
+  <template name="Add">
+    <form id="AddClimber">
+      <h1>Add new climber</h1>
+      {{> /Climber.Form}}
+      <fieldset class="actions">
+        <button type="submit" name="create">Create</button>
+        <button type="button" name="cancel">Cancel</button>
+      </fieldset>
+    </form>
+  </template>
+
+  <template name="Edit">
+    <form id="EditClimber">
+      <h1>Edit {{name}}</h1>
+      {{> /Climber.Form}}
+      <fieldset class="actions">
+        <button type="submit" name="update">Save</button>
+        <button type="button" name="delete">Delete</button>
+        <button type="button" name="cancel">Cancel</button>
+      </fieldset>
+    </form>
+  </template>
+
+  <template name="ConfirmDelete">
+    <div>
+      <h1>Delete {{name}}?</h1>
+      <span>Are you sure you want to delete this climber?</span>
+    </div>
+  </template>
+
+  <template name="Form">
+    <fieldset class="fields">
+      {{labelField "name"}}
+      {{labelField "dateOfBirth" placeholder="yyyy-mm-dd"}}
+      {{labelField "gender" selectList=genderList}}
+      {{labelField "club_id" selectList=clubList includeBlank=""}}
+      {{labelField "number"}}
+    </fieldset>
+  </template>
+</template>

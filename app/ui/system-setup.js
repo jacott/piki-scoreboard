@@ -12,11 +12,12 @@ define(function(require, exports, module) {
 
   var $ = Dom.current;
 
+  var base = Route.root.addBase(Tpl);
+
   env.onunload(module, function () {
-    Route.root.removeTemplate(Tpl);
+    Route.root.removeBase(Tpl);
   });
 
-  var base = Route.root.addBase(Tpl);
   base.addTemplate(Tpl.Index, {defaultPage: true});
   base.addTemplate(Tpl.OrgForm, {
     data: function (page, pageRoute) {

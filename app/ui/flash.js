@@ -1,6 +1,7 @@
 define(function(require, exports, module) {
   var Dom = require('koru/dom');
   var util = require('koru/util');
+  var env = require('koru/env');
 
   var Tpl = Dom.newTemplate(require('koru/html!./flash'));
 
@@ -28,7 +29,8 @@ define(function(require, exports, module) {
 
 
   Dom.globalErrorCatch = function (e) {
-    Tpl.error(e.reason);
+    env.error(e.stack);
+    Tpl.error(e.reason || "Unexpected error");
     return true;
   };
 

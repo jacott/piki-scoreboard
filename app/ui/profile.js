@@ -11,14 +11,14 @@ define(function(require, exports, module) {
 
   var Tpl = Dom.newTemplate(require('koru/html!./profile'));
 
+  var base = Route.root.addBase(Tpl);
   env.onunload(module, function () {
-    Route.root.removeTemplate(Tpl);
+    Route.root.removeBase(Tpl);
   });
 
   var $ = Dom.current;
   var ChangePassword = Tpl.ChangePassword;
 
-  var base = Route.root.addBase(Tpl);
   base.addTemplate(Tpl.Index, {
     focus: true,
     defaultPage: true,

@@ -4,6 +4,8 @@ define(function(require, exports, module) {
   var Val = require('koru/model/validation');
 
   return function (model) {
+    model.registerObserveField('org_id');
+
     util.extend(model.prototype, {
       authorize: function (userId) {
         var user = User.findById(userId);

@@ -72,7 +72,7 @@ define(function(require, exports, module) {
     },
 
     login: function (func) {
-      return this.loginAs(user || TH.Factory.last.user || TH.Factory.createUser(), func);
+      return this.loginAs(user || TH.Factory.last.user || TH.Factory.createUser('admin'), func);
     },
 
     loginAs: function (newUser, func) {

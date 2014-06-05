@@ -5,8 +5,6 @@ define(function (require, exports, module) {
   var publish = require('koru/session/publish');
   var Model = require('koru/model');
   var env = require('koru/env');
-  var User = require('models/user');
-  var Org = require('models/org');
 
   TH.testCase(module, {
     setUp: function () {
@@ -27,9 +25,16 @@ define(function (require, exports, module) {
       var user1 = TH.Factory.createUser();
       var user2 = TH.Factory.createUser();
 
+      var club1 = TH.Factory.createClub();
 
-      var orgSpy = test.spy(User, 'observeOrg_id');
-
+      var ObSpys = 'User Club Climber Event Category'.split(' ').map(function (name) {
+        try {
+          return test.spy(Model[name], 'observeOrg_id');
+        } catch(ex) {
+          ex.message += ". Failed for: " + name;
+          throw ex;
+        }
+      });
 
       // Subscribe
       var sub = TH.mockSubscribe(v, 'Org', 's123', 'foo');
@@ -39,6 +44,9 @@ define(function (require, exports, module) {
       assert.calledWith(v.conn.added, 'User', user2._id, user2.attributes);
 
 
+      assert.calledWith(v.conn.added, 'Club', club1._id, club1.attributes);
+
+
       // Test changes
       user1.name = 'new name';
       user1.$$save();
@@ -46,14 +54,32 @@ define(function (require, exports, module) {
       assert.calledWith(v.conn.changed, 'User', user1._id, {name: 'new name'});
 
 
+      club1.name = 'new club name';
+      club1.$$save();
+
+      assert.calledWith(v.conn.changed, 'Club', club1._id, {name: 'new club name'});
+
       // *** test stopping ***
-      assert.calledWith(orgSpy, org1._id);
-      var orgStop = test.spy(orgSpy.returnValues[0], 'stop');
+      var stopSpys = ObSpys.map(function (spy) {
+        assert.calledWith(spy, org1._id);
+        return  test.spy(spy.returnValues[0], 'stop');
+      });
 
       sub.stop();
 
-      assert.called(orgStop);
+      stopSpys.forEach(function (spy) {
+        assert.called(spy);
+      });
     },
+
+    /**
+     * session user should not be sent to client as it is already
+     * present.
+     */
+    "//test session user not sent": function () {
+    },
+
+
 
     "test org not found": function () {
       var sub = TH.mockSubscribe(v, 'Org', 's123', 'bad');

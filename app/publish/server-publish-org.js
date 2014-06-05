@@ -4,6 +4,13 @@ define(function(require, exports, module) {
   var Org = require('models/org');
   var User = require('models/user');
   var env = require('koru/env');
+  var Model = require('model');
+  require('models/club');
+  require('models/climber');
+  require('models/event');
+  require('models/category');
+
+  var orgChildren = ['Club', 'Climber', 'Event', 'Category'];
 
   env.onunload(module, function () {
     publish._destroy('Org');
@@ -27,5 +34,11 @@ define(function(require, exports, module) {
 
     handles.push(User.observeOrg_id(org._id, sendUpdate));
     User.query.where('org_id', org._id).forEach(sendUpdate);
+
+    orgChildren.forEach(function (name) {
+      var model = Model[name];
+      handles.push(model.observeOrg_id(org._id, sendUpdate));
+      model.query.where('org_id', org._id).forEach(sendUpdate);
+    });
   });
 });

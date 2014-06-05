@@ -4,6 +4,7 @@ isClient && define(function (require, exports, module) {
   var Home = require('./home');
   var Route = require('koru/ui/route');
   var Dom = require('koru/dom');
+  var Climber = require('./climber');
 
   TH.testCase(module, {
     setUp: function () {
@@ -54,7 +55,7 @@ isClient && define(function (require, exports, module) {
         });
       },
 
-      "//test climbers link": function () {
+      "test climbers link": function () {
         Route.gotoPage(Dom.Home);
         TH.click('button.link', 'Climbers');
 

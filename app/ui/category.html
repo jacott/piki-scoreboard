@@ -1,0 +1,75 @@
+<template name="Category">
+  <section id="Category">
+    <div>
+      <section class="body">
+      </section>
+    </div>
+  </section>
+  <template name="Index">
+    <div>
+      <nav>
+        {{pageLink name="addCategory" value="Add new category" template="Category.Add"}}
+      </nav>
+      <section class="categories">
+        <h1>Competitor categories</h1>
+        <table class="select">
+          <thead>
+            <tr>
+              <th>Name</th><th>Short name</th><th>Group</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{each "categories" template="Row"}}
+          </tbody>
+          <template name="Row">
+            <tr>
+              <td>{{name}}</td><td>{{shortName}}</td><td>{{group}}</td>
+            </tr>
+          </template>
+        </table>
+      </section>
+    </div>
+  </template>
+  <template name="Add">
+    <form id="AddCategory">
+      <h1>Add new category</h1>
+      {{> /Category.Form}}
+      <fieldset class="actions">
+        <button type="submit" name="create">Create</button>
+        <button type="button" name="cancel">Cancel</button>
+      </fieldset>
+    </form>
+  </template>
+
+  <template name="Edit">
+    <form id="EditCategory">
+      <h1>Edit {{name}}</h1>
+      {{> /Category.Form}}
+      <fieldset class="actions">
+        <button type="submit" name="update">Save</button>
+        <button type="button" name="delete">Delete</button>
+        <button type="button" name="cancel">Cancel</button>
+      </fieldset>
+    </form>
+  </template>
+
+  <template name="ConfirmDelete">
+    <div>
+      <h1>Delete {{name}}?</h1>
+      <span>Are you sure you want to delete this category?</span>
+    </div>
+  </template>
+
+  <template name="Form">
+    <fieldset class="fields">
+      {{labelField "name"}}
+      {{labelField "shortName"}}
+      {{labelField "group"}}
+      {{labelField "type" selectList=typeList}}
+      {{labelField "heatFormat"}}
+      {{labelField "gender" selectList=genderList}}
+      {{labelField "minAge"}}
+      {{labelField "maxAge"}}
+    </fieldset>
+  </template>
+</template>

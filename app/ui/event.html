@@ -1,0 +1,113 @@
+<template name="Event">
+  <section id="Event" class="body">
+    <div>
+      <nav class="menu">
+        {{pageLink name="show" value="Results" template="Event.Show" search="type=results"}}
+        {{pageLink name="show" value="Start lists" template="Event.Show" search="type=startlists"}}
+        {{pageLink class="adminAccess" name="register" value="Registrations" template="Event.Register"}}
+        {{pageLink class="adminAccess" name="edit" value="Edit event" template="Event.Edit"}}
+        {{pageLink class="adminAccess" name="edit" value="Upload registrations" template="Event.RegUpload"}}
+     </nav>
+      <section class="body">
+      </section>
+    </div>
+  </section>
+  <template name="Index">
+    <div>
+      <section class="events">
+        <h1>Events</h1>
+        <nav>
+          {{pageLink class="adminAccess" name="add" value="Add new event" template="Event.Add"}}
+        </nav>
+        <table class="select">
+          <thead>
+            <tr>
+              <th>Name</th><th>Start Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{each "events" template="Row"}}
+          </tbody>
+          <template name="Row">
+            <tr class="{{classes}}">
+              <td>{{name}}</td><td>{{date}}</td>
+            </tr>
+          </template>
+        </table>
+      </section>
+    </div>
+  </template>
+  <template name="Show">
+    <section id="Show">
+      <div>
+        <h1>{{name}} - Category {{listType}}</h1>
+        <table class="categories">
+          {{each "categories" template="Event.CatList"}}
+        </table>
+
+        {{>Action ""}}
+        <template name="Action">
+          <div class="action">
+            {{content}}
+          </div>
+        </template>
+      </div>
+    </section>
+  </template>
+  <template name="CatList">
+    <tr class="{{type}}">
+      <td><span class="select"></span></td>
+      <td>{{pageLink value=name template="Event.Category" append=_id search=listType}}</td>
+      {{heats}}
+    </tr>
+  </template>
+  <template name="Add">
+    <form id="AddEvent">
+      <h1>Add new event</h1>
+      {{> /Event.Form}}
+      <fieldset class="actions">
+        <button type="submit" name="create">Create</button>
+        <button type="button" name="cancel">Cancel</button>
+      </fieldset>
+    </form>
+  </template>
+
+  <template name="Edit">
+    <div id="EditEvent">
+      <h1>Edit {{name}}</h1>
+      <form>
+        {{> /Event.Form}}
+        <fieldset class="actions">
+          <button type="submit" name="update">Save</button>
+          <button type="button" name="delete">Delete</button>
+          <button type="button" name="cancel">Cancel</button>
+        </fieldset>
+      </form>
+
+      <div class="categories">
+        <h1>Category formats</h1>
+        {{each "categories" template="Cat"}}
+        <template name="Cat">
+          <label>
+            <span class="name">{{name}}</span>
+            <input name="changeFormat" value="{{eventFormat}}">
+          </label>
+        </template>
+      </div>
+    </div>
+  </template>
+
+  <template name="ConfirmDelete">
+    <div>
+      <h1>Delete {{name}}?</h1>
+      <span>Are you sure you want to delete this event?</span>
+    </div>
+  </template>
+
+  <template name="Form">
+    <fieldset class="fields">
+      {{labelField "name"}}
+      {{labelField "date" placeholder="yyyy-mm-dd"}}
+    </fieldset>
+  </template>
+</template>

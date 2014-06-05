@@ -7,6 +7,8 @@ define(function(require, exports, module) {
   return function (model) {
     ChangeLog.logChanges(model);
 
+    model.registerObserveField('org_id');
+
     util.extend(model.prototype, {
       authorize: function (userId) {
         var user = User.findById(userId);

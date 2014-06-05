@@ -30,6 +30,10 @@ define(function (require, exports, module) {
 
       assert.isTrue(m({org_id: org._id}));
       assert.isFalse(m({org_id: 'x'+org._id}));
+
+      'Club Climber Event Category'.split(' ').forEach(function (name) {
+        assert.calledWith(v.sub.match, name, m);
+      });
     },
   });
 });

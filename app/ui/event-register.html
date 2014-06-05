@@ -1,0 +1,97 @@
+<template name="Event.Register">
+  <Section id="Register">
+    <h1>{{name}}</h1>
+
+    <section class="body">
+    </section>
+
+    <template name="Add">
+      <form class="add no-print">
+        <h1>Add competitor</h1>
+        <fieldset>
+          {{labelField "name" class="autoComplete" autocomplete="off"}}
+        </fieldset>
+        <fieldset class="actions">
+          <button type="submit">Register</button>
+          <button name="cancel">Cancel</button>
+        </fieldset>
+      </form>
+    </template>
+
+    <template name="Edit">
+      <form class="edit">
+        <fieldset class="actions">
+          <button type="submit">Save</button>
+          <button name="delete">Deregister</button>
+          <button name="cancel">Cancel</button>
+        </fieldset>
+      </form>
+    </template>
+
+    <template name="Groups">
+      <div class="Groups">
+        <h1>{{climber.name}}</h1>
+
+        {{>ClimberNumber climber}}
+
+        <template name="ClimberNumber">
+          <fieldset class="fields climber">
+            {{labelField "number" label="Competitor number"}}
+            <button name="editClimber" type="button">Edit Climber</button>
+          </fieldset>
+        </template>
+      </div>
+    </template>
+    <template name="Category">
+      <label>
+        <span class="name">{{groupName}}</span>
+        {{field "category_id" selectList=groupList includeBlank="true"}}
+      </label>
+    </template>
+
+    <template name="AddClimber">
+      <form id="AddClimber">
+        <h1>Add new climber</h1>
+        {{> /Climber.Form}}
+        <fieldset class="actions">
+          <button type="submit" name="create">Create</button>
+          <button type="button" name="cancel">Cancel</button>
+        </fieldset>
+      </form>
+    </template>
+
+    <table class="select">
+      <thead><tr>
+          <th data-sort="name">Competitor</th>
+          <th data-sort="dateOfBirth">DOB</th>
+          <th data-sort="gender">M/F</th>
+          <th data-sort="club">Club</th>
+          <th data-sort="number">Number</th>
+          <th data-sort="createdAt">Reg. Date</th>
+          <th data-sort="cat">Categories</th>
+          {{sortOrder}}
+      </tr></thead>
+      <tbody>
+        {{each "competitors" template="Row"}}
+        <template name="Row">
+          <tr>
+            <td>{{climber.name}}</td>
+            <td>{{climber.dateOfBirth}}</td>
+            <td>{{climber.gender}}</td>
+            <td><abbr title="{{climber.club.name}}">{{climber.club.shortName}}</abbr></td>
+            <td>{{climber.number}}</td>
+            <td>{{date createdAt}}</td>
+            <td>{{categories}}</td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+  </Section>
+
+  <template name="ConfirmDelete">
+    <div>
+      <h1>Deregister {{climber.name}}?</h1>
+      <span>Are you sure you want to remove this climber from the event?</span>
+    </div>
+  </template>
+</template>

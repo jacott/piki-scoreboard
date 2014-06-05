@@ -4,6 +4,8 @@ define(function(require, exports, module) {
   var client = require('koru/client');
   var App = require('ui/app');
   require('ui/profile');
+  require('ui/club');
+  require('ui/climber');
 
   return {
     start: function () {

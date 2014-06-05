@@ -1,0 +1,53 @@
+<template name="Event.Category">
+  <div class="{{classes}}">
+    <h1>{{category.name}}</h1>
+    <nav class="viewMenu">
+      <button name="toggleStartOrder">{{modeSwitchLabel}}</button>
+      {{field "selectHeat" selectList=heats}}
+    </nav>
+    <h1 class="selectedHeat">{{heat.name}} - {{mode}}</h1>
+    <table class="select results">
+      <thead>
+        <tr>
+          <th class="climber">Climber</th>
+          {{headers}}
+          <template name="HeatHeader">
+            <th {{heatClass}}>{{name}}</th>
+          </template>
+        </tr>
+      </thead>
+      <tbody>
+        {{results}}
+        <template name="Result">
+          <tr id="{{elmId 'Result'}}">
+            <td class="climber">
+              <span class="club">{{climber.club.shortName}}</span>
+              <span class="name">{{climber.name}}</span>
+              <span class="number">{{climber.number}}</span>
+            </td>
+            {{scores}}
+          </tr>
+        </template>
+        <template name="Score">
+          <td class="score" {{heatClass}}>
+            {{rank}}
+            {{score}}
+          </td>
+        </template>
+        <template name="BoulderScore">
+          <td class="BoulderScore score">
+            {{problems}}
+          </td>
+        </template>
+        <template name="InvalidInput">
+          <span class="errorMsg">
+            Invalid format
+          </span>
+        </template>
+      </tbody>
+    </table>
+    <span class="note">
+      Start lists subject to change prior to start of heat, as later registrations will be inserted randomly.
+    </span>
+  </div>
+</template>

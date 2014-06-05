@@ -1,0 +1,36 @@
+<template name="Event.RegUpload">
+  <div id="RegUpload">
+    <section  class="upload no-print">
+      <h1>Upload Registrations</h1>
+
+      <label>Choose File to import
+        <input id="regUploadFile" type="file" name="filename">
+      </label>
+    </section>
+
+    <section class="errors">
+      <h1>Upload Errors</h1>
+
+      <table class="select">
+        <thead>
+          <tr>
+            <th>Line</th>
+            <th>Message</th>
+            <th>Fields</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{eachError}}
+        </tbody>
+        <template name="ErrorRow">
+          <tr>
+            <td>{{line}}</td>
+            <td>{{message}}</td>
+            <td>{{fields}}</td>
+          </tr>
+        </template>
+      </table>
+    </section>
+
+  </div>
+</template>
