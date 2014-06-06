@@ -38,7 +38,7 @@ requirejs.config({
 module.exports = {};
 
 requirejs([
-  'koru/env', 'koru/file-watch', 'server-startup',
+  'koru/env', 'koru/file-watch', 'startup-server',
   'koru/css/less-watcher', 'koru/server-rc',
 ], function (env, fileWatch, startup) {
   env.Fiber(function () {
