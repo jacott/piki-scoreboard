@@ -151,6 +151,8 @@ define(function(require, exports, module) {
     },
 
     sortByStartOrder: function (results) {
+      if (results.length === 0) return results;
+
       var x = this.number;
 
       if (x <= 0) x = 1;
@@ -201,8 +203,14 @@ define(function(require, exports, module) {
 
     sort: function (results, number, rso) {
       if (results.length === 0) return results;
+
+
       if (number == null) number = this.number;
       var rankIndex = this.rankIndex;
+
+      for(var i = 0; i < results.length; ++i) {
+        results[i].rankMult = 1;
+      }
 
       // set qual ranks
       for(var x=rankIndex; x > 0; --x) {
@@ -238,7 +246,7 @@ define(function(require, exports, module) {
         for(var i = from; i < to; ++i) {
           var row = results[i];
           row[rankName] = rank;
-          row.rankMult = (row.rankMult || 1) * rank;
+          row.rankMult = row.rankMult * rank;
         }
       }
 

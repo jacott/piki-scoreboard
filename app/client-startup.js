@@ -6,6 +6,7 @@ define(function(require, exports, module) {
   require('ui/profile');
   require('ui/club');
   require('ui/climber');
+  require('ui/event-category');
 
   return {
     start: function () {

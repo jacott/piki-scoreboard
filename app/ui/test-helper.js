@@ -4,7 +4,6 @@ define(function(require, exports, module) {
   var Dom =       require('koru/dom');
   var Route =     require('koru/ui/route');
   var env =       require('koru/env');
-  var subscribe = require('koru/session/subscribe');
   var App =       require('./app');
   var Home =      require('ui/home');
   var TH =        require('test-helper');
@@ -15,16 +14,9 @@ define(function(require, exports, module) {
 
   env.onunload(module, 'reload');
 
+  TH.setAccess = App.setAccess, // used by TH.loginAs
+
   TH = util.reverseExtend({
-    setAccess: App.setAccess, // used by TH.loginAs
-
-    stubSubscribe: function (name) {
-      return (('restore' in subscribe.intercept) ?
-       subscribe.intercept :
-       geddon.test.stub(subscribe, 'intercept'))
-        .withArgs(name);
-    },
-
     setOrg: function (org) {
       org = org || TH.Factory.createOrg();
       App.orgId = org._id;

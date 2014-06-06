@@ -6,7 +6,6 @@ isClient && define(function (require, exports, module) {
   var Dom     = require('koru/dom');
   var Spinner = require('ui/spinner');
   var session = require('koru/session');
-  var subscribe = require('koru/session/subscribe');
   var env = require('koru/env');
   var publish = require('koru/session/publish');
 
@@ -18,7 +17,7 @@ isClient && define(function (require, exports, module) {
       test.stub(window, 'addEventListener');
       test.stub(Spinner, 'init');
       test.stub(session, 'sendP');
-      v.subSelf = test.stub(subscribe, 'intercept').withArgs('Self');
+      v.subSelf = test.stub(App.subscribe, 'intercept').withArgs('Self');
     },
 
     tearDown: function () {
@@ -88,7 +87,7 @@ isClient && define(function (require, exports, module) {
       Route.replacePath.restore();
       test.stub(env, 'getLocation').returns({pathname: '/FOO'});
 
-      v.subOrg = subscribe.intercept.withArgs('Org');
+      v.subOrg = App.subscribe.intercept.withArgs('Org');
 
       assert.same(Route.root.routeVar, 'orgSN');
 
