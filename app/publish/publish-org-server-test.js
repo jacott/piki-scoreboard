@@ -5,6 +5,7 @@ define(function (require, exports, module) {
   var publish = require('koru/session/publish');
   var Model = require('koru/model');
   var env = require('koru/env');
+  var Val = require('koru/model/validation');
 
   TH.testCase(module, {
     setUp: function () {
@@ -12,6 +13,7 @@ define(function (require, exports, module) {
       v = {};
       v.user = TH.Factory.createUser();
       TH.loginAs(v.user);
+      test.stub(Val, 'ensureString');
     },
 
     tearDown: function () {
@@ -27,7 +29,7 @@ define(function (require, exports, module) {
 
       var club1 = TH.Factory.createClub();
 
-      var ObSpys = 'User Club Climber Event Category'.split(' ').map(function (name) {
+      var obSpys = 'User Club Climber Event Category'.split(' ').map(function (name) {
         try {
           return test.spy(Model[name], 'observeOrg_id');
         } catch(ex) {
@@ -38,6 +40,8 @@ define(function (require, exports, module) {
 
       // Subscribe
       var sub = TH.mockSubscribe(v, 'Org', 's123', 'foo');
+
+      assert.calledWith(Val.ensureString, 'foo');
 
       // Test initial data
       assert.calledWith(v.conn.added, 'User', user1._id, user1.attributes);
@@ -60,9 +64,9 @@ define(function (require, exports, module) {
       assert.calledWith(v.conn.changed, 'Club', club1._id, {name: 'new club name'});
 
       // *** test stopping ***
-      var stopSpys = ObSpys.map(function (spy) {
+      var stopSpys = obSpys.map(function (spy) {
         assert.calledWith(spy, org1._id);
-        return  test.spy(spy.returnValues[0], 'stop');
+        return test.spy(spy.returnValues[0], 'stop');
       });
 
       sub.stop();

@@ -1,14 +1,16 @@
 define(function(require, exports, module) {
   var publish = require('koru/session/publish');
-  var Query = require('koru/model/query');
   var Org = require('models/org');
-  var User = require('models/user');
   var env = require('koru/env');
   var Model = require('model');
+  var Val = require('koru/model/validation');
+  var User = require('models/user');
+
   require('models/club');
   require('models/climber');
   require('models/event');
   require('models/category');
+
 
   var orgChildren = ['Club', 'Climber', 'Event', 'Category'];
 
@@ -17,6 +19,7 @@ define(function(require, exports, module) {
   });
 
   publish('Org', function (shortName) {
+    Val.ensureString(shortName);
     var sub = this;
 
     var org = Org.findByField('shortName', shortName);

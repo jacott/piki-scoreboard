@@ -9,6 +9,7 @@ define(function(require, exports, module) {
                   require('./home');
                   require('publish/publish-self');
                   require('publish/publish-org');
+                  require('publish/publish-event');
   var Spinner =   require('ui/spinner');
   var util =      require('koru/util');
   var App =       require('./app-base');

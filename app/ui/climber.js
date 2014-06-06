@@ -1,7 +1,6 @@
 define(function(require, exports, module) {
   var App   = require('./app-base');
   var Dom   = require('koru/dom');
-  var Org   = require('models/org');
   var Route = require('koru/ui/route');
   var Tpl   = Dom.newTemplate(require('koru/html!./climber'));
   var util  = require('koru/util');

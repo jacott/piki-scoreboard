@@ -17,6 +17,8 @@ define(function(require, exports, module) {
     createdAt: 'timestamp',
   });
 
+  model.registerObserveField('event_id');
+
   require('koru/env!./competitor')(model);
 
   return model;

@@ -32,6 +32,7 @@ define(function(require, exports, module) {
     problems: 'has-many',
   });
 
+  model.registerObserveField('event_id');
 
   model.remote({
     setScore: function (id, index, score) {
