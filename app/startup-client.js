@@ -7,6 +7,7 @@ define(function(require, exports, module) {
   require('ui/club');
   require('ui/climber');
   require('ui/event-category');
+  require('ui/event-register');
 
   return {
     start: function () {

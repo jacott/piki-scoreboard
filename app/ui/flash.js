@@ -29,7 +29,7 @@ define(function(require, exports, module) {
 
 
   Dom.globalErrorCatch = function (e) {
-    env.error(e.stack);
+    env.error(util.extractError(e));
     Tpl.error(e.reason || "Unexpected error");
     return true;
   };

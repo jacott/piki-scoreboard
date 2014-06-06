@@ -10,7 +10,7 @@ define(function(require, exports, module) {
         for(var id in docs) {
           var doc = docs[id];
           if (regex.test(doc.name) && (! tester || tester(doc))) {
-            results.push(new model(doc));
+            results.push(doc);
             if (results.length === limit)
               break;
           }
