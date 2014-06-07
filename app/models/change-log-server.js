@@ -63,7 +63,7 @@ define(function(require, exports, module) {
         for(var key in was) {
           ++count;
           if (key.match(/\./)) {
-            var val = Model.lookupDottedValue(key, attributes);
+            var val = util.lookupDottedValue(key, attributes);
           } else {
             var val = attributes[key];
           }
