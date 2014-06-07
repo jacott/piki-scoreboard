@@ -5,7 +5,6 @@ define(function(require, exports, module) {
   var User = require('./user');
   var Heat = require('./heat');
   var Competitor = require('./competitor');
-  var ChangeLog = require('./change-log');
   var Event = require('./event');
   var Category = require('./category');
 
@@ -50,7 +49,6 @@ define(function(require, exports, module) {
       if (index === 99) {
         var time =  heat.scoreToNumber(score, 99);
         Val.allowAccessIf(time !== false);
-        recordScoreChange(result, {time: result.time}, {time: time});
         model.query.onId(id).update({time: time});
         return;
       }
@@ -62,7 +60,6 @@ define(function(require, exports, module) {
 
       changes['scores.' + index] = score = heat.scoreToNumber(score);
 
-      recordScoreChange(result, {score: result.scores[index]}, {index: index, score: score});
       model.query.onId(id).update(changes);
     },
 
@@ -133,8 +130,6 @@ define(function(require, exports, module) {
       changes['problems.' + (index-1)] = round;
       changes['scores.' + index] = dnc === "dnc" ? -1 : score = heat.boulderScoreToNumber(b, ba, t, ta);
 
-      recordScoreChange(result, {score: result.scores[index], probScore: b4ProbScore},
-                        {index: index, problem: problem, score: score, probScore: round[problem]});
       model.query.onId(id).update(changes);
     },
   });
@@ -199,24 +194,6 @@ define(function(require, exports, module) {
       heat["heats."+doc.category_id] = value;
       return heat;
     }
-  }
-
-
-  function recordScoreChange(result, before, after) {
-    if (isClient) return;
-
-    var params = {
-      user_id: env.userId(),
-      org_id: result.event.org_id,
-      parent: 'Event', parent_id: result.event_id,
-      model: 'Result', model_id: result._id,
-      type: 'update',
-      aux: 'score',
-      before: JSON.stringify(before),
-      after: JSON.stringify(after),
-    };
-
-    ChangeLog.create(params);
   }
 
   require('koru/env!./result')(model);

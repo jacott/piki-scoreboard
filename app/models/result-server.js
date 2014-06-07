@@ -3,9 +3,10 @@ define(function(require, exports, module) {
   var ChangeLog = require('./change-log');
   var User = require('./user');
   var Val = require('koru/model/validation');
+  var Event = require('models/event');
 
   return function (model) {
-    ChangeLog.logChanges(model);
+    ChangeLog.logChanges(model, {parent: Event});
 
     util.extend(model.prototype, {
       authorize: function (userId) {
