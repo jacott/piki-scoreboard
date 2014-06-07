@@ -80,10 +80,18 @@ define(function (require, exports, module) {
      * session user should not be sent to client as it is already
      * present.
      */
-    "//test session user not sent": function () {
+    "test session user not sent": function () {
+      var org = v.user.org;
+
+      var sub = TH.mockSubscribe(v, 'Org', 's123', org.shortName);
+
+      refute.calledWith(v.conn.added, 'User');
+
+      v.user.name = 'new name';
+      v.user.$$save();
+
+      refute.calledWith(v.conn.changed, 'User');
     },
-
-
 
     "test org not found": function () {
       var sub = TH.mockSubscribe(v, 'Org', 's123', 'bad');

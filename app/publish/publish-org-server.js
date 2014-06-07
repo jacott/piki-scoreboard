@@ -35,13 +35,18 @@ define(function(require, exports, module) {
 
     var sendUpdate = sub.sendUpdate.bind(sub);
 
-    handles.push(User.observeOrg_id(org._id, sendUpdate));
-    User.query.where('org_id', org._id).forEach(sendUpdate);
+    handles.push(User.observeOrg_id(org._id, sendUser));
+    User.query.where('org_id', org._id).forEach(sendUser);
 
     orgChildren.forEach(function (name) {
       var model = Model[name];
       handles.push(model.observeOrg_id(org._id, sendUpdate));
       model.query.where('org_id', org._id).forEach(sendUpdate);
     });
+
+    function sendUser(doc, was) {
+      if (doc && doc._id === sub.userId) return;
+      sendUpdate(doc, was);
+    }
   });
 });
