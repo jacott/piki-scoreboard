@@ -27,7 +27,7 @@ isClient && define(function (require, exports, module) {
         Route.gotoPage(Profile);
       },
 
-      "//test signOut me": function () {
+      "test signOut me": function () {
         test.stub(UserAccount, 'logout');
 
         TH.click('[name=signOut]');
@@ -35,7 +35,7 @@ isClient && define(function (require, exports, module) {
         assert.called(UserAccount.logout);
       },
 
-      "//test signOut other clients": function () {
+      "test signOut other clients": function () {
         test.stub(UserAccount, 'logoutOtherClients');
 
         TH.click('[name=signOutOthers]');
