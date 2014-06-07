@@ -150,7 +150,7 @@ isClient && define(function (require, exports, module) {
         });
       },
 
-      "//test registration link": function () {
+      "test registration link": function () {
         TH.click('[name=register]');
 
         assert.dom('#Event #Register');

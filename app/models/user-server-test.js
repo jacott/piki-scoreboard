@@ -4,6 +4,8 @@ define(function (require, exports, module) {
   var User = require('./user');
   var env = require('koru/env');
   var session = require('koru/session');
+  var UserAccount = require('koru/user-account');
+  var Val = require('koru/model/validation');
 
   TH.testCase(module, {
     setUp: function () {
@@ -50,23 +52,19 @@ define(function (require, exports, module) {
       });
     },
 
-    "//test createUser": function () {
-      test.stub(Accounts, 'sendResetPasswordEmail');
+    "test createUser": function () {
+      test.stub(UserAccount, 'sendResetPasswordEmail');
       TH.loginAs(TH.Factory.createUser('su'));
       var user = TH.Factory.buildUser();
       user.$$save();
 
-      var mUser = Meteor.users.findOne(user._id);
+      var mUser = UserAccount.model.findByField('userId', user._id);
 
       assert(mUser);
 
-      assert.equals(mUser.emails, [{address: user.email, verified: false}]);
+      assert.equals(mUser.email, user.email);
 
-      assert.calledWith(Accounts.sendResetPasswordEmail, user._id);
-
-      // and remove
-      user.$remove();
-      refute(Meteor.users.findOne(user._id));
+      assert.calledWith(UserAccount.sendResetPasswordEmail, user._id);
     },
 
     "test change email": function () {
@@ -81,45 +79,46 @@ define(function (require, exports, module) {
       assert.same(user.email, "foo@bar.com");
     },
 
-    "//forgotPassword": {
+    "forgotPassword": {
       setUp: function () {
-        test.stub(global, 'check');
-        test.stub(Accounts, 'sendResetPasswordEmail');
+        test.stub(Val, 'ensureString');
+        test.stub(UserAccount, 'sendResetPasswordEmail');
+        v.rpc = TH.mockRpc();
       },
 
       "test missing email": function () {
-        var res = App.rpc('User.forgotPassword', '  ');
+        var res = v.rpc('User.forgotPassword', '  ');
 
         assert.equals(res, {email: 'is_required'});
-        refute.called(Accounts.sendResetPasswordEmail);
+        refute.called(UserAccount.sendResetPasswordEmail);
       },
 
       "test invalid email": function () {
-        var res = App.rpc('User.forgotPassword', ' xyz ');
+        var res = v.rpc('User.forgotPassword', ' xyz ');
 
         assert.equals(res, {email: 'is_invalid'});
-        refute.called(Accounts.sendResetPasswordEmail);
+        refute.called(UserAccount.sendResetPasswordEmail);
       },
 
       "test user without meteor account": function () {
         var user = TH.Factory.createUser({email: 'foo@bar.com'});
-        Meteor.users.remove(user._id);
-        var res = App.rpc('User.forgotPassword', 'foo@bar.com  ');
+        var res = v.rpc('User.forgotPassword', 'foo@bar.com  ');
 
         assert.equals(res, {success: true});
 
-        refute.calledWith(Accounts.sendResetPasswordEmail);
+        refute.calledWith(UserAccount.sendResetPasswordEmail);
       },
 
       "test success": function () {
-        var user = TH.Factory.createUser({email: 'foo@bar.com'});
-        var res = App.rpc('User.forgotPassword', 'foo@bar.com  ');
+        var user = TH.Factory.buildUser({email: 'foo@bar.com'});
+        user.$save('force');
+        var res = v.rpc('User.forgotPassword', 'foo@bar.com  ');
 
         assert.equals(res, {success: true});
 
-        assert.calledWith(check, 'foo@bar.com  ', String);
+        assert.calledWith(Val.ensureString, 'foo@bar.com  ');
 
-        assert.calledWith(Accounts.sendResetPasswordEmail, user._id);
+        assert.calledWith(UserAccount.sendResetPasswordEmail, user._id);
       },
     }
 

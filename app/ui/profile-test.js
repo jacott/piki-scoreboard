@@ -81,7 +81,7 @@ isClient && define(function (require, exports, module) {
 
           assert.className(this, 'submitting');
 
-          assert.calledWith(cpwStub,'oldpw', 'newpw', TH.match(function (func) {
+          assert.calledWith(cpwStub,v.user.email, 'oldpw', 'newpw', TH.match(function (func) {
             v.func = func;
             return typeof func === 'function';
           }));

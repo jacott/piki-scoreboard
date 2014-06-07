@@ -87,7 +87,7 @@ define(function(require, exports, module) {
 
       Dom.addClass(form, 'submitting');
 
-      UserAccount.changePassword(oldPassword, newPassword.value, function (error) {
+      UserAccount.changePassword(User.me().email, oldPassword, newPassword.value, function (error) {
         if (error) {
           Dom.removeClass(form, 'submitting');
           Form.renderError(form, 'oldPassword', 'invalid password.');

@@ -62,7 +62,7 @@ isClient && define(function (require, exports, module) {
         assert.dom('#Climber');
       },
 
-      "//test events link": function () {
+      "test events link": function () {
         Route.gotoPage(Dom.Home);
         TH.click('button.link', 'Events');
 

@@ -51,6 +51,7 @@ define(function(require, exports, module) {
       if (me && me.isSuperUser()) return;
       if (!me) {
         Val.addError(this, '_id', 'not_allowed');
+        return;
       }
       if (this.isSuperUser() || this.role === 's')
         Val.addError(this, 'role', 'is_invalid');
