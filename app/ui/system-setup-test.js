@@ -113,7 +113,7 @@ isClient && define(function (require, exports, module) {
 
         assert.dom('.Dialog.Confirm', function () {
           assert.dom('h1', 'Delete ' + v.org.name + '?');
-          TH.click('[name=cancel');
+          TH.click('[name=cancel]');
         });
 
         refute.dom('.Dialog');
@@ -191,7 +191,7 @@ isClient && define(function (require, exports, module) {
 
         assert.dom('.Dialog.Confirm', function () {
           assert.dom('h1', 'Delete ' + v.user.name + '?');
-          TH.click('[name=cancel');
+          TH.click('[name=cancel]');
         });
 
         refute.dom('.Dialog');
