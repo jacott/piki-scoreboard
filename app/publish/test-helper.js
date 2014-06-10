@@ -5,6 +5,7 @@ define(function(require, exports, module) {
   var Model = require('koru/model');
   var Val = require('koru/model/validation');
   var session = require('koru/session');
+  var message = require('koru/session/message');
 
   var geddon = TH.geddon;
 
@@ -13,16 +14,17 @@ define(function(require, exports, module) {
       return {match: geddon.test.stub()};
     },
 
-    mockSubscribe: function (v, name, id) {
+    mockSubscribe: function (v, id, name) {
       var test = geddon.test;
       session._onMessage(v.conn = {
         userId: env.userId(),
         added: test.stub(),
         changed: test.stub(),
         removed: test.stub(),
+        sendBinary: test.stub(),
         ws: {send: v.send = test.stub()},
         _subs: {},
-      }, 'P'+name+'|'+id+JSON.stringify(util.slice(arguments, 3)));
+      }, message.encodeMessage('P', [id, name, util.slice(arguments, 3)]));
 
       return v.conn._subs[id];
     },

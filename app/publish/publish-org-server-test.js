@@ -39,7 +39,7 @@ define(function (require, exports, module) {
       });
 
       // Subscribe
-      var sub = TH.mockSubscribe(v, 'Org', 's123', 'foo');
+      var sub = TH.mockSubscribe(v, 's123', 'Org', 'foo');
 
       assert.calledWith(Val.ensureString, 'foo');
 
@@ -83,7 +83,7 @@ define(function (require, exports, module) {
     "test session user not sent": function () {
       var org = v.user.org;
 
-      var sub = TH.mockSubscribe(v, 'Org', 's123', org.shortName);
+      var sub = TH.mockSubscribe(v, 's123', 'Org', org.shortName);
 
       refute.calledWith(v.conn.added, 'User');
 
@@ -94,11 +94,11 @@ define(function (require, exports, module) {
     },
 
     "test org not found": function () {
-      var sub = TH.mockSubscribe(v, 'Org', 's123', 'bad');
+      var sub = TH.mockSubscribe(v, 's123', 'Org', 'bad');
 
       refute(sub);
 
-      assert.calledWith(v.send, 'Ps123|404|Org not found');
+      assert.calledWith(v.conn.sendBinary, 'P', ['s123', 404, 'Org not found']);
     },
   });
 });

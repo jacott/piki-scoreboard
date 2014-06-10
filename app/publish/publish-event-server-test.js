@@ -37,7 +37,7 @@ define(function (require, exports, module) {
         return test.spy(Model[modelName], 'observeEvent_id');
       });
 
-      var sub = TH.mockSubscribe(v, 'Event', 's123', v.event._id);
+      var sub = TH.mockSubscribe(v, 's123', 'Event', v.event._id);
 
       assert.calledWith(Val.ensureString, v.event._id);
 

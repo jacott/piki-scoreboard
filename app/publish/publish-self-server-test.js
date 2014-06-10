@@ -20,7 +20,7 @@ define(function (require, exports, module) {
     },
 
     "test publish guest": function () {
-      var sub = TH.mockSubscribe(v, 'Self', 's123');
+      var sub = TH.mockSubscribe(v, 's123', 'Self');
 
       assert.same(v.conn.userId, 'guest');
 
@@ -39,7 +39,7 @@ define(function (require, exports, module) {
 
 
       // Subscribe
-      var sub = TH.mockSubscribe(v, 'Self', 's123');
+      var sub = TH.mockSubscribe(v, 's123', 'Self');
 
       assert.msg("should be logged in user")
         .same(v.conn.userId, user._id);
@@ -77,11 +77,11 @@ define(function (require, exports, module) {
     "test user not found": function () {
       test.stub(env, 'userId').returns('bad');
 
-      var sub = TH.mockSubscribe(v, 'Self', 's123');
+      var sub = TH.mockSubscribe(v, 's123', 'Self');
 
       refute(sub);
 
-      assert.calledWith(v.send, 'Ps123|404|User Not Found');
+      assert.calledWith(v.conn.sendBinary, 'P', ['s123', 404, 'User not found']);
     },
   });
 });

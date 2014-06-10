@@ -18,7 +18,7 @@ define(function(require, exports, module) {
     var user = User.findById(sub.userId);
 
     if (! user) {
-      sub.error(new env.Error(404, 'User Not Found'));
+      sub.error(new env.Error(404, 'User not found'));
       return;
     }
 
