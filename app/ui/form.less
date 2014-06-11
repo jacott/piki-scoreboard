@@ -65,6 +65,12 @@ table.select {
   position: relative;
   &+ul.complete {
     position: absolute;
+    list-style-type: none;
+    &>li {
+      margin: 0;
+      padding: 0;
+    }
+
     margin: 0;
     border: 1px solid fade(#000, 80%);
     .box-shadow(0 0 4px fade(#000, 60%));
