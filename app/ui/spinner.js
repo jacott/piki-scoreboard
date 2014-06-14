@@ -2,13 +2,14 @@ define(function(require, exports, module) {
   var env = require('koru/env');
   var session = require('koru/session');
   var Dom = require('koru/dom');
+  var sync = require('koru/session/sync');
 
   var onChangeHandle;
 
   env.onunload(module, stop);
 
   exports.init = function () {
-    onChangeHandle = session.rpc.onChange(function (show) {
+    onChangeHandle = sync.onChange(function (show) {
       Dom.setClass('show', show, document.getElementById('Spinner'));
     });
 
@@ -25,7 +26,7 @@ define(function(require, exports, module) {
   }
 
   function confirmLeave(ev) {
-    if (session.rpc.waiting())
+    if (sync.waiting())
       ev.returnValue = "You have unsaved changes.";
   }
 });
