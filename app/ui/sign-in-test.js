@@ -9,6 +9,7 @@ isClient && define(function (require, exports, module) {
   var UserAccount = require('koru/user-account');
   var User        = require('models/user');
                     require('koru/ui/page-link');
+ var login = require('koru/user-account/client-login');
 
   TH.testCase(module, {
     setUp: function () {
@@ -26,7 +27,7 @@ isClient && define(function (require, exports, module) {
       document.body.appendChild(SignIn.$autoRender({}));
       TH.login();
 
-      UserAccount.notify('ready');
+      login.notify('ready');
       refute.dom('[name=signIn]');
       test.stub(Route, 'gotoPath');
       TH.click('#ProfileLink');

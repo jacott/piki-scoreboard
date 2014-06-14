@@ -8,6 +8,7 @@ define(function(require, exports, module) {
   var Dialog = require('koru/ui/dialog');
   var SystemSetup = require('./system-setup');
   var env = require('koru/env');
+  var login = require('koru/user-account/client-login');
 
   var Tpl = Dom.newTemplate(require('koru/html!./profile'));
 
@@ -72,7 +73,7 @@ define(function(require, exports, module) {
     },
 
     $created: function (ctx) {
-      ctx.onDestroy(UserAccount.onChange(function () {
+      ctx.onDestroy(login.onChange(function () {
         Route.replacePath(Home);
       }));
     },

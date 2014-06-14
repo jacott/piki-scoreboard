@@ -9,9 +9,10 @@ define(function(require, exports, module) {
   var startup = require('startup-client');
                 require('koru/css/loader').loadAll('ui');
 
-  env.onunload(module, function () {
+  env.onunload(module, function (id, error) {
     startup.stop();
-    require([module.id], function () {});
+    if (! error)
+      require([module.id], function () {});
   });
 
   startup.start();

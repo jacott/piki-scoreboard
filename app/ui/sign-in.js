@@ -8,6 +8,7 @@ define(function(require, exports, module) {
   var UserAccount = require('koru/user-account');
   var util = require('koru/util');
   var env = require('koru/env');
+  var login = require('koru/user-account/client-login');
 
   var Tpl = Dom.newTemplate(require('koru/html!./sign-in'));
   var ForgotPassword = Tpl.ForgotPassword;
@@ -35,7 +36,7 @@ define(function(require, exports, module) {
   util.extend(Tpl, {
     $created: function (ctx, elm) {
       var userOb;
-      ctx.onDestroy(UserAccount.onChange(function (state) {
+      ctx.onDestroy(login.onChange(function (state) {
         if (state !== 'ready') return;
         observeUserId();
       }));
