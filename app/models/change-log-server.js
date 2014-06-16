@@ -27,7 +27,9 @@ define(function(require, exports, module) {
       },
     });
 
-    // FIXME model.docs._ensureIndex({createdAt: -1, parent_id: 1});
+    env.Fiber(function () {
+      model.addIndex('createdAt', -1, 'parent_id');
+    }).run();
 
     function observeChanges(subject, aux, callback) {
       subject.onChange(function (doc, was) {
