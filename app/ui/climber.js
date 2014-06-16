@@ -7,6 +7,7 @@ define(function(require, exports, module) {
   var env = require('koru/env');
   var Climber = require('models/climber');
   var Club = require('models/club');
+  var Form = require('koru/ui/form');
 
   var $ = Dom.current;
   var Index = Tpl.Index;
@@ -90,7 +91,7 @@ define(function(require, exports, module) {
 
   Tpl.Add.$events({
     'click [name=cancel]': cancel,
-    'click [type=submit]': Dom.Form.submitFunc('AddClimber', "back"),
+    'click [type=submit]': Form.submitFunc('AddClimber', "back"),
   });
 
   Tpl.Edit.$events({
@@ -113,7 +114,7 @@ define(function(require, exports, module) {
       });
 
     },
-    'click [type=submit]': Dom.Form.submitFunc('EditClimber', "back"),
+    'click [type=submit]': Form.submitFunc('EditClimber', "back"),
   });
 
   base.addTemplate(Index, {defaultPage: true, path: ''});

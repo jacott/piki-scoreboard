@@ -99,7 +99,7 @@ define(function(require, exports, module) {
 
 
   Tpl.OrgForm.$events({
-    'click [type=submit]': Dom.Form.submitFunc('OrgForm', Tpl),
+    'click [type=submit]': Form.submitFunc('OrgForm', Tpl),
   });
 
   Tpl.UserForm.$helpers({
@@ -120,7 +120,7 @@ define(function(require, exports, module) {
   });
 
   Tpl.UserForm.$events({
-    'click [type=submit]': Dom.Form.submitFunc('UserForm', Tpl),
+    'click [type=submit]': Form.submitFunc('UserForm', Tpl),
   });
 
   return Tpl;

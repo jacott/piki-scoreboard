@@ -6,6 +6,7 @@ define(function(require, exports, module) {
   var util  = require('koru/util');
   var env = require('koru/env');
   var Club = require('models/club');
+  var Form = require('koru/ui/form');
 
   var $ = Dom.current;
   var Index = Tpl.Index;
@@ -64,7 +65,7 @@ define(function(require, exports, module) {
 
   Tpl.Add.$events({
     'click [name=cancel]': cancel,
-    'click [type=submit]': Dom.Form.submitFunc('AddClub', Tpl),
+    'click [type=submit]': Form.submitFunc('AddClub', Tpl),
   });
 
 
@@ -88,7 +89,7 @@ define(function(require, exports, module) {
       });
 
     },
-    'click [type=submit]': Dom.Form.submitFunc('EditClub', Tpl),
+    'click [type=submit]': Form.submitFunc('EditClub', Tpl),
   });
 
   function cancel(event) {

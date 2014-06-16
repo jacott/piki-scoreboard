@@ -11,6 +11,7 @@ define(function(require, exports, module) {
   var Result = require('models/result');
   var Heat = require('models/heat');
   var makeSubject = require('koru/make-subject');
+  var Form = require('koru/ui/form');
 
   var $ = Dom.current;
   var Index = Tpl.Index;
@@ -110,7 +111,7 @@ define(function(require, exports, module) {
 
   Tpl.Add.$events({
     'click [name=cancel]': cancel,
-    'click [type=submit]': Dom.Form.submitFunc('AddEvent', Tpl),
+    'click [type=submit]': Form.submitFunc('AddEvent', Tpl),
   });
 
 
@@ -134,7 +135,7 @@ define(function(require, exports, module) {
       });
 
     },
-    'click [type=submit]': Dom.Form.submitFunc('EditEvent', Tpl),
+    'click [type=submit]': Form.submitFunc('EditEvent', Tpl),
 
     'change [name=changeFormat]': function (event) {
       var cat = $.data(this);
@@ -142,12 +143,12 @@ define(function(require, exports, module) {
 
       ev.$change('heats')[cat._id] = cat.type + this.value;
       if (ev.$save()) {
-        Dom.Form.clearErrors(this.parentNode);
+        Form.clearErrors(this.parentNode);
       } else {
         Dom.stopEvent();
         this.focus();
         this.select();
-        Dom.Form.renderError(this.parentNode, 'changeFormat', Val.Error.msgFor(ev, 'heats'));
+        Form.renderError(this.parentNode, 'changeFormat', Val.Error.msgFor(ev, 'heats'));
         ev.$reload();
       }
     },
@@ -204,7 +205,7 @@ define(function(require, exports, module) {
 
       function addHeat(i) {
         var elm = document.createElement('td');
-        elm.appendChild(Dom.Form.pageLink({
+        elm.appendChild(Form.pageLink({
           value: heat.getName(i), template: "Event.Category", append: cat._id,
           search: listType() + "&heat="+i,
         }));

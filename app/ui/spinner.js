@@ -2,15 +2,15 @@ define(function(require, exports, module) {
   var env = require('koru/env');
   var session = require('koru/session');
   var Dom = require('koru/dom');
-  var sync = require('koru/session/sync');
+  var sessState = require('koru/session/state');
 
   var onChangeHandle;
 
   env.onunload(module, stop);
 
   exports.init = function () {
-    onChangeHandle = sync.onChange(function (show) {
-      Dom.setClass('show', show, document.getElementById('Spinner'));
+    onChangeHandle = sessState.pending.onChange(function (pending) {
+      Dom.setClass('show', pending, document.getElementById('Spinner'));
     });
 
     window.addEventListener('beforeunload', confirmLeave);
@@ -26,7 +26,7 @@ define(function(require, exports, module) {
   }
 
   function confirmLeave(ev) {
-    if (sync.waiting())
+    if (sessState.pendingCount())
       ev.returnValue = "You have unsaved changes.";
   }
 });

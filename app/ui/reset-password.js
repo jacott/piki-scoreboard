@@ -7,6 +7,7 @@ define(function(require, exports, module) {
   var env = require('koru/env');
   var UserAccount = require('koru/user-account');
   var Val = require('koru/model/validation');
+  var Form = require('koru/ui/form');
 
   var $ = Dom.current;
 
@@ -32,12 +33,12 @@ define(function(require, exports, module) {
       var password = form.querySelector('[name=newPassword]').value;
 
       if (password.length < 4) {
-        Dom.Form.renderError(form, 'newPassword', 'Password too short.');
+        Form.renderError(form, 'newPassword', 'Password too short.');
         return;
       }
 
       if (password !== form.querySelector('[name=confirm]').value) {
-        Dom.Form.renderError(form, 'newPassword', 'Password did not match.');
+        Form.renderError(form, 'newPassword', 'Password did not match.');
         return;
       }
 
@@ -47,7 +48,7 @@ define(function(require, exports, module) {
       function callback(error) {
         if (error) {
           if (error.error === 403)
-            Dom.Form.renderError(form, 'newPassword', Val.Error.msgFor(error.reason));
+            Form.renderError(form, 'newPassword', Val.Error.msgFor(error.reason));
           env.error(error.message);
         } else {
           Route.replacePath(Dom.Home);

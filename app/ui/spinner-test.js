@@ -4,7 +4,7 @@ isClient && define(function (require, exports, module) {
   var session = require('koru/session');
   var Spinner = require('./spinner');
   var Dom = require('koru/dom');
-  var sync = require('koru/session/sync');
+  var sessState = require('koru/session/state');
 
   TH.testCase(module, {
     setUp: function () {
@@ -21,31 +21,31 @@ isClient && define(function (require, exports, module) {
     },
 
     "test init": function () {
-      test.stub(sync, 'onChange').returns({stop: v.stop = test.stub()});
+      test.stub(sessState.pending, 'onChange').returns({stop: v.stop = test.stub()});
       test.stub(window, 'addEventListener');
       test.stub(window, 'removeEventListener');
 
       Spinner.init();
 
-      assert.called(sync.onChange);
+      assert.called(sessState.pending.onChange);
       assert.calledWith(window.addEventListener, 'beforeunload');
 
-      sync.onChange.yield(true);
+      sessState.pending.onChange.yield(true);
 
       assert.dom('#Spinner.show');
 
-      sync.onChange.yield(false);
+      sessState.pending.onChange.yield(false);
 
       assert.dom('#Spinner:not(.show)');
 
-      test.stub(sync, 'waiting').returns(true);
+      test.stub(sessState, 'pendingCount').returns(1);
 
       window.addEventListener.yield(v.ev = {});
 
       assert.same(v.ev.returnValue, "You have unsaved changes.");
 
-      sync.waiting.restore();
-      test.stub(sync, 'waiting').returns(false);
+      sessState.pendingCount.restore();
+      test.stub(sessState, 'pendingCount').returns(0);
 
       window.addEventListener.yield(v.ev = {});
 

@@ -11,13 +11,16 @@ define(function(require, exports, module) {
                   require('publish/publish-org');
                   require('publish/publish-event');
   var Spinner =   require('ui/spinner');
+  var session =   require('koru/session');
   var util =      require('koru/util');
   var App =       require('./app-base');
 
   var selfSub, orgSub, orgShortName, pathname;
 
+  env.onunload(module, 'reload');
+
   util.extend(App, {
-    subscribe: require('koru/session/subscribe'),
+    subscribe: require('koru/session/subscribe')(session),
 
     stop: function () {
       orgSub && orgSub.stop();
@@ -45,8 +48,6 @@ define(function(require, exports, module) {
     }
   });
 
-  env.onunload(module, App.stop);
-
   Route.root.routeVar = 'orgSN';
   Route.root.onBaseEntry = function (page, pageRoute) {
     if (pageRoute.orgSN !== orgShortName) {
@@ -72,7 +73,7 @@ define(function(require, exports, module) {
       orgSub = App.subscribe('Org', orgShortName, function (err) {
         Dom.removeId('Flash');
         if (err) {
-          Dom.globalErrorCatch(err);
+          env.globalErrorCatch(err);
           subscribeOrg();
           return;
         }
