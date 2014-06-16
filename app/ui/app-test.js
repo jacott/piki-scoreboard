@@ -6,7 +6,7 @@ isClient && define(function (require, exports, module) {
   var Dom     = require('koru/dom');
   var Spinner = require('ui/spinner');
   var session = require('koru/session');
-  var env = require('koru/env');
+  var koru = require('koru');
   var publish = require('koru/session/publish');
 
   TH.testCase(module, {
@@ -46,7 +46,7 @@ isClient && define(function (require, exports, module) {
 
       refute(App.me());
 
-      env.util.thread.userId = user._id;
+      koru.util.thread.userId = user._id;
 
       assert.same(App.me(), user);
     },
@@ -85,7 +85,7 @@ isClient && define(function (require, exports, module) {
     "test subscribing to Org": function () {
       test.stub(publish._pubs, 'Org');
       Route.replacePath.restore();
-      test.stub(env, 'getLocation').returns({pathname: '/FOO'});
+      test.stub(koru, 'getLocation').returns({pathname: '/FOO'});
 
       v.subOrg = App.subscribe.intercept.withArgs('Org');
 

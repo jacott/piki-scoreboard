@@ -4,7 +4,7 @@ define(function(require, exports, module) {
   var Route = require('koru/ui/route');
   var Tpl   = Dom.newTemplate(require('koru/html!./event'));
   var util  = require('koru/util');
-  var env = require('koru/env');
+  var koru = require('koru');
   var Event = require('models/event');
   var Val = require('koru/model/validation');
   var Category = require('models/category');
@@ -17,7 +17,7 @@ define(function(require, exports, module) {
   var Index = Tpl.Index;
 
   var base = Route.root.addBase(Tpl, 'eventId');
-  env.onunload(module, function () {
+  koru.onunload(module, function () {
     Route.root.removeBase(Tpl);
   });
 

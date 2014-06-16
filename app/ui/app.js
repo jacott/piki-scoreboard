@@ -1,5 +1,5 @@
 define(function(require, exports, module) {
-  var env =       require('koru/env');
+  var koru =       require('koru');
   var User =      require('models/user');
   var Dom =       require('koru/dom');
   var header =    require('ui/header');
@@ -17,7 +17,7 @@ define(function(require, exports, module) {
 
   var selfSub, orgSub, orgShortName, pathname;
 
-  env.onunload(module, 'reload');
+  koru.onunload(module, 'reload');
 
   util.extend(App, {
     subscribe: require('koru/session/subscribe')(session),
@@ -33,7 +33,7 @@ define(function(require, exports, module) {
     start: function () {
       App.stop();
       Spinner.init();
-      pathname = [env.getLocation()];
+      pathname = [koru.getLocation()];
       App.setAccess();
       selfSub = App.subscribe('Self', function (err) {
         Dom.removeClass(document.body, 'loading');
@@ -73,7 +73,7 @@ define(function(require, exports, module) {
       orgSub = App.subscribe('Org', orgShortName, function (err) {
         Dom.removeId('Flash');
         if (err) {
-          env.globalErrorCatch(err);
+          koru.globalErrorCatch(err);
           subscribeOrg();
           return;
         }

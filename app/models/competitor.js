@@ -1,7 +1,7 @@
 define(function(require, exports, module) {
   var Val = require('koru/model/validation');
   var util = require('koru/util');
-  var env = require('koru/env');
+  var koru = require('koru');
   var Event = require('./event');
   var Climber = require('./climber');
   var Category = require('./category');

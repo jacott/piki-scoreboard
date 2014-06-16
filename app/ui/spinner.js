@@ -1,12 +1,12 @@
 define(function(require, exports, module) {
-  var env = require('koru/env');
+  var koru = require('koru');
   var session = require('koru/session');
   var Dom = require('koru/dom');
   var sessState = require('koru/session/state');
 
   var onChangeHandle;
 
-  env.onunload(module, stop);
+  koru.onunload(module, stop);
 
   exports.init = function () {
     onChangeHandle = sessState.pending.onChange(function (pending) {

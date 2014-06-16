@@ -17,7 +17,7 @@ requirejs.config({
   },
 
   packages: [
-    "koru/model", "koru/session", "koru/user-account",
+    "koru", "koru/model", "koru/session", "koru/user-account",
   ],
 
   paths: {
@@ -38,10 +38,10 @@ requirejs.config({
 module.exports = {};
 
 requirejs([
-  'koru/env', 'koru/file-watch', 'startup-server',
+  'koru', 'koru/file-watch', 'startup-server',
   'koru/css/less-watcher', 'koru/server-rc',
-], function (env, fileWatch, startup) {
-  env.Fiber(function () {
+], function (koru, fileWatch, startup) {
+  koru.Fiber(function () {
     var file = __dirname + '/' + koruPath;
     fileWatch.watch(file, file.replace(/\/koru$/, ''));
 

@@ -6,7 +6,7 @@ define(function(require, exports, module) {
   var Org = require('models/org');
   var App = require('./app-base');
   var util = require('koru/util');
-  var env = require('koru/env');
+  var koru = require('koru');
 
   var Tpl = Dom.newTemplate(require('koru/html!./system-setup'));
 
@@ -14,7 +14,7 @@ define(function(require, exports, module) {
 
   var base = Route.root.addBase(Tpl);
 
-  env.onunload(module, function () {
+  koru.onunload(module, function () {
     Route.root.removeBase(Tpl);
   });
 

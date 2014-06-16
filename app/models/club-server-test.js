@@ -4,7 +4,7 @@ define(function (require, exports, module) {
   var Club = require('./club');
   var Org = require('./org');
   var User = require('./user');
-  var env = require('koru/env');
+  var koru = require('koru');
 
   TH.testCase(module, {
     setUp: function () {
@@ -12,7 +12,7 @@ define(function (require, exports, module) {
       v = {};
       v.org = TH.Factory.createOrg();
       v.user = TH.Factory.createUser();
-      test.stub(env, 'info');
+      test.stub(koru, 'info');
     },
 
     tearDown: function () {

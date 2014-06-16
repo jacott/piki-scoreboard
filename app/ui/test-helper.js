@@ -3,7 +3,7 @@ define(function(require, exports, module) {
   var util =      require('koru/util');
   var Dom =       require('koru/dom');
   var Route =     require('koru/ui/route');
-  var env =       require('koru/env');
+  var koru =       require('koru');
   var App =       require('./app');
   var Home =      require('ui/home');
   var TH =        require('test-helper');
@@ -12,7 +12,7 @@ define(function(require, exports, module) {
 
   var geddon = TH.geddon;
 
-  env.onunload(module, 'reload');
+  koru.onunload(module, 'reload');
 
   TH.setAccess = App.setAccess, // used by TH.loginAs
 

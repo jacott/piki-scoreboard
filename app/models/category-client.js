@@ -1,12 +1,12 @@
 define(function(require, exports, module) {
   var util = require('koru/util');
-  var env = require('koru/env');
+  var koru = require('koru');
 
   var groupOrgs = {};
 
   var obHandle;
 
-  env.onunload(module, function () {
+  koru.onunload(module, function () {
     obHandle && obHandle.stop();
     obHandle = null;
   });

@@ -1,7 +1,7 @@
 define(function(require, exports, module) {
   var publish = require('koru/session/publish');
   var Event = require('models/event');
-  var env = require('koru/env');
+  var koru = require('koru');
   var Model = require('model');
   var Val = require('koru/model/validation');
 
@@ -10,7 +10,7 @@ define(function(require, exports, module) {
 
   var orgChildren = ['Competitor', 'Result'];
 
-  env.onunload(module, function () {
+  koru.onunload(module, function () {
     publish._destroy('Event');
   });
 
@@ -19,7 +19,7 @@ define(function(require, exports, module) {
     var sub = this;
 
     var event = Event.findById(eventId);
-    if (! event) return sub.error(new env.Error(404, 'Event not found'));
+    if (! event) return sub.error(new koru.Error(404, 'Event not found'));
     event = null;
 
     var handles = [];

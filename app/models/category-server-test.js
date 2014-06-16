@@ -2,7 +2,7 @@ define(function (require, exports, module) {
   var test, v;
   var TH = require('test-helper');
   var Category = require('./category');
-  var env = require('koru/env');
+  var koru = require('koru');
 
   TH.testCase(module, {
     setUp: function () {
@@ -24,7 +24,7 @@ define(function (require, exports, module) {
 
         var category = TH.Factory.buildCategory();
 
-        test.stub(env, 'info');
+        test.stub(koru, 'info');
         assert.accessDenied(function () {
           category.authorize(v.user._id);
         });

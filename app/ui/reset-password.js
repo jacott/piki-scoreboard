@@ -4,7 +4,7 @@ define(function(require, exports, module) {
   var Route = require('koru/ui/route');
   var Tpl   = Dom.newTemplate(require('koru/html!./reset-password'));
   var util  = require('koru/util');
-  var env = require('koru/env');
+  var koru = require('koru');
   var UserAccount = require('koru/user-account');
   var Val = require('koru/model/validation');
   var Form = require('koru/ui/form');
@@ -13,7 +13,7 @@ define(function(require, exports, module) {
 
   var elm;
 
-  env.onunload(module, function () {
+  koru.onunload(module, function () {
     Route.root.removeTemplate(Tpl);
   });
 
@@ -49,7 +49,7 @@ define(function(require, exports, module) {
         if (error) {
           if (error.error === 403)
             Form.renderError(form, 'newPassword', Val.Error.msgFor(error.reason));
-          env.error(error.message);
+          koru.error(error.message);
         } else {
           Route.replacePath(Dom.Home);
         }

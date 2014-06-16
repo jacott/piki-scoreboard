@@ -3,9 +3,9 @@ define(function(require, exports, module) {
   var Query = require('koru/model/query');
   var Org = require('models/org');
   var User = require('models/user');
-  var env = require('koru/env');
+  var koru = require('koru');
 
-  env.onunload(module, function () {
+  koru.onunload(module, function () {
     publish._destroy('Self');
   });
 
@@ -18,7 +18,7 @@ define(function(require, exports, module) {
     var user = User.findById(sub.userId);
 
     if (! user) {
-      sub.error(new env.Error(404, 'User not found'));
+      sub.error(new koru.Error(404, 'User not found'));
       return;
     }
 

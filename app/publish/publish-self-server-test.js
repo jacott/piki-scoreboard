@@ -4,7 +4,7 @@ define(function (require, exports, module) {
   var sut = require('./publish-self');
   var publish = require('koru/session/publish');
   var Model = require('koru/model');
-  var env = require('koru/env');
+  var koru = require('koru');
   var User = require('models/user');
   var Org = require('models/org');
 
@@ -75,7 +75,7 @@ define(function (require, exports, module) {
     },
 
     "test user not found": function () {
-      test.stub(env, 'userId').returns('bad');
+      test.stub(koru, 'userId').returns('bad');
 
       var sub = TH.mockSubscribe(v, 's123', 'Self');
 

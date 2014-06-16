@@ -3,7 +3,7 @@ define(function (require, exports, module) {
   var TH = require('test-helper');
   var Org = require('./org');
   var User = require('./user');
-  var env = require('koru/env');
+  var koru = require('koru');
 
   TH.testCase(module, {
     setUp: function () {
@@ -25,7 +25,7 @@ define(function (require, exports, module) {
 
       user = TH.Factory.createUser();
 
-      test.stub(env, 'info');
+      test.stub(koru, 'info');
 
       assert.accessDenied(function () {
         org.authorize(user._id);

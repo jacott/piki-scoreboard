@@ -2,7 +2,7 @@ define(function (require, exports, module) {
   var test, v;
   var TH = require('test-helper');
   var User = require('./user');
-  var env = require('koru/env');
+  var koru = require('koru');
   var session = require('koru/session');
   var UserAccount = require('koru/user-account');
   var Val = require('koru/model/validation');
@@ -11,7 +11,7 @@ define(function (require, exports, module) {
     setUp: function () {
       test = this;
       v = {};
-      test.stub(env, 'info');
+      test.stub(koru, 'info');
     },
 
     tearDown: function () {

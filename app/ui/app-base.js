@@ -1,7 +1,7 @@
 define(function(require, exports, module) {
   var Org = require('models/org');
   var User = require('models/user');
-  var env = require('koru/env');
+  var koru = require('koru');
   var Dom = require('koru/dom');
 
   var App = {
@@ -14,7 +14,7 @@ define(function(require, exports, module) {
     },
 
     setAccess: function() {
-      var _id = env.userId();
+      var _id = koru.userId();
       var user = _id && User.findById(_id);
       Dom.setClassBySuffix(user ? user.accessClasses(App.orgId) : 'readOnly', 'Access', document.body);
     },

@@ -1,8 +1,8 @@
 define(function(require, exports, module) {
   var publish = require('koru/session/publish');
-  var env = require('koru/env');
+  var koru = require('koru');
 
-  env.onunload(module, function () {
+  koru.onunload(module, function () {
     publish._destroy('Self');
   });
 

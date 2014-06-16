@@ -4,7 +4,7 @@ define(function(require, exports, module) {
   var Route = require('koru/ui/route');
   var Tpl   = Dom.newTemplate(require('koru/html!./climber'));
   var util  = require('koru/util');
-  var env = require('koru/env');
+  var koru = require('koru');
   var Climber = require('models/climber');
   var Club = require('models/club');
   var Form = require('koru/ui/form');
@@ -20,7 +20,7 @@ define(function(require, exports, module) {
   var elm;
 
   var base = Route.root.addBase(Tpl, 'climberId');
-  env.onunload(module, function () {
+  koru.onunload(module, function () {
     Route.root.removeBase(Tpl);
   });
 

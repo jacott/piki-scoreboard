@@ -7,7 +7,7 @@ define(function(require, exports, module) {
   var Val = require('koru/model/validation');
   var UserAccount = require('koru/user-account');
   var util = require('koru/util');
-  var env = require('koru/env');
+  var koru = require('koru');
   var login = require('koru/user-account/client-login');
 
   var Tpl = Dom.newTemplate(require('koru/html!./sign-in'));
@@ -50,8 +50,8 @@ define(function(require, exports, module) {
 
       function observeUserId() {
         userOb && userOb.stop();
-        if (env.userId())
-          userOb = User.observeId(env.userId(), userChange);
+        if (koru.userId())
+          userOb = User.observeId(koru.userId(), userChange);
 
         userChange(User.me());
       }
@@ -128,7 +128,7 @@ define(function(require, exports, module) {
         if (error) {
           Form.renderError(form, 'submit', 'An unexpected error occured. Please reload page.');
           form.querySelector('[name=submit]').style.display = 'none';
-          env.error(error.message);
+          koru.error(error.message);
           return;
         }
         if (response.success) {

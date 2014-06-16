@@ -2,13 +2,13 @@ define(function (require, exports, module) {
   var test, v;
   var TH = require('test-helper');
   var Event = require('./event');
-  var env = require('koru/env');
+  var koru = require('koru');
 
   TH.testCase(module, {
     setUp: function () {
       test = this;
       v = {};
-      test.stub(env, 'info');
+      test.stub(koru, 'info');
     },
 
     tearDown: function () {

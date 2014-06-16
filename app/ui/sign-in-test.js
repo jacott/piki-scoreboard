@@ -2,7 +2,7 @@ isClient && define(function (require, exports, module) {
   var test, v;
 
   var Dom         = require('koru/dom');
-  var env         = require('koru/env');
+  var koru         = require('koru');
   var Route       = require('koru/ui/route');
   var SignIn      = require('./sign-in');
   var TH          = require('./test-helper');
@@ -82,7 +82,7 @@ isClient && define(function (require, exports, module) {
       },
 
       "test unexpected error": function () {
-        test.stub(env, 'error');
+        test.stub(koru, 'error');
 
         v.callback({message: 'foo'});
 
@@ -94,7 +94,7 @@ isClient && define(function (require, exports, module) {
           assert.dom('[name=submit]+.errorMsg', 'An unexpected error occured. Please reload page.');
         });
 
-        assert.calledOnceWith(env.error, 'foo');
+        assert.calledOnceWith(koru.error, 'foo');
       },
     },
 

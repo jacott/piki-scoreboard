@@ -7,13 +7,13 @@ define(function(require, exports, module) {
   var Home = require('ui/home');
   var Dialog = require('koru/ui/dialog');
   var SystemSetup = require('./system-setup');
-  var env = require('koru/env');
+  var koru = require('koru');
   var login = require('koru/user-account/client-login');
 
   var Tpl = Dom.newTemplate(require('koru/html!./profile'));
 
   var base = Route.root.addBase(Tpl);
-  env.onunload(module, function () {
+  koru.onunload(module, function () {
     Route.root.removeBase(Tpl);
   });
 

@@ -1,5 +1,5 @@
 define(function(require, exports, module) {
-  var env = require('koru/env');
+  var koru = require('koru');
   var TH = require('test-helper');
   var util = require('koru/util');
   var Model = require('koru/model');
@@ -17,7 +17,7 @@ define(function(require, exports, module) {
     mockSubscribe: function (v, id, name) {
       var test = geddon.test;
       session._onMessage(v.conn = {
-        userId: env.userId(),
+        userId: koru.userId(),
         added: test.stub(),
         changed: test.stub(),
         removed: test.stub(),

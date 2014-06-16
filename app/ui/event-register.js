@@ -4,7 +4,7 @@ define(function(require, exports, module) {
   var Route = require('koru/ui/route');
   var Tpl   = Dom.newTemplate(require('koru/html!./event-register'));
   var util  = require('koru/util');
-  var env = require('koru/env');
+  var koru = require('koru');
   var Form = require('koru/ui/form');
   var CompleteList = require('koru/ui/complete-list');
   var eventTpl = require('./event');
@@ -29,7 +29,7 @@ define(function(require, exports, module) {
 
   setSortFunc();
 
-  env.onunload(module, function () {
+  koru.onunload(module, function () {
     eventTpl.route.removeBase(Tpl);
   });
 

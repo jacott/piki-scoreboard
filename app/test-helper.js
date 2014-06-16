@@ -1,5 +1,5 @@
 define(function(require, exports, module) {
-  var env = require('koru/env');
+  var koru = require('koru');
   var TH = require('koru/session/test-helper');
   var util = require('koru/util');
   var Model = require('koru/model');
@@ -61,7 +61,7 @@ define(function(require, exports, module) {
         var id = 'koru/session/server-connection';
         conn = new (require(id)({}))(ws, sessId, geddon.test.stub());
         return function (method /*, args */) {
-          conn.userId = env.userId();
+          conn.userId = koru.userId();
           return session._rpcs[method].apply(conn, util.slice(arguments, 1));
         };
       } else {
@@ -80,10 +80,10 @@ define(function(require, exports, module) {
 
       if (newUser !== user) {
         user && TH.user.restore();
-        env.userId.restore && env.userId.restore();
+        koru.userId.restore && koru.userId.restore();
 
         if (newUser) {
-          test.stub(env, 'userId', function () {return user._id});
+          test.stub(koru, 'userId', function () {return user._id});
           test.stub(TH,'user',function () {return user});
           var restore = TH.user.restore;
           TH.user.restore = function () {
@@ -109,11 +109,11 @@ define(function(require, exports, module) {
   function tcStart() {
     if (session.hasOwnProperty('sendP')) {
       sendP = session.sendP;
-      session.sendP = env.nullFunc;
+      session.sendP = koru.nullFunc;
     }
     if (session.hasOwnProperty('sendM')) {
       sendM = session.sendM;
-      session.sendM = env.nullFunc;
+      session.sendM = koru.nullFunc;
     }
   }
 

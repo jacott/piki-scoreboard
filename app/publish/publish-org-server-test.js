@@ -4,7 +4,7 @@ define(function (require, exports, module) {
   var sut = require('./publish-org');
   var publish = require('koru/session/publish');
   var Model = require('koru/model');
-  var env = require('koru/env');
+  var koru = require('koru');
   var Val = require('koru/model/validation');
 
   TH.testCase(module, {

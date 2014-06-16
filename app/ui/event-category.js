@@ -4,7 +4,7 @@ define(function(require, exports, module) {
   var Route = require('koru/ui/route');
   var Tpl   = Dom.newTemplate(require('koru/html!./event-category'));
   var util  = require('koru/util');
-  var env = require('koru/env');
+  var koru = require('koru');
   var Result = require('models/result');
   var Category = require('models/category');
   var Heat = require('models/heat');
@@ -17,7 +17,7 @@ define(function(require, exports, module) {
   var InvalidInput = Tpl.InvalidInput.$render();
   var focusField;
 
-  env.onunload(module, function () {
+  koru.onunload(module, function () {
     eventTpl.route.removeTemplate(Tpl);
   });
 

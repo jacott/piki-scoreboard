@@ -5,7 +5,7 @@ define(function (require, exports, module) {
   var util = require('koru/util');
   var Category = require('./category');
   var Val = require('koru/model/validation');
-  var env = require('koru/env');
+  var koru = require('koru');
 
   TH.testCase(module, {
     setUp: function () {
@@ -18,7 +18,7 @@ define(function (require, exports, module) {
       v.competitor.$$save();
 
       v.rpc = TH.mockRpc();
-      test.stub(env, 'info');
+      test.stub(koru, 'info');
 
       TH.loginAs(TH.Factory.createUser('su'));
 

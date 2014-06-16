@@ -2,7 +2,7 @@ define(function(require, exports, module) {
   var util = require('koru/util');
   var Model = require('model');
   var Random = require('koru/random');
-  var env = require('koru/env');
+  var koru = require('koru');
   var User = require('./user');
 
   Model.prototype.$parentId = parentId;
@@ -27,7 +27,7 @@ define(function(require, exports, module) {
       },
     });
 
-    env.Fiber(function () {
+    koru.Fiber(function () {
       model.addIndex('createdAt', -1, 'parent_id');
     }).run();
 
@@ -43,7 +43,7 @@ define(function(require, exports, module) {
     }
 
     function createChangeLog(subject, aux, doc, was) {
-      var userId = env.userId();
+      var userId = koru.userId();
       if (! userId) return;
 
       var attributes = doc.attributes;

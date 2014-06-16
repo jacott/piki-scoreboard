@@ -5,12 +5,12 @@ define(function(require, exports, module) {
   var Route = require('koru/ui/route');
   var Tpl   = Dom.newTemplate(require('koru/html!./home'));
   var util  = require('koru/util');
-  var env = require('koru/env');
+  var koru = require('koru');
 
   var $ = Dom.current;
   var ChooseOrg = Tpl.ChooseOrg;
 
-  env.onunload(module, function () {
+  koru.onunload(module, function () {
     Route.root.removeTemplate(Tpl, {path: ""});
     Route.root.removeTemplate(ChooseOrg);
     Route.root.defaultPage = null;

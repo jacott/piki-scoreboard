@@ -1,7 +1,7 @@
 define(function(require, exports, module) {
   var publish = require('koru/session/publish');
   var Org = require('models/org');
-  var env = require('koru/env');
+  var koru = require('koru');
   var Model = require('model');
   var Val = require('koru/model/validation');
   var User = require('models/user');
@@ -14,7 +14,7 @@ define(function(require, exports, module) {
 
   var orgChildren = ['Club', 'Climber', 'Event', 'Category'];
 
-  env.onunload(module, function () {
+  koru.onunload(module, function () {
     publish._destroy('Org');
   });
 
@@ -23,7 +23,7 @@ define(function(require, exports, module) {
     var sub = this;
 
     var org = Org.findByField('shortName', shortName);
-    if (! org) return sub.error(new env.Error(404, 'Org not found'));
+    if (! org) return sub.error(new koru.Error(404, 'Org not found'));
 
     var handles = [];
 

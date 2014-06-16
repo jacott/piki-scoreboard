@@ -8,7 +8,7 @@ isClient && define(function (require, exports, module) {
   var UserAccount = require('koru/user-account');
   var Random = require('koru/random');
   var Home = require('./home');
-  var env = require('koru/env');
+  var koru = require('koru');
 
   TH.testCase(module, {
     setUp: function () {
@@ -41,7 +41,7 @@ isClient && define(function (require, exports, module) {
         return typeof callback === 'function';
       }));
 
-      test.stub(env, 'error');
+      test.stub(koru, 'error');
 
       v.callback({error: 403, reason: 'token expired', message: 'foo'});
 
@@ -49,7 +49,7 @@ isClient && define(function (require, exports, module) {
         assert.dom('.error[name=newPassword]+span.errorMsg', 'token expired');
       });
 
-      assert.calledWith(env.error, 'foo');
+      assert.calledWith(koru.error, 'foo');
     },
 
     "test update": function () {

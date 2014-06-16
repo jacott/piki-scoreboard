@@ -2,7 +2,7 @@ define(function (require, exports, module) {
   var test, v;
   var TH = require('test-helper');
   var Competitor = require('./competitor');
-  var env = require('koru/env');
+  var koru = require('koru');
   var Event = require('./event');
   var User = require('./user');
   var Val = require('koru/model/validation');
@@ -13,7 +13,7 @@ define(function (require, exports, module) {
       v = {};
       v.event = TH.Factory.createEvent();
       v.user = TH.Factory.createUser();
-      test.stub(env, 'info');
+      test.stub(koru, 'info');
 
       test.stub(Val, 'ensureString');
     },
