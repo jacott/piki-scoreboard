@@ -26,7 +26,7 @@ define(function(require, exports, module) {
   }
 
   function confirmLeave(ev) {
-    if (sessState.pendingCount())
+    if (session.isRpcPending())
       ev.returnValue = "You have unsaved changes.";
   }
 });

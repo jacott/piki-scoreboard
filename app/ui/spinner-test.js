@@ -38,14 +38,14 @@ isClient && define(function (require, exports, module) {
 
       assert.dom('#Spinner:not(.show)');
 
-      test.stub(sessState, 'pendingCount').returns(1);
+      test.stub(session, 'isRpcPending').returns(true);
 
       window.addEventListener.yield(v.ev = {});
 
       assert.same(v.ev.returnValue, "You have unsaved changes.");
 
-      sessState.pendingCount.restore();
-      test.stub(sessState, 'pendingCount').returns(0);
+      session.isRpcPending.restore();
+      test.stub(session, 'isRpcPending').returns(false);
 
       window.addEventListener.yield(v.ev = {});
 
