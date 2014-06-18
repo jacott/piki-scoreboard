@@ -1,4 +1,4 @@
-var requirejs = require('requirejs');
+var requirejs = require('koru').requirejs;
 
 var koruPath = '../node_modules/koru/app/koru';
 

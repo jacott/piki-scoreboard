@@ -19,7 +19,7 @@ var runTime;
 var exitCode = 0;
 var sessionCount = 0;
 
-var WebSocket = require('ws');
+var WebSocket = require('koru/node_modules/ws');
 
 var typeCount = ARGV[0] === 'both' ? 2 : 1;
 
