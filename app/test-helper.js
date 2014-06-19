@@ -106,6 +106,26 @@ define(function(require, exports, module) {
 
   }, TH);
 
+  if (isClient) {
+    TH.MockFileReader = function (v) {
+      function MockFileReader() {
+        v.fileReaderargs = arguments;
+        v.fileReader = this;
+      };
+
+      MockFileReader.prototype = {
+        constructor: MockFileReader,
+
+        readAsArrayBuffer: function (file) {
+          this.blob = file.slice(0);
+        },
+      };
+
+      return MockFileReader;
+    };
+  }
+
+
   function tcStart() {
     if (session.hasOwnProperty('sendP')) {
       sendP = session.sendP;

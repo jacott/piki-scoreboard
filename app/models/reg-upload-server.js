@@ -2,7 +2,6 @@ var Future = requirejs.nodeRequire('fibers/future');
 var CSV = require('csv');
 
 define(function(require, exports, module) {
-  var util = require('koru/util');
   var session = require('koru/session');
   var Val = require('koru/model/validation');
   var User = require('models/user');
