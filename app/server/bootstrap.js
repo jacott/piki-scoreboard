@@ -3,6 +3,8 @@ define(function(require, exports, module) {
   var UserAccount = require('koru/user-account');
   var Org = require('models/org');
   var Random = require('koru/random');
+  var mongoDb = require('koru/mongo/driver');
+  var Model = require('koru/model');
 
   return function () {
     if (User.query.count(1) === 0) {
@@ -13,6 +15,16 @@ define(function(require, exports, module) {
 
     if (Org.query.count(1) === 0) {
       Org.create({name: 'Example org', shortName: 'EG', email: "su@example.com"});
+    }
+
+    // port Meteor users
+    if (Model.UserLogin.query.count(1) === 0) {
+      var users = mongoDb.defaultDb.collection('users');
+
+      User.query.forEach(function (doc) {
+        var mu = users.findOne({_id: doc._id});
+        mu && Model.UserLogin.create({email: doc.email, userId: doc._id, tokens: {}, srp: mu.services.password.srp});
+      });
     }
   };
 });
