@@ -219,6 +219,7 @@ define(function(require, exports, module) {
       this.category_ids.forEach(function (id) {
         var abbr = document.createElement('abbr');
         var cat = Category.findById(id);
+        if (! cat) return;
         abbr.setAttribute("title", cat.name);
         abbr.textContent = cat.shortName;
         frag.appendChild(abbr);

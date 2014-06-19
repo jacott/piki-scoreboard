@@ -19,7 +19,9 @@ define(function(require, exports, module) {
     var docs = Category.docs;
     for(var i = 0; i < ids.length; ++i) {
       var id = ids[i];
-      groupHash[docs[id].group] = id;
+      var doc = docs[id];
+      if (doc)
+        groupHash[doc.group] = id;
     }
     return groupHash;
   }
