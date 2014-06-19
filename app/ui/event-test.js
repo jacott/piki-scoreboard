@@ -140,6 +140,18 @@ isClient && define(function (require, exports, module) {
         assert.dom('#Event .Category', function () {
           assert.dom('h1.selectedHeat', 'Qual 2 - Results');
         });
+
+        Route.gotoPage(sut.Index);
+        v.eventSub.reset();
+        TH.click('td', v.event2.name);
+        v.eventSub.yield();
+
+        Route.gotoPage(sut.Index);
+        v.eventSub.reset();
+        TH.click('td', v.event.name);
+        v.eventSub.yield();
+
+        assert.dom('.link', "Qual 2");
       },
 
       "test selecting category": function () {

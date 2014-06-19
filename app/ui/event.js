@@ -161,7 +161,7 @@ define(function(require, exports, module) {
             .map(function (cat_id) {
               return cats[cat_id];
             }).sort(compareCategories)
-            .forEach(function (doc) {callback(doc)});
+            .forEach(function (doc) {doc && callback(doc)});
 
       $.ctx.onDestroy(Result.onChange(function (doc, was) {
         if (doc && was) return;
@@ -232,7 +232,7 @@ define(function(require, exports, module) {
             .map(function (cat_id) {
               return cats[cat_id];
             }).sort(compareCategories)
-            .forEach(function (doc) {callback(doc)});
+            .forEach(function (doc) {doc && callback(doc)});
 
       $.ctx.onDestroy(Result.onChange(function (doc, was) {
         if (doc && was) return;
@@ -379,7 +379,7 @@ define(function(require, exports, module) {
       var res = doc || was;
       if (res.event_id !== Tpl.event._id) return;
 
-      var oldScores = (doc ? doc.$asBefore(was) : was).scores || [];
+      var oldScores = (was && (doc ? doc.$asBefore(was) : was).scores) || [];
       var newScores = (doc && doc.scores) || [];
 
       var len = Math.max(oldScores.length, newScores.length);
