@@ -15,7 +15,8 @@
   ],
   "author": "Geoff Jacobsen <geoffjacobsen@gmail.com>",
   "dependencies": {
-    "koru": "git+ssh://git@dev.obeya.co:koru.git"
+    "koru": "git+ssh://git@dev.obeya.co:koru.git",
+    "csv": "0.3.7"
   },
   "engines": {
     "node": "~0.10"
