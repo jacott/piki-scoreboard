@@ -64,7 +64,7 @@ define(function(require, exports, module) {
         importCompetitor();
       } catch(ex) {
         errors.push([i+1, data[i], ex.toString()]);
-        }
+      }
     };
 
     Event.query.onId(event._id).update({errors: errors});
@@ -115,13 +115,12 @@ define(function(require, exports, module) {
 
       codes.forEach(function (code) {
         code = code.trim();
-        var cat = Category.findByField('shortName', code);
+        var cat = Category.query.where({shortName: code, org_id: event.org_id}).fetchOne();
         if (! cat) {
           throw "Category not found: " + code;
         }
         category_ids.push(cat._id);
       });
-
 
       var competitor = Competitor.query.where({event_id: event._id, climber_id: climber._id}).fetchOne() ||
             Competitor.build({event_id: event._id, climber_id: climber._id});

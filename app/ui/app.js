@@ -1,5 +1,5 @@
 define(function(require, exports, module) {
-  var koru =       require('koru');
+  var koru =      require('koru');
   var User =      require('models/user');
   var Dom =       require('koru/dom');
   var header =    require('ui/header');
@@ -14,12 +14,25 @@ define(function(require, exports, module) {
   var session =   require('koru/session');
   var util =      require('koru/util');
   var App =       require('./app-base');
+  var format =    require('koru/format');
+  var ResourceString = require('resource-string');
 
   var selfSub, orgSub, orgShortName, pathname;
 
   koru.onunload(module, 'reload');
 
   util.extend(App, {
+    text: function (text) {
+      var m = /^([^:]+):(.*)$/.exec(text);
+      if (m) {
+        var fmt = ResourceString.en[m[1]];
+        if (fmt) {
+          return format(fmt, m[2].split(':'));
+        }
+      }
+      return ResourceString.en[text] || text;
+    },
+
     subscribe: require('koru/session/subscribe')(session),
 
     stop: function () {

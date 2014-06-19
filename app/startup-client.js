@@ -9,6 +9,7 @@ define(function(require, exports, module) {
   require('ui/category');
   require('ui/event-category');
   require('ui/event-register');
+  require('ui/reg-upload');
 
   return {
     start: function () {

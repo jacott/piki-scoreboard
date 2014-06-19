@@ -4,6 +4,7 @@ define(function(require, exports, module) {
   require('publish/publish-self');
   require('publish/publish-org');
   require('publish/publish-event');
+  require('models/reg-upload-server');
 
   koru.onunload(module, 'reload'); // FIXME maybe close all client connections instead
 
