@@ -10,6 +10,7 @@ define(function(require, exports, module) {
   require('ui/event-category');
   require('ui/event-register');
   require('ui/reg-upload');
+  require('ui/reset-password');
 
   return {
     start: function () {

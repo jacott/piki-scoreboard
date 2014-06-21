@@ -154,6 +154,15 @@ isClient && define(function (require, exports, module) {
         assert.dom('.link', "Qual 2");
       },
 
+      "test add category": function () {
+        var comp = TH.Factory.buildCompetitor({category_ids: [v.cats[2]._id]});
+        assert.dom('.categories', function () {
+          refute.dom('button', 'Youth A 2');
+          comp.$$save();
+          assert.dom('tr.L button', 'Youth A 2');
+        });
+      },
+
       "test selecting category": function () {
         TH.click('.categories .link', v.cats[0].name);
 
@@ -191,6 +200,14 @@ isClient && define(function (require, exports, module) {
           assert.equals(v.event.$reload().heats[v.cats[0]._id], 'LQQF8');
         },
 
+        "test add category": function () {
+          var comp = TH.Factory.buildCompetitor({category_ids: [v.cats[2]._id]});
+          assert.dom('.categories', function () {
+            refute.dom('label span', 'Youth A 2');
+            comp.$$save();
+            assert.dom('label span', 'Youth A 2');
+          });
+        },
 
         "test change name": function () {
           assert.dom('#EditEvent', function () {

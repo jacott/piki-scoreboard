@@ -6,6 +6,8 @@ define(function(require, exports, module) {
   require('publish/publish-event');
   require('models/reg-upload-server');
 
+  require('koru/email').initPool();
+
   koru.onunload(module, 'reload'); // FIXME maybe close all client connections instead
 
   return function () {

@@ -37,6 +37,20 @@ define(function (require, exports, module) {
       });
     },
 
+    "test save on remove": function () {
+      var climber = TH.Factory.createClimber({_id: '123'});
+      TH.login();
+      session.rpc('remove', 'Climber', '123');
+
+      var cl = ChangeLog.query.where('type', 'remove').fetchOne();
+
+      assert.attributesEqual(cl, {_id: cl._id, before: JSON.stringify(climber.attributes),
+                                  createdAt: cl.createdAt, model_id: climber._id,
+                                  parent: 'Climber', parent_id: climber._id,
+                                  user_id: TH.userId(),
+                                  org_id: climber.org_id, type: 'remove', model: 'Climber'});
+    },
+
     "test save on update": function () {
       TH.login();
       var climber = TH.Factory.createClimber({_id: '123'}),

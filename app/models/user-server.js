@@ -4,15 +4,20 @@ define(function(require, exports, module) {
   var UserAccount = require('koru/user-account');
   var session = require('koru/session');
 
-
   return function (model) {
     var permitSpec = Val.permitSpec('name', 'email', 'initials', 'org_id', 'role');
 
+    require(['./change-log'], function (ChangeLog) {
+      ChangeLog.logChanges(model);
+    });
+
     model.registerObserveField('org_id');
 
-    model.beforeCreate(model, function (doc) {
-      UserAccount.createUserLogin({email: doc.email, userId: doc._id});
-      UserAccount.sendResetPasswordEmail(doc._id);
+    model.onChange(function (doc, was) {
+      if (was === null) {
+        UserAccount.createUserLogin({email: doc.email, userId: doc._id});
+        UserAccount.sendResetPasswordEmail(doc._id);
+      }
     });
 
     util.extend(model, {

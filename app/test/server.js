@@ -11,6 +11,10 @@ requirejs.config({
   baseUrl: __dirname+'/..',
 
   config: {
+    "koru/main": {
+      "urlRoot": 'http://test.piki/',
+    },
+
     "koru/mongo/driver": {url: "mongodb://localhost:3004/koru"},
 
     "koru/web-server": {port: 3030, defaultPage: '/test/index.html'},

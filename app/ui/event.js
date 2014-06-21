@@ -165,9 +165,7 @@ define(function(require, exports, module) {
 
       $.ctx.onDestroy(Result.onChange(function (doc, was) {
         if (doc && was) return;
-        doc = doc && cats[doc.category_id];
-        was = was && cats[was.category_id];
-        (doc || was) && callback(doc && new Category(doc), was && new Category(was), compareCategories);
+        (doc || was) && callback(doc && cats[doc.category_id], was && cats[was.category_id], compareCategories);
       }));
     },
   });
@@ -180,8 +178,10 @@ define(function(require, exports, module) {
     heats: function () {
       var cat = this;
       var frag = document.createDocumentFragment();
-      var counts = Tpl.scoreCounts[cat._id];
-      var heat = new Heat(-1,  Tpl.event.heats[cat._id]);
+      var counts = Tpl.scoreCounts[cat._id] || [];
+      var format = Tpl.event.heats[cat._id];
+      if (! format) format = cat.type + cat.heatFormat;
+      var heat = new Heat(-1,  format);
       var total = heat.total;
       if (Tpl.Show.results) ++total;
 
@@ -236,14 +236,12 @@ define(function(require, exports, module) {
 
       $.ctx.onDestroy(Result.onChange(function (doc, was) {
         if (doc && was) return;
-        doc = doc && cats[doc.category_id];
-        was = was && cats[was.category_id];
-        (doc || was) && callback(doc && new Category(doc), was && new Category(was), compareCategories);
+        (doc || was) && callback(doc && cats[doc.category_id], was && cats[was.category_id], compareCategories);
       }));
 
       $.ctx.onDestroy(Tpl.scoreCounts.onChange(function (cat_id) {
         var doc = Category.findById(cat_id);
-        callback(doc, doc, util.compareByName);
+        doc && callback(doc, doc, util.compareByName);
       }));
     },
   });
@@ -359,7 +357,11 @@ define(function(require, exports, module) {
 
   function eventFormat() {
     var event = $.ctx.parentCtx.data;
-    return event.heats[this._id].slice(1);
+    var format = event.heats[this._id];
+    if (format)
+      return format.slice(1);
+    else
+      return this.heatFormat; // not yet copied to event
   }
 
   function observeScores() {

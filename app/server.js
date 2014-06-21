@@ -14,6 +14,19 @@ requirejs.config({
     "koru/mongo/driver": {url: "mongodb://localhost:3014/demo"},
 
     "koru/web-server": {port: 3030},
+
+    "koru/main": {
+      "urlRoot": 'http://localhost:3030/',
+      "userAccount" : {
+        emailConfig: {
+          from: 'piki-demo@obeya.co',
+          siteName: 'Piki demo',
+          sendResetPasswordEmailText: function(userId, resetToken) {
+            return requirejs('email-text').sendResetPasswordEmailText(userId, resetToken);
+          },
+        },
+      }
+    },
   },
 
   packages: [

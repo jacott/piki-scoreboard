@@ -33,31 +33,33 @@ define(function(require, exports, module) {
 
     function observeChanges(subject, aux, callback) {
       subject.onChange(function (doc, was) {
+        var userId = koru.userId();
+        if (! userId) return;
+
+        var sub = doc || was;
+        var params = {
+          model: subject.modelName,
+          model_id: sub.attributes._id,
+          parent: subject._parent ? subject._parent.modelName : subject.modelName,
+          parent_id: subject._parent ? sub.$parentId() : sub.attributes._id,
+          user_id: userId,
+          org_id: User.findById(userId).org_id,
+        };
         if (! doc) {
-          // FIXME remove all change logs
+          params.type= 'remove';
+          params.before = JSON.stringify(was.attributes);
+          var cl = model.create(params);
         } else {
-          var cl = createChangeLog(subject, aux, doc, was);
-          cl && callback && callback(cl, doc, was);
+          var cl = createChangeLog(params, subject, aux, doc, was);
         }
+        callback && callback(cl, doc, was);
       });
     }
 
-    function createChangeLog(subject, aux, doc, was) {
-      var userId = koru.userId();
-      if (! userId) return;
-
+    function createChangeLog(params, subject, aux, doc, was) {
       var attributes = doc.attributes;
 
-      var params = {
-        type: was ? 'update' : 'create',
-        model: subject.modelName,
-        model_id: attributes._id,
-        parent: subject._parent ? subject._parent.modelName : subject.modelName,
-        parent_id: subject._parent ? doc.$parentId() : attributes._id,
-        user_id: userId,
-        org_id: User.findById(userId).org_id,
-      };
-
+      params.type = was ? 'update' : 'create';
 
       if (was) {
         var after = {};

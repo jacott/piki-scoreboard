@@ -6,6 +6,7 @@ define(function (require, exports, module) {
   var session = require('koru/session');
   var UserAccount = require('koru/user-account');
   var Val = require('koru/model/validation');
+  var ChangeLog = require('models/change-log');
 
   TH.testCase(module, {
     setUp: function () {
@@ -53,9 +54,12 @@ define(function (require, exports, module) {
     },
 
     "test createUser": function () {
-      test.stub(UserAccount, 'sendResetPasswordEmail');
+      test.stub(UserAccount, 'sendResetPasswordEmail', function (userId, token) {
+        assert(User.exists({_id: userId}));
+      });
       TH.loginAs(TH.Factory.createUser('su'));
       var user = TH.Factory.buildUser();
+      ChangeLog.docs.remove({});
       user.$$save();
 
       var mUser = UserAccount.model.findByField('userId', user._id);
@@ -65,6 +69,8 @@ define(function (require, exports, module) {
       assert.equals(mUser.email, user.email);
 
       assert.calledWith(UserAccount.sendResetPasswordEmail, user._id);
+
+      assert.same(ChangeLog.query.count(), 1);
     },
 
     "test change email": function () {
