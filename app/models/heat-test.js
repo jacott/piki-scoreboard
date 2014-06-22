@@ -315,6 +315,26 @@ define(function (require, exports, module) {
           assert.same(v.r2.rankMult, 4.5);
           assert.same(v.r3.rankMult, 3);
         },
+
+        "test finals split by time": function () {
+          v.s1.push(500, 300, 200);
+          v.s2.push(500, 300, 200);
+          v.s3.push(500, 300, 200);
+
+          assert.equals(v.run(), [v.r1, v.r2, v.r3]);
+
+          v.r1.time = 123;
+          v.r2.time = 122;
+          v.r3.time = 224;
+
+          assert.equals(v.run(), [v.r2, v.r1, v.r3]);
+
+          v.r1.time = 123;
+          v.r2.time = 124;
+          v.r3.time = 24;
+
+          assert.equals(v.run(), [v.r3, v.r1, v.r2]);
+        },
       },
 
       "test sorting methods": function () {

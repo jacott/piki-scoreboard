@@ -273,7 +273,7 @@ define(function(require, exports, module) {
         for(; mLen >= min; --mLen) {
           if (mLen === rankIndex) {
             if (a.rankMult == b.rankMult) {
-              if (max == last && a.time != b.time ) { // final by time
+              if ((max == last || max === -1) && a.time != b.time ) { // final by time
                 return (a.time || 0) < (b.time || 0) ? -1 : 1; // lower time is better
               } else
                 return rso ? rso(aScores[0], bScores[0]) : 0;
