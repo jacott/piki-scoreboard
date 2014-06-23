@@ -2,6 +2,14 @@ var requirejs = require('koru').requirejs;
 
 var koruPath = '../node_modules/koru/app/koru';
 
+var config = require('./' + (process.argv[2] || 'demo') +'-config.js');
+
+var mainConfig = config['koru/main'];
+
+mainConfig.userAccount.emailConfig.sendResetPasswordEmailText = function(userId, resetToken) {
+  return requirejs('email-text').sendResetPasswordEmailText(userId, resetToken);
+};
+
 requirejs.config({
   //Use node's special variable __dirname to
   //get the directory containing this file.
@@ -9,25 +17,7 @@ requirejs.config({
   //be used in node but does not require the
   //use of node outside
   baseUrl: __dirname,
-
-  config: {
-    "koru/mongo/driver": {url: "mongodb://localhost:3014/demo"},
-
-    "koru/web-server": {port: 3030},
-
-    "koru/main": {
-      "urlRoot": 'http://localhost:3030/',
-      "userAccount" : {
-        emailConfig: {
-          from: 'piki-demo@obeya.co',
-          siteName: 'Piki demo',
-          sendResetPasswordEmailText: function(userId, resetToken) {
-            return requirejs('email-text').sendResetPasswordEmailText(userId, resetToken);
-          },
-        },
-      }
-    },
-  },
+  config: config,
 
   packages: [
     "koru", "koru/model", "koru/session", "koru/user-account",
@@ -43,22 +33,12 @@ requirejs.config({
   nodeRequire: require
 });
 
-// requirejs.onResourceLoad = function (context, map, depArray) {
-// }
-
-
-//Now export a value visible to Node.
-module.exports = {};
-
 requirejs([
-  'koru', 'koru/file-watch', 'startup-server',
-  'koru/css/less-watcher', 'koru/server-rc',
-], function (koru, fileWatch, startup) {
+  'koru', 'startup-server',
+].concat(mainConfig.extraRequires || []), function (koru, startup) {
   koru.Fiber(function () {
-    var file = __dirname + '/' + koruPath;
-    fileWatch.watch(file, file.replace(/\/koru$/, ''));
-
     startup();
+    mainConfig.startup && mainConfig.startup(koruPath);
 
     console.log('=> Ready');
   }).run();
