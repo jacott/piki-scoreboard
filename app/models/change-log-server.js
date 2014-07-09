@@ -5,9 +5,9 @@ define(function(require, exports, module) {
   var koru = require('koru');
   var User = require('./user');
 
-  Model.prototype.$parentId = parentId;
-
   return function (model) {
+    Model.prototype.$parentId = parentId;
+
     util.extend(model, {
       logChanges: function (subject, options) {
         options = options || {};

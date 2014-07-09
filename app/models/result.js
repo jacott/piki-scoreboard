@@ -138,11 +138,11 @@ define(function(require, exports, module) {
     addResults(doc.category_ids || [], doc);
   });
 
-  model.beforeUpdate(Competitor, function (doc, changes) {
-    var added = util.diff(changes.category_ids || [], doc.attributes.category_ids || []);
+  model.beforeUpdate(Competitor, function (doc) {
+    var added = util.diff(doc.changes.category_ids || [], doc.attributes.category_ids || []);
 
     addResults(added, doc);
-    var removed = util.diff(doc.attributes.category_ids || [], changes.category_ids || []);
+    var removed = util.diff(doc.attributes.category_ids || [], doc.changes.category_ids || []);
     removeResults(removed, doc);
   });
 
