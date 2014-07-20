@@ -35,6 +35,8 @@ define(function(require, exports, module) {
       subject.onChange(function (doc, was) {
         var userId = koru.userId();
         if (! userId) return;
+        var user = User.findById(userId);
+        if (! user) return;
 
         var sub = doc || was;
         var params = {
@@ -43,7 +45,7 @@ define(function(require, exports, module) {
           parent: subject._parent ? subject._parent.modelName : subject.modelName,
           parent_id: subject._parent ? sub.$parentId() : sub.attributes._id,
           user_id: userId,
-          org_id: User.findById(userId).org_id,
+          org_id: user.org_id,
         };
         if (! doc) {
           params.type= 'remove';

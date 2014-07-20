@@ -16,8 +16,10 @@ define(function(require, exports, module) {
   var App =       require('./app-base');
   var format =    require('koru/format');
   var ResourceString = require('resource-string');
+  var sessState = require('koru/session/state');
+  var Disconnected = require('./disconnected');
 
-  var selfSub, orgSub, orgShortName, pathname;
+  var selfSub, orgSub, orgShortName, pathname, sessStateChange;
 
   koru.onunload(module, 'reload');
 
@@ -38,6 +40,7 @@ define(function(require, exports, module) {
     stop: function () {
       orgSub && orgSub.stop();
       selfSub && selfSub.stop();
+      sessStateChange && sessStateChange.stop();
       selfSub = orgSub = orgShortName = pathname = null;
 
       window.removeEventListener('popstate', pageChanged);
@@ -45,6 +48,7 @@ define(function(require, exports, module) {
 
     start: function () {
       App.stop();
+      sessStateChange = sessState.onChange(connectChange);
       Spinner.init();
       pathname = [koru.getLocation()];
       App.setAccess();
@@ -71,6 +75,13 @@ define(function(require, exports, module) {
   Route.root.onBaseExit = function () {
     subscribeOrg(null);
   };
+
+  function connectChange(state) {
+    if (state)
+      Dom.removeId('Disconnected');
+    else
+      document.body.appendChild(Disconnected.$autoRender({}));
+  }
 
   function pageChanged(event) {
     Route.pageChanged();

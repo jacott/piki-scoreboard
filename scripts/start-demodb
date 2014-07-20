@@ -1,7 +1,9 @@
 #!/bin/bash
 set -em
-mkdir -p /tmp/demodb
-mongod --quiet --nojournal --smallfiles --port 3014 --dbpath /tmp/demodb >/tmp/demodb.log &
+cd `dirname "$0"`/..
+dbdir=`pwd`/tmp/demodb
+mkdir -p $dbdir
+mongod --quiet --nojournal --smallfiles --port 3014 --dbpath $dbdir >/tmp/demodb.log &
 mongod=$!
 
 sleep 0.1

@@ -15,7 +15,7 @@ define(function (require, exports, module) {
     },
 
     tearDown: function () {
-      TH.clearDB();
+      TH.cleanUpTest(v);
       v = null;
     },
 
@@ -24,7 +24,7 @@ define(function (require, exports, module) {
 
       assert.same(v.conn.userId, 'guest');
 
-      refute(sub._stop);
+      assert(sub._stop);
     },
 
     "test publish user": function () {
@@ -36,7 +36,6 @@ define(function (require, exports, module) {
 
       test.spy(User, 'observeId');
       test.spy(Org, 'onChange');
-
 
       // Subscribe
       var sub = TH.mockSubscribe(v, 's123', 'Self');

@@ -28,7 +28,7 @@ define(function (require, exports, module) {
     },
 
     tearDown: function () {
-      TH.clearDB();
+      TH.cleanUpTest(v);
       v = null;
     },
 

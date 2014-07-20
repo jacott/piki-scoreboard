@@ -106,7 +106,7 @@ define(function (require, exports, module) {
         refute.called(UserAccount.sendResetPasswordEmail);
       },
 
-      "test user without meteor account": function () {
+      "test user without userAccount": function () {
         var user = TH.Factory.createUser({email: 'foo@bar.com'});
         var res = v.rpc('User.forgotPassword', 'foo@bar.com  ');
 

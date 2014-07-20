@@ -8,10 +8,6 @@ define(function(require, exports, module) {
   var Home =      require('ui/home');
   var TH =        require('test-helper');
 
-  require('test-helper');
-
-  var geddon = TH.geddon;
-
   koru.onunload(module, 'reload');
 
   TH.setAccess = App.setAccess, // used by TH.loginAs
