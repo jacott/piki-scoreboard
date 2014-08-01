@@ -58,9 +58,9 @@ define(function(require, exports, module) {
 
       email = email.addresses[0].toLowerCase();
 
-      var user = model.findByField('email', email);
+      var user = model.findBy('email', email);
       if (user) {
-        var accUser = UserAccount.model.findByField('userId', user._id);
+        var accUser = UserAccount.model.findBy('userId', user._id);
         accUser && UserAccount.sendResetPasswordEmail(user._id);
       }
       return {success: true};

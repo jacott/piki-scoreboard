@@ -62,7 +62,7 @@ define(function (require, exports, module) {
       ChangeLog.docs.remove({});
       user.$$save();
 
-      var mUser = UserAccount.model.findByField('userId', user._id);
+      var mUser = UserAccount.model.findBy('userId', user._id);
 
       assert(mUser);
 

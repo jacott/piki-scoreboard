@@ -21,7 +21,7 @@ define(function (require, exports, module) {
       TH.login();
       var result = TH.Factory.createResult();
 
-      var cl = ChangeLog.findByField('model_id', result._id);
+      var cl = ChangeLog.findBy('model_id', result._id);
 
       assert.same(cl.parent, 'Event');
       assert.same(cl.parent_id, result.event_id);

@@ -72,10 +72,10 @@ define(function (require, exports, module) {
           'Participant ID': '147'}, "Invalid or missing codes",
       ]]);
 
-      var club = Club.findByField('name', 'Rock Hoppers');
+      var club = Club.findBy('name', 'Rock Hoppers');
       assert(club);
 
-      var climber = Climber.findByField('name', 'Anna Smith');
+      var climber = Climber.findBy('name', 'Anna Smith');
       assert(climber);
 
       assert.same(climber.dateOfBirth, '1996-04-16');
@@ -85,7 +85,7 @@ define(function (require, exports, module) {
       assert.same(climber.gender, 'f');
 
 
-      var competitor = Competitor.findByField('climber_id', climber._id);
+      var competitor = Competitor.findBy('climber_id', climber._id);
       assert(competitor);
 
       assert.same(competitor.event_id, v.event._id);

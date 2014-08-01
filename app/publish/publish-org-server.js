@@ -22,7 +22,7 @@ define(function(require, exports, module) {
     Val.ensureString(shortName);
     var sub = this;
 
-    var org = Org.findByField('shortName', shortName);
+    var org = Org.findBy('shortName', shortName);
     if (! org) return sub.error(new koru.Error(404, 'Org not found'));
 
     var handles = [];

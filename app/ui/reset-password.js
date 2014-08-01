@@ -56,4 +56,6 @@ define(function(require, exports, module) {
       }
     },
   });
+
+  return Tpl;
 });

@@ -101,7 +101,7 @@ define(function(require, exports, module) {
           subscribeOrg();
           return;
         }
-        var doc = Org.findByField('shortName', orgShortName);
+        var doc = Org.findBy('shortName', orgShortName);
         if (! doc) {
           subscribeOrg();
           return;
