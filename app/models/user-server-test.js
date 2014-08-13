@@ -62,7 +62,7 @@ define(function (require, exports, module) {
       ChangeLog.docs.remove({});
       user.$$save();
 
-      var mUser = UserAccount.model.findByField('userId', user._id);
+      var mUser = UserAccount.model.findBy('userId', user._id);
 
       assert(mUser);
 
@@ -106,7 +106,7 @@ define(function (require, exports, module) {
         refute.called(UserAccount.sendResetPasswordEmail);
       },
 
-      "test user without meteor account": function () {
+      "test user without userAccount": function () {
         var user = TH.Factory.createUser({email: 'foo@bar.com'});
         var res = v.rpc('User.forgotPassword', 'foo@bar.com  ');
 

@@ -12,6 +12,7 @@ define(function (require, exports, module) {
     },
 
     tearDown: function () {
+      TH.cleanUpTest(v);
       v = null;
     },
 

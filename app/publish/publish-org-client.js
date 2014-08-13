@@ -16,7 +16,7 @@ define(function(require, exports, module) {
   publish('Org', function (shortName) {
     var sub = this;
 
-    var org = Org.findByField('shortName', shortName);
+    var org = Org.findBy('shortName', shortName);
     if (! org) return sub.error(new koru.Error(404, 'org not found'));
 
     orgChildren.forEach(function (name) {

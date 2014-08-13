@@ -3,6 +3,7 @@ define(function(require, exports, module) {
   var util = require('koru/util');
   var koru = require('koru');
   var Org = require('./org');
+  var User = require('./user');
 
   var model = require('model').define(module, {
 
