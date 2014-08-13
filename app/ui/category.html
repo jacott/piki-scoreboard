@@ -66,7 +66,15 @@
       {{labelField "shortName"}}
       {{labelField "group"}}
       {{labelField "type" selectList=typeList}}
-      {{labelField "heatFormat"}}
+      <label>
+        <span class="name">
+          Heat format<br>
+        </span>
+        {{field "heatFormat"}}<inlinehelp>
+          <info></info>
+          <popup>{{> /Help.HeatFormatLead}}{{> /Help.HeatFormatBoulder}}</popup>
+        </inlinehelp>
+      </label>
       {{labelField "gender" selectList=genderList}}
       {{labelField "minAge"}}
       {{labelField "maxAge"}}
