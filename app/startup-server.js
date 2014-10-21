@@ -1,16 +1,19 @@
 define(function(require, exports, module) {
-  var koru = require('koru/server');
-  var bootstrap = require('server/bootstrap');
+  require('koru/server');
+  var koru = require('koru');
   require('publish/publish-self');
   require('publish/publish-org');
   require('publish/publish-event');
   require('models/reg-upload-server');
 
-  require('koru/email').initPool();
-
   koru.onunload(module, 'reload'); // FIXME maybe close all client connections instead
 
+  var emailConfig = koru.config.userAccount.emailConfig;
+  emailConfig.sendResetPasswordEmailText = function(userId, resetToken) {
+    return require('server/email-text').sendResetPasswordEmailText(userId, resetToken);
+  };
+
   return function () {
-    bootstrap();
+    require('koru/email').initPool(koru.config.mailUrl);
   };
 });

@@ -23,7 +23,7 @@ var WebSocket = require('koru/node_modules/ws');
 
 var typeCount = ARGV[0] === 'both' ? 2 : 1;
 
-var ws = new WebSocket('ws://localhost:3030/');
+var ws = new WebSocket('ws://localhost:3000/');
 ws.on('open', runTests);
 ws.on('message', function(data, flags) {
   // flags.binary will be set if a binary data is received
@@ -79,11 +79,26 @@ function writeEmacs(args) {
   process.stdout.write(args.join('\0') + '\0\0e\n');
 }
 
+var lastMsg;
+
 function writeTty(args) {
-  process.stdout.write(args.slice(1).join(" "));
+  switch (args[0]) {
+  case 'exit':
+    process.stdout.write("\n" + args.join(" ") + ' - ' +
+                         (args[args.length-1].match(/0$/) ? 'SUCCESS\n' : 'FAILURE\n'));
+    break;
+  case 'result':
+    process.stdout.write("\r" + args.slice(1).join(" "));
+    break;
+  default:
+    if (lastMsg === 'result')
+      process.stdout.write("\n");
+    process.stdout.write(args.join(" ")+"\n");
+  }
+  lastMsg = args[0];
 }
 
-var result = {}, timer;
+var recvdResult, result = {}, timer;
 
 function sendResults() {
   timer = null;
@@ -96,6 +111,7 @@ function sendResults() {
 }
 
 function addResult(key, value) {
+  recvdResult = true;
   result[key] = value.split("\x00")[1];
 
   if (! timer)
@@ -121,7 +137,10 @@ function processBuffer(buffer) {
       exitProcess('ALL FAILED', 1);
     break;
   case 'F': // Finish
-    exitProcess(key, +data);
+    if (recvdResult)
+      exitProcess(key, +data);
+    else
+      exitProcess('No TESTS RUN', 1);
     break;
   case 'L': // Log
     log(key, data);

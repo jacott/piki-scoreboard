@@ -1,56 +1,19 @@
-var requirejs = require('koru').requirejs;
+var path = require('path');
 
-var koruPath = '../node_modules/koru/app/koru';
+define(function(require, exports, module) {
+  var util = require('koru/util');
+  var koru = require('koru');
+  var fileWatch = require('koru/file-watch');
+  var test = require('koru/test');
+  var Model = require('koru/model');
 
-requirejs.config({
-  //Use node's special variable __dirname to
-  //get the directory containing this file.
-  //Useful if building a library that will
-  //be used in node but does not require the
-  //use of node outside
-  baseUrl: __dirname+'/..',
-
-  config: {
-    "koru/main": {
-      "urlRoot": 'http://test.piki/',
-    },
-
-    "koru/mongo/driver": {url: "mongodb://localhost:3004/koru"},
-
-    "koru/web-server": {port: 3030, defaultPage: '/test/index.html'},
-
-    "koru/test/build-cmd": {excludeDirs: ['koru']}
-  },
-
-  packages: [
-    "koru", "koru/test", "koru/model", "koru/session", "koru/user-account",
-  ],
-
-  paths: {
-    koru: koruPath,
-  },
-
-  //Pass the top-level main.js/index.js require
-  //function to requirejs so that node modules
-  //are loaded relative to the top-level JS file.
-  nodeRequire: require
-});
-
-// requirejs.onResourceLoad = function (context, map, depArray) {
-// }
-
-
-//Now export a value visible to Node.
-module.exports = {};
-
-requirejs([
-  'koru', 'koru/file-watch', 'koru/server' , 'koru/server-rc',
-], function (koru, fileWatch) {
+  require('koru/server');
+  require('koru/server-rc');
 
   koru.Fiber(function () {
-    var file = __dirname + '/../' + koruPath;
-    fileWatch.watch(file, file.replace(/\/koru$/, ''));
+    test.geddon.sinon.spy(Model._modelProperties, 'addUniqueIndex');
+    test.geddon.sinon.spy(Model._modelProperties, 'addIndex');
 
-    console.log('=> Ready');
+    fileWatch.watch(path.join(koru.libDir, 'app/koru'), path.join(koru.libDir, 'app'));
   }).run();
 });

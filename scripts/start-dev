@@ -1,15 +1,14 @@
 #!/bin/bash
-set -em
+set -e
 
-cd `dirname "$0"`/../app
+. `dirname "$0"`/environ.sh
+init ${1-demo}
 
 # export NODE_OPTIONS='--prof'
 # send SIGUSR1 to debug
 
-type=${1:-demo}
-shift
 
-if [ $type = demo ];then
-    type="."
-fi
-exec node ${type}/server.js "$@"
+fuser -s "$MONGO_DIR/mongod.lock" || ./scripts/startdb.sh $branch
+cd app
+echo -e "starting ${branch}...\c"
+exec node ../node_modules/koru/lib/koru.js "$@"

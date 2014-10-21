@@ -34,15 +34,15 @@ define(function (require, exports, module) {
       var fr = v.fileReader;
       assert.same(fr.constructor, frStub);
       assert.isFunction(fr.onload);
-      assert.same(fr.blob, "abcd");
+      assert.same(fr._result2Str(), "abcd");
 
-      fr.result = ['a','b','c'];
-      var u8result = new Uint8Array(fr.result);
       fr.onload();
-      assert.calledWithExactly(session.rpc, 'Reg.upload', v.event._id, u8result, TH.match(function (func) {
-        v.callResultFunc = func;
-        return typeof func === 'function';
-      }));
+      assert.calledWithExactly(session.rpc, 'Reg.upload', v.event._id,
+                               TH.match(function (arg) {return 'abcd' === fr._result2Str(arg)}),
+                               TH.match(function (func) {
+                                 v.callResultFunc = func;
+                                 return typeof func === 'function';
+                               }));
 
       v.callResultFunc('bad file', 'the result');
 

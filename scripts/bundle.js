@@ -10,16 +10,23 @@ var requirejs = require('koru/node_modules/requirejs');
 var topDir = Path.resolve(Path.join(__dirname, '../app'));
 var buildDir = Path.resolve(Path.join(__dirname, '../build'));
 
-var optConfig = {
-  baseUrl: topDir,
-  paths: {
-    requireLib: Path.join(topDir, "../node_modules/koru/node_modules/requirejs/require"),
-  },
+process.chdir(topDir);
+var cfg = require('koru/lib/build-conf');
 
-  packages: ['koru', 'koru/model', 'koru/session', 'koru/user-account', 'koru/session'],
+var cfgStr = "requirejs.config(" + JSON.stringify(cfg.client.requirejs) + ");\n";
 
+var optConfig = cfg.setTarget(cfg.client.requirejs);
+
+cfg.merge("paths", {
+  requireLib: Path.join(cfg.rootDir, "node_modules/koru/node_modules/requirejs/require"),
+});
+
+var clientjs = cfg.server.clientjs;
+console.log(clientjs);
+
+cfg.extend(optConfig, {
   include: 'requireLib',
-//  optimize: 'none',
+  // optimize: 'none',
 
   stubModules: ['koru/dom/template-compiler'],
 
@@ -27,12 +34,17 @@ var optConfig = {
     if (moduleName === 'koru/css/loader')
       return "define({loadAll: function(){}});";
 
+    if (moduleName === 'client') {
+      contents = fs.readFileSync(Path.join(topDir, clientjs+".js")).toString();
+      return cfgStr + contents;
+    }
+
     return contents;
   },
 
-  name: "client",
+  name: 'client',
   out: Path.join(buildDir, "/index.js"),
-};
+});
 
 try {fs.mkdirSync(buildDir);} catch(ex) {}
 

@@ -99,7 +99,7 @@ define(function(require, exports, module) {
     switch (sortField) {
     case 'club':
       return sortFunc = function (a, b) {
-        return util.compareByName(a.club, b.club);
+        return util.compareByName(a && a.club, b && b.club);
       };
     case 'cat':
       sortClimber = false;
@@ -184,7 +184,7 @@ define(function(require, exports, module) {
         var competitors = Competitor.eventIndex({event_id: competitor.event_id}) || {};
 
         var found = false;
-        var completeList = value && Climber.search(value, 20, function (doc) {
+        var completeList = Climber.search(value, 20, function (doc) {
           found = true;
           return ! (doc._id in competitors);
         });

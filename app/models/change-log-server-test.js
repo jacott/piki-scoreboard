@@ -82,10 +82,13 @@ define(function (require, exports, module) {
 
       var cl = query.fetchOne();
 
-      assert.equals(cl.attributes, {_id: cl._id, after: JSON.stringify(climber.attributes), createdAt: cl.createdAt, model_id: climber._id,
+      assert.attributesEqual(cl.attributes, {_id: cl._id, createdAt: cl.createdAt, model_id: climber._id,
                                     user_id: TH.userId(),
                                     parent: 'Climber', parent_id: climber._id,
-                                    org_id: climber.org_id, type: 'create', model: 'Climber'});
+                                    org_id: climber.org_id, type: 'create', model: 'Climber'},['after']);
+
+      assert.equals(JSON.parse(cl.attributes.after), climber.attributes);
+
     },
 
   });

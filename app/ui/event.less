@@ -46,12 +46,16 @@
         height: 1.2em;
         cursor: pointer;
         border: 1px solid fade(#000, 20%);
+        .icon(@icon-tick);
+        &:before {
+          visibility: hidden;
+        }
       }
       &.selected {
         background-color: #aff;
 
-        .select {
-          .icon(@icon-tick);
+        .select:before {
+          visibility: visible;
         }
       }
       &.B+.L {

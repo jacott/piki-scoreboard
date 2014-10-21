@@ -17,7 +17,7 @@ isClient && define(function (require, exports, module) {
       test.stub(window, 'addEventListener');
       test.stub(Spinner, 'init');
       test.stub(session, 'sendP');
-      v.subSelf = test.stub(App.subscribe, 'intercept').withArgs('Self');
+      v.subSelf = test.spy(session, 'interceptSubscribe').withArgs('Self');
     },
 
     tearDown: function () {
@@ -87,7 +87,7 @@ isClient && define(function (require, exports, module) {
       Route.replacePath.restore();
       test.stub(koru, 'getLocation').returns({pathname: '/FOO'});
 
-      v.subOrg = App.subscribe.intercept.withArgs('Org');
+      v.subOrg = session.interceptSubscribe.withArgs('Org');
 
       assert.same(Route.root.routeVar, 'orgSN');
 
