@@ -4,6 +4,8 @@ define(function(require, exports, module) {
   var User = require('./user');
   var Val = require('koru/model/validation');
 
+  var permitSpec = Val.permitSpec('name', 'org_id', 'date', 'closed', {heats: '*'});
+
   return function (model) {
     ChangeLog.logChanges(model);
 
@@ -11,8 +13,18 @@ define(function(require, exports, module) {
 
     util.extend(model.prototype, {
       authorize: function (userId) {
-        var user = User.findById(userId);
-        Val.allowAccessIf(user && user.org_id === this.org_id || user.role.indexOf(User.ROLE.superUser) >= 0);
+        User.fetchAdminister(userId, this);
+
+        var changes = this.changes;
+
+        Val.permitParams(changes, permitSpec, this.$isNewRecord());
+
+        if (changes.hasOwnProperty('closed'))
+          Val.allowAccessIf(Object.keys(changes).length === 1);
+        else
+          Val.allowAccessIf(! this.closed &&
+                            (this.$isNewRecord() || ! changes.hasOwnProperty('org_id')));
+
       },
     });
 

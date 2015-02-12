@@ -29,6 +29,7 @@ define(function (require, exports, module) {
 
       assert.validators(validators.name, {maxLength: [200], required: [true], trim: [true], unique: [{scope: 'org_id'}]});
       assert.validators(validators.date, {inclusion: [{matches: /^\d{4}-[01]\d-[0-3]\d$/ }]});
+      assert.validators(validators.closed, {boolean: ['trueOnly']});
     },
 
     "heat validation": {

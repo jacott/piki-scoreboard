@@ -7,6 +7,12 @@ define(function(require, exports, module) {
   var Model = require('koru/model');
 
   return function () {
+    initNewInstall();
+
+    Model.ensureIndexes();
+  };
+
+  function initNewInstall() {
     if (User.query.count(1) === 0) {
       var id = Random.id();
       User.docs.insert({_id: id, name: "Super User", initials: "SU", email: "su@example.com", role: 's'});
@@ -16,15 +22,5 @@ define(function(require, exports, module) {
     if (Org.query.count(1) === 0) {
       Org.create({name: 'Example org', shortName: 'EG', email: "su@example.com"});
     }
-
-    // port Meteor users
-    if (Model.UserLogin.query.count(1) === 0) {
-      var users = mongoDb.defaultDb.collection('users');
-
-      User.query.forEach(function (doc) {
-        var mu = users.findOne({_id: doc._id});
-        mu && Model.UserLogin.create({email: doc.email, userId: doc._id, tokens: {}, srp: mu.services.password.srp});
-      });
-    }
-  };
+  }
 });

@@ -31,6 +31,7 @@ define(function(require, exports, module) {
     heats: 'has-many',
     date: {type: 'date', inclusion: {matches: /^\d{4}-[01]\d-[0-3]\d$/}},
     errors: 'has-many',
+    closed: {type: 'boolean', boolean: 'trueOnly'}
   });
 
   require('koru/env!./event')(model);

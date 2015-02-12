@@ -10,8 +10,7 @@ define(function(require, exports, module) {
 
     util.extend(model.prototype, {
       authorize: function (userId) {
-        var user = User.findById(userId);
-        Val.allowAccessIf(user && user.org_id === this.org_id || user.role.indexOf(User.ROLE.superUser) >= 0);
+        User.fetchAdminister(userId, this);
       },
     });
 

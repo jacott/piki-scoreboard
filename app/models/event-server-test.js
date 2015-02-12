@@ -10,6 +10,7 @@ define(function (require, exports, module) {
     setUp: function () {
       test = this;
       v = {};
+      v.rpc = TH.mockRpc();
       v.org = TH.Factory.createOrg();
       v.user = TH.Factory.createUser();
       test.stub(koru, 'info');
@@ -21,7 +22,7 @@ define(function (require, exports, module) {
     },
 
     "authorize": {
-      "test denied": function () {
+      "test wrong org denied": function () {
         var oOrg = TH.Factory.createOrg();
         var oUser = TH.Factory.createUser();
 
@@ -34,6 +35,46 @@ define(function (require, exports, module) {
 
       "test allowed": function () {
         var event = TH.Factory.buildEvent();
+
+        refute.accessDenied(function () {
+          event.authorize(v.user._id);
+        });
+      },
+
+      'test permitParams': function () {
+        var event = TH.Factory.buildEvent();
+
+        event.attributes = event.changes;
+        event.changes = {'name': 'new name'};
+        assert.permitSpec(['name', 'org_id', 'date', 'closed', {heats: '*'}], event.changes,
+                          function () {event.authorize(v.user._id);}, true);
+
+      },
+
+      "test closing": function () {
+        var event = TH.Factory.buildEvent();
+        event.attributes = event.changes;
+        event.changes = {closed: true};
+
+        refute.accessDenied(function () {
+          event.authorize(v.user._id);
+        });
+      },
+
+      "test change on closed": function () {
+        var event = TH.Factory.buildEvent({closed: true});
+        event.attributes = event.changes;
+        event.changes = {name: 'bob'};
+
+        assert.accessDenied(function () {
+          event.authorize(v.user._id);
+        });
+      },
+
+      "test opening": function () {
+        var event = TH.Factory.buildEvent({closed: false});
+        event.attributes = event.changes;
+        event.changes = {closed: 'true'};
 
         refute.accessDenied(function () {
           event.authorize(v.user._id);

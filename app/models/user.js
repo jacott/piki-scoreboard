@@ -37,11 +37,12 @@ define(function(require, exports, module) {
       return this.attributes.role === ROLE.superUser;
     },
 
-    canAdminister: function () {
+    canAdminister: function (doc) {
       switch(this.attributes.role) {
       case ROLE.superUser:
-      case ROLE.admin:
         return true;
+      case ROLE.admin:
+        return ! doc || (doc.attributes.org_id || doc.changes.org_id) === this.org_id;
       }
       return false;
     },
@@ -64,6 +65,12 @@ define(function(require, exports, module) {
   util.extend(model, {
     me: function () {
       return koru.userId() && model.findById(koru.userId());
+    },
+
+    fetchAdminister: function (userId, doc) {
+      var user = model.findById(userId);
+      Val.allowAccessIf(user && user.canAdminister(doc));
+      return user;
     },
   });
 

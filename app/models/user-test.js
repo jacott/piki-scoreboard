@@ -3,6 +3,7 @@ define(function (require, exports, module) {
   var TH = require('test-helper');
   var util = require('koru/util');
   var User = require('./user');
+  var koru = require('koru');
 
   TH.testCase(module, {
     setUp: function () {
@@ -35,6 +36,48 @@ define(function (require, exports, module) {
 
       user.attributes.role = 'x';
       assert.isFalse(user.isSuperUser());
+    },
+
+    "test canAdminister": function () {
+      var doc = new User({org_id: '123'});
+      doc.attributes.role = User.ROLE.superUser;
+
+      assert(doc.canAdminister());
+      assert(doc.canAdminister('x'));
+
+      doc.attributes.role = User.ROLE.admin;
+
+      assert(doc.canAdminister());
+      assert(doc.canAdminister({attributes: {org_id: doc.org_id}}));
+      assert(doc.canAdminister({attributes: {}, changes: {org_id: doc.org_id}}));
+      refute(doc.canAdminister({attributes: {org_id: '456'}, changes: {org_id: doc.org_id}}));
+
+      doc.attributes.role = User.ROLE.judge;
+      doc.changes.role = User.ROLE.superUser;
+
+      refute(doc.canAdminister());
+    },
+
+    "test fetchAdminister": function () {
+      test.stub(koru, 'info');
+      var user = TH.Factory.createUser();
+
+      var ca = test.stub(User.prototype, 'canAdminister').returns(false);
+
+      assert.accessDenied(function () {
+        User.fetchAdminister(user._id, 'x');
+      });
+
+      assert.calledOnceWith(ca, 'x');
+      assert.same(ca.thisValues[0]._id, user._id);
+
+       assert.accessDenied(function () {
+        User.fetchAdminister('123');
+      });
+
+      ca.returns(true);
+
+      assert.same(User.fetchAdminister(user._id)._id, user._id);
     },
 
     "test emailWithName": function () {
