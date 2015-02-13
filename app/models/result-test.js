@@ -119,6 +119,22 @@ define(function (require, exports, module) {
 
         assert.equals(v.result.$reload().scores, [1, 235005]);
       },
+
+      "test delete middle score": function () {
+        v.result.$update({scores: [1, 220000, 440000]});
+
+        v.rpc("Result.setScore", v.result._id, 1, '');
+
+        assert.equals(v.result.$reload().scores, [1, null, 440000]);
+      },
+
+      "test delete last score": function () {
+        v.result.$update({scores: [1, 220000, 440000]});
+
+        v.rpc("Result.setScore", v.result._id, 2, '');
+
+        assert.equals(v.result.$reload().scores, [1, 220000, null]);
+      },
     },
 
     "Result.setBoulderScore": {

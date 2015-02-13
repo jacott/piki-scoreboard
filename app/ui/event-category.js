@@ -416,8 +416,11 @@ define(function(require, exports, module) {
 
   function saveScore(elm) {
     var ctx = Dom.getCtx(elm);
-    var heat = Tpl.$ctx(ctx).data.heat;
     var data = ctx.data;
+    if (! data.result || data.score === elm.value) return true;
+
+    var heat = Tpl.$ctx(ctx).data.heat;
+
     if (Dom.hasClass(elm, 'score')) {
       var number = heat.scoreToNumber(elm.value, data.heat);
 

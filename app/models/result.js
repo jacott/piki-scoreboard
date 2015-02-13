@@ -59,11 +59,9 @@ define(function(require, exports, module) {
 
       Val.allowAccessIf(heat.type === 'L' && index >=0 && index <= heat.total);
 
-
       var changes = {};
-
-      changes['scores.' + index] = score = heat.scoreToNumber(score);
-
+      score = heat.scoreToNumber(score) || null;
+      changes['scores.' + index] = score;
       model.query.onId(id).update(changes);
     },
 
