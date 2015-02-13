@@ -45,6 +45,16 @@ define(function (require, exports, module) {
 
         assert.calledWith(Val.ensureString, v.event._id);
       },
+
+      "test event closed": function () {
+        var event = TH.Factory.createEvent({closed: true});
+        var competitor = TH.Factory.buildCompetitor();
+
+        assert.accessDenied(function () {
+          competitor.authorize(v.user._id);
+        });
+
+      },
     },
 
   });

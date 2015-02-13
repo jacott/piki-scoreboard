@@ -20,6 +20,10 @@ define(function(require, exports, module) {
         minutes = '0' + minutes;
       return Math.floor(this.time / 60) + ':' + minutes;
     },
+
+    get org_id() {
+      return this.event && this.event.org_id;
+    }
   });
 
   model.defineFields({
@@ -42,7 +46,7 @@ define(function(require, exports, module) {
       var result = model.findById(id);
       var event = result.event;
 
-      Val.allowAccessIf(user && (user.isSuperUser() || user.org_id === event.org_id));
+      Val.allowAccessIf(! event.closed && user && (user.isSuperUser() || user.org_id === event.org_id));
 
       var heat = new Heat(index, event.heats[result.category_id]);
 

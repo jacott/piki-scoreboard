@@ -42,7 +42,7 @@ define(function(require, exports, module) {
       case ROLE.superUser:
         return true;
       case ROLE.admin:
-        return ! doc || (doc.attributes.org_id || doc.changes.org_id) === this.org_id;
+        return ! doc || (doc.attributes.org_id || doc.org_id) === this.org_id;
       }
       return false;
     },

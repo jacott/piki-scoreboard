@@ -32,10 +32,18 @@ isClient && define(function (require, exports, module) {
       v = null;
     },
 
+    "test closed": function () {
+      v.event.$update({closed: true});
+
+      gotoPage();
+
+      assert.dom('#Register.closed');
+    },
+
     "test registering": function () {
       gotoPage();
 
-      assert.dom('#Event #Register', function () {
+      assert.dom('#Event #Register:not(.closed)', function () {
         assert.dom('h1', v.event.name);
         refute.dom('.Groups');
         assert.dom('fieldset', function () {

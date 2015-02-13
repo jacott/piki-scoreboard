@@ -25,19 +25,29 @@ define(function (require, exports, module) {
         var oOrg = TH.Factory.createOrg();
         var oUser = TH.Factory.createUser();
 
-        var event = TH.Factory.buildEvent();
+        var result = TH.Factory.buildResult();
 
         assert.accessDenied(function () {
-          event.authorize(v.user._id);
+          result.authorize(v.user._id);
         });
       },
 
       "test allowed": function () {
-        var event = TH.Factory.buildEvent();
+        var result = TH.Factory.buildResult();
 
         refute.accessDenied(function () {
-          event.authorize(v.user._id);
+          result.authorize(v.user._id);
         });
+      },
+
+      "test event closed": function () {
+        var event = TH.Factory.createEvent({closed: true});
+        var result = TH.Factory.buildResult();
+
+        assert.accessDenied(function () {
+          result.authorize(v.user._id);
+        });
+
       },
     },
 

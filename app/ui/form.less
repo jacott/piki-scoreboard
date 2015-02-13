@@ -85,6 +85,57 @@ table.select {
   }
 }
 
+.onOff {
+  @cellWidth: 2.5em;
+  position: relative;
+  user-select: none;
+  cursor: pointer;
+  display: inline-block;
+  width: 2 * @cellWidth;
+  height: 2em;
+  line-height: 2em;
+  color: white;
+  background-color: #000;
+  border-radius: 2px;
+  border: 4px solid #000;
+  .content-box();
+  >i {
+    display: block;
+    transition: margin-left 200ms;
+    position: absolute;
+    margin-left: 0em;
+    width: 50%;
+    height: 2em;
+    border-radius: 2px;
+    background-color: #0aa;
+    z-index: 1;
+  }
+  >span {
+    transition: opacity 200ms;
+    opacity: 1;
+    &+span {
+      opacity: 0.5;
+      margin-left: 50%;
+    }
+    position: absolute;
+    z-index: 2;
+    text-align: center;
+    display: inline-block;
+    width: 50%;
+  }
+  &.on {
+    >span {
+      opacity: 0.5;
+    }
+    >span+span {
+      opacity: 1;
+    }
+    >i {
+      margin-left: 50%;
+    }
+  }
+}
+
 @media print {
   table.select {
     tr {

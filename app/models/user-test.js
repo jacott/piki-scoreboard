@@ -49,8 +49,8 @@ define(function (require, exports, module) {
 
       assert(doc.canAdminister());
       assert(doc.canAdminister({attributes: {org_id: doc.org_id}}));
-      assert(doc.canAdminister({attributes: {}, changes: {org_id: doc.org_id}}));
-      refute(doc.canAdminister({attributes: {org_id: '456'}, changes: {org_id: doc.org_id}}));
+      assert(doc.canAdminister({attributes: {}, org_id: doc.org_id}));
+      refute(doc.canAdminister({attributes: {org_id: '456'}, org_id: doc.org_id}));
 
       doc.attributes.role = User.ROLE.judge;
       doc.changes.role = User.ROLE.superUser;

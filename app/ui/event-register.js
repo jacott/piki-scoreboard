@@ -46,6 +46,9 @@ define(function(require, exports, module) {
   });
 
   Tpl.$helpers({
+    closedClass: function () {
+      Dom.setClass('closed', eventTpl.event.closed);
+    },
     competitors: function (callback) {
       callback.render({
         model: Competitor,

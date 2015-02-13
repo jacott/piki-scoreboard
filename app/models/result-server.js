@@ -11,6 +11,7 @@ define(function(require, exports, module) {
     util.extend(model.prototype, {
       authorize: function (userId) {
         User.fetchAdminister(userId, this);
+        Val.allowAccessIf(! this.event.closed);
       },
     });
 

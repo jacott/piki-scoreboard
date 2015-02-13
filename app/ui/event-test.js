@@ -78,6 +78,7 @@ isClient && define(function (require, exports, module) {
         assert.dom('#AddEvent', function () {
           TH.input('[name=name]', 'National Cup 1 - Auckland');
           TH.input('[name=date]', '2014-03-14');
+          assert.dom('.onOff[data-field=closed]');
           TH.click('[type=submit]');
         });
         refute.dom('#AddEvent');

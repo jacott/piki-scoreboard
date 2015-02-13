@@ -93,7 +93,7 @@ define(function(require, exports, module) {
           showingResults = value;
           if (showingResults)
             focusField = null;
-          this.canInput = ! value && Dom.hasClass(document.body, 'jAccess');
+          this.canInput = ! (value || eventTpl.event.closed)  && Dom.hasClass(document.body, 'jAccess');
           return value;
         },
       });
