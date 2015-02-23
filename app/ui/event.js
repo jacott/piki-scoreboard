@@ -170,6 +170,12 @@ define(function(require, exports, module) {
     },
   });
 
+  Tpl.Edit.$extend({
+    $destroyed: function (ctx, elm) {
+      ctx.data.$clearChanges();
+    }
+  });
+
   Tpl.Edit.Cat.$helpers({
     eventFormat: eventFormat,
   });

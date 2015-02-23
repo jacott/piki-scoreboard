@@ -17,7 +17,7 @@ define(function(require, exports, module) {
 
         var changes = this.changes;
 
-        Val.permitParams(changes, permitSpec, this.$isNewRecord());
+        Val.permitDoc(this, permitSpec);
 
         if (changes.hasOwnProperty('closed'))
           Val.allowAccessIf(Object.keys(changes).length === 1);

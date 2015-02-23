@@ -117,6 +117,12 @@ define(function(require, exports, module) {
     'click [type=submit]': Form.submitFunc('EditClimber', "back"),
   });
 
+  Tpl.Edit.$extend({
+    $destroyed: function (ctx, elm) {
+      ctx.data.$clearChanges();
+    }
+  });
+
   base.addTemplate(Index, {defaultPage: true, path: ''});
   base.addTemplate(Tpl.Add, {
     focus: true,

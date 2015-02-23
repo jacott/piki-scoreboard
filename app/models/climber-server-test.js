@@ -5,6 +5,7 @@ define(function (require, exports, module) {
   var Org = require('./org');
   var User = require('./user');
   var koru = require('koru');
+  var Result = require('./result');
 
   TH.testCase(module, {
     setUp: function () {
@@ -38,6 +39,25 @@ define(function (require, exports, module) {
         refute.accessDenied(function () {
           climber.authorize(v.user._id);
         });
+      },
+
+      "test okay to remove": function () {
+        var climber = TH.Factory.createClimber();
+
+        refute.accessDenied(function () {
+          climber.authorize(v.user._id, {remove: true});
+        });
+
+      },
+
+      "test remove in use": function () {
+        var climber = TH.Factory.createClimber();
+        var result = TH.Factory.createResult();
+
+        assert.accessDenied(function () {
+          climber.authorize(v.user._id, {remove: true});
+        });
+
       },
     },
 

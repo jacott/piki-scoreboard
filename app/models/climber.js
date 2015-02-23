@@ -17,6 +17,7 @@ define(function(require, exports, module) {
     gender: {type: 'text', inclusion: {allowBlank: true, matches: /^[mf]$/ }},
     number: {type: 'number', number: {integer: true, $gt: 0}},
     uploadId: 'number',
+    disabled: {type: 'boolean', boolean: 'trueOnly'},
   });
 
   require('koru/env!./climber')(model);

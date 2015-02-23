@@ -106,6 +106,12 @@ define(function(require, exports, module) {
     'click [type=submit]': Form.submitFunc('EditCategory', Tpl),
   });
 
+  Tpl.Edit.$extend({
+    $destroyed: function (ctx, elm) {
+      ctx.data.$clearChanges();
+    }
+  });
+
   function cancel(event) {
     Dom.stopEvent();
     Route.gotoPage(Tpl);
