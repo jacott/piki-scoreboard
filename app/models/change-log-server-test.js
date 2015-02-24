@@ -44,11 +44,14 @@ define(function (require, exports, module) {
 
       var cl = ChangeLog.query.where('type', 'remove').fetchOne();
 
-      assert.attributesEqual(cl, {_id: cl._id, before: JSON.stringify(climber.attributes),
+      assert.attributesEqual(cl, {_id: cl._id,
                                   createdAt: cl.createdAt, model_id: climber._id,
                                   parent: 'Climber', parent_id: climber._id,
                                   user_id: TH.userId(),
-                                  org_id: climber.org_id, type: 'remove', model: 'Climber'});
+                                  org_id: climber.org_id, type: 'remove', model: 'Climber'}, ['before']);
+
+      assert.equals(JSON.parse(cl.before), climber.attributes);
+
     },
 
     "test save on update": function () {

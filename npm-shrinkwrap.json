@@ -10,12 +10,29 @@
     "koru": {
       "version": "0.0.2",
       "from": "koru@git+ssh://git@dev.obeya.co:koru.git",
-      "resolved": "git+ssh://git@dev.obeya.co:koru.git#1c7cb2f16d9c3b484a469ae8289b926ec51b8ff6",
+      "resolved": "git+ssh://git@dev.obeya.co:koru.git#9cba241d685a8fa121692e3dc4b6ff0d20bd7031",
       "dependencies": {
         "fibers": {
           "version": "1.0.5",
           "from": "fibers@1.0.5",
           "resolved": "https://registry.npmjs.org/fibers/-/fibers-1.0.5.tgz"
+        },
+        "weak": {
+          "version": "0.4.0",
+          "from": "weak@0.4.0",
+          "resolved": "https://registry.npmjs.org/weak/-/weak-0.4.0.tgz",
+          "dependencies": {
+            "bindings": {
+              "version": "1.2.1",
+              "from": "bindings@*",
+              "resolved": "https://registry.npmjs.org/bindings/-/bindings-1.2.1.tgz"
+            },
+            "nan": {
+              "version": "1.6.2",
+              "from": "nan@~1.6.2",
+              "resolved": "https://registry.npmjs.org/nan/-/nan-1.6.2.tgz"
+            }
+          }
         },
         "kexec": {
           "version": "0.2.0",

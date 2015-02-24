@@ -25,14 +25,19 @@ define(function(require, exports, module) {
     },
 
     clearDB: function () {
-      TH.Factory.clear();
+      this.Factory.clear();
       for(var name in Model) {
         var model = Model[name];
         if ('docs' in model) {
-          if (isClient)
-            Model[name].docs = {};
-          else {
-            Model[name].docs.remove({});
+          if (isClient) {
+            model.docs = {};
+            var indexes = model._indexUpdate.indexes;
+            for(var id in indexes) {
+              indexes[id].reload();
+            }
+          } else {
+            model.docs.truncate();
+            model._$wm = {};
           }
         }
       };
