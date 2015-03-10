@@ -37,7 +37,7 @@ define(function(require, exports, module) {
             }
           } else {
             model.docs.truncate();
-            model._$wm = {};
+            model._$wm.clear();
           }
         }
       };

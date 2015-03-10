@@ -10,7 +10,7 @@
     "koru": {
       "version": "0.0.2",
       "from": "koru@git+ssh://git@dev.obeya.co:koru.git",
-      "resolved": "git+ssh://git@dev.obeya.co:koru.git#9cba241d685a8fa121692e3dc4b6ff0d20bd7031",
+      "resolved": "git+ssh://git@dev.obeya.co:koru.git#e17fc9a606a44175fc07f0a4643f562bef12a74a",
       "dependencies": {
         "fibers": {
           "version": "1.0.5",
