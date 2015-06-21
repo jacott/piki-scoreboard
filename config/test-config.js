@@ -9,7 +9,6 @@ exports.server = function (cfg) {
       "koru/config": {
         DBDriver: "koru/pg/driver",
       },
-      "koru/mongo/driver": {url: "mongodb://localhost:"+MONGO_PORT+"/pikitest"},
       "koru/pg/driver": {
         url: "host=/var/run/postgresql dbname=pikitest",
       },
