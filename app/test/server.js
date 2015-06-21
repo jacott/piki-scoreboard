@@ -1,8 +1,8 @@
 var path = require('path');
 
 define(function(require, exports, module) {
+  var koru = require('koru/main-server');
   var util = require('koru/util');
-  var koru = require('koru');
   var fileWatch = require('koru/file-watch');
   var test = require('koru/test');
   var Model = require('koru/model');

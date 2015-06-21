@@ -195,7 +195,7 @@ isClient && define(function (require, exports, module) {
           assert.dom('.categories input[name=changeFormat]', {value: "QQF8"}, function () {
             TH.change(this, 'QQF8FX');
           });
-          assert.dom('input.error+.errorMsg', 'not valid');
+          assert.dom('input.error+.errorMsg', 'is not valid');
 
           assert.equals(sut.event.heats[v.cats[0]._id], 'LQQF8'); // ensure reverted
           assert.equals(v.event.$reload().heats[v.cats[0]._id], 'LQQF8');

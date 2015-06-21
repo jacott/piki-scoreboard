@@ -5,8 +5,6 @@
     "type": "git",
     "url": "git+ssh://git@goblin.jacott:piki.git"
   },
-  "bugs": {
-  },
   "keywords": [
     "climbing",
     "koru",
@@ -15,11 +13,12 @@
   ],
   "author": "Geoff Jacobsen <geoffjacobsen@gmail.com>",
   "dependencies": {
-    "koru": "git+ssh://git@dev.obeya.co:koru.git",
+    "koru": "git+ssh://git@dev.obeya.co:/home/git/koru.git",
+    "mongodb": "1.4.31",
     "csv": "0.3.7"
   },
   "engines": {
-    "node": "~0.10"
+    "node": ">=0.12"
   },
-  "version": "0.1.0"
+  "version": "0.2.0"
 }

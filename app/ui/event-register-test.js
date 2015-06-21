@@ -87,7 +87,7 @@ isClient && define(function (require, exports, module) {
 
         TH.click('fieldset.actions [type=submit]');
 
-        assert.dom('[name=number].error+.errorMsg', 'not numeric');
+        assert.dom('[name=number].error+.errorMsg', 'must be numeric');
         TH.input('[name=number]', '567');
 
         TH.click('fieldset.actions [type=submit]');

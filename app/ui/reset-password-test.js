@@ -46,7 +46,7 @@ isClient && define(function (require, exports, module) {
       v.callback({error: 403, reason: 'token expired', message: 'foo'});
 
       assert.dom('#ResetPassword', function () {
-        assert.dom('.error[name=newPassword]+span.errorMsg', 'token expired');
+        assert.dom('.error[name=newPassword]+.errorMsg', 'token expired');
       });
 
       assert.calledWith(koru.error, 'foo');

@@ -10,8 +10,8 @@ window.history.replaceState(null, document.title = 'Piki Test Mode', '/');
 
 
 define(function(require, exports, module) {
+  var koru = require('koru/main-client');
   require('koru/session/main-client');
-  var koru = require('koru');
 
   koru.onunload(module, 'reload');
 

@@ -46,8 +46,15 @@ define(function (require, exports, module) {
 
         event.attributes = event.changes;
         event.changes = {'name': 'new name'};
-        assert.permitSpec(['name', 'org_id', 'date', 'closed', {heats: '*'}], event.changes,
-                          function () {event.authorize(v.user._id);}, true);
+        assert.docChanges(event, {
+          name: 'string',
+          org_id: 'string',
+          date: 'string',
+          closed: TH.match.any,
+          heats: 'object',
+        }, function () {
+          event.authorize(v.user._id);
+        });
 
       },
 

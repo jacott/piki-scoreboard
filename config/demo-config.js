@@ -6,6 +6,9 @@ var urlRoot = 'http://localhost:'+KORU_PORT+'/';
 exports.server = function (cfg) {
   cfg.merge('requirejs', {
     config: {
+      "koru/config": {
+        DBDriver: "koru/mongo/driver",
+      },
       "koru/mongo/driver": {url: "mongodb://localhost:"+MONGO_PORT+"/pikidemo"},
 
       "koru/web-server": {

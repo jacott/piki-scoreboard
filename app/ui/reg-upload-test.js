@@ -41,7 +41,7 @@ isClient && define(function (require, exports, module) {
         uploadResult(new koru.Error(415, 'unsupported_import_format'));
         assert.dom('#RegUpload:not(.uploading)', function () {
           assert.dom('input.error[name=filename]');
-          assert.dom('span.errorMsg', 'The uploaded file is unsupported');
+          assert.dom('.errorMsg', 'The uploaded file is unsupported');
         });
       },
 

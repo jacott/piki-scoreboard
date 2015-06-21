@@ -3,8 +3,15 @@ define(function(require, exports, module) {
   var ChangeLog = require('./change-log');
   var User = require('./user');
   var Val = require('koru/model/validation');
+  var match = require('koru/match');
 
-  var permitSpec = Val.permitSpec('name', 'org_id', 'date', 'closed', {heats: '*'});
+  var FIELD_SPEC = {
+    name: 'string',
+    org_id: 'string',
+    date: 'string',
+    closed: match.or(match.boolean, match.string),
+    heats: 'object',
+  };
 
   return function (model) {
     ChangeLog.logChanges(model);
@@ -17,7 +24,7 @@ define(function(require, exports, module) {
 
         var changes = this.changes;
 
-        Val.permitDoc(this, permitSpec);
+        Val.assertDocChanges(this, FIELD_SPEC);
 
         if (changes.hasOwnProperty('closed'))
           Val.allowAccessIf(Object.keys(changes).length === 1);

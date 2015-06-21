@@ -9,16 +9,6 @@ exports.common = function (cfg) {
 };
 
 exports.client = function (cfg) {
-  cfg.merge('requirejs', {
-    shim: {
-      d3: {exports: 'd3'}
-    },
-
-    paths: {
-      "moment": "packages/vendor/moment",
-      "d3": "packages/vendor/d3",
-    },
-  });
 };
 
 exports.server = function (cfg) {

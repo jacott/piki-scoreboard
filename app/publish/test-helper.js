@@ -43,7 +43,7 @@ define(function(require, exports, module) {
 
     mockConnection: function () {
       var test = geddon.test;
-      var conn = new (serverConnection())({send: test.stub(), on: test.stub()}, 's123');
+      var conn = new (serverConnection())({send: test.stub(), on: test.stub()}, 's123', test.stub());
       conn.userId = koru.userId();
       conn.sendBinary = test.stub();
       conn.added = test.stub();
@@ -64,7 +64,7 @@ define(function(require, exports, module) {
 
     cleanUpTest: function (v) {
       TH.clearDB();
-      v.conn && v.conn.closed();
+      v.conn && v.conn.close();
     },
   }, TH);
 });

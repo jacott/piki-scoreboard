@@ -73,7 +73,7 @@ isClient && define(function (require, exports, module) {
 
         assert.dom('#ForgotPassword', function () {
           assert.dom('input.error[name=email]');
-          assert.dom('input.error[name=email]+.errorMsg', 'not valid');
+          assert.dom('input.error[name=email]+.errorMsg', 'is not valid');
 
           v.callback(null, {success: true});
 

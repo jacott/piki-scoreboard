@@ -184,23 +184,30 @@ define(function(require, exports, module) {
 
   var ga = geddon.assertions;
 
-  ga.add('permitSpec', {
-    assert: function (spec, changes, func, isNewRec) {
-      var spy = geddon.sinon.spy(Val,'permitParams'),
-          cSpec = this.cSpec = Val.permitSpec.apply(Val,spec);
+  ga.add('docChanges', {
+    assert: function (doc, spec, newSpec, func) {
+      if (! func) {
+        func = newSpec;
+        newSpec = null;
+      }
+      var spy = geddon.sinon.spy(Val,'assertDocChanges');
 
       try {
         func.call();
         this.args = spy.getCall(0);
-
-        return spy.calledWith(changes, cSpec, isNewRec);
+        if (newSpec) {
+          this.newSpec = ", "+ util.inspect(newSpec);
+          return spy.calledWith(doc, spec, newSpec);
+        }
+        this.newSpec = '';
+        return spy.calledWith(doc, spec);
       } finally {
         spy.restore();
       }
     },
 
-    assertMessage: "Expected AppVal.permitSpec to be called like:\npermitParams({i1}, {i$cSpec})\nbut was called with:\n{$args}",
-    refuteMessage: "Did not expect AppVal.permitSpec to be called like:\npermitParams({i1}, {i$cSpec})"
+    assertMessage: "Expected Val.assertDocChanges to be called with:\n{i1}, {i0}{$newSpec}\nbut was called with:\n{$args}",
+    refuteMessage: "Did not expect Val.assertDocChanges to be called with:\n{i1}, {i0}{$newSpec}"
   });
 
   isServer && ga.add('modelUniqueIndex', {

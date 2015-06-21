@@ -5,7 +5,15 @@ define(function(require, exports, module) {
   var Val = require('koru/model/validation');
   var Model = require('model');
 
-  var permitSpec = Val.permitSpec('name', 'org_id', 'club_id', 'dateOfBirth', 'gender', 'number', 'disabled');
+  var FIELD_SPEC = {
+    name: 'string',
+    org_id: 'string',
+    club_id: 'string',
+    dateOfBirth: 'string',
+    gender: 'string',
+    number: 'number',
+    disabled: 'boolean',
+  };
 
   return function (model) {
     ChangeLog.logChanges(model);
@@ -14,7 +22,7 @@ define(function(require, exports, module) {
 
     util.extend(model.prototype, {
       authorize: function (userId, options) {
-        Val.permitDoc(this, permitSpec);
+        Val.assertDocChanges(this, FIELD_SPEC);
         User.fetchAdminister(userId, this);
 
         if (options && options.remove) {

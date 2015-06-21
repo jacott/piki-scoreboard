@@ -8,14 +8,20 @@ define(function(require, exports, module) {
   return function (model) {
     ChangeLog.logChanges(model);
 
-    var changeSpec = Val.permitSpec('category_ids');
+    var FIELD_SPEC = {
+      category_ids: ['string'],
+    };
+
+    var NEW_FIELD_SPEC = {
+      event_id: 'string',
+      climber_id: 'string',
+    };
 
     util.extend(model.prototype, {
       authorize: function (userId) {
         Val.ensureString(this.event_id);
 
-        if (! this.$isNewRecord())
-          Val.permitParams(this.changes, changeSpec);
+        Val.assertDocChanges(this, FIELD_SPEC, NEW_FIELD_SPEC);
 
         var event = Event.findById(this.attributes.event_id || this.event_id);
 

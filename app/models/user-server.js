@@ -5,7 +5,13 @@ define(function(require, exports, module) {
   var session = require('koru/session');
 
   return function (model) {
-    var permitSpec = Val.permitSpec('name', 'email', 'initials', 'org_id', 'role');
+    var FIELD_SPEC = {
+      name: 'string',
+      email: 'string',
+      initials: 'string',
+      org_id: 'string',
+      role: 'string',
+    };
 
     require(['./change-log'], function (ChangeLog) {
       ChangeLog.logChanges(model);
@@ -32,7 +38,7 @@ define(function(require, exports, module) {
       authorize: function (userId) {
         var role = model.ROLE;
 
-        Val.permitDoc(this, permitSpec);
+        Val.assertDocChanges(this, FIELD_SPEC);
 
         var authUser = model.query.where({
           _id: userId,
