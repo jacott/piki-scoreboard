@@ -10,7 +10,7 @@ define(function(require, exports, module) {
     org_id: 'string',
     date: 'string',
     closed: match.or(match.boolean, match.string),
-    heats: 'object',
+    heats: 'baseObject',
   };
 
   return function (model) {

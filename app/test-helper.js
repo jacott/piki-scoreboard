@@ -5,6 +5,7 @@ define(function(require, exports, module) {
   var Model = require('koru/model');
   var Val = require('koru/model/validation');
   var session = require('koru/session');
+  var User = require('models/user');
 
   var geddon = TH.geddon;
 
@@ -12,15 +13,12 @@ define(function(require, exports, module) {
 
   TH.Factory = require('test/factory');
 
-  var testCase = TH.testCase;
-  var sendP, sendM;
+  koru.onunload(module, 'reload');
 
   TH = util.reverseExtend({
     showErrors: function (doc) {
-      return {
-        toString: function () {
-          return Val.inspectErrors(doc);
-        },
+      return function () {
+        return Val.inspectErrors(doc);
       };
     },
 
@@ -36,7 +34,7 @@ define(function(require, exports, module) {
               indexes[id].reload();
             }
           } else {
-            model.docs.truncate();
+            txSave || model.docs.truncate();
             model._$wm.clear();
           }
         }
@@ -51,43 +49,66 @@ define(function(require, exports, module) {
       return user && user._id;
     },
 
-    mockRpc: function (sessId) {
+    noInfo: function () {
+      if (! koru.info.restore)
+        geddon.test.stub(koru, 'info');
+    },
+
+    mockRpc: function (v, sessId) {
       sessId = (sessId || "1").toString();
       if (isServer) {
-        var ws = TH.mockWs();
+        var ws = this.mockWs();
         var conn;
         var id = 'koru/session/server-connection';
-        conn = new (require(id)({}))(ws, sessId, geddon.test.stub());
-        return function (method /*, args */) {
+        if (v && v.conn)
+          conn = v.conn;
+        else {
+          conn = new (require(id)({}))(ws, sessId, geddon.test.stub());
+          if (v) v.conn = conn;
+        }
+        return geddon.test.stub(session, 'rpc', function (method /*, args */) {
           conn.userId = koru.userId();
-          return session._rpcs[method].apply(conn, util.slice(arguments, 1));
-        };
+          try {
+            var prevUserId = util.thread.userId;
+            var prevConnection = util.thread.connection;
+            util.thread.userId = conn.userId;
+            util.thread.connection = conn;
+
+            if (! session._rpcs[method]) throw new Error('RPC: "' + method + '" is undefined');
+            return session._rpcs[method].apply(conn, util.slice(arguments, 1));
+          } finally {
+            util.thread.userId = prevUserId;
+            util.thread.connection = prevConnection;
+          }
+        });
       } else {
-        return function (method /*, args */) {
+        return geddon.test.stub(session, 'rpc', function (method /*, args */) {
           return session._rpcs[method].apply(util.thread, util.slice(arguments, 1));
-        };
+        });
       }
     },
 
     login: function (func) {
-      return this.loginAs(user || TH.Factory.last.user || TH.Factory.createUser('admin'), func);
+      return this.loginAs(user || this.Factory.last.user || this.Factory.createUser('admin'), func);
     },
 
     loginAs: function (newUser, func) {
       var test = geddon.test;
+      var self = this;
 
       if (newUser !== user) {
-        user && TH.user.restore();
+        user && self.user.restore();
         koru.userId.restore && koru.userId.restore();
 
         if (newUser) {
           test.stub(koru, 'userId', function () {return user._id});
-          test.stub(TH,'user',function () {return user});
-          var restore = TH.user.restore;
-          TH.user.restore = function () {
-            restore.call(TH.user);
+          test.stub(self, 'user',function () {return user});
+          var restore = self.user.restore;
+          self.user.restore = function () {
+            restore.call(self.user);
             user = null;
             util.thread.userId = null;
+            koru.userId.restore && koru.userId.restore();
           };
 
           user = newUser._id ? newUser : Model.User.findById(newUser);
@@ -95,11 +116,54 @@ define(function(require, exports, module) {
         }
       }
 
-      TH.setAccess && TH.setAccess();
+      self.setAccess && self.setAccess();
 
       if (! func) return user;
 
-      return func();
+      try {
+        return func();
+      } finally {
+        self.user && self.user.restore && self.user.restore();
+      }
+    },
+
+    matchModel: function (expect) {
+      var func = this.match(function (actual) {
+        return actual._id === expect._id;
+      });
+
+      Object.defineProperty(func, 'message', {get: function () {
+        return util.inspect(expect);
+      }});
+
+      return func;
+    },
+
+    matchItems: function (items) {
+      var func = this.match(function (actual) {
+        return util.deepEqual(actual && actual.sort(), items && items.sort());
+      });
+
+      Object.defineProperty(func, 'message', {get: function () {
+        return JSON.stringify(items);
+      }});
+
+      return func;
+    },
+
+    makeResponse: function (v) {
+      v.output = [];
+      return {
+        writeHead: geddon.test.stub(),
+        write: function (data) {
+          refute(v.ended);
+          v.output.push(data);
+        },
+        end: function (data) {
+          v.output.push(data);
+          v.ended = true;
+        }
+      };
     },
 
   }, TH);
@@ -160,25 +224,57 @@ define(function(require, exports, module) {
         sendM = session.sendM;
         session.sendM = koru.nullFunc;
       }
+    } else {
+      if (User.docs.isPG) {
+        User.docs.transaction(function (tx) {
+          txSave = tx;
+          tx.count = 1;
+        });
+        txSave.transaction = 'ROLLBACK';
+      }
     }
   });
+
+  var txSave;
+
+  if (isServer) {
+    geddon.onTestStart(function () {
+      txSave && User.docs._client.query('BEGIN');
+    });
+
+    geddon.onTestEnd(function () {
+      txSave && User.docs._client.query('ROLLBACK');
+    });
+
+  }
 
   function overrideSub(name, sub, callback) {
     return true;
   }
 
   geddon.onEnd(function () {
+    if (isServer && txSave) {
+      txSave.count = 0;
+      txSave.transaction = null;
+      txSave = null;
+      User.docs.transaction(function () {});
+    }
+
     koru.setTimeout = koruSetTimeout;
     koru.clearTimeout = koruClearTimeout;
     koru.afTimeout = koruAfTimeout;
-    if (sendP) {
-      session.interceptSubscribe = null;
-      session.sendP = sendP;
-      sendP = null;
-    }
-    if (sendM) {
-      session.sendM = sendM;
-      sendM = null;
+    if (isClient) {
+      if (sendP) {
+        session.interceptSubscribe = null;
+        session.sendP = sendP;
+        sendP = null;
+      }
+      if (sendM) {
+        session.sendM = sendM;
+        sendM = null;
+      }
+    } else {
+      User.docs.query('ROLLBACK');
     }
   });
 

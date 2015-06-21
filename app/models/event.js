@@ -28,9 +28,9 @@ define(function(require, exports, module) {
   model.defineFields({
     name: {type:  'text', trim: true, required: true, maxLength: 200, unique: {scope: 'org_id'}},
     org_id: 'belongs_to',
-    heats: 'has-many',
-    date: {type: 'date', inclusion: {matches: /^\d{4}-[01]\d-[0-3]\d$/}},
-    errors: 'has-many',
+    heats: 'object',
+    date: {type: 'text', inclusion: {matches: /^\d{4}-[01]\d-[0-3]\d$/}},
+    errors: 'object',
     closed: {type: 'boolean', boolean: 'trueOnly'}
   });
 

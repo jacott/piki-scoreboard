@@ -13,10 +13,10 @@ define(function(require, exports, module) {
 
   model.defineFields({
     createdAt: 'timestamp',
-    model: 'modelName',
-    model_id: 'modelId',
-    parent: 'modelName',
-    parent_id: 'modelId',
+    model: 'text',
+    model_id: 'id',
+    parent: 'text',
+    parent_id: 'id',
     type: 'text',
     before: 'text',
     after: 'text',

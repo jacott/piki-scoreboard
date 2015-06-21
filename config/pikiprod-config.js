@@ -7,9 +7,13 @@ var urlRoot = 'https://'+KORU_HOSTNAME+'/';
 exports.server = function (cfg) {
   cfg.merge('requirejs', {
     config: {
+      "koru/config": {
+        DBDriver: "koru/pg/driver",
+      },
       "koru/mongo/driver": {
         url: "mongodb://localhost:"+MONGO_PORT+"/piki",
       },
+      "koru/pg/driver": {url: "host=/var/run/postgresql dbname=pikiprod"},
 
       "koru/web-server": {
         host: "127.0.0.1",

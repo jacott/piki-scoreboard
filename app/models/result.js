@@ -30,9 +30,9 @@ define(function(require, exports, module) {
     event_id: 'belongs_to',
     climber_id: 'belongs_to',
     category_id: 'belongs_to',
-    time: 'number',
-    scores: 'has-many',
-    problems: 'has-many',
+    time: 'integer',
+    scores: 'object',
+    problems: 'object',
   });
 
   model.registerObserveField('event_id');

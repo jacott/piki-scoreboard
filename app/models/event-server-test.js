@@ -51,7 +51,7 @@ define(function (require, exports, module) {
           org_id: 'string',
           date: 'string',
           closed: TH.match.any,
-          heats: 'object',
+          heats: 'baseObject',
         }, function () {
           event.authorize(v.user._id);
         });

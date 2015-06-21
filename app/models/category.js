@@ -18,8 +18,8 @@ define(function(require, exports, module) {
     gender: {type: 'text', inclusion: {allowBlank: true, matches: /^[mf]$/ }},
     type: {type: 'text', inclusion: {matches: /^[BL]$/}},
     heatFormat: {type: 'text', inclusion: {matches: model.HEAT_FORMAT_REGEX}},
-    minAge: {type: 'number', number: {integer: true, $gt: 0, $lt: 100}},
-    maxAge: {type: 'number', number: {integer: true, $gt: 0, $lt: 100}},
+    minAge: {type: 'integer', number: {integer: true, $gt: 0, $lt: 100}},
+    maxAge: {type: 'integer', number: {integer: true, $gt: 0, $lt: 100}},
   });
 
   require('koru/env!./category')(model);

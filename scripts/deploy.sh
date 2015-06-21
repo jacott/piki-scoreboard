@@ -19,15 +19,15 @@ mkdir -p $dest
 
 git archive --format=tar HEAD | (cd $dest && tar xf -)
 
-cd $app_dir
-
-if [ -e current ];then
-    rsync -a current/node_modules staging/
-fi
-
 cd $dest
 
-$NPM install
+if [ -e ../current -a "$(grep "NODE_PATH=" config/${branch}.cfg)" = "$(grep "NODE_PATH=" ../current/config/${branch}.cfg)" ];then
+    rsync -a ../current/node_modules ./
+    diff -q ../current/npm-shrinkwrap.json ./npm-shrinkwrap.json >/dev/null ||
+        $NPM install
+else
+    $NPM install
+fi
 
 $NODE scripts/bundle.js $branch
 
@@ -41,29 +41,25 @@ mv build/index.css app
 
 cd app
 
+echo -e "\nCompressing...\c"
+
 zopfli index.js index.css index.html
 
 
 cd ../..
 
+echo -e "\nTransferring...\c"
 
+rsync -a --info=progress2 --delete --exclude='node_modules/**' --compare-dest=../current staging/ ${KORU_DEST_SERVER}:${app_dir}/staging
 
+echo -e "\nInstalling..."
 
-# Stop old and decomission old
-if test -e current; then
-    current/scripts/stop.sh $branch
-    rm -rf previous
-    mv current previous
-fi
+ssh ${KORU_DEST_SERVER} ${app_dir}/staging/scripts/install_pkg.sh $branch
+
+echo "SUCCESS"
+
+cd $app_dir
+
+rm -rf current
+
 mv staging current
-
-mkdir current/tmp
-# Configure nginx
-sed <current/config/${branch}-nginx.conf -e "s/{{KORU_PORT}}/$KORU_PORT/g" -e "s/{{KORU_HOSTNAME}}/$KORU_HOSTNAME/g" >current/tmp/nginx.conf
-if test ! -e /etc/nginx/conf.d/$branch.conf || ! diff -q current/tmp/nginx.conf /etc/nginx/conf.d/$branch.conf;then
-    mv current/tmp/nginx.conf /etc/nginx/conf.d/$branch.conf
-    sudo /usr/sbin/service nginx reload
-fi
-
-# start new
-./current/scripts/start.sh $branch

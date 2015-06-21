@@ -7,10 +7,10 @@ top_dir=$PWD
 
 init ${1-$(basename $top_dir)}
 
-mkdir -p /u/backup/${branch}db.mongo/piki
-cd /u/backup/${branch}db.mongo/piki
-rm -f *
-mongodump -o .. -h 127.0.0.1:${MONGO_PORT} -d piki
+mkdir -p /u/backup/${branch}db.pg
+cd /u/backup/${branch}db.pg
+rm -rf pikiprod
+pg_dump --compress=0 --format=d --file=pikiprod pikiprod
 
 if [ ! -e .git ];then
     git init .

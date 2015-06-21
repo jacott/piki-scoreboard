@@ -7,9 +7,12 @@ exports.server = function (cfg) {
   cfg.merge('requirejs', {
     config: {
       "koru/config": {
-        DBDriver: "koru/mongo/driver",
+        DBDriver: "koru/pg/driver",
       },
       "koru/mongo/driver": {url: "mongodb://localhost:"+MONGO_PORT+"/pikidemo"},
+      "koru/pg/driver": {
+        url: "host=/var/run/postgresql dbname=pikidemo",
+      },
 
       "koru/web-server": {
         host: "0.0.0.0",

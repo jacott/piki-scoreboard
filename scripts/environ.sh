@@ -8,6 +8,7 @@ function abort {
 
 test -e .koru || abort "First change to the toplevel directory to run this command: ($0)"
 
+export TZ=UTC
 export KORU_HOME=$PWD
 
 tmpdir=$KORU_HOME/tmp
@@ -31,4 +32,6 @@ function init {
         echo "no log dir: $LOG_DIR"
         exit 1
     fi
+
+    export PATH=${NODE_PATH}:/bin:/usr/bin:/sbin:/usr/sbin
 }

@@ -15,7 +15,8 @@
   "dependencies": {
     "koru": "git+ssh://git@dev.obeya.co:/home/git/koru.git",
     "mongodb": "1.4.31",
-    "csv": "0.3.7"
+    "pg-libpq": ">=1.0.0",
+    "csv-parse": ">=0.1.3"
   },
   "engines": {
     "node": ">=0.12"

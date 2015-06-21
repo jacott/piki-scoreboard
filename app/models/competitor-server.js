@@ -13,6 +13,7 @@ define(function(require, exports, module) {
     };
 
     var NEW_FIELD_SPEC = {
+      _id: 'string',
       event_id: 'string',
       climber_id: 'string',
     };

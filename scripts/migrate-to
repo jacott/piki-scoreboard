@@ -1,0 +1,9 @@
+#!/bin/bash
+. `dirname $0`/environ.sh
+
+init "$1"
+
+migratedir="`pwd`/db/migration"
+
+cd app
+exec $NODE ../node_modules/koru/lib/migrate.js "$1" "$migratedir" "$2"

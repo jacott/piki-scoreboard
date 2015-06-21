@@ -1,5 +1,5 @@
 var Future = requirejs.nodeRequire('fibers/future');
-var CSV = require('csv');
+var parse = require('csv-parse');
 
 define(function(require, exports, module) {
   var session = require('koru/session');
@@ -32,13 +32,13 @@ define(function(require, exports, module) {
 
     var future = new Future();
 
-    CSV()
-      .from.string(
-        new Buffer(data), {columns: true})
-      .to.array( function(rows){
-        data = rows;
-        future.return();
-      }, {columns: ['Fee level', 'First Name', 'Last Name', 'Birth Date', 'Participant ID']});
+    parse(new Buffer(data).toString(), {
+      columns: function () {return ['Fee level', 'First Name', 'Last Name', 'Birth Date', 'Participant ID']}
+    }, function(err, rows){
+      if (err) return future.throw(err);
+      data = rows;
+      future.return();
+    });
 
     future.wait();
 
@@ -46,7 +46,7 @@ define(function(require, exports, module) {
     var row;
     var climbers = {};
 
-    if (data.length === 1)
+    if (data.length === 0)
       throw new koru.Error(415, 'unsupported_import_format');
 
     for(var i = 0; i < data.length; ++i) {
