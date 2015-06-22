@@ -12,7 +12,7 @@ define(function(require, exports, module) {
   });
 
   model.defineFields({
-    createdAt: 'timestamp',
+    createdAt: 'auto_timestamp',
     model: 'text',
     model_id: 'id',
     parent: 'text',

@@ -14,7 +14,7 @@ define(function(require, exports, module) {
     event_id: 'belongs_to',
     climber_id: 'belongs_to',
     category_ids: 'has_many',
-    createdAt: 'timestamp',
+    createdAt: 'auto_timestamp',
   });
 
   model.registerObserveField('event_id');
