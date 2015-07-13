@@ -41,9 +41,7 @@
     <section id="Show">
       <div>
         <h1>{{name}} - Category {{listType}}</h1>
-        <table class="categories">
-          {{each "categories" template="Event.CatList"}}
-        </table>
+        {{eachCategory}}
 
         {{>Action ""}}
         <template name="Action">
@@ -55,7 +53,7 @@
     </section>
   </template>
   <template name="CatList">
-    <tr class="{{type}}">
+    <tr id="{{catID}}" class="{{type}}">
       <td><span class="select"></span></td>
       <td>{{pageLink value=name template="Event.Category" append=_id search=listType}}</td>
       {{heats}}

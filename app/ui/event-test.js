@@ -8,6 +8,7 @@ isClient && define(function (require, exports, module) {
   var Result = require('models/result');
   var Event = require('models/event');
   require('./event-category');
+  require('./event-register');
 
   TH.testCase(module, {
     setUp: function () {
@@ -156,11 +157,17 @@ isClient && define(function (require, exports, module) {
       },
 
       "test add category": function () {
-        var comp = TH.Factory.buildCompetitor({category_ids: [v.cats[2]._id]});
+        v.cats[2].$update('heatFormat', 'QQQF3F4');
+        var comp = TH.Factory.buildCompetitor({event_id: v.event._id, category_ids: [v.cats[2]._id]});
         assert.dom('.categories', function () {
           refute.dom('button', 'Youth A 2');
           comp.$$save();
-          assert.dom('tr.L button', 'Youth A 2');
+        });
+        assert.dom('.categories', function () {
+          assert.dom('td[colspan="8"]', {count: 2});
+          assert.dom('[colspan="8"]', 'Qualifier 1; Qualifier 2; Final (8 competitors)');
+          assert.dom('[colspan="8"]', 'Qualifier 1; Qualifier 2; Qualifier 3; Semi-final (3 competitors); Final (4 competitors)');
+          assert.dom('.categories tr.L button', 'Youth A 2');
         });
       },
 
@@ -175,7 +182,9 @@ isClient && define(function (require, exports, module) {
       "test registration link": function () {
         TH.click('[name=register]');
 
-        assert.dom('#Event #Register');
+        assert.dom('body', function () {
+          assert.dom('#Event #Register');
+        });
       },
 
       "Edit": {

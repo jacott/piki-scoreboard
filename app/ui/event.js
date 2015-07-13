@@ -181,6 +181,10 @@ define(function(require, exports, module) {
   });
 
   Tpl.CatList.$helpers({
+    catID: function () {
+      return "cat_"+this._id;
+    },
+
     heats: function () {
       var cat = this;
       var frag = document.createDocumentFragment();
@@ -226,29 +230,57 @@ define(function(require, exports, module) {
     return "type=" + (Tpl.Show.results ? "results" : "startlists");
   }
 
+  var FORMAT_ROW = Dom.html({tag: 'tr', content: [{tag: 'td', colspan: 8}]});
+
+  function buildTable(table) {
+    var cats = Category.docs;
+    var lastType;
+    Dom.removeChildren(table);
+    Object.keys(Result.eventCatIndex({event_id: Tpl.event._id})||{})
+      .map(function (cat_id) {
+        return cats[cat_id];
+      }).sort(compareCategories)
+      .forEach(function (doc) {
+        if (! doc) return;
+        var thisType = Tpl.event.heatTypes(doc._id);
+        if (lastType !== thisType) {
+          lastType = thisType;
+          var fr = FORMAT_ROW.cloneNode(true);
+          fr.firstChild.textContent = Event.describeFormat(thisType);
+          table.appendChild(fr);
+        }
+        table.appendChild(Tpl.CatList.$autoRender(doc));
+      });
+  }
 
   Tpl.Show.$helpers({
     listType: function () {
       return Tpl.Show.results ? "results" : "start lists";
     },
 
-    categories: function (callback) {
-      var cats = Category.docs;
-      var eventCats = Object.keys(Result.eventCatIndex({event_id: Tpl.event._id})||{})
-            .map(function (cat_id) {
-              return cats[cat_id];
-            }).sort(compareCategories)
-            .forEach(function (doc) {doc && callback(doc)});
+    eachCategory: function () {
+      if ($.element.tagName === 'TABLE') {
+        buildTable($.element);
+        return;
+      }
+
+      var table = document.createElement('table');
+      Dom.addClass(table, 'categories');
+
+
+      buildTable(table);
 
       $.ctx.onDestroy(Result.onChange(function (doc, was) {
-        if (doc && was) return;
-        (doc || was) && callback(doc && cats[doc.category_id], was && cats[was.category_id], compareCategories);
+        if (doc && was) return; // already showing this row
+        buildTable(table);
       }));
 
       $.ctx.onDestroy(Tpl.scoreCounts.onChange(function (cat_id) {
-        var doc = Category.findById(cat_id);
-        doc && callback(doc, doc, util.compareByName);
+        var elm = document.getElementById('cat_'+cat_id);
+        elm && Dom.getMyCtx(elm).updateAllTags();
       }));
+
+      return table;
     },
   });
 

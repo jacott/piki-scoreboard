@@ -32,6 +32,37 @@ define(function (require, exports, module) {
       assert.validators(validators.closed, {boolean: ['trueOnly']});
     },
 
+    "test describeFormat": function () {
+      // All types of rounds included
+      assert.same(Event.describeFormat('LQQF201F101F90F26F8'), 'Qualifier 1; Qualifier 2; Round of 201 competitors; '+
+                  'Round of 101 competitors; Quarter-final (90 competitors); Semi-final (26 competitors); Final (8 competitors)');
+      assert.same(Event.describeFormat('BQ:18F100:6F30:6F20:4F6:4'), 'Qualifier 1 (18 problems); '+
+                  'Round of 100 competitors (6 problems); Quarter-final (30 competitors; 6 problems); '+
+                  'Semi-final (20 competitors; 4 problems); Final (6 competitors; 4 problems)');
+
+      // No qualification rounds
+      assert.same(Event.describeFormat('LF201F101F90F26F8'), 'Round of 201 competitors; Round of 101 competitors; '+
+                  'Quarter-final (90 competitors); Semi-final (26 competitors); Final (8 competitors)');
+      assert.same(Event.describeFormat('BF100:6F30:6F20:4F6:4'), 'Round of 100 competitors (6 problems); '+
+                  'Quarter-final (30 competitors; 6 problems); Semi-final (20 competitors; 4 problems); '+
+                  'Final (6 competitors; 4 problems)');
+
+      // No final rounds
+      assert.same(Event.describeFormat('LQQ'), 'Qualifier 1; Qualifier 2');
+      assert.same(Event.describeFormat('BQ:18'), 'Qualifier 1 (18 problems)');
+
+      // IFSC usual format
+      assert.same(Event.describeFormat('LQQF26F8'), 'Qualifier 1; Qualifier 2; Semi-final (26 competitors); '+
+                  'Final (8 competitors)');
+      assert.same(Event.describeFormat('BQ:5F20:4F6:4'), 'Qualifier 1 (5 problems); '+
+                  'Semi-final (20 competitors; 4 problems); Final (6 competitors; 4 problems)');
+
+      // CNZ usual format
+      assert.same(Event.describeFormat('LQQF8'), 'Qualifier 1; Qualifier 2; Final (8 competitors)');
+      assert.same(Event.describeFormat('BQ:8F6:3'), 'Qualifier 1 (8 problems); Final (6 competitors; 3 problems)');
+
+    },
+
     "heat validation": {
       setUp: function () {
         v.oOrg = TH.Factory.createOrg();
