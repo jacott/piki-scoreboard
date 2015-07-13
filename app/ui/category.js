@@ -30,9 +30,11 @@ define(function(require, exports, module) {
     },
   });
 
+  var typeNameComparitor = util.compareBy(['type', 'heatFormat', 'name']);
+
   Index.$helpers({
     categories: function (callback) {
-      callback.render({model: Category, sort: util.compareByName});
+      callback.render({model: Category, sort: typeNameComparitor});
     },
   });
 
