@@ -165,8 +165,8 @@ isClient && define(function (require, exports, module) {
         });
         assert.dom('.categories', function () {
           assert.dom('td[colspan="8"]', {count: 2});
-          assert.dom('[colspan="8"]', 'Qualifier 1; Qualifier 2; Final (8 competitors)');
-          assert.dom('[colspan="8"]', 'Qualifier 1; Qualifier 2; Qualifier 3; Semi-final (3 competitors); Final (4 competitors)');
+          assert.dom('[colspan="8"]', 'Format: Qualifier 1; Qualifier 2; Final (8 competitors)');
+          assert.dom('[colspan="8"]', 'Format: Qualifier 1; Qualifier 2; Qualifier 3; Semi-final (3 competitors); Final (4 competitors)');
           assert.dom('.categories tr.L button', 'Youth A 2');
         });
       },
@@ -194,7 +194,13 @@ isClient && define(function (require, exports, module) {
 
         "test changing format": function () {
           assert.dom('.categories input[name=changeFormat]', {value: "QQF8"}, function () {
+            assert.dom(this.parentNode, function () {
+              assert.dom('.desc', "Qualifier 1; Qualifier 2; Final (8 competitors)");
+            });
             TH.change(this, 'QQF8F2');
+            assert.dom(this.parentNode, function () {
+              assert.dom('.desc', "Qualifier 1; Qualifier 2; Semi-final (8 competitors); Final (2 competitors)");
+            });
           });
 
           assert.equals(v.event.$reload().heats[v.cats[0]._id], 'LQQF8F2');

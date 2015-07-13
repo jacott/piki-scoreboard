@@ -157,11 +157,24 @@ define(function(require, exports, module) {
   Tpl.Edit.$helpers({
     categories: function (callback) {
       var cats = Category.docs;
-      var eventCats = Object.keys(Result.eventCatIndex({event_id: Tpl.event._id})||{})
-            .map(function (cat_id) {
-              return cats[cat_id];
-            }).sort(compareCategories)
+      var eventCats = catList()
             .forEach(function (doc) {doc && callback(doc)});
+
+      function catList() {
+        return Object.keys(Result.eventCatIndex({event_id: Tpl.event._id})||{})
+          .map(function (cat_id) {
+              return cats[cat_id];
+            }).sort(compareCategories);
+      }
+
+      $.ctx.onDestroy(Event.onChange(function (doc, was) {
+        doc = doc || was;
+        if (doc._id !== Tpl.event._id) return;
+        catList().forEach(function (doc) {
+          callback(doc, doc, compareCategories);
+        });
+      }));
+
 
       $.ctx.onDestroy(Result.onChange(function (doc, was) {
         if (doc && was) return;
@@ -177,7 +190,18 @@ define(function(require, exports, module) {
   });
 
   Tpl.Edit.Cat.$helpers({
-    eventFormat: eventFormat,
+    eventFormat: function () {
+    var event = $.ctx.parentCtx.data;
+    var format = event.heats[this._id];
+    if (format)
+      return format.slice(1);
+    else
+      return this.heatFormat; // not yet copied to event
+    } ,
+    describeFormat: function () {
+      var event = $.ctx.parentCtx.data;
+      return Event.describeFormat(event.heats[this._id] || this.type+this.heatFormat);
+    }
   });
 
   Tpl.CatList.$helpers({
@@ -230,11 +254,11 @@ define(function(require, exports, module) {
     return "type=" + (Tpl.Show.results ? "results" : "startlists");
   }
 
-  var FORMAT_ROW = Dom.html({tag: 'tr', content: [{tag: 'td', colspan: 8}]});
+  var FORMAT_ROW = Dom.html({tag: 'tr', class: 'fmt', content: [{tag: 'td', colspan: 8}]});
 
   function buildTable(table) {
     var cats = Category.docs;
-    var lastType;
+    var lastType, lastStyle;
     Dom.removeChildren(table);
     Object.keys(Result.eventCatIndex({event_id: Tpl.event._id})||{})
       .map(function (cat_id) {
@@ -246,7 +270,11 @@ define(function(require, exports, module) {
         if (lastType !== thisType) {
           lastType = thisType;
           var fr = FORMAT_ROW.cloneNode(true);
-          fr.firstChild.textContent = Event.describeFormat(thisType);
+          if (lastStyle !== thisType[0]) {
+            lastStyle = thisType[0];
+            Dom.addClass(fr, lastStyle);
+          }
+          fr.firstChild.textContent = "Format: " + Event.describeFormat(thisType);
           table.appendChild(fr);
         }
         table.appendChild(Tpl.CatList.$autoRender(doc));
@@ -391,15 +419,6 @@ define(function(require, exports, module) {
   function cancel(event) {
     Dom.stopEvent();
     Route.history.back();
-  }
-
-  function eventFormat() {
-    var event = $.ctx.parentCtx.data;
-    var format = event.heats[this._id];
-    if (format)
-      return format.slice(1);
-    else
-      return this.heatFormat; // not yet copied to event
   }
 
   function observeScores() {

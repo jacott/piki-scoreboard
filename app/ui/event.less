@@ -44,16 +44,27 @@
       &:not(:last-child) {
         border-bottom: 1px solid fade(#000, 10%);
       }
-      .select {
-        display: inline-block;
-        width: 1.2em;
-        height: 1.2em;
-        cursor: pointer;
-        border: 1px solid fade(#000, 20%);
-        .icon(@icon-tick);
-        &:before {
-          visibility: hidden;
+      &.fmt {
+        >td {
+          padding-top: 20px;
+          padding-bottom: 8px;
         }
+        &.L>td:before {
+          content: "Lead ";
+        }
+        &.B>td:before {
+          content: "Bouldering ";
+        }
+        &.L, &.B {
+          >td:before {
+            display: block;
+            font-size: 1.2em;
+            font-weight: bold;
+          }
+        }
+        color: #000;
+        font-size: 1.1em;
+        border-bottom: none;
       }
       &.selected {
         background-color: #aff;
@@ -64,6 +75,20 @@
       }
       &.B+.L {
         border-top: 1em solid fade(#fff, 0%);
+      }
+      button {
+        text-align: left;
+      }
+      .select {
+        display: inline-block;
+        width: 1.2em;
+        height: 1.2em;
+        cursor: pointer;
+        border: 1px solid fade(#000, 20%);
+        .icon(@icon-tick);
+        &:before {
+          visibility: hidden;
+        }
       }
     }
   }
@@ -99,6 +124,13 @@
       display: inline-block;
       width: 15em;
       margin-right: 10px;
+    }
+    input {
+      width: 8em;
+    }
+    .desc {
+      margin-left: 10px;
+      display: inline-block;
     }
   }
 }
