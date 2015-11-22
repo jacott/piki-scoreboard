@@ -50,7 +50,7 @@ isClient && define(function (require, exports, module) {
 
     "test rendering": function () {
       var events = TH.Factory.createList(2, 'createEvent', function (index, options) {
-        options.date = "2014/01/0"+(8-index);
+        options.date = "2014/01/0"+(6+index);
       });
 
       Route.gotoPage(sut.Index);

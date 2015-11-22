@@ -69,7 +69,7 @@ define(function(require, exports, module) {
   });
 
   function sortByDate(a, b) {
-    return a.date === b.date ? 0 : a.date < b.date ? -1 : 1;
+    return a.date === b.date ? 0 : a.date < b.date ? 1 : -1;
   }
 
   Index.$events({
