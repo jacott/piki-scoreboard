@@ -1,6 +1,5 @@
 var KORU_HOSTNAME = process.env['KORU_HOSTNAME'];
 var KORU_PORT = process.env['KORU_PORT'];
-var MONGO_PORT = process.env['MONGO_PORT'];
 
 var urlRoot = 'https://'+KORU_HOSTNAME+'/';
 

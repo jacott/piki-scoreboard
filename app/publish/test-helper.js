@@ -41,9 +41,9 @@ define(function(require, exports, module) {
       return funcs;
     },
 
-    mockConnection: function () {
+    mockConnection: function (sessId, session) {
       var test = geddon.test;
-      var conn = new (serverConnection())({send: test.stub(), on: test.stub()}, 's123', test.stub());
+      var conn = new (serverConnection(session || this.mockSession()))({send: test.stub(), on: test.stub()}, sessId || 's123', test.stub());
       conn.userId = koru.userId();
       conn.sendBinary = test.stub();
       conn.added = test.stub();
@@ -52,12 +52,17 @@ define(function(require, exports, module) {
       return conn;
     },
 
+    mockSession: function () {
+      return {globalDict: message.newGlobalDict()};
+    },
+
     mockSubscribe: function (v, id, name) {
+      if (! v.session) v.session = this.mockSession();
       if (! v.conn) {
-        v.conn = this.mockConnection();
+        v.conn = this.mockConnection(null, v.session);
         v.send = v.conn.ws.send;
       }
-      session._onMessage(v.conn, message.encodeMessage('P', [id, name, util.slice(arguments, 3)]));
+      session._onMessage(v.conn, message.encodeMessage('P', [id, name, util.slice(arguments, 3)], v.session.globalDict));
 
       return v.conn._subs[id];
     },

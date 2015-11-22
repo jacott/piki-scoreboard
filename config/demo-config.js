@@ -1,5 +1,4 @@
 var KORU_PORT = process.env['KORU_PORT'];
-var MONGO_PORT = process.env['MONGO_PORT'];
 
 var urlRoot = 'http://localhost:'+KORU_PORT+'/';
 

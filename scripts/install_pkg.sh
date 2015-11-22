@@ -37,5 +37,9 @@ if test ! -e /etc/nginx/conf.d/$branch.conf || ! diff -q current/tmp/nginx.conf 
     sudo /usr/sbin/service nginx reload
 fi
 
+if [ -x ./current/backup-${branch} ];then
+    ./current/backup-${branch}
+fi
+
 # start new
 ./current/scripts/start.sh $branch

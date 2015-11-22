@@ -49,14 +49,16 @@ isClient && define(function (require, exports, module) {
         assert.dom('fieldset', function () {
           assert.dom('label .name', {text: 'Name', parent: function () {
             TH.input('[name=name]', {value: ''}, 'bo');
-            assert.dom('ul>li', 'Bob');
-            assert.dom('ul>li', 'bobby');
+            assert.dom(Dom('body>.complete'), function () {
+              assert.dom('li', 'Bob');
+              assert.dom('li', 'bobby');
+            });
             TH.input('[name=name]', '');
-            refute.dom('ul');
+            refute(Dom('body>.complete'));
             TH.input('[name=name]', 'b');
-            TH.trigger('li', 'mousedown');
+            TH.trigger(Dom('body>ul>li'), 'mousedown');
             TH.input('[name=name]', 'bre');
-            TH.trigger('li', 'mousedown');
+            TH.trigger(Dom('body>ul>li'), 'mousedown');
           }});
         });
         assert.dom('.Groups', function () {
@@ -119,10 +121,10 @@ isClient && define(function (require, exports, module) {
       assert.dom('#Register', function () {
         assert.dom('label .name', {parent: function () {
           TH.input('[name=name]', 'John Smith');
-          assert.dom('ul>li', 'Add "John Smith"', function () {
-            TH.trigger(this, 'mousedown');
-          });
         }});
+      });
+      assert.dom('body>ul>li', 'Add "John Smith"', function () {
+        TH.trigger(this, 'mousedown');
       });
 
       assert.dom('.Dialog #AddClimber', function () {
@@ -143,8 +145,8 @@ isClient && define(function (require, exports, module) {
 
       assert.dom('#Event #Register', function () {
         TH.input('[name=name]', v.climbers[1].name);
-        assert.dom('ul>li', {count: 1, text: 'Already registered'});
       });
+      assert.dom('body>ul>li', {count: 1, text: 'Already registered'});
     },
 
     "test cancel add": function () {
@@ -152,7 +154,7 @@ isClient && define(function (require, exports, module) {
 
       assert.dom('#Event #Register', function () {
         TH.input('[name=name]', v.climbers[1].name);
-        TH.click('ul>li');
+        TH.click(Dom('body>ul>li'));
 
         test.stub(Route, 'replacePath');
 
