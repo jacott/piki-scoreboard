@@ -5,7 +5,7 @@ define(function(require, exports, module) {
   var webServer = require('koru/web-server');
   var session = require('koru/session');
 
-  koru.onunload('reload');
+  koru.onunload(module, 'reload');
 
   return function () {
     bootstrap();

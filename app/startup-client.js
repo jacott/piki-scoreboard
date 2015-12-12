@@ -21,7 +21,7 @@ define(function(require, exports, module) {
     _extras = extras || _extras;
     if (_extras) {
       _extras.forEach(function (extra) {
-        koru.onunload(extra, restart);
+        koru.onunload(module.get(extra), restart);
       });
     }
     userAccount.init();
