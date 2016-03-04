@@ -19,7 +19,7 @@ exports.server = function (cfg) {
 
       "koru/main": {
         "urlRoot": urlRoot,
-        indexjs: __dirname+"/../build/index.js",
+//        indexjs: __dirname+"/../build/index.js",
         "userAccount" : {
           emailConfig: {
             from: 'piki-demo@obeya.co',

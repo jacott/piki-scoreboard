@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+. `dirname $0`/environ.sh
+
+top_dir=$PWD
+
+init ${1-$(basename $top_dir)}
+
+version=`git describe --tag --always`
+
+echo $branch $version $PWD
+
+$NODE scripts/bundle.js $branch

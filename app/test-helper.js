@@ -29,10 +29,7 @@ define(function(require, exports, module) {
         if ('docs' in model) {
           if (isClient) {
             model.docs = {};
-            var indexes = model._indexUpdate.indexes;
-            for(var id in indexes) {
-              indexes[id].reload();
-            }
+            model._indexUpdate.reloadAll();
           } else {
             txSave || model.docs.truncate();
             model._$wm.clear();
@@ -51,7 +48,7 @@ define(function(require, exports, module) {
 
     noInfo: function () {
       if (! koru.info.restore)
-        geddon.test.stub(koru, 'info');
+        geddon.test.intercept(koru, 'info');
     },
 
     mockRpc: function (v, sessId) {
@@ -63,10 +60,10 @@ define(function(require, exports, module) {
         if (v && v.conn)
           conn = v.conn;
         else {
-          conn = new (require(id)({}))(ws, sessId, geddon.test.stub());
+          conn = new (require(id)({globalDict: session.globalDict}))(ws, sessId, function () {});
           if (v) v.conn = conn;
         }
-        return geddon.test.stub(session, 'rpc', function (method /*, args */) {
+        return geddon.test.intercept(session, 'rpc', function (method /*, args */) {
           conn.userId = koru.userId();
           try {
             var prevUserId = util.thread.userId;
@@ -82,7 +79,7 @@ define(function(require, exports, module) {
           }
         });
       } else {
-        return geddon.test.stub(session, 'rpc', function (method /*, args */) {
+        return geddon.test.intercept(session, 'rpc', function (method /*, args */) {
           return session._rpcs[method].apply(util.thread, util.slice(arguments, 1));
         });
       }
@@ -101,15 +98,12 @@ define(function(require, exports, module) {
         koru.userId.restore && koru.userId.restore();
 
         if (newUser) {
-          test.stub(koru, 'userId', function () {return user._id});
-          test.stub(self, 'user',function () {return user});
-          var restore = self.user.restore;
-          self.user.restore = function () {
-            restore.call(self.user);
+          test.intercept(koru, 'userId', function () {return user._id});
+          test.intercept(self, 'user', function () {return user}, function () {
             user = null;
             util.thread.userId = null;
             koru.userId.restore && koru.userId.restore();
-          };
+          });
 
           user = newUser._id ? newUser : Model.User.findById(newUser);
           util.thread.userId = user && user._id;
@@ -171,7 +165,7 @@ define(function(require, exports, module) {
   if (isClient) {
     TH.MockFileReader = function (v) {
       function MockFileReader() {
-        v.fileReaderargs = arguments;
+        v.fileReaderargs = util.slice(arguments);
         v.fileReader = this;
       };
 
@@ -239,11 +233,11 @@ define(function(require, exports, module) {
 
   if (isServer) {
     geddon.onTestStart(function () {
-      txSave && User.docs._client.query('BEGIN');
+      txSave && User.db.query('BEGIN');
     });
 
     geddon.onTestEnd(function () {
-      txSave && User.docs._client.query('ROLLBACK');
+      txSave && User.db.query('ROLLBACK');
     });
 
   }

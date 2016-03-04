@@ -15,7 +15,6 @@ if test -e npm-shrinkwrap.json;then
     fi
 fi
 
-# fuser -s "$MONGO_DIR/mongod.lock" || ./scripts/startdb.sh $branch
 cd app
 echo -e "starting ${branch}...\c"
 exec ${NODEDEBUG-node} ../node_modules/koru/lib/koru.js "$@"
