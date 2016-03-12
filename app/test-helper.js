@@ -32,7 +32,7 @@ define(function(require, exports, module) {
             model._indexUpdate.reloadAll();
           } else {
             txSave || model.docs.truncate();
-            model._$wm.clear();
+            model._$docCacheClear();
           }
         }
       };
