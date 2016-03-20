@@ -36,7 +36,7 @@ define(function(require, exports, module) {
       if (doc) {
         if (was) {
           if (was.hasOwnProperty('org_id') || was.hasOwnProperty('group')) {
-            groupRemove(doc.$asBefore(was));
+            groupRemove(doc.$withChanges(was));
           }
         }
         getGroup(doc.org_id, doc.group)[doc._id] = true;

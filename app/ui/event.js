@@ -438,7 +438,7 @@ define(function(require, exports, module) {
       var res = doc || was;
       if (res.event_id !== Tpl.event._id) return;
 
-      var oldScores = (was && (doc ? doc.$asBefore(was) : was).scores) || [];
+      var oldScores = (was && (doc ? doc.$withChanges(was) : was).scores) || [];
       var newScores = (doc && doc.scores) || [];
 
       var len = Math.max(oldScores.length, newScores.length);
