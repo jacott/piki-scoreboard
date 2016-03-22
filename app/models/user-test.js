@@ -69,7 +69,7 @@ define(function (require, exports, module) {
       });
 
       assert.calledOnceWith(ca, 'x');
-      assert.same(ca.thisValues[0]._id, user._id);
+      assert.same(ca.firstCall.thisValue._id, user._id);
 
        assert.accessDenied(function () {
         User.fetchAdminister('123');

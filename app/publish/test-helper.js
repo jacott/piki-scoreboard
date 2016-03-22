@@ -36,7 +36,7 @@ define(function(require, exports, module) {
       for (var key in matchers) {
         var match = matchers[key];
         assert.calledOnce(match);
-        funcs[key] = match.args[0][1];
+        funcs[key] = match.args(0, 1);
       }
       return funcs;
     },

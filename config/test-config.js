@@ -35,7 +35,6 @@ exports.server = function (cfg) {
     'koru/css/less-watcher', 'koru/server-rc',
   ]);
 
-  cfg.merge("requirejs.paths", {sinon: "koru/test/sinon"});
   cfg.merge("requirejs.packages", ["koru/test"]);
 
   cfg.set('startup', 'test/server');

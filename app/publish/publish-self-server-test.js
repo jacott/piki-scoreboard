@@ -62,10 +62,10 @@ define(function (require, exports, module) {
 
       // *** test stopping ***
       assert.calledWith(User.observeId, user._id);
-      var uStop = test.spy(User.observeId.returnValues[0], 'stop');
+      var uStop = test.spy(User.observeId.firstCall.returnValue, 'stop');
 
       assert.calledOnce(Org.onChange);
-      var oStop = test.spy(Org.onChange.returnValues[0], 'stop');
+      var oStop = test.spy(Org.onChange.firstCall.returnValue, 'stop');
 
       sub.stop();
 

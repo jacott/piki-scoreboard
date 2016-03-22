@@ -6,6 +6,7 @@ define(function(require, exports, module) {
   var Val = require('koru/model/validation');
   var session = require('koru/session');
   var User = require('models/user');
+  var stubber = require('koru/test/stubber');
 
   var geddon = TH.geddon;
 
@@ -280,7 +281,7 @@ define(function(require, exports, module) {
         func = newSpec;
         newSpec = null;
       }
-      var spy = geddon.sinon.spy(Val,'assertDocChanges');
+      var spy = stubber.spy(Val,'assertDocChanges');
 
       try {
         func.call();
@@ -304,13 +305,16 @@ define(function(require, exports, module) {
     assert: function (model /*, arguments */) {
       var enIdx = model.addUniqueIndex,
           count = enIdx.callCount,
-          tv = enIdx.thisValues,
-          expected = util.slice(arguments, 1),
+          tvLength = enIdx.callCount,
+          expected = new Array(arguments.length - 1),
           result = false;
 
-      for(var i=0;i < tv.length;++i) {
-        if (tv[i] === model) {
-          var call = enIdx.getCall(i);
+      for(var i = expected.length; i > 0; --i)
+        expected[i-1] = arguments[i];
+
+      for(var i=0;i < tvLength;++i) {
+        var call = enIdx.getCall(i);
+        if (call.thisValue === model) {
           if (call.calledWith.apply(call,expected)) {
             result = true;
             break;

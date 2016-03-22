@@ -10,7 +10,7 @@
     "koru": {
       "version": "0.2.0",
       "from": "git+ssh://git@dev.obeya.co:/home/git/koru.git",
-      "resolved": "git+ssh://git@dev.obeya.co:/home/git/koru.git#0f6d1e5ef183013e6b87733b81432366f24079e0",
+      "resolved": "git+ssh://git@dev.obeya.co:/home/git/koru.git#d36f4fa9855ba63f97c0b67c1da773c1b793042e",
       "dependencies": {
         "autoprefixer": {
           "version": "6.3.3",

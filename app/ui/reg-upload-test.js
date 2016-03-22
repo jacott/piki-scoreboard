@@ -75,7 +75,7 @@ isClient && define(function (require, exports, module) {
     var uploadStub = test.stub(RegUpload, 'upload');
 
     TH.trigger('#RegUpload input[name=filename]', 'change');
-    var callback = uploadStub.args[0][2];
+    var callback = uploadStub.args(0, 2);
     callback(error, result);
     return callback;
   }

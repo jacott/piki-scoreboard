@@ -26,7 +26,7 @@ define(function (require, exports, module) {
 
       assert.calledOnce(matchUser);
 
-      var m = matchUser.args[0][1];
+      var m = matchUser.args(0, 1);
 
       assert.isTrue(m({org_id: org._id}));
       assert.isFalse(m({org_id: 'x'+org._id}));

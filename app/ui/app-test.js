@@ -72,12 +72,12 @@ isClient && define(function (require, exports, module) {
 
       refute.called(window.addEventListener);
 
-      var sub = v.subSelf.args[0][1];
+      var sub = v.subSelf.args(0, 1);
 
       sub.callback();
 
       assert.calledOnceWith(window.addEventListener, 'popstate');
-      window.addEventListener.getCall(0).yield();
+      window.addEventListener.args(0, 1)();
 
       assert.calledWithExactly(Route.pageChanged);
     },
@@ -95,14 +95,14 @@ isClient && define(function (require, exports, module) {
 
       assert.called(v.subSelf);
       refute.called(v.subOrg);
-      v.subSelf.args[0][1].callback();
+      v.subSelf.args(0, 1).callback();
 
       assert.called(v.subOrg);
 
       // simulate org added by subscribe
       v.org = TH.Factory.createOrg({shortName: 'FOO'});
       Dom.getCtxById('Header').updateAllTags();
-      v.subOrg.args[0][1].callback();
+      v.subOrg.args(0, 1).callback();
 
       assert.same(App.orgId, v.org._id);
       assert.equals(App.org().attributes, v.org.attributes);
@@ -110,7 +110,7 @@ isClient && define(function (require, exports, module) {
       assert.dom('#OrgHomeLink', v.org.name);
       assert.className(document.body, 'inOrg');
 
-      v.stopStub = test.stub(v.subOrg.args[0][1], 'stop');
+      v.stopStub = test.stub(v.subOrg.args(0, 1), 'stop');
 
       Route.root.onBaseEntry(null, {});
 

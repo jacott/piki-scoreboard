@@ -26,8 +26,8 @@ define(function (require, exports, module) {
       assert.calledOnce(matchUser);
       assert.calledOnce(matchOrg);
 
-      var mu = matchUser.args[0][1];
-      var mo = matchOrg.args[0][1];
+      var mu = matchUser.args(0, 1);
+      var mo = matchOrg.args(0, 1);
 
       v.sub.userId = 'ufoo';
 
