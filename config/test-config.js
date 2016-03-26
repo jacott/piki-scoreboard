@@ -43,4 +43,5 @@ exports.server = function (cfg) {
 
 exports.client = function (cfg) {
   cfg.set('requirejs.config.koru/main.urlRoot', urlRoot);
+  cfg.merge('requirejs.packages', ["koru/test"]);
 };
