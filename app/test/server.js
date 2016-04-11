@@ -1,13 +1,12 @@
-var path = require('path');
+const path = require('path');
 
 define(function(require, exports, module) {
-  var koru = require('koru/main-server');
-  var util = require('koru/util');
-  var fileWatch = require('koru/file-watch');
-  var test = require('koru/test');
-  var Model = require('koru/model');
-  var webServer = require('koru/web-server');
-  var stubber = require('koru/test/stubber');
+  const koru      = require('koru');
+  const fileWatch = require('koru/file-watch');
+  const Model     = require('koru/model');
+  const test      = require('koru/test/server');
+  const stubber   = require('koru/test/stubber');
+  const webServer = require('koru/web-server');
 
   require('koru/server');
   require('koru/server-rc');

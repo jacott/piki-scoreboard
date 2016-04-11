@@ -1,8 +1,10 @@
 define(function(require, exports, module) {
-  var session = require('koru/session');
-  var userAccount = require('koru/user-account');
-  var client = require('koru/client');
-  var App = require('ui/app');
+  const koru = require('koru');
+  const session = require('koru/session');
+  const userAccount = require('koru/user-account');
+  const client = require('koru/client');
+  const App = require('ui/app');
+  require('koru/ui/helpers');
   require('ui/profile');
   require('ui/club');
   require('ui/climber');
@@ -11,7 +13,6 @@ define(function(require, exports, module) {
   require('ui/event-register');
   require('ui/reg-upload');
   require('ui/reset-password');
-  var koru = require('koru');
 
   koru.onunload(module, restart);
 

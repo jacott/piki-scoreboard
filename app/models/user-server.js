@@ -1,11 +1,11 @@
 define(function(require, exports, module) {
-  var util = require('koru/util');
-  var Val = require('koru/model/validation');
-  var UserAccount = require('koru/user-account');
-  var session = require('koru/session');
+  const Val         = require('koru/model/validation');
+  const session     = require('koru/session');
+  const UserAccount = require('koru/user-account');
+  const util        = require('koru/util');
 
   return function (model) {
-    var FIELD_SPEC = {
+    const FIELD_SPEC = {
       name: 'string',
       email: 'string',
       initials: 'string',
@@ -22,7 +22,7 @@ define(function(require, exports, module) {
     model.onChange(function (doc, was) {
       if (was === null) {
         UserAccount.createUserLogin({email: doc.email, userId: doc._id});
-        UserAccount.sendResetPasswordEmail(doc._id);
+        UserAccount.sendResetPasswordEmail(doc);
       }
     });
 
@@ -67,7 +67,7 @@ define(function(require, exports, module) {
       var user = model.findBy('email', email);
       if (user) {
         var accUser = UserAccount.model.findBy('userId', user._id);
-        accUser && UserAccount.sendResetPasswordEmail(user._id);
+        accUser && UserAccount.sendResetPasswordEmail(user);
       }
       return {success: true};
     });

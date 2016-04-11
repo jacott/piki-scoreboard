@@ -4,6 +4,7 @@ define(function(require, exports, module) {
   var startup = require('./startup-server');
   var webServer = require('koru/web-server');
   var session = require('koru/session');
+  var IdleCheck = require('koru/idle-check').singleton;
 
   koru.onunload(module, 'reload');
 
@@ -15,7 +16,8 @@ define(function(require, exports, module) {
     process.on('SIGTERM', function () {
       console.log('Closing [SIGTERM]');
       webServer.stop();
-      session.stop(function () {
+      session.stop();
+      IdleCheck.waitIdle(function () {
         console.log('=> Shutdown ' + new Date());
         process.exit(0);
       });

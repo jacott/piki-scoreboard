@@ -3,4 +3,4 @@
 
 init ${1-$(basename $PWD)}
 
-daemon --respawn -P /u/run -n ${branch} -O /u/log/${branch}.log -E /u/log/${branch}.log -D /u/app/${branch}/current/app -- $NODE ../node_modules/koru/lib/koru.js "$branch"
+daemon --respawn -P /u/run -n ${branch} -O /u/log/${branch}.log -E /u/log/${branch}.log -D /u/app/${branch}/current/app -- $NODE --es_staging ../node_modules/koru/lib/koru.js "$branch"

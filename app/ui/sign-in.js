@@ -1,24 +1,24 @@
 define(function(require, exports, module) {
-  var Dom    = require('koru/dom');
-  var Route = require('koru/ui/route');
-  var Form = require('koru/ui/form');
-  var App = require('./app-base');
-  var User = require('models/user');
-  var Val = require('koru/model/validation');
-  var UserAccount = require('koru/user-account');
-  var util = require('koru/util');
-  var koru = require('koru');
-  var login = require('koru/user-account/client-login');
+  const koru          = require('koru');
+  const Dom           = require('koru/dom');
+  const Val           = require('koru/model/validation');
+  const session       = require('koru/session');
+  const Form          = require('koru/ui/form');
+  const Route         = require('koru/ui/route');
+  const UserAccount   = require('koru/user-account');
+  const login         = require('koru/user-account/client-login');
+  const util          = require('koru/util');
+  const User          = require('models/user');
+  const App           = require('./app-base');
 
-  var Tpl = Dom.newTemplate(require('koru/html!./sign-in'));
-  var ForgotPassword = Tpl.ForgotPassword;
-  var Dialog = Tpl.Dialog;
-
-  var $ = Dom.current;
+  const Tpl = Dom.newTemplate(require('koru/html!./sign-in'));
+  const $ = Dom.current;
+  const ForgotPassword = Tpl.ForgotPassword;
+  const Dialog = Tpl.Dialog;
 
 
   Tpl.$helpers({
-    item: function () {
+    item () {
       if (this && this.role !== 'g')
         return Tpl.ProfileLink.$autoRender(this);
       else
@@ -27,16 +27,16 @@ define(function(require, exports, module) {
   });
 
   Tpl.SignInLink.$events({
-    'click': function (event) {
+    'click' (event) {
       Dom.stopEvent();
       Dom.Dialog.open(Dialog.$autoRender({}));
     },
   });
 
   util.extend(Tpl, {
-    $created: function (ctx, elm) {
+    $created (ctx, elm) {
       var userOb;
-      ctx.onDestroy(login.onChange(function (state) {
+      ctx.onDestroy(login.onChange(session, state => {
         if (state !== 'ready') return;
         observeUserId();
       }));
@@ -65,7 +65,7 @@ define(function(require, exports, module) {
 
 
   Dialog.$events({
-    'click [name=forgot]': function (event) {
+    'click [name=forgot]' (event) {
       Dom.stopEvent();
       closeDialog();
 
@@ -75,7 +75,7 @@ define(function(require, exports, module) {
 
     'click [name=cancel]': closeDialog,
 
-    'click [type=submit]': function (event) {
+    'click [type=submit]' (event) {
       Dom.stopEvent();
       var button = this;
       var form = document.getElementById('SignInDialog');
@@ -103,7 +103,7 @@ define(function(require, exports, module) {
   }
 
   Dialog.Progress.$helpers({
-    message: function () {
+    message () {
       switch(this.state) {
       case 'submit':
         return 'Signing in...';
@@ -119,7 +119,7 @@ define(function(require, exports, module) {
     'click [name=cancel]': function () {
       closeDialog();
     },
-    'submit': function (event) {
+    'submit' (event) {
       Dom.stopEvent();
 
       User.forgotPassword(document.getElementById('email').value, function (error, response) {

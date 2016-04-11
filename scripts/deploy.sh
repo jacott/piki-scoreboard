@@ -12,7 +12,7 @@ version=`git describe --tag --always`
 echo $branch $version $PWD
 
 app_dir="/u/app/${branch}"
-dest="${app_dir}/staging"
+dest="${app_dir}/build"
 
 rm -rf $dest
 mkdir -p $dest
@@ -21,15 +21,15 @@ git archive --format=tar HEAD | (cd $dest && tar xf -)
 
 cd $dest
 
-if [ -e ../current -a "$(grep "NODE_PATH=" config/${branch}.cfg)" = "$(grep "NODE_PATH=" ../current/config/${branch}.cfg)" ];then
-    rsync -a ../current/node_modules ./
-    diff -q ../current/npm-shrinkwrap.json ./npm-shrinkwrap.json >/dev/null ||
+if [ -e ../built -a "$(grep "NODE_PATH=" config/${branch}.cfg)" = "$(grep "NODE_PATH=" ../built/config/${branch}.cfg)" ];then
+    rsync -a ../built/node_modules ./
+    diff -q ../built/npm-shrinkwrap.json ./npm-shrinkwrap.json >/dev/null ||
         $NPM install
 else
     $NPM install
 fi
 
-$NODE scripts/bundle.js $branch
+$NODE --es_staging scripts/bundle.js $branch
 
 MD5SUM=$(cat build/index.js build/index.css app/index.html|md5sum -b);MD5SUM=${MD5SUM/ */}
 
@@ -45,14 +45,13 @@ echo -e "\nCompressing...\c"
 
 zopfli index.js index.css index.html
 
-
 cd ../..
 
-echo -e "\nTransferring...\c"
+echo -e "\n\nTransferring..."
 
-rsync -a --info=progress2 --delete --exclude='node_modules/**' --compare-dest=../current staging/ ${KORU_DEST_SERVER}:${app_dir}/staging
+rsync -a --info=progress2 --delete --exclude='node_modules/**' --compare-dest=../built build/ ${KORU_DEST_SERVER}:${app_dir}/staging
 
-echo -e "\nInstalling..."
+echo -e "\n\nInstalling..."
 
 ssh ${KORU_DEST_SERVER} ${app_dir}/staging/scripts/install_pkg.sh $branch
 
@@ -60,6 +59,6 @@ echo "SUCCESS"
 
 cd $app_dir
 
-rm -rf current
+rm -rf built
 
-mv staging current
+mv build built

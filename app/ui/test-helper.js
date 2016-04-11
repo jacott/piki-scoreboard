@@ -1,20 +1,19 @@
 define(function(require, exports, module) {
-  var koruTH =    require('koru/ui/test-helper');
-  var util =      require('koru/util');
-  var Dom =       require('koru/dom');
-  var Route =     require('koru/ui/route');
-  var koru =       require('koru');
-  var App =       require('./app');
-  var Home =      require('ui/home');
-  var TH =        require('test-helper');
+  const koruTH =    require('koru/ui/test-helper');
+  const util =      require('koru/util');
+  const Dom =       require('koru/dom');
+  const Route =     require('koru/ui/route');
+  const koru =       require('koru');
+  const App =       require('./app');
+  const Home =      require('ui/home');
+  const TH =        require('test-helper');
+  require('koru/ui/helpers');
 
   koru.onunload(module, 'reload');
 
-  TH.setAccess = App.setAccess, // used by TH.loginAs
-
-  TH = util.reverseExtend({
+  exports = module.exports = util.reverseExtend({
     setOrg: function (org) {
-      org = org || TH.Factory.createOrg();
+      org = org || exports.Factory.createOrg();
       App.orgId = org._id;
       Dom.addClass(document.body, 'inOrg');
       App._setOrgShortName(org.shortName);
@@ -24,11 +23,14 @@ define(function(require, exports, module) {
 
     tearDown: function () {
       Route.replacePage();
-      TH.domTearDown();
-      TH.clearDB();
+      exports.domTearDown();
+      exports.clearDB();
       util.thread.userId = null;
     },
   }, TH);
 
-  return util.reverseExtend(TH, koruTH);
+  exports.setAccess = App.setAccess, // used by TH.loginAs
+
+
+  util.reverseExtend(exports, koruTH);
 });

@@ -1,23 +1,23 @@
 define(function(require, exports, module) {
-  var koru =      require('koru');
-  var User =      require('models/user');
-  var Dom =       require('koru/dom');
-  var header =    require('ui/header');
-  var Org =       require('models/org');
-  var Route =     require('koru/ui/route');
-  var Flash =     require('ui/flash');
-                  require('./home');
-                  require('publish/publish-self');
-                  require('publish/publish-org');
-                  require('publish/publish-event');
-  var Spinner =   require('ui/spinner');
-  var session =   require('koru/session');
-  var util =      require('koru/util');
-  var App =       require('./app-base');
-  var format =    require('koru/format');
-  var ResourceString = require('resource-string');
-  var sessState = require('koru/session/state');
-  var Disconnected = require('./disconnected');
+  const koru            = require('koru');
+  const Dom             = require('koru/dom');
+  const format          = require('koru/format');
+  const session         = require('koru/session');
+  const sessState       = require('koru/session/state');
+  const Route           = require('koru/ui/route');
+  const util            = require('koru/util');
+  const Org             = require('models/org');
+  const User            = require('models/user');
+  require('publish/publish-event');
+  require('publish/publish-org');
+  require('publish/publish-self');
+  const ResourceString  = require('resource-string');
+  const Flash           = require('ui/flash');
+  const header          = require('ui/header');
+  const Spinner         = require('ui/spinner');
+  const App             = require('./app-base');
+  const Disconnected    = require('./disconnected');
+  require('./home');
 
   var selfSub, orgSub, orgShortName, pathname, sessStateChange;
 

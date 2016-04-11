@@ -1,23 +1,25 @@
 isClient && define(function (require, exports, module) {
   var test, v;
-  var TH = require('./test-helper');
-  var Home = require('./home');
-  var Route = require('koru/ui/route');
-  var Dom = require('koru/dom');
-  var Climber = require('./climber');
+  const Dom     = require('koru/dom');
+  const Route   = require('koru/ui/route');
+  const Event   = require('ui/event');
+  const Climber = require('./climber');
+  const Home    = require('./home');
+  const TH      = require('./test-helper');
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
+      TH.loginAs(TH.Factory.createUser('guest'));
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.tearDown();
       v = null;
     },
 
-    "test Choose org": function() {
+    "test Choose org"() {
       v.org = TH.Factory.createOrg();
       Route.gotoPage(Dom.Home);
 
@@ -30,11 +32,11 @@ isClient && define(function (require, exports, module) {
     },
 
     "with org": {
-      setUp: function () {
+      setUp() {
         TH.setOrg();
       },
 
-      "test rendering": function () {
+      "test rendering"() {
         assert.same(Route.root.defaultPage, Dom.Home);
 
         Route.gotoPage(Dom.Home);
@@ -55,14 +57,14 @@ isClient && define(function (require, exports, module) {
         });
       },
 
-      "test climbers link": function () {
+      "test climbers link"() {
         Route.gotoPage(Dom.Home);
         TH.click('button.link', 'Climbers');
 
         assert.dom('#Climber');
       },
 
-      "test events link": function () {
+      "test events link"() {
         Route.gotoPage(Dom.Home);
         TH.click('button.link', 'Events');
 

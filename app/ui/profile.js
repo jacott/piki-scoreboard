@@ -1,18 +1,19 @@
 define(function(require, exports, module) {
-  var Dom    = require('koru/dom');
-  var Route = require('koru/ui/route');
-  var UserAccount = require('koru/user-account');
-  var Form = require('koru/ui/form');
-  var User = require('models/user');
-  var Home = require('ui/home');
-  var Dialog = require('koru/ui/dialog');
-  var SystemSetup = require('./system-setup');
-  var koru = require('koru');
-  var login = require('koru/user-account/client-login');
+  const koru        = require('koru');
+  const Dom         = require('koru/dom');
+  const session     = require('koru/session');
+  const Dialog      = require('koru/ui/dialog');
+  const Form        = require('koru/ui/form');
+  const Route       = require('koru/ui/route');
+  const UserAccount = require('koru/user-account');
+  const login       = require('koru/user-account/client-login');
+  const User        = require('models/user');
+  const Home        = require('ui/home');
+  const SystemSetup = require('./system-setup');
 
-  var Tpl = Dom.newTemplate(require('koru/html!./profile'));
+  const Tpl = Dom.newTemplate(require('koru/html!./profile'));
 
-  var base = Route.root.addBase(Tpl);
+  const base = Route.root.addBase(Tpl);
   koru.onunload(module, function () {
     Route.root.removeBase(Tpl);
   });
@@ -28,7 +29,7 @@ define(function(require, exports, module) {
   base.addTemplate(Tpl.ChangePassword, {focus: true});
 
   Tpl.$helpers({
-    systemSetup: function () {
+    systemSetup () {
       var user = $.data();
       if (user && user.isSuperUser()) {
         return Form.pageLink({value: "System setup", template: "SystemSetup"});
@@ -37,12 +38,12 @@ define(function(require, exports, module) {
   });
 
   Tpl.$events({
-    'click [name=signOut]': function (event) {
+    'click [name=signOut]' (event) {
       Dom.stopEvent();
       UserAccount.logout();
     },
 
-    'click [name=signOutOthers]': function (event) {
+    'click [name=signOutOthers]' (event) {
       Dom.stopEvent();
 
       var elm = Tpl.SignOutOthers.$autoRender({});
@@ -57,30 +58,30 @@ define(function(require, exports, module) {
   });
 
   Tpl.SignOutOthers.$events({
-    'click [name=close]': function (event) {
+    'click [name=close]' (event) {
       Dom.stopEvent();
       Dialog.close('SignOutOthers');
     },
   });
 
   Tpl.$extend({
-    onBaseEntry: function () {
+    onBaseEntry () {
       document.body.appendChild(Tpl.$autoRender(User.me()));
     },
 
-    onBaseExit: function () {
+    onBaseExit () {
       Dom.removeId('Profile');
     },
 
-    $created: function (ctx) {
-      ctx.onDestroy(login.onChange(function () {
+    $created (ctx) {
+      ctx.onDestroy(login.onChange(session, function () {
         Route.replacePath(Home);
       }));
     },
   });
 
   ChangePassword.$events({
-    'submit': function (event) {
+    'submit' (event) {
       Dom.stopEvent();
       var form = event.currentTarget;
       var oldPassword = form.querySelector('[name=oldPassword]').value;
@@ -99,7 +100,7 @@ define(function(require, exports, module) {
 
     },
 
-    'input [name=newPassword],[name=confirm]': function (event) {
+    'input [name=newPassword],[name=confirm]' (event) {
       Dom.stopEvent();
 
       var form = event.currentTarget;

@@ -1,15 +1,16 @@
 isClient && define(function (require, exports, module) {
   var test, v;
 
-  var Dom         = require('koru/dom');
-  var koru         = require('koru');
-  var Route       = require('koru/ui/route');
-  var SignIn      = require('./sign-in');
-  var TH          = require('./test-helper');
-  var UserAccount = require('koru/user-account');
-  var User        = require('models/user');
-                    require('koru/ui/page-link');
- var login = require('koru/user-account/client-login');
+  const koru        = require('koru');
+  const Dom         = require('koru/dom');
+  const session     = require('koru/session');
+  require('koru/ui/page-link');
+  const Route       = require('koru/ui/route');
+  const UserAccount = require('koru/user-account');
+  const login       = require('koru/user-account/client-login');
+  const User        = require('models/user');
+  const SignIn      = require('./sign-in');
+  const TH          = require('./test-helper');
 
   TH.testCase(module, {
     setUp: function () {
@@ -23,11 +24,11 @@ isClient && define(function (require, exports, module) {
       v = null;
     },
 
-    "test profile link": function () {
+    "test profile link" () {
       document.body.appendChild(SignIn.$autoRender({}));
       TH.login();
 
-      login.notify('ready');
+      login.ready(session);
       refute.dom('[name=signIn]');
       test.stub(Route, 'gotoPath');
       TH.click('#ProfileLink');
@@ -35,14 +36,14 @@ isClient && define(function (require, exports, module) {
       assert.calledWith(Route.gotoPath, Dom.Profile);
     },
 
-    "test cancel": function () {
+    "test cancel" () {
       Dom.Dialog.open(SignIn.Dialog.$autoRender({}));
       TH.click('[name=cancel]');
 
       refute.dom('.Dialog');
     },
 
-    "test clicking forgot password": function () {
+    "test clicking forgot password" () {
       Dom.Dialog.open(SignIn.Dialog.$autoRender({}));
       TH.input('[name=email]', 'email@address');
       TH.click('[name=forgot]');
@@ -55,7 +56,7 @@ isClient && define(function (require, exports, module) {
     },
 
     "forgot password": {
-      setUp: function () {
+      setUp () {
         v.remoteCall = test.stub(User, 'forgotPassword');
 
         Dom.Dialog.open(SignIn.ForgotPassword.$autoRender({email: 'foo@bar.com'}));
@@ -68,7 +69,7 @@ isClient && define(function (require, exports, module) {
         }));
       },
 
-      "test bad email": function () {
+      "test bad email" () {
         v.callback(null, {email: 'is_invalid'});
 
         assert.dom('#ForgotPassword', function () {
@@ -81,7 +82,7 @@ isClient && define(function (require, exports, module) {
         });
       },
 
-      "test unexpected error": function () {
+      "test unexpected error" () {
         test.stub(koru, 'error');
 
         v.callback({message: 'foo'});
@@ -98,7 +99,7 @@ isClient && define(function (require, exports, module) {
       },
     },
 
-    "test signing in": function () {
+    "test signing in" () {
       TH.loginAs(TH.Factory.createUser('guest'));
       document.body.appendChild(SignIn.$autoRender({}));
       assert.dom('#SignIn', function () {

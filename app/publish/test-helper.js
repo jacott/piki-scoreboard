@@ -57,12 +57,14 @@ define(function(require, exports, module) {
     },
 
     mockSubscribe: function (v, id, name) {
-      if (! v.session) v.session = this.mockSession();
       if (! v.conn) {
         v.conn = this.mockConnection(null, v.session);
         v.send = v.conn.ws.send;
       }
-      session._onMessage(v.conn, message.encodeMessage('P', [id, name, util.slice(arguments, 3)], v.session.globalDict));
+      var pub = session._commands.P;
+      var args =  new Array(arguments.length - 3);
+      for(var i = args.length - 1; i >= 0; --i) args[i] = arguments[i+3];
+      pub.call(v.conn, [id, name, args]);
 
       return v.conn._subs[id];
     },

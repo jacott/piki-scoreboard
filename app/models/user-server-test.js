@@ -54,8 +54,8 @@ define(function (require, exports, module) {
     },
 
     "test createUser": function () {
-      test.stub(UserAccount, 'sendResetPasswordEmail', function (userId, token) {
-        assert(User.exists({_id: userId}));
+      test.stub(UserAccount, 'sendResetPasswordEmail', function (user, token) {
+        assert(User.exists({_id: user._id}));
       });
       TH.loginAs(TH.Factory.createUser('su'));
       var user = TH.Factory.buildUser();
@@ -68,7 +68,7 @@ define(function (require, exports, module) {
 
       assert.equals(mUser.email, user.email);
 
-      assert.calledWith(UserAccount.sendResetPasswordEmail, user._id);
+      assert.calledWith(UserAccount.sendResetPasswordEmail, TH.matchModel(user));
 
       assert.same(ChangeLog.query.count(), 1);
     },
@@ -77,7 +77,7 @@ define(function (require, exports, module) {
       TH.Factory.createUser('su');
       TH.login();
 
-      var rpc = TH.mockRpc("1");
+      var rpc = TH.mockRpc(v);
       rpc('save', 'User', TH.userId(), {email: "foo@bar.com"});
 
       var user = User.findById(TH.userId());
@@ -124,10 +124,8 @@ define(function (require, exports, module) {
 
         assert.calledWith(Val.ensureString, 'foo@bar.com  ');
 
-        assert.calledWith(UserAccount.sendResetPasswordEmail, user._id);
+        assert.calledWith(UserAccount.sendResetPasswordEmail, TH.matchModel(user));
       },
     }
-
-
   });
 });

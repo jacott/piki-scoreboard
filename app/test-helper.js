@@ -1,14 +1,15 @@
 define(function(require, exports, module) {
-  var koru = require('koru');
-  var TH = require('koru/session/test-helper');
-  var util = require('koru/util');
-  var Model = require('koru/model');
-  var Val = require('koru/model/validation');
-  var session = require('koru/session');
-  var User = require('models/user');
-  var stubber = require('koru/test/stubber');
+  'use strict';
+  const koru    = require('koru');
+  const Model   = require('koru/model');
+  const Val     = require('koru/model/validation');
+  const session = require('koru/session');
+  const stubber = require('koru/test/stubber');
+  const util    = require('koru/util');
+  const User    = require('models/user');
 
-  var geddon = TH.geddon;
+  var   TH      = require('koru/session/test-helper');
+  const geddon = TH.geddon;
 
   var user;
 
@@ -23,20 +24,22 @@ define(function(require, exports, module) {
       };
     },
 
-    clearDB: function () {
-      this.Factory.clear();
+    clearDB: isClient ? function () {
+      TH.Factory.clear();
+      let dbv = Model._databases.default;
+      for(var name in dbv) {
+        var model = Model[name];
+        model.docs = null;
+      }
+    } : function () {
+      TH.Factory.clear();
       for(var name in Model) {
         var model = Model[name];
         if ('docs' in model) {
-          if (isClient) {
-            model.docs = {};
-            model._indexUpdate.reloadAll();
-          } else {
-            txSave || model.docs.truncate();
-            model._$docCacheClear();
-          }
+          txSave || model.docs.truncate();
+          model._$docCacheClear();
         }
-      };
+      }
     },
 
     user: function () {
@@ -45,11 +48,6 @@ define(function(require, exports, module) {
 
     userId: function () {
       return user && user._id;
-    },
-
-    noInfo: function () {
-      if (! koru.info.restore)
-        geddon.test.intercept(koru, 'info');
     },
 
     mockRpc: function (v, sessId) {
@@ -64,7 +62,7 @@ define(function(require, exports, module) {
           conn = new (require(id)({globalDict: session.globalDict}))(ws, sessId, function () {});
           if (v) v.conn = conn;
         }
-        return geddon.test.intercept(session, 'rpc', function (method /*, args */) {
+        return geddon.test.intercept(session, 'rpc', function (method, ...args) {
           conn.userId = koru.userId();
           try {
             var prevUserId = util.thread.userId;
@@ -73,15 +71,15 @@ define(function(require, exports, module) {
             util.thread.connection = conn;
 
             if (! session._rpcs[method]) throw new Error('RPC: "' + method + '" is undefined');
-            return session._rpcs[method].apply(conn, util.slice(arguments, 1));
+            return session._rpcs[method].apply(conn, args);
           } finally {
             util.thread.userId = prevUserId;
             util.thread.connection = prevConnection;
           }
         });
       } else {
-        return geddon.test.intercept(session, 'rpc', function (method /*, args */) {
-          return session._rpcs[method].apply(util.thread, util.slice(arguments, 1));
+        return geddon.test.intercept(session, 'rpc', function (method, ...args) {
+          return session._rpcs[method].apply(util.thread, args);
         });
       }
     },
@@ -161,12 +159,37 @@ define(function(require, exports, module) {
       };
     },
 
+    startTransaction: function () {
+      if (isClient) return;
+      util.forEach(arguments, db => {
+        db._getConn();
+        var tx = db._weakMap.get(util.thread);
+        transactionMap.set(db, tx);
+        tx.transaction = 'ROLLBACK';
+        db.query('BEGIN');
+        util.thread.db = db;
+      });
+    },
+
+    rollbackTransaction: function () {
+      if (isClient) return;
+      util.forEach(arguments, db => {
+        var tx = transactionMap.get(db);
+        if (! tx) return;
+        util.thread.db = null;
+        tx.transaction = null;
+        db.query('ROLLBACK');
+        db._releaseConn();
+      });
+      util.thread.db = null;
+    },
+
   }, TH);
 
   if (isClient) {
     TH.MockFileReader = function (v) {
-      function MockFileReader() {
-        v.fileReaderargs = util.slice(arguments);
+      function MockFileReader(...args) {
+        v.fileReaderargs = args.slice();
         v.fileReader = this;
       };
 
@@ -194,6 +217,8 @@ define(function(require, exports, module) {
 
       return MockFileReader;
     };
+  } else {
+    var transactionMap = new WeakMap;
   }
 
   var koruAfTimeout, koruSetTimeout, koruClearTimeout;
@@ -220,39 +245,18 @@ define(function(require, exports, module) {
         session.sendM = koru.nullFunc;
       }
     } else {
-      if (User.docs.isPG) {
-        User.docs.transaction(function (tx) {
-          txSave = tx;
-          tx.count = 1;
-        });
-        txSave.transaction = 'ROLLBACK';
-      }
+      txClient = User.db;
+      txClient._getConn();
+      txSave = txClient._weakMap.get(util.thread);
+      txSave.transaction = 'ROLLBACK';
     }
   });
 
-  var txSave;
-
-  if (isServer) {
-    geddon.onTestStart(function () {
-      txSave && User.db.query('BEGIN');
-    });
-
-    geddon.onTestEnd(function () {
-      txSave && User.db.query('ROLLBACK');
-    });
-
-  }
-
-  function overrideSub(name, sub, callback) {
-    return true;
-  }
-
   geddon.onEnd(function () {
     if (isServer && txSave) {
-      txSave.count = 0;
       txSave.transaction = null;
       txSave = null;
-      User.docs.transaction(function () {});
+      txClient._releaseConn();
     }
 
     koru.setTimeout = koruSetTimeout;
@@ -268,10 +272,26 @@ define(function(require, exports, module) {
         session.sendM = sendM;
         sendM = null;
       }
-    } else {
-      User.docs.query('ROLLBACK');
     }
   });
+
+  var txSave, txClient;
+
+  if (isServer) {
+    geddon.onTestStart(function () {
+      util.thread.db = txClient;
+      txSave && txClient.query('BEGIN');
+    });
+
+    geddon.onTestEnd(function () {
+      txSave && txClient.query('ROLLBACK');
+    });
+
+  }
+
+  function overrideSub(name, sub, callback) {
+    return true;
+  }
 
   var ga = geddon.assertions;
 
@@ -302,15 +322,11 @@ define(function(require, exports, module) {
   });
 
   isServer && ga.add('modelUniqueIndex', {
-    assert: function (model /*, arguments */) {
+    assert: function (model, ...expected) {
       var enIdx = model.addUniqueIndex,
           count = enIdx.callCount,
           tvLength = enIdx.callCount,
-          expected = new Array(arguments.length - 1),
           result = false;
-
-      for(var i = expected.length; i > 0; --i)
-        expected[i-1] = arguments[i];
 
       for(var i=0;i < tvLength;++i) {
         var call = enIdx.getCall(i);

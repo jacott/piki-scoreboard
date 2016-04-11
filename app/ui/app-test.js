@@ -1,16 +1,16 @@
 isClient && define(function (require, exports, module) {
   var test, v;
-  var TH      = require('ui/test-helper');
-  var Route   = require('koru/ui/route');
-  var App     = require('./app');
-  var Dom     = require('koru/dom');
-  var Spinner = require('ui/spinner');
-  var session = require('koru/session');
-  var koru = require('koru');
-  var publish = require('koru/session/publish');
+  const koru    = require('koru');
+  const Dom     = require('koru/dom');
+  const session = require('koru/session');
+  const publish = require('koru/session/publish');
+  const Route   = require('koru/ui/route');
+  const Spinner = require('ui/spinner');
+  const TH      = require('ui/test-helper');
+  const App     = require('./app');
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
       test.stub(Route, 'replacePath');
@@ -18,21 +18,22 @@ isClient && define(function (require, exports, module) {
       test.stub(Spinner, 'init');
       test.stub(session, 'sendP');
       v.subSelf = test.spy(session, 'interceptSubscribe').withArgs('Self');
+      TH.loginAs(TH.Factory.createUser('guest'));
     },
 
-    tearDown: function () {
+    tearDown() {
       App.stop();
       TH.tearDown();
       v = null;
     },
 
-    "test inits spinner": function () {
+    "test inits spinner"() {
       App.start();
 
       assert.called(Spinner.init);
     },
 
-    "test Org": function () {
+    "test Org"() {
       refute(App.org());
 
       var org = TH.Factory.createOrg();
@@ -41,7 +42,8 @@ isClient && define(function (require, exports, module) {
       assert.same(App.org(), org);
     },
 
-    "test me": function () {
+    "test me"() {
+      TH.user.restore();
       var user = TH.Factory.createUser();
 
       refute(App.me());
@@ -51,7 +53,7 @@ isClient && define(function (require, exports, module) {
       assert.same(App.me(), user);
     },
 
-    "test rendering": function () {
+    "test rendering"() {
       TH.loginAs(TH.Factory.createUser('guest'));
       App.start();
 
@@ -65,7 +67,7 @@ isClient && define(function (require, exports, module) {
       });
     },
 
-    "test popstate": function () {
+    "test popstate"() {
       test.stub(Route, 'pageChanged');
 
       App.start();
@@ -82,7 +84,7 @@ isClient && define(function (require, exports, module) {
       assert.calledWithExactly(Route.pageChanged);
     },
 
-    "test subscribing to Org": function () {
+    "test subscribing to Org"() {
       test.stub(publish._pubs, 'Org');
       Route.replacePath.restore();
       test.stub(koru, 'getLocation').returns({pathname: '/FOO'});

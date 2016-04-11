@@ -1,12 +1,12 @@
 isClient && define(function (require, exports, module) {
   var test, v;
-  var TH = require('./test-helper');
-  var sut = require('./event-category');
-  var Route = require('koru/ui/route');
-  var App = require('ui/app');
+  const Route = require('koru/ui/route');
+  const App   = require('ui/app');
+  const sut   = require('./event-category');
+  const TH    = require('./test-helper');
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
       v = {
@@ -15,6 +15,7 @@ isClient && define(function (require, exports, module) {
         event: TH.Factory.createEvent(),
         result: TH.Factory.createResult({scores: [0.1]}),
       };
+      TH.login();
       TH.Factory.createClimber();
       v.result2 = TH.Factory.createResult({scores: [0.3]});
       TH.setOrg(v.org);
@@ -23,12 +24,12 @@ isClient && define(function (require, exports, module) {
       v.eventSub.yield();
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.tearDown();
       v = null;
     },
 
-    "test rendering": function () {
+    "test rendering"() {
       assert.dom('#Event .Category', function () {
         assert.dom('h1', v.category.name);
         assert.dom('.rank table.results', function () {
@@ -94,7 +95,7 @@ isClient && define(function (require, exports, module) {
       });
     },
 
-    "test switching to start order": function () {
+    "test switching to start order"() {
       v.result.$update({scores: [1, 310000, 220000, 330000]});
       v.result2.$update({scores: [2, 210000, 320000, 230000]});
       TH.login();
@@ -119,7 +120,7 @@ isClient && define(function (require, exports, module) {
     },
 
     "boulder category": {
-      setUp: function () {
+      setUp() {
         v.category = TH.Factory.createCategory({type: 'B', heatFormat: 'QF6'});
         v.event = TH.Factory.createEvent();
         v.result = TH.Factory.createResult({
@@ -133,7 +134,7 @@ isClient && define(function (require, exports, module) {
         v.eventSub.yield();
       },
 
-      "test no time column": function () {
+      "test no time column"() {
         TH.change('select[name=selectHeat]', 2);
 
         assert.dom('#Event .Category', function () {
@@ -150,7 +151,7 @@ isClient && define(function (require, exports, module) {
         });
       },
 
-      "test rendering qual round": function () {
+      "test rendering qual round"() {
         TH.change('select[name=selectHeat]', 1);
 
         assert.dom('#Event .Category', function () {
@@ -189,7 +190,7 @@ isClient && define(function (require, exports, module) {
         });
       },
 
-      "test entering finals": function () {
+      "test entering finals"() {
         assert.dom('#Event .Category', function () {
           assert.dom('tr#Result_'+ v.result._id, function () {
             TH.trigger('td:nth-child(3)', 'mousedown');
@@ -229,7 +230,7 @@ isClient && define(function (require, exports, module) {
     },
 
     "lead category": {
-      "test clicking on time in results mode": function () {
+      "test clicking on time in results mode"() {
         TH.login();
 
         TH.change('select[name=selectHeat]', 3);
@@ -251,7 +252,7 @@ isClient && define(function (require, exports, module) {
         });
       },
 
-      "test entering finals": function () {
+      "test entering finals"() {
         TH.loginAs(TH.Factory.createUser('admin'));
 
         assert.dom('#Event .Category', function () {
@@ -273,7 +274,7 @@ isClient && define(function (require, exports, module) {
         });
       },
 
-      "test selecting heat": function () {
+      "test selecting heat"() {
         TH.login();
 
         assert.dom('select[name=selectHeat]', function () {
@@ -288,7 +289,7 @@ isClient && define(function (require, exports, module) {
         assert.dom('.results>tbody>tr:first-child>td', {count: 2});
       },
 
-      "test selecting score": function () {
+      "test selecting score"() {
         TH.login();
         assert.dom('#Event .Category', function () {
           assert.dom('tr#Result_'+ v.result._id,  function() {
