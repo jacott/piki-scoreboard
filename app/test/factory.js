@@ -44,6 +44,11 @@ define(function(require, exports, module) {
         .addField('shortName', 'shortName' in options || Factory.generateName('SN').replace(/\s+/g, ''));
     },
 
+    TeamType(options) {
+      return new Factory.Builder('TeamType', options).genName()
+        .addRef('org');
+    },
+
     Category: function (options) {
       return new Factory.Builder('Category', options).genName()
         .addRef('org')

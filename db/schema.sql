@@ -2,12 +2,16 @@
 -- PostgreSQL database dump
 --
 
+-- Dumped from database version 9.5.3
+-- Dumped by pg_dump version 9.5.3
+
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
+SET row_security = off;
 
 --
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
@@ -30,7 +34,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: Category; Type: TABLE; Schema: public; Owner: -; Tablespace:
+-- Name: Category; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE "Category" (
@@ -48,7 +52,7 @@ CREATE TABLE "Category" (
 
 
 --
--- Name: ChangeLog; Type: TABLE; Schema: public; Owner: -; Tablespace:
+-- Name: ChangeLog; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE "ChangeLog" (
@@ -68,7 +72,7 @@ CREATE TABLE "ChangeLog" (
 
 
 --
--- Name: Climber; Type: TABLE; Schema: public; Owner: -; Tablespace:
+-- Name: Climber; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE "Climber" (
@@ -85,7 +89,7 @@ CREATE TABLE "Climber" (
 
 
 --
--- Name: Club; Type: TABLE; Schema: public; Owner: -; Tablespace:
+-- Name: Club; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE "Club" (
@@ -98,7 +102,7 @@ CREATE TABLE "Club" (
 
 
 --
--- Name: Competitor; Type: TABLE; Schema: public; Owner: -; Tablespace:
+-- Name: Competitor; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE "Competitor" (
@@ -111,7 +115,7 @@ CREATE TABLE "Competitor" (
 
 
 --
--- Name: Event; Type: TABLE; Schema: public; Owner: -; Tablespace:
+-- Name: Event; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE "Event" (
@@ -126,7 +130,7 @@ CREATE TABLE "Event" (
 
 
 --
--- Name: Migration; Type: TABLE; Schema: public; Owner: -; Tablespace:
+-- Name: Migration; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE "Migration" (
@@ -135,7 +139,7 @@ CREATE TABLE "Migration" (
 
 
 --
--- Name: Org; Type: TABLE; Schema: public; Owner: -; Tablespace:
+-- Name: Org; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE "Org" (
@@ -147,7 +151,7 @@ CREATE TABLE "Org" (
 
 
 --
--- Name: Result; Type: TABLE; Schema: public; Owner: -; Tablespace:
+-- Name: Result; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE "Result" (
@@ -162,7 +166,18 @@ CREATE TABLE "Result" (
 
 
 --
--- Name: User; Type: TABLE; Schema: public; Owner: -; Tablespace:
+-- Name: TeamType; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE "TeamType" (
+    _id character varying(24) NOT NULL,
+    org_id character varying(24),
+    name text
+);
+
+
+--
+-- Name: User; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE "User" (
@@ -176,7 +191,7 @@ CREATE TABLE "User" (
 
 
 --
--- Name: UserLogin; Type: TABLE; Schema: public; Owner: -; Tablespace:
+-- Name: UserLogin; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE "UserLogin" (
@@ -191,7 +206,7 @@ CREATE TABLE "UserLogin" (
 
 
 --
--- Name: Category_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
+-- Name: Category_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "Category"
@@ -199,7 +214,7 @@ ALTER TABLE ONLY "Category"
 
 
 --
--- Name: ChangeLog_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
+-- Name: ChangeLog_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "ChangeLog"
@@ -207,7 +222,7 @@ ALTER TABLE ONLY "ChangeLog"
 
 
 --
--- Name: Climber_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
+-- Name: Climber_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "Climber"
@@ -215,7 +230,7 @@ ALTER TABLE ONLY "Climber"
 
 
 --
--- Name: Club_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
+-- Name: Club_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "Club"
@@ -223,7 +238,7 @@ ALTER TABLE ONLY "Club"
 
 
 --
--- Name: Competitor_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
+-- Name: Competitor_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "Competitor"
@@ -231,7 +246,7 @@ ALTER TABLE ONLY "Competitor"
 
 
 --
--- Name: Event_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
+-- Name: Event_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "Event"
@@ -239,7 +254,7 @@ ALTER TABLE ONLY "Event"
 
 
 --
--- Name: Migration_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
+-- Name: Migration_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "Migration"
@@ -247,7 +262,7 @@ ALTER TABLE ONLY "Migration"
 
 
 --
--- Name: Org_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
+-- Name: Org_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "Org"
@@ -255,7 +270,7 @@ ALTER TABLE ONLY "Org"
 
 
 --
--- Name: Result_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
+-- Name: Result_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "Result"
@@ -263,7 +278,15 @@ ALTER TABLE ONLY "Result"
 
 
 --
--- Name: UserLogin_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
+-- Name: TeamType_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY "TeamType"
+    ADD CONSTRAINT "TeamType_pkey" PRIMARY KEY (_id);
+
+
+--
+-- Name: UserLogin_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "UserLogin"
@@ -271,7 +294,7 @@ ALTER TABLE ONLY "UserLogin"
 
 
 --
--- Name: User_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
+-- Name: User_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "User"
@@ -279,7 +302,7 @@ ALTER TABLE ONLY "User"
 
 
 --
--- Name: ChangeLog_createdAt_parent_id; Type: INDEX; Schema: public; Owner: -; Tablespace:
+-- Name: ChangeLog_createdAt_parent_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX "ChangeLog_createdAt_parent_id" ON "ChangeLog" USING btree ("createdAt" DESC, parent_id);
@@ -298,3 +321,4 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 --
 -- PostgreSQL database dump complete
 --
+
