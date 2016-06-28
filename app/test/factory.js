@@ -49,6 +49,13 @@ define(function(require, exports, module) {
         .addRef('org');
     },
 
+    Team(options) {
+      return new Factory.Builder('Team', options).genName()
+        .addRef('teamType')
+        .addField('shortName',  () => Factory.generateName('SN').replace(/\s+/g, ''))
+        .addRef('org');
+    },
+
     Category: function (options) {
       return new Factory.Builder('Category', options).genName()
         .addRef('org')

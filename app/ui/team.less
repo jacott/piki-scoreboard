@@ -1,0 +1,29 @@
+@import "global.lessimport";
+
+#Team {
+  table {
+    th:first-child {
+      width: 60%;
+    }
+    body:not(.aAccess) & {
+      cursor: inherit;
+    }
+  }
+
+  form {
+    margin: 10px;
+
+    font-size: 1.2em;
+    >h1 {
+      font-size: 1.4em;
+    }
+
+    [name=name] {
+      width: 50ex;
+    }
+    [name=shortName] {
+      text-transform:uppercase;
+      width: 6ex;
+    }
+  }
+}

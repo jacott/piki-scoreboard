@@ -21,6 +21,24 @@ define(function(require, exports, module) {
       Route.replacePage(Home, {orgSN: org.shortName});
     },
 
+    selectMenu(node, value, func) {
+      koruTH.trigger(node, 'mousedown');
+      koruTH.click(node);
+      var pre = koruTH.geddon.__elidePoint;
+      assert.elideFromStack.dom(document.body, function () {
+        assert.dom('body>.glassPane>#SelectMenu', function () {
+          assert.dom('li', {data: value}, function () {
+            if (func) {
+              koruTH.geddon.__elidePoint = pre;
+              func.call(this);
+            } else
+              koruTH.click(this);
+          });
+        });
+      });
+      return this;
+    },
+
     tearDown: function () {
       Route.replacePage();
       exports.domTearDown();

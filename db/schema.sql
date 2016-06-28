@@ -166,6 +166,19 @@ CREATE TABLE "Result" (
 
 
 --
+-- Name: Team; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE "Team" (
+    _id character varying(24) NOT NULL,
+    org_id character varying(24),
+    "teamType_id" character varying(24),
+    name text,
+    "shortName" text
+);
+
+
+--
 -- Name: TeamType; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -283,6 +296,14 @@ ALTER TABLE ONLY "Result"
 
 ALTER TABLE ONLY "TeamType"
     ADD CONSTRAINT "TeamType_pkey" PRIMARY KEY (_id);
+
+
+--
+-- Name: Team_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY "Team"
+    ADD CONSTRAINT "Team_pkey" PRIMARY KEY (_id);
 
 
 --
