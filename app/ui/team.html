@@ -6,20 +6,21 @@
     </div>
   </section>
   <template name="Index">
-    <div id="TeamIndex">
-      <nav>
-        {{pageLink class="adminAccess" name="addTeam" value="Add new team" template="Team.Add"}}
-      </nav>
-      <label>
-        <span class="teamType">Team type</span>
-        <button name="teamType_id" type="button">{{teamType.name}}</button>
+    <div id="TeamIndex" {{hasTeamTypeClass}}>
+      <label class="teamType">
+        <span>Team type</span>
+        <button name="teamType_id" type="button" class="select">{{teamTypePrompt}}</button>
       </label>
+      <nav>
+        {{pageLink class="adminAccess" name="addTeam" value=addTeamText template="Team.Add"}}
+      </nav>
       <section class="teams">
-        <h1>Teams</h1>
         <table class="select">
           <thead>
             <tr>
-              <th>Name</th><th>Short name</th>
+              <th data-sort="name">Name</th>
+              <th data-sort="shortName">Short name</th>
+              {{sortOrder}}
             </tr>
           </thead>
           <tbody>
@@ -34,10 +35,24 @@
       </section>
     </div>
   </template>
+
   <template name="Add">
     <form id="AddTeam">
       <h1>Add new team</h1>
       {{> /Team.Form}}
+      <fieldset class="actions">
+        <button type="submit" name="create">Create</button>
+        <button type="button" name="cancel">Cancel</button>
+      </fieldset>
+    </form>
+  </template>
+
+  <template name="AddTeamType">
+    <form id="AddTeamType">
+      <h1>Add new team type</h1>
+      <fieldset class="fields">
+        {{labelField "name"}}
+      </fieldset>
       <fieldset class="actions">
         <button type="submit" name="create">Create</button>
         <button type="button" name="cancel">Cancel</button>

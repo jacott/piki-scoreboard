@@ -9,13 +9,14 @@ define(function(require, exports, module) {
     ChangeLog.logChanges(model);
 
     var FIELD_SPEC = {
-      category_ids: ['string'],
+      category_ids: ['id'],
+      team_ids: ['id'],
     };
 
     var NEW_FIELD_SPEC = {
-      _id: 'string',
-      event_id: 'string',
-      climber_id: 'string',
+      _id: 'id',
+      event_id: 'id',
+      climber_id: 'id',
     };
 
     util.extend(model.prototype, {

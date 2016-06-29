@@ -7,7 +7,8 @@ define(function(require, exports, module) {
 
   var FIELD_SPEC = {
     name: 'string',
-    org_id: 'string',
+    org_id: 'id',
+    teamType_ids: ['id'],
     date: 'string',
     closed: match.or(match.boolean, match.string),
     heats: 'baseObject',

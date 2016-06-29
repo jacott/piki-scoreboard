@@ -17,11 +17,13 @@ define(function (require, exports, module) {
     },
 
     'test creation': function () {
+      var teamType = TH.Factory.createTeamType({_id: 'tt1'});
       var event=TH.Factory.createEvent();
 
       assert(Event.exists(event._id));
 
       assert(event.org);
+      assert.equals(event.teamType_ids, ['tt1']);
     },
 
     'test standard validators': function () {

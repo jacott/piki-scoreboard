@@ -84,7 +84,8 @@ CREATE TABLE "Climber" (
     gender text,
     number integer,
     "uploadId" text,
-    disabled boolean
+    disabled boolean,
+    team_ids character varying(24)[]
 );
 
 
@@ -110,7 +111,8 @@ CREATE TABLE "Competitor" (
     event_id character varying(24),
     climber_id character varying(24),
     category_ids character varying(24)[],
-    "createdAt" timestamp without time zone
+    "createdAt" timestamp without time zone,
+    team_ids character varying(24)[]
 );
 
 
@@ -125,7 +127,8 @@ CREATE TABLE "Event" (
     heats jsonb,
     date text,
     errors jsonb,
-    closed boolean
+    closed boolean,
+    "teamType_ids" character varying(24)[]
 );
 
 

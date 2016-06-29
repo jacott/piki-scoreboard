@@ -1,10 +1,11 @@
 isClient && define(function (require, exports, module) {
   var test, v;
-  var TH = require('./test-helper');
-  var sut = require('./team');
-  var Route = require('koru/ui/route');
-  var Team = require('models/team');
-  var App = require('ui/app');
+  const Route    = require('koru/ui/route');
+  const Team     = require('models/team');
+  const TeamType = require('models/team-type');
+  const App      = require('ui/app');
+  const sut      = require('./team');
+  const TH       = require('./test-helper');
 
   TH.testCase(module, {
     setUp: function () {
@@ -31,11 +32,14 @@ isClient && define(function (require, exports, module) {
       Route.gotoPage(sut.Index);
 
       assert.dom('#Team', function () {
+        assert.dom('#TeamIndex.noTeamType');
+
         TH.selectMenu('[name=teamType_id]', TH.match.field('id', 'tt1'));
+        assert.dom('#TeamIndex:not(.noTeamType)');
         assert.dom('[name=teamType_id]', 'type 1');
+
         assert.dom('.teams', function () {
-          assert.dom('h1', 'Teams');
-          assert.dom('h1+table', function () {
+          assert.dom('table', function () {
             assert.dom('tr', {count: 3});
             assert.dom('tr>td', teams[0].name, function () {
               assert.domParent('td', teams[0].shortName);
@@ -45,7 +49,7 @@ isClient && define(function (require, exports, module) {
             });
           });
         });
-        assert.dom('nav [name=addTeam]', 'Add new team');
+        assert.dom('nav [name=addTeam]', 'Add new type 1');
       });
     },
 
@@ -66,6 +70,26 @@ isClient && define(function (require, exports, module) {
       assert(Team.exists({org_id: v.org._id, name: 'Dynomites Wellington', shortName: 'Wgtn', teamType_id: 'tt1'}));
 
       assert.dom('#Team [name=addTeam]');
+    },
+
+    "test adding new teamType"() {
+      Route.gotoPage(sut.Index);
+
+      TH.selectMenu('#Team [name=teamType_id]', TH.match.field('id', '$new'));
+
+      assert.dom('#AddTeamType', function () {
+        TH.input('[name=name]', 'Club');
+        TH.click('[type=submit]');
+      });
+      refute.dom('#AddTeamType');
+
+      assert(TeamType.exists({org_id: v.org._id, name: 'Club'}));
+
+      TH.selectMenu('#Team [name=teamType_id]', TH.match.field('id', '$new'));
+      assert.dom('#AddTeamType', function () {
+        TH.click('[name=cancel]');
+      });
+      refute.dom('#AddTeamType');
     },
 
     "edit": {

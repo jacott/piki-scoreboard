@@ -70,7 +70,6 @@ isClient && define(function (require, exports, module) {
 
       assert(climber);
 
-      assert.same(climber.club_id, club._id);
       assert.same(climber.gender, "m");
     },
 

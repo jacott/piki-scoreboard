@@ -1,6 +1,7 @@
 define(function(require, exports, module) {
   const koru       = require('koru');
   const Dom        = require('koru/dom');
+  const Dialog     = require('koru/ui/dialog');
   const Form       = require('koru/ui/form');
   const Route      = require('koru/ui/route');
   const SelectMenu = require('koru/ui/select-menu');
@@ -12,6 +13,11 @@ define(function(require, exports, module) {
   var Tpl   = Dom.newTemplate(require('koru/html!./team'));
   var $ = Dom.current;
   var Index = Tpl.Index;
+  var sortField = 'name';
+  var asc = 1;
+  var sortFunc;
+
+  setSortFunc();
 
   var elm;
 
@@ -34,13 +40,38 @@ define(function(require, exports, module) {
     teams: function (callback) {
       callback.render({
         model: Team,
-        sort: util.compareByName,
+        sort: function (a, b) {
+          return sortFunc(a, b) * asc;
+        },
         params: {teamType_id: Tpl.teamType_id},
       });
     },
 
-    teamType() {
-      return TeamType.findById(Tpl.teamType_id);
+    teamTypePrompt() {
+      let tt = TeamType.findById(Tpl.teamType_id);
+      return tt ? tt.name : 'Please select';
+    },
+
+    hasTeamTypeClass() {
+      Dom.setClass('noTeamType', ! TeamType.findById(Tpl.teamType_id));
+    },
+
+    addTeamText() {
+      let teamType = TeamType.findById(Tpl.teamType_id);
+      return teamType && 'Add new ' + teamType.name;
+    },
+
+    sortOrder() {
+      var parent = $.element.parentNode;
+      var ths = parent.getElementsByTagName('th');
+      for(var i = 0; i < ths.length; ++i) {
+        Dom.removeClass(ths[i], 'sort');
+        Dom.removeClass(ths[i], 'desc');
+      }
+
+      var elm = parent.querySelector('[data-sort="'+sortField+'"]');
+      Dom.addClass(elm, 'sort');
+      asc === -1 &&  Dom.addClass(elm, 'desc');
     },
   });
 
@@ -52,15 +83,35 @@ define(function(require, exports, module) {
       var data = $.data(this);
       Route.gotoPage(Tpl.Edit, {teamId: data._id});
     },
+
+    'click th': function (event) {
+      Dom.stopEvent();
+      var sort = this.getAttribute('data-sort');
+      if (sortField === sort)
+        asc = asc * -1;
+      else {
+        sortField = sort;
+        asc = 1;
+      }
+      setSortFunc();
+      $.ctx.updateAllTags();
+    },
+
     'click [name=teamType_id]': function (event) {
       Dom.stopEvent();
       let ctx = $.ctx;
       let list = TeamType.query.map(doc => [doc._id, doc.name]);
+      list.push({id: '$new', name: "Add new team type"});
       SelectMenu.popup(this, {
         list,
         onSelect(elm) {
-          Tpl.teamType_id = $.data(elm).id;
-          ctx.updateAllTags();
+          let id = $.data(elm).id;
+          if (id === '$new') {
+            Dialog.open(Tpl.AddTeamType.$autoRender(new TeamType({org_id: App.orgId})));
+          } else {
+            Tpl.teamType_id = id;
+            ctx.updateAllTags();
+          }
           return true;
         }
       });
@@ -89,6 +140,27 @@ define(function(require, exports, module) {
   Tpl.Add.$events({
     'click [name=cancel]': cancel,
     'click [type=submit]': Form.submitFunc('AddTeam', Tpl),
+  });
+
+  Tpl.AddTeamType.$events({
+    'click [name=cancel]'(event) {
+      Dialog.close(event.currentTarget);
+    },
+
+    'click [type=submit]'(event) {
+      Dom.stopEvent();
+      var doc = $.data();
+
+      Form.fillDoc(doc, event.currentTarget);
+
+      if (doc.$save()) {
+        Dialog.close(event.currentTarget);
+      } else {
+        Form.renderErrors(doc, event.currentTarget);
+      }
+
+
+    }
   });
 
   Tpl.Edit.$events({
@@ -123,6 +195,10 @@ define(function(require, exports, module) {
   function cancel(event) {
     Dom.stopEvent();
     Route.gotoPage(Tpl);
+  }
+
+  function setSortFunc() {
+    return sortFunc = util.compareByField(sortField);
   }
 
   return Tpl;

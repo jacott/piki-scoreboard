@@ -81,6 +81,11 @@ define(function(require, exports, module) {
         options.category_ids = [category._id];
       }
 
+      if (options.team_ids === undefined) {
+        var team = Factory.last.team || Factory.createTeam();
+        options.team_ids = [team._id];
+      }
+
       return new Factory.Builder('Competitor', options)
         .addRef('climber')
         .addRef('event');
@@ -97,6 +102,11 @@ define(function(require, exports, module) {
     },
 
     Event: function (options) {
+      if (options.teamType_ids === undefined) {
+        var teamType = Factory.last.teamType || Factory.createTeamType();
+        options.teamType_ids = [teamType._id];
+      }
+
       var category = Factory.last.category || Factory.createCategory();
       if (! ('heats' in options)) {
         options.heats = [category._id];

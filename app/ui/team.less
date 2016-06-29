@@ -1,0 +1,46 @@
+@import "global.lessimport";
+
+#Team {
+  #TeamIndex {
+    padding: 2px 4px;
+    &.noTeamType table {
+      display: none;
+    }
+
+    label.teamType {
+      span {
+        margin-right: 1em;
+      }
+    }
+
+    nav {
+      margin-top: 1em;
+    }
+  }
+
+  table {
+    th:first-child {
+      width: 60%;
+    }
+    body:not(.aAccess) & tbody {
+      cursor: initial;
+    }
+  }
+
+  form {
+    margin: 10px;
+
+    font-size: 1.2em;
+    >h1 {
+      font-size: 1.4em;
+    }
+
+    [name=name] {
+      width: 50ex;
+    }
+    [name=shortName] {
+      text-transform:uppercase;
+      width: 6ex;
+    }
+  }
+}

@@ -1,10 +1,11 @@
 define(function(require, exports, module) {
-  var Val = require('koru/model/validation');
-  var util = require('koru/util');
-  var koru = require('koru');
-  var Category = require('./category');
-  var Org = require('./org');
-  var Heat = require('./heat');
+  const koru     = require('koru');
+  const Val      = require('koru/model/validation');
+  const util     = require('koru/util');
+  const TeamType = require('models/team-type');
+  const Category = require('./category');
+  const Heat     = require('./heat');
+  const Org      = require('./org');
 
   var model = require('model').define(module, {
     validate: function () {
@@ -30,7 +31,8 @@ define(function(require, exports, module) {
     heats: 'object',
     date: {type: 'text', inclusion: {matches: /^\d{4}-[01]\d-[0-3]\d$/}},
     errors: 'object',
-    closed: {type: 'boolean', boolean: 'trueOnly'}
+    closed: {type: 'boolean', boolean: 'trueOnly'},
+    teamType_ids: 'has_many',
   });
 
   model.describeFormat = function (format) {

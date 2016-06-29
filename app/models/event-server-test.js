@@ -48,7 +48,8 @@ define(function (require, exports, module) {
         event.changes = {'name': 'new name'};
         assert.docChanges(event, {
           name: 'string',
-          org_id: 'string',
+          org_id: 'id',
+          teamType_ids: ['id'],
           date: 'string',
           closed: TH.match.any,
           heats: 'baseObject',
