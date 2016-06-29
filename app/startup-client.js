@@ -7,6 +7,7 @@ define(function(require, exports, module) {
   require('koru/ui/helpers');
   require('ui/profile');
   require('ui/club');
+  require('ui/team');
   require('ui/climber');
   require('ui/category');
   require('ui/event-category');

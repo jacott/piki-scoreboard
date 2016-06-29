@@ -14,6 +14,31 @@
 
 .error, .error:focus {
   background-color: @colorInputErrorBG;
+        }
+
+body>.glassPane {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+
+  >span {
+    position: absolute;
+    width: 0;
+    height: 0;
+  }
+  >:not(.dialogContainer):not(span):not(.inline) {
+    position: fixed;
+    background-color: #fff;
+    .box-shadow-level(1);
+    padding: 5px;
+    max-height: 100vh;
+    >ul>li {
+      cursor: pointer;
+    }
+  }
 }
 
 fieldset {

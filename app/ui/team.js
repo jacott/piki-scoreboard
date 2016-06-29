@@ -35,8 +35,12 @@ define(function(require, exports, module) {
       callback.render({
         model: Team,
         sort: util.compareByName,
-        params: {teamType_id: $.ctx.data.teamType_id},
+        params: {teamType_id: Tpl.teamType_id},
       });
+    },
+
+    teamType() {
+      return TeamType.findById(Tpl.teamType_id);
     },
   });
 
@@ -55,7 +59,7 @@ define(function(require, exports, module) {
       SelectMenu.popup(this, {
         list,
         onSelect(elm) {
-          ctx.data.teamType_id = $.data(elm).id;
+          Tpl.teamType_id = $.data(elm).id;
           ctx.updateAllTags();
           return true;
         }
@@ -67,11 +71,7 @@ define(function(require, exports, module) {
   base.addTemplate(Tpl.Add, {
     focus: true,
     data: function () {
-      let teamType_id = Tpl.$data(document.getElementById('Team')).teamType_id;
-      a.debug
-      _koru_.debug('teamType_id', teamType_id);
-
-      return new Team({org_id: App.orgId, teamType_id});
+      return new Team({org_id: App.orgId, teamType_id: Tpl.teamType_id});
     }
   });
 

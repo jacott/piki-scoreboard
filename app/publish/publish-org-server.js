@@ -7,12 +7,14 @@ define(function(require, exports, module) {
   var User = require('models/user');
 
   require('models/club');
+  require('models/team');
+  require('models/team-type');
   require('models/climber');
   require('models/event');
   require('models/category');
 
 
-  var orgChildren = ['Club', 'Climber', 'Event', 'Category'];
+  var orgChildren = ['Club', 'Climber', 'Event', 'Category', 'Team', 'TeamType'];
 
   koru.onunload(module, function () {
     publish._destroy('Org');

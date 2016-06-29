@@ -13,13 +13,14 @@ isClient && define(function (require, exports, module) {
       v.org =  TH.Factory.createOrg();
       TH.login();
       TH.setOrg(v.org);
-      TH.Factory.createTeamType({_id: 'tt1'});
+      TH.Factory.createTeamType({_id: 'tt1', name: 'type 1'});
       App.setAccess();
     },
 
     tearDown: function () {
       TH.tearDown();
       v = null;
+      sut.teamType_id = null;
     },
 
     "test rendering": function () {
@@ -31,6 +32,7 @@ isClient && define(function (require, exports, module) {
 
       assert.dom('#Team', function () {
         TH.selectMenu('[name=teamType_id]', TH.match.field('id', 'tt1'));
+        assert.dom('[name=teamType_id]', 'type 1');
         assert.dom('.teams', function () {
           assert.dom('h1', 'Teams');
           assert.dom('h1+table', function () {
@@ -50,6 +52,7 @@ isClient && define(function (require, exports, module) {
     "test adding new team": function () {
       Route.gotoPage(sut.Index);
 
+      TH.selectMenu('#Team [name=teamType_id]', TH.match.field('id', 'tt1'));
       assert.dom('#Team', function () {
         TH.click('[name=addTeam]');
         assert.dom('#AddTeam', function () {
@@ -71,6 +74,7 @@ isClient && define(function (require, exports, module) {
         v.team2 = TH.Factory.createTeam();
 
         Route.gotoPage(sut.Index);
+        TH.selectMenu('#Team [name=teamType_id]', TH.match.field('id', 'tt1'));
 
         TH.click('td', v.team.name);
       },

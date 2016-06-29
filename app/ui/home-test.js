@@ -43,8 +43,8 @@ isClient && define(function (require, exports, module) {
         test.stub(Route, 'gotoPath');
 
         assert.dom('#Home', function () {
-          TH.click('button.link', 'Clubs');
-          assert.calledWith(Route.gotoPath, Dom.Club);
+          TH.click('button.link', 'Teams');
+          assert.calledWith(Route.gotoPath, Dom.Team);
 
           TH.click('button.link', 'Climbers');
           assert.calledWith(Route.gotoPath, Dom.Climber);
