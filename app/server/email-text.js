@@ -13,9 +13,7 @@ define(function(require, exports, module) {
   );
 
   return {
-    sendResetPasswordEmailText: function(userId, resetToken) {
-      var user = User.findById(userId);
-
+    sendResetPasswordEmailText: function(user, resetToken) {
       return format(RESET_PASSWORD_TEXT, {user: user, url: koru.config.urlRoot + '#reset-password/'+resetToken});
     }
   };

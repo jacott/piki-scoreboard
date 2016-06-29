@@ -37,14 +37,14 @@ define(function(require, exports, module) {
     userAccount.stop();
   }
 
-  function restart(id, error) {
+  function restart(mod, error) {
     var location = window.location;
     var href = location.href;
     var state = window.history.state;
     stop();
     window.history.replaceState(state, '', href);
     if (error) return;
-    require([id], function () {
+    require([mod.id], function () {
       start();
     });
   }

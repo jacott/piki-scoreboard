@@ -1,11 +1,13 @@
 isClient && define(function (require, exports, module) {
   var test, v;
-  var TH = require('./test-helper');
-  var Profile = require('./profile');
-  var Route = require('koru/ui/route');
-  var Dom = require('koru/dom');
-  var UserAccount = require('koru/user-account');
-  var session = require('koru/session');
+  const Dom         = require('koru/dom');
+  const session     = require('koru/session');
+  const Route       = require('koru/ui/route');
+  const UserAccount = require('koru/user-account');
+  const ClientLogin = require('koru/user-account/client-login');
+  const Home        = require('ui/home');
+  const Profile     = require('./profile');
+  const TH          = require('./test-helper');
 
   TH.testCase(module, {
     setUp: function () {
@@ -33,6 +35,12 @@ isClient && define(function (require, exports, module) {
         TH.click('[name=signOut]');
 
         assert.called(UserAccount.logout);
+        test.stub(Route, 'replacePage');
+
+        ClientLogin.wait(session, 'wait');
+        refute.called(Route.replacePage);
+        ClientLogin.ready(session, 'ready');
+        assert.calledWith(Route.replacePage, Home);
       },
 
       "test signOut other clients": function () {

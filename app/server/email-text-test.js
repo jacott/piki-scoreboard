@@ -16,7 +16,7 @@ isServer && define(function (require, exports, module) {
 
     "test sendResetPasswordEmailText": function () {
       var user = TH.Factory.createUser({name: 'Kate Sheppard'});
-      var result = emailText.sendResetPasswordEmailText(user._id, 'foo-bar');
+      var result = emailText.sendResetPasswordEmailText(user, 'foo-bar');
 
       assert.match(result, /Hello Kate Sheppard/);
 

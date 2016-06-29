@@ -66,6 +66,11 @@ define(function(require, exports, module) {
 
   Tpl.$extend({
     onBaseEntry () {
+      var user = User.me();
+
+      if (! user || user._id === 'guest')
+        Route.abortPage(Home);
+
       document.body.appendChild(Tpl.$autoRender(User.me()));
     },
 
@@ -74,8 +79,8 @@ define(function(require, exports, module) {
     },
 
     $created (ctx) {
-      ctx.onDestroy(login.onChange(session, function () {
-        Route.replacePath(Home);
+      ctx.onDestroy(login.onChange(session, state => {
+        state === 'ready' && Route.replacePage(Home);
       }));
     },
   });
