@@ -41,62 +41,424 @@
   }
 }
 
-button.link {
+button.on, button.input, button[type=submit], button[name=cancel], button[name=delete], select, .input, button.action {
+  border-radius: @fixedBorderRadius;
+  font-family: 'Roboto', sans-serif;
+  font-size: 100%;
+
+  &.error {
+    border-color: @colorErrorHighlight;
+  }
+}
+
+button {
   border: none;
   background: none;
+  outline: none;
+  font-family: 'Roboto', sans-serif;
+  font-size: 100%;
+  cursor: pointer;
+  padding: 0;
   color: inherit;
-  &:hover, &:focus {
-    text-decoration: underline;
-    outline: 0;
-  }
-}
+  position: relative;
 
-button:not(.link), textarea, input, select {
-  font-size: inherit;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-button:not(.link) {
-  border-radius: 6px;
-  padding: 0.5em 1em;
-  &:focus {
-    outline: 0;
-    .box-shadow(0 0 2px fade(#000, 60%));
+  &:focus:not(:active) {
+    box-shadow: none;
+    background-color: fade(#444, 15%);
   }
-  &[type=submit] {
+
+  &:hover {
+    background-color: fade(#888, 10%);
+  }
+
+  >* {
+    pointer-events: none;
+  }
+
+  &.on,
+  &.input,
+  &[name=cancel] {
+    color: @cLinkText;
+  }
+
+  &.input, &.action, &[type=submit], &[name=cancel], &[name=delete], &[name=color] {
+    height: 28px;
+    padding: 0 10px;
+  }
+
+  &[type=submit], &.action {
+    background-color: @cPrimary;
+    color: @colorLightText;
+    .box-shadow-level;
+
+    &:focus:not(:active) {
+      background-color: darken(@cPrimary, 10%);
+      box-shadow: 0 0 8px rgba(0,0,0,.18),0 8px 16px rgba(0,0,0,.36);
+    }
+  }
+
+  &[name=delete]:not(.minor) {
     color: #fff;
-    .linear-gradient(#6d8, #0a2);
+    background-color: @cWarn;
+
+    &:focus:not(:active) {
+      background-color: darken(@cWarn, 10%);
+    }
+  }
+
+  &[name=delete].minor {
+    color: @cWarn;
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+    background-color: @cDisabledBG;
+    color: @cDisabledFG;
+    cursor: not-allowed;
+  }
+
+  &.check {
+    .md-checkbox();
   }
 }
 
-textarea, input, select {
+.input {
+  border: 1px solid @colorButtonBorder;
+
   &:focus {
-    outline: 1px solid fade(#000, 10%);
-    background-color: #eee;
+    border-bottom-color: @cPrimary;
+    box-shadow: 0 0  4px @cPrimary;
   }
 }
+
+button[name=checkbox], button.checkbox {
+  border: none;
+  .md-checkbox();
+}
+
+label.checkboxLabel {
+  input[type=checkbox] {
+    opacity: 0;
+    &+span:before {
+      .md-inline-icon("check_box_outline_blank");
+      vertical-align: -25%;
+      margin-left: -1.1em;
+    }
+    &[checked]+span:before {
+      content: "check_box";
+    }
+    &:focus:not(:active)+span:before {
+      background-color: fade(#444, 15%);
+    }
+  }
+}
+
+select {
+  border: none;
+  background: none;
+  color: @cLinkText;
+
+  option {
+    color: @cLinkText;
+  }
+
+  .webkitbrowser & {
+    -webkit-appearance: none;
+    background: url("/public/images/down-arrow.svg") no-repeat right;
+    background-size: .8em;
+    padding-right: 0.8em;
+  }
+}
+
+.removeLink {
+  color: @cWarn;
+}
+
+
+.errorField.error {
+  border-color: @colorErrorHighlight !important;
+}
+
+i.bad {
+  color: @cWarn;
+  .md-icon("clear");
+}
+i.good {
+  color: @cGood;
+  .md-icon("check");
+}
+
+a, input, textarea, select {
+  outline: 0;
+  &.error {
+    border-color: @colorErrorHighlight !important;
+  }
+}
+
+a:focus, a:hover {
+  text-decoration: underline;
+}
+
+
+h1 {
+  font-weight: normal;
+  font-size: 1.3em;
+  margin: 0;
+}
+
+span.errorMsg {
+  display: none;
+  font-size: 95%;
+}
+
+.errorMsg {
+  display: none;
+  color: @colorErrorHighlight;
+}
+
+.error+.errorMsg, .msg.errorMsg {
+  display: block;
+}
+
+@keyframes errorAnmiate {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.errorTop+.errorMsg {
+  pointer-events: none;
+  z-index: 1;
+  background: transparent;
+  padding-bottom: 5px;
+  position: relative;
+  >div {
+    background: #f84;
+    border-radius: @fixedBorderRadius;
+    padding: 4px 6px;
+    color: #fff;
+    white-space: nowrap;
+    &:after {
+      position: absolute;
+      height: 0;
+      width: 0;
+      .md-inline-icon("arrow_drop_down");
+      display: block;
+      margin-top: -13px;
+      color: #f84;
+      font-size: 36px;
+    }
+  }
+  &.animate {
+    animation-duration: 200ms;
+    animation-name: errorAnmiate;
+  }
+}
+.errorRight+.errorMsg>div:after {
+  right: 0;
+}
+
+span.value {
+  color: @cFormText;
+}
+
+button.link, a {
+  user-select: none;
+  &:focus, &:active, &:hover {
+    &:not([disabled=disabled]) {
+      text-decoration: underline;
+    }
+  }
+  &[disabled=disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+input {
+  border: none;
+  background: transparent;
+  border-bottom: 1px solid fade(#000, 20%);
+  &:focus {
+    border-bottom: 1px solid #008;
+  }
+}
+
+input[type=number] {
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  -moz-appearance: textfield;
+}
+
+div:focus, section:focus {
+  outline: none;
+  .box-shadow-level;
+}
+
+// highlight link
+.hlLink {
+  color: @colorActionLink;
+}
+
+button.ui-editable {
+  margin: 0;
+}
+
+span.label {
+  display: block;
+  font-size: 0.8em;
+}
+
+fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+  -webkit-margin-start: 0;
+  -webkit-margin-end: 0;
+  -webkit-padding-before: 0;
+  -webkit-padding-start: 0;
+  -webkit-padding-end: 0;
+  -webkit-padding-after: 0;
+  min-width: 0;
+}
+
+.glassPane.dragging {
+  cursor: move;
+}
+
+.fab, .icon {
+  padding: .4em;
+}
+
+.fab, .icon, icon, button>.downList {
+  &:before {
+    .md-inline-icon("", @fontSize: 22px);
+  }
+}
+
+button>.downList:before {
+  content: "arrow_drop_down";
+}
+
+button.fab {
+  border-radius: 50%;
+  >.ripple {
+    -webkit-mask-image: -webkit-radial-gradient(circle,#fff,#000);
+    border-radius: 50%;
+  }
+}
+
+.ripple-button {
+  position: relative;
+  >:not(button):not([draggable="true"]) {
+    pointer-events: none;
+  }
+}
+
+.ripple {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  overflow: hidden;
+  will-change: transform, width, height;
+
+  >div {
+    position: absolute;
+    opacity: .3;
+    background: #000;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  @rippleCurve: cubic-bezier(0, 0, 0.2, 1);
+
+  &.animate>div {
+    transition: transform .3s @rippleCurve,
+    width 0.3s @rippleCurve,
+    height 0.3s @rippleCurve,
+    opacity 0.6s @rippleCurve;
+  }
+
+  &.ripple-finished>div {
+    opacity: 0;
+  }
+}
+
+.spacer {
+  flex: 1 1 0%;
+}
+
+.value, .format, .input, [contenteditable=true] {
+  user-select: text;
+}
+
+.format, .input {
+  line-height: 1.2em;
+  ol {list-style-type: decimal}
+  ul {list-style-type: disc}
+  ol, ul {
+    padding-left: 1.5em;
+  }
+
+  pre {
+    margin: 10px;
+    padding: 2px;
+    border: 1px solid #000;
+  }
+
+  span {
+    line-height: 1em;
+  }
+
+  a.user {
+    text-decoration: none;
+    padding: 1px 2px;
+    border-radius: 0;
+    border: 1px solid fade(#000, 10%);
+    color: darken(@colorHeaderDlistBtnBGSel, 10%);
+    cursor: text;
+  }
+
+  blockquote {
+    margin: 0;
+    padding-left: 1.5em;
+  }
+}
+
 
 table {
   border-collapse: collapse;
 }
 
 th.sort {
-  .user-select(none);
+  user-select: none;
   &:after {
-    .inline-icon(@icon-arrow-down);
+    .md-inline-icon("arrow_drop_down");
     margin-left: 4px;
   }
   &.desc:after {
-    .inline-icon(@icon-arrow-up);
+    .md-inline-icon("arrow_drop_up");
   }
 }
 
 .body>div {
   >nav.menu {
-    .linear-gradient(#fff, #ccc);
-    .box-shadow(-1px 0 0 #ccc);
+    background-color: #fff;
+    box-shadow: -1px 0 0 #ccc;
     border-bottom: 1px solid #888;
+    padding: 2px 4px;
+    >:not(:first-child) {
+      margin-left: 1em;
+    }
   }
   >section {
     margin: 10px;
@@ -116,9 +478,31 @@ th.sort {
 
 }
 
+table.select {
+  width: 100%;
+  cursor: pointer;
+  thead {
+    border-bottom: 1px solid #000;
+    th {
+      text-align: left;
+    }
+  }
+  tr:nth-child(even) {
+    background-color: fade(#000, 10%);
+  }
+  table-layout:fixed;
+  th, td {
+    padding: 2px;
+  }
+  tbody tr:hover {
+    background-color: #0ff;
+  }
+}
+
 table>tbody>tr.selected {
   background-color: fade(@colorSelectedBackground, 90%);
 }
+
 
 @media print {
   select, button:not(.print), .no-print {

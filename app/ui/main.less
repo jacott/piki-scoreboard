@@ -1,5 +1,11 @@
 @import "global.lessimport";
 
+@import url("https://fonts.googleapis.com/css?family=Roboto");
+
+*, :after, :before {
+  box-sizing: border-box;
+}
+
 html {
   .linear-gradient(#0ff, #eff);
   height: 100%;
@@ -30,12 +36,6 @@ body {
   }
 }
 
-*, :after, :before {
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-
 #Header {
   body:not(.inOrg) &>div {
     &:after {
@@ -61,6 +61,7 @@ body {
     height: @headerHeight;
     line-height: @headerHeight;
     font-size: 1.2em;
+    padding: 4px;
 
     nav.left {
       float: left;
@@ -75,6 +76,9 @@ body {
     }
     nav.right {
       float: right;
+      >:not(:first-child) {
+        margin-left: 1em;
+      }
     }
   }
   &~section {
@@ -84,7 +88,7 @@ body {
     left: 0;
     right: 0;
     > div {
-      background-color: fade(#fff, 90%);
+      background-color: #fff;
       height: 100%;
       overflow: auto;
       margin: auto;

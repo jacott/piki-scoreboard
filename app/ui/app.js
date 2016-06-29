@@ -21,10 +21,14 @@ define(function(require, exports, module) {
 
   var selfSub, orgSub, orgShortName, pathname, sessStateChange;
 
+  const isTouch = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i
+        .test(navigator.userAgent.toLowerCase());
+
+
   koru.onunload(module, 'reload');
 
   util.extend(App, {
-    text: function (text) {
+    text(text) {
       var m = /^([^:]+):(.*)$/.exec(text);
       if (m) {
         var fmt = ResourceString.en[m[1]];
@@ -37,7 +41,7 @@ define(function(require, exports, module) {
 
     subscribe: require('koru/session/subscribe')(session),
 
-    stop: function () {
+    stop() {
       orgSub && orgSub.stop();
       selfSub && selfSub.stop();
       sessStateChange && sessStateChange.stop();
@@ -46,7 +50,7 @@ define(function(require, exports, module) {
       window.removeEventListener('popstate', pageChanged);
     },
 
-    start: function () {
+    start() {
       App.stop();
       sessStateChange = sessState.onChange(connectChange);
       Spinner.init();
@@ -60,7 +64,7 @@ define(function(require, exports, module) {
       header.show();
     },
 
-    _setOrgShortName: function (value) {
+    _setOrgShortName(value) {
       orgShortName = value;
     }
   });
@@ -132,6 +136,54 @@ define(function(require, exports, module) {
       if (orgLink) orgLink.textContent = "Choose Organization";
     }
   }
+
+  document.addEventListener(isTouch ? 'touchstart' : 'mousedown', ripple, true);
+  var rippleElm = Dom.html({class: 'ripple', html: {}});
+
+  function ripple(event) {
+    var button = event.target;
+    if (button.tagName !== 'BUTTON' && ! Dom.hasClass(button, 'ripple-button')) return;
+
+    Dom.removeClass(rippleElm, 'animate');
+    Dom.removeClass(rippleElm, 'ripple-finished');
+    var rect = button.getBoundingClientRect();
+    var activeElement = document.activeElement;
+
+    var st = rippleElm.style;
+    st.width = rect.width + 'px';
+    st.height = rect.height + 'px';
+    st = rippleElm.firstChild.style;
+    if (! st) return;
+    var rippleSize = Math.sqrt(rect.width * rect.width +
+                               rect.height * rect.height) * 2 + 2;
+    st.width = rippleSize + 'px';
+    st.height = rippleSize + 'px';
+    var translate = 'translate(-50%, -50%) ' +
+          'translate(' + (event.clientX - rect.left) + 'px, ' + (event.clientY - rect.top) + 'px)';
+    st[Dom.vendorTransform] = translate + ' scale(0.0001, 0.0001)';
+
+    button.insertBefore(rippleElm, button.firstChild);
+    Dom.nextFrame(function () {
+      Dom.addClass(rippleElm, 'animate');
+      st[Dom.vendorTransform] = translate;
+    });
+
+    document.addEventListener('mouseup', removeRipple, true);
+
+    function removeRipple(event) {
+      document.removeEventListener('mouseup', removeRipple, true);
+
+      // Allow a repaint to occur before removing this class, so the animation
+      // shows for tap events, which seem to trigger a mouseup too soon after
+      // mousedown.
+      Dom.nextFrame(function() {
+        Dom.addClass(rippleElm, 'ripple-finished');
+      });
+
+    }
+  }
+
+
 
   return App;
 });

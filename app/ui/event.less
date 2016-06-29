@@ -1,7 +1,7 @@
 @import "global.lessimport";
 
 #Event {
-  .user-select(none);
+  user-select: none;
   table th:first-child {
     width: 60%;
   }
@@ -70,7 +70,7 @@
         background-color: #aff;
 
         .select:before {
-          visibility: visible;
+          content: "check_box";
         }
       }
       &.B+.L {
@@ -83,11 +83,9 @@
         display: inline-block;
         width: 1.2em;
         height: 1.2em;
-        cursor: pointer;
-        border: 1px solid fade(#000, 20%);
-        .icon(@icon-tick);
         &:before {
-          visibility: hidden;
+          .md-inline-icon("check_box_outline_blank"; @fontSize: 1em);
+          vertical-align: top;
         }
       }
     }

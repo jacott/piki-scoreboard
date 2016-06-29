@@ -1,20 +1,12 @@
-@import "global.lessimport";
+@import "forms.lessimport";
 
-.errorMsg {
-  display: none;
-  color: @colorErrorText;
+div.ui-buttonMenu {
+  .buttonMenu();
 }
 
-.error+.errorMsg {
-  &:first-letter {
-    text-transform:uppercase;
-  }
-  display: inherit;
+.ui-selectList.boardSelect>div>div {
+  min-width: 200px;
 }
-
-.error, .error:focus {
-  background-color: @colorInputErrorBG;
-        }
 
 body>.glassPane {
   position: fixed;
@@ -41,71 +33,14 @@ body>.glassPane {
   }
 }
 
-fieldset {
-  border: none;
-  label {
-    display: block;
-    >.name {
-      display: block;
-      font-size: 0.8em;
-      color: @colorText;
-    }
-    margin-top: 0.5em;
-  }
-  &.actions {
-    >button  {
-      margin-right: 1em;
-    }
-  }
-
-  [name=delete] {
-    color: #fff;
-    .linear-gradient(#a00, #800);
-  }
-
-}
-
-table.select {
-  width: 100%;
-  cursor: pointer;
-  thead {
-    border-bottom: 1px solid #000;
-    th {
-      text-align: left;
-    }
-  }
-  tr:nth-child(even) {
-    background-color: fade(#000, 10%);
-  }
-  th, td {
-    padding: 2px;
-  }
-  tbody tr:hover {
-    background-color: #0ff;
-  }
-}
-
-.autoComplete {
-  position: relative;
-  &+ul.complete {
-    position: absolute;
-    list-style-type: none;
-    &>li {
-      margin: 0;
-      padding: 0;
-    }
-
-    margin: 0;
-    border: 1px solid fade(#000, 80%);
-    .box-shadow(0 0 4px fade(#000, 60%));
-    border-bottom-right-radius: 4px;
-    background-color: #fff;
-    color: #444;
-    padding: 4px;
-    >li:hover, >li.selected {
-      color: #000;
-      background: #0ff;
-    }
+button.select, .dropList {
+  padding: 3px;
+  border-radius: @fixedBorderRadius;
+  &:after {
+    margin-left: 3px;
+    position: relative;
+    top: -2px;
+    .md-inline-icon("arrow_drop_down");
   }
 }
 
@@ -131,7 +66,7 @@ table.select {
     width: 50%;
     height: 2em;
     border-radius: 2px;
-    background-color: #0aa;
+    background-color: @cPrimary;
     z-index: 1;
   }
   >span {
@@ -160,12 +95,268 @@ table.select {
   }
 }
 
-@media print {
-  table.select {
-    tr {
-      page-break-inside: avoid;
-      border-bottom: 1px solid #ddd;
-      background: none !important;
+li.sep {
+  border-top: 2px groove;
+  margin: 4px 0;
+  padding: 0;
+}
+
+body>.complete {
+  position: absolute;
+  cursor: pointer;
+  margin: 0;
+  .box-shadow-level(2);
+  border-bottom-right-radius: 4px;
+  background-color: #fff;
+  color: #444;
+  padding: 4px;
+  >li {
+    padding: 2px;
+    border-radius: @fixedBorderRadius;
+    &:hover, &.selected {
+      color: #fff;
+      background: @cPrimary;
     }
   }
+}
+
+#SelectMenu {
+  max-height: 20em;
+  .flexFlow(column);
+  >.search {
+    flex-shrink: 0;
+    &:after {
+      .md-inline-icon("search"; @fontSize: 1.4em);
+      margin-left: .1em;
+    }
+    input {
+      border: none;
+      border-radius: 0;
+      border-bottom: 1px solid #444;
+      display: inline-block;
+      width: calc(~"100% - 24px");
+    }
+  }
+
+  >ul {
+    flex: 1 1 auto;
+    overflow: auto;
+  }
+
+  li {
+    padding: 2px 4px;
+  }
+}
+
+#SelectMenu {
+  >ul, >menu {
+    li:not(.disabled):not(.sep) {
+      border-radius: 2px;
+      &:hover, &.selected {
+        color: @colorHeaderDlistBtnSel;
+        background: @colorHeaderDlistBtnBGSel;
+      }
+      &:hover {
+        background-color: lighten(@cPrimary, 10%);
+      }
+      &:hover.selected {
+        background-color: darken(@cPrimary, 5%);
+      }
+    }
+    li.disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.buttonMenu {
+  position: relative;
+  >[name=dropMenu] {
+    .md-icon("arrow_drop_down");
+  }
+  >.dropMenu {
+    position: absolute;
+    top: 100%;
+    min-width: 100%;
+    background-color: #fff;
+    font-size:  1em;
+    box-shadow: @colorShadowLight 4px 4px 2px;
+    white-space: nowrap;
+    >* {
+      width: 100%;
+      text-align: left;
+      display: block;
+    }
+  }
+}
+
+fieldset.actions {
+  margin-top: 0.5em;
+  button:not(:first-child) {
+    margin-left: 0.5em;
+  }
+}
+
+fieldset.fields {
+  >div {
+    margin-top: 0.5em;
+  }
+  >label {
+    &:after {
+      content: " ";
+      display: table;
+    }
+    >span:first-child {
+      margin-top: 0.5em;
+      display: block;
+      font-size: 0.8em;
+    }
+  }
+}
+
+.label+form {
+  display: inline-block;
+}
+
+.mdMention, .rtMention {
+  >div {
+    &.empty:after {
+      content: "Not found";
+      display: block;
+      padding: 5px;
+      color: #aaa;
+    }
+    &.needMore.empty:after {
+      content: "Enter text";
+    }
+    &[data-type]:before {
+      padding: 5px;
+      width: 100%;
+      display: block;
+      background-color: #888;
+      color: #fff;
+      text-align: center;
+    }
+    &[data-type="Ticket"]:before {
+      content: "Tickets"
+    }
+    &[data-type="Board"]:before {
+      content: "Boards"
+    }
+    color: @cFormText;
+    z-index: 1;
+    min-width: 10em;
+    >div {
+      .flexFlow(row);
+      align-items: baseline;
+      >.name {
+        padding: 4px;
+      }
+      padding: 5px;
+      border-bottom: 1px solid #ccc;
+      &.selected {
+        &:hover, &.selected {
+          color: @colorHeaderDlistBtnSel;
+          background: @colorHeaderDlistBtnBGSel;
+        }
+      }
+    }
+  }
+  &:not(.inline), >div {
+    border-radius: @fixedBorderRadius;
+    background-color: @colorDialogBackground;
+    .box-shadow-level(2);
+  }
+}
+
+.mdEditor, .format {
+  [data-a] {
+    padding: 1px 2px;
+    border-radius: 0;
+    border: 1px solid fade(#000, 10%);
+    font-weight: bold;
+    color: darken(@colorHeaderDlistBtnBGSel, 10%);
+  }
+}
+
+body>.Calendar {
+  position: absolute;
+  margin-top: 4px;
+  background: #fff;
+  color: @cFormText;
+  z-index: 1000;
+  .box-shadow-level(2);
+
+  header {
+    padding: 8px;
+    background: @cPrimary;
+    color: #fff;
+    .flexFlow(row, nowrap);
+    justify-content: space-between;
+    button:before {
+      .md-inline-icon(""; @fontSize: 1.4em);
+    }
+    [name=previous]:before {
+      content: "arrow_back";
+    }
+    [name=next]:before {
+      content: "arrow_forward";
+    }
+    button {
+      font-size: .9em;
+    }
+    span {
+      display: block;
+      flex: 1 1 100%;
+      text-align: center;
+    }
+  }
+
+  table {
+    margin: 8px;
+  }
+  td {
+    padding: 2px;
+    text-align: right;
+    &.previous, &.next {
+      color: #aaa;
+    }
+    &.today {
+      background: @colorBackground;
+      .box-shadow-level;
+    }
+  }
+
+  tr:not(.dow)>td:hover,
+  table:not(:hover) td.select {
+    background: @cPrimary;
+    color: #fff;
+    .box-shadow-level(2);
+  }
+}
+
+.input[contenteditable=true] {
+  word-break: break-word;
+  &:focus,
+  &:hover {
+    outline: none;
+    box-shadow: inset 0 0 5px #d5d5d5;
+  }
+}
+
+#SelectMenu.userList {
+  li {
+    .flexFlow(row);
+    align-items: baseline;
+    padding: 2px;
+  }
+
+  .avatar {
+    margin-right: .5ex;
+  }
+}
+
+.sliderContainer {
+  .slider();
 }

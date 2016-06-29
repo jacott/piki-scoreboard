@@ -1,0 +1,165 @@
+@import "global.lessimport";
+
+.buttonMenu() {
+  display: inline-block;
+  position: relative;
+  &>div {
+    border-radius: 4px;
+    &:hover {
+      background-color: lighten(@colorToolbarBtnBGSel, 10%);
+      &>button {
+        color: @colorToolbarBtnSel;
+      }
+    }
+    &>button[name=dropMenu] {
+      .md-icon("arrow_drop_down");
+    }
+  }
+  &>ul {
+    display: none;
+    margin-top: 2px;
+    clear: both;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: @colorShadowLight 4px 4px 2px;
+    &>li {
+      display: block;
+      padding: 0 4px 0 0;
+      >button {
+        width: 100%;
+        text-align: left;
+      }
+    }
+  }
+  &.open {
+    &>ul {
+      display: block;
+    }
+    z-index: 1;
+  }
+}
+
+
+.actions() {
+  margin-top: 1em;
+  font-size: 1.2em;
+  >button {
+    width: 40%;
+    padding: 6px 12px;
+    &:first-child {
+      margin-right: 1em;
+    }
+  }
+}
+
+.slider() {
+  .flexFlow(row, nowrap);
+  align-items: center;
+
+  .slider {
+    flex: 1 1 100%;
+    position: relative;
+    height: 16px;
+    border: 6px solid white;
+    background-color: #444;
+    border-radius: @fixedBorderRadius;
+    margin: 0 4px;
+
+    .handle {
+      position: absolute;
+      top: 2px;
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      border-radius: 50%;
+      background-color: #444;
+      transform: translate(-50%, -50%);
+    }
+  }
+}
+
+// depreated
+.dropDownSelect(@_; @buttonWidth: 0; @numActions: 0) {
+  width: @buttonWidth;
+  display: inline-block;
+  vertical-align:text-top;
+
+  &>button {
+    font-size: inherit;
+    width: 100%;
+    display: block;
+    color: @colorHeaderDlistBtn;
+    background: @colorHeaderDlistBtnBG;
+    border: none;
+    border-radius: 3px;
+    font-size: inherit;
+    font-weight: bold;
+    padding: 6px 24px 3px 8px;
+    text-align: left;
+    margin: 0;
+
+    position: relative;
+    &:hover{
+      color: @colorHeaderDlistBtnSel;
+      background: @colorHeaderDlistBtnBGSel;
+    }
+
+    .downList {
+      position: absolute;
+      display: block;
+      top: 5px;
+      right: -1px;
+      width: 20px;
+      height: 20px;
+      .md-icon("arrow_drop_down"; @fontSize: 32px);
+    }
+    & + ul {
+      height: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      max-height: 380px;
+      visibility: hidden;
+      width: @buttonWidth;
+      color: @colorHeaderDlist;
+      background: @colorHeaderDlistBG;
+      border-radius: 3px;
+      box-shadow: @colorShadowMed 4px 4px 2px;
+      padding: 2px;
+      margin: 4px 0px;
+      border: 1px solid @colorHeaderDlistBorder;
+      &>li {
+        &:first-child {
+          margin-top: 1px;
+        }
+        &.disabled {
+          opacity: 0.5;
+        }
+        @lastOption: (@numActions + 1);
+        &:nth-last-child(@{lastOption}) {
+          margin-bottom: 1px;
+        }
+        &:nth-last-child(@{numActions}) {
+          margin-bottom: 1px;
+          border-top: 2px groove;
+          margin-top: 4px;
+          padding-top: 6px;
+        }
+        margin: 2px 1px;
+        padding: 4px 4px;
+        display: block;
+        cursor: pointer;
+        &.selected, &:not(.disabled):hover {
+          color: @colorHeaderDlistSel;
+          background-color: @colorHeaderDlistBGSel;
+          border-radius: 3px;
+        }
+      }
+    }
+    &.active + ul {
+      height: auto;
+      position: absolute;
+      z-index: 1000;
+      visibility: visible;
+    }
+  }
+}
