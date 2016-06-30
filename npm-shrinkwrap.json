@@ -561,7 +561,7 @@
     "koru": {
       "version": "0.4.1",
       "from": "git+ssh://git@dev.obeya.co:/home/git/koru.git#master",
-      "resolved": "git+ssh://git@dev.obeya.co:/home/git/koru.git#db9049d3d9b1774ab7059e38c74737ec47c3fc47"
+      "resolved": "git+ssh://git@dev.obeya.co:/home/git/koru.git#2763f438b0b662a6ffd401adf1919469c04a3a36"
     },
     "less": {
       "version": "2.7.1",

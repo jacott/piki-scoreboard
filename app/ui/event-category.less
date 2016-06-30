@@ -29,8 +29,24 @@
 
   .results {
     clear: both;
+    thead {
+      @media screen and (max-width: @smallDeviceWidth) {
+        th:last-child {
+          font-size: 8px;
+        }
+      }
+      th.score {
+        min-width: 7ex !important;
+      }
+
+      th.climber {
+      }
+    }
     td, th {
       cursor: initial;
+    }
+    th.problem {
+      width: 60%;
     }
     border: 1px solid fade(#000, 30%);
     width: inherit;
@@ -122,12 +138,6 @@
     thead {
       background-color: #08a;
       color: #fff;
-      th.score {
-        width: 6.5em;
-      }
-      th.climber {
-        width: 20em;
-      }
     }
     &+.note {
       color: #888;

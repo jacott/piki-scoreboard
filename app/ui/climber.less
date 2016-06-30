@@ -2,11 +2,14 @@
 
 #Climber {
   table {
-    th:first-child {
-      width: 20em;
+    th[data-sort=dateOfBirth] {
+      width: 8ex;
     }
-    th:last-child {
-      width: 20em;
+    th[data-sort=gender] {
+      width: 7ex;
+    }
+    th[data-sort=number] {
+      width: 11ex;
     }
     body:not(.aAccess) & tbody {
       cursor: initial;

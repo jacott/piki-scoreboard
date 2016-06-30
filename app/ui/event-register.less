@@ -49,8 +49,20 @@
   }
 
   table {
-    tr>th:first-child {
-      width: 20em;
+    @media all and (max-width: @smallDeviceWidth) {
+      .extra {display: none;}
+    }
+    th[data-sort=name] {
+      width: auto;
+    }
+    th[data-sort=dateOfBirth] {
+      width: 8ex;
+    }
+    th[data-sort=gender] {
+      width: 7ex;
+    }
+    th[data-sort=number] {
+      width: 8ex;
     }
 
     td abbr+abbr:before {

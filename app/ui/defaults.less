@@ -504,6 +504,16 @@ table>tbody>tr.selected {
   background-color: fade(@colorSelectedBackground, 90%);
 }
 
+ol.ui-ul, ul.ui-ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  &>li {
+    margin: 0;
+    padding: 0;
+  }
+}
+
 
 @media print {
   select, button:not(.print), .no-print {
