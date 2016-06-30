@@ -1,10 +1,10 @@
 define(function (require, exports, module) {
   var test, v;
-  var TH = require('test-helper');
-  var Event = require('./event');
-  var Org = require('./org');
-  var User = require('./user');
-  var koru = require('koru');
+  const koru  = require('koru');
+  const TH    = require('test-helper');
+  const Event = require('./event');
+  const Org   = require('./org');
+  const User  = require('./user');
 
   TH.testCase(module, {
     setUp: function () {
@@ -51,7 +51,11 @@ define(function (require, exports, module) {
           org_id: 'id',
           teamType_ids: ['id'],
           date: 'string',
-          closed: TH.match.any,
+          closed: TH.match(arg => {
+            return arg.$test(undefined)
+              && arg.$test(false) && ! arg.$test([])
+              && arg.$test("f") && ! arg.$test(1);
+          }),
           heats: 'baseObject',
         }, function () {
           event.authorize(v.user._id);

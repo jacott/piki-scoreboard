@@ -10,7 +10,7 @@ define(function(require, exports, module) {
     org_id: 'id',
     teamType_ids: ['id'],
     date: 'string',
-    closed: match.or(match.boolean, match.string),
+    closed: match.or(match.boolean, match.string, match.nil),
     heats: 'baseObject',
   };
 
