@@ -13,7 +13,7 @@
 
   <template name="Dialog">
     <form id="SignInDialog">
-      <fieldset>
+      <fieldset class="fields">
         <label>
           <span>Email</span>
           <input type="text" name="email">
@@ -44,7 +44,7 @@
           <input type="text" id="email" name="email" value="{{email}}" autocomplete="on">
         </label>
 
-        <fieldset>
+        <fieldset class="actions">
           <button type="submit" name="submit">Submit</button>
           <button type="button" name="cancel">Back to login</button>
         </fieldset>
