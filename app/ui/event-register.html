@@ -28,6 +28,21 @@
       </form>
     </template>
 
+    <template name="Teams">
+      <div class="Teams">
+        <h1>Representing</h1>
+        <div>
+          {{each "teamTypes" template="TeamType"}}
+          <template name="TeamType">
+            <label>
+              <span class="name">{{name}}</span>
+              <button class="select" type="button">{{teamName}}</button>
+            </label>
+          </template>
+        </div>
+      </div>
+    </template>
+
     <template name="Groups">
       <div class="Groups">
         <h1>{{climber.name}}</h1>
@@ -42,6 +57,7 @@
         </template>
       </div>
     </template>
+
     <template name="Category">
       <label>
         <span class="name">{{groupName}}</span>

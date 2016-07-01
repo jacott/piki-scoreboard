@@ -15,6 +15,24 @@ define(function (require, exports, module) {
       v = null;
     },
 
+    "test team"() {
+      v.tt = TH.Factory.createList(2, 'createTeamType');
+      v.teams1 = TH.Factory.createList(2, 'createTeam', function (index, options) {
+        options.teamType_id = v.tt[0]._id;
+      });
+
+      v.teams2 = TH.Factory.createList(2, 'createTeam', function (index, options) {
+        options.teamType_id = v.tt[1]._id;
+      });
+
+      let climber = TH.Factory.createClimber({team_ids: [v.teams1[0]._id]});
+      let climber2 = TH.Factory.createClimber();
+
+      assert.equals(climber.team(v.tt[0]), TH.matchModel(v.teams1[0]));
+      assert.equals(climber2.team(v.tt[0]), undefined);
+
+    },
+
     "test search": function () {
       var names = ['Bob', 'brendon', 'bobby', 'robert'];
       v.climbers = TH.Factory.createList(4, 'createClimber', function (index, options) {

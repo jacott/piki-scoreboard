@@ -1,5 +1,6 @@
 define(function(require, exports, module) {
-  var util = require('koru/util');
+  const util = require('koru/util');
+  const Team = require('models/team');
 
   return function (model) {
     util.extend(model, {
@@ -20,5 +21,17 @@ define(function(require, exports, module) {
       },
     });
 
+    util.extend(model.prototype, {
+      team(teamType_id) {
+        if (this.team_ids === undefined)
+          return;
+        teamType_id = model.toId(teamType_id);
+        for (let id of this.team_ids) {
+          let team = Team.findById(id);
+          if (team.teamType_id === teamType_id)
+            return team;
+        }
+      },
+    });
   };
 });

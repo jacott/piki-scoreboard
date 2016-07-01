@@ -14,6 +14,29 @@ define(function (require, exports, module) {
       v = null;
     },
 
+    "test setTeam"() {
+      let team = TH.Factory.createTeam();
+      let team2 = TH.Factory.createTeam();
+      let tt2 = TH.Factory.createTeamType();
+      let team3 = TH.Factory.createTeam();
+      let competitor = TH.Factory.createCompetitor({team_ids: null});
+
+      competitor.setTeam(team._id);
+      assert.equals(competitor.changes, {team_ids: [team._id]});
+
+      competitor.setTeam(team2);
+      assert.equals(competitor.changes, {team_ids: [team2._id]});
+
+      competitor.setTeam(team3);
+      assert.equals(competitor.changes, {team_ids: [team2._id, team3._id]});
+    },
+
+    "test team"() {
+      let competitor = TH.Factory.createCompetitor({team_ids: null});
+
+      assert.same(competitor.team, competitor.climber.team);
+
+    },
     "test categoryIdForGroup": function () {
       var aCategories = TH.Factory.createList(3, 'createCategory', function (index, options) {
         options.group = "A";

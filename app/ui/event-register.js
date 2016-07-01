@@ -1,18 +1,21 @@
 define(function(require, exports, module) {
-  var App   = require('./app-base');
-  var Dom   = require('koru/dom');
-  var Route = require('koru/ui/route');
-  var Tpl   = Dom.newTemplate(require('koru/html!./event-register'));
-  var util  = require('koru/util');
-  var koru = require('koru');
-  var Form = require('koru/ui/form');
-  var CompleteList = require('koru/ui/complete-list');
-  var eventTpl = require('./event');
-  var Competitor = require('models/competitor');
-  var Climber = require('models/climber');
-  var Category = require('models/category');
+  const koru         = require('koru');
+  const Dom          = require('koru/dom');
+  const CompleteList = require('koru/ui/complete-list');
+  const Form         = require('koru/ui/form');
+  const Route        = require('koru/ui/route');
+  const SelectMenu   = require('koru/ui/select-menu');
+  const util         = require('koru/util');
+  const Category     = require('models/category');
+  const Climber      = require('models/climber');
+  const Competitor   = require('models/competitor');
+  const Team         = require('models/team');
+  const TeamType     = require('models/team-type');
+  const App          = require('./app-base');
   require('./climber');
+  const eventTpl     = require('./event');
 
+  var Tpl   = Dom.newTemplate(require('koru/html!./event-register'));
   var $ = Dom.current;
   var Index = Tpl.Index;
 
@@ -20,6 +23,7 @@ define(function(require, exports, module) {
   var Edit = Tpl.Edit;
   var catTpl = Tpl.Category;
   var Groups = Tpl.Groups;
+  var Teams = Tpl.Teams;
   var AddClimber = Tpl.AddClimber;
   var competitor;
   var sortField = 'name';
@@ -134,6 +138,7 @@ define(function(require, exports, module) {
   Edit.$extend({
     $created: function (ctx, elm) {
       addGroups(elm, ctx.data);
+      addTeams(elm, ctx.data);
     },
   });
 
@@ -205,9 +210,9 @@ define(function(require, exports, module) {
         callback: function (ret) {
           if (ret._id) {
             input.value = ret.name;
-            competitor.climber_id = ret._id;
-
+            addClimber(competitor, ret);
             addGroups(form, competitor);
+            addTeams(form, competitor);
           } else if (ret.addNew) {
             addNew(form, value);
           }
@@ -242,8 +247,9 @@ define(function(require, exports, module) {
       Dom.Dialog.close();
       var form = document.querySelector('#Register form.add');
       var competitor = $.data(form);
-      competitor.climber_id = doc._id;
+      addClimber(competitor, doc);
       addGroups(form, competitor);
+      addTeams(form, competitor);
     }),
 
     'click [name=cancel]': function (event) {
@@ -258,6 +264,44 @@ define(function(require, exports, module) {
       Dom.stopEvent();
 
       Route.gotoPage(Dom.Climber.Edit, {climberId: $.ctx.data.climber._id});
+    },
+  });
+
+  Teams.$helpers({
+    teamTypes(callback) {
+      callback.render({
+        model: TeamType,
+      });
+    },
+  });
+
+  Teams.TeamType.$helpers({
+    teamName() {
+      let competitor = Teams.$data();
+      let team = competitor.team(this._id);
+      Dom.setClass('none', ! team, $.element.parentNode);
+      if (team)
+        return team.name;
+      return 'Select';
+    },
+  });
+
+  Teams.TeamType.$events({
+    'click .select': function (event) {
+      Dom.stopEvent();
+
+      let ctx = $.ctx;
+      let competitor = Teams.$data();
+      let list = Team.where('teamType_id', $.ctx.data._id).map(team => [team._id, team.name]);
+      SelectMenu.popup(this, {
+        list,
+        onSelect(elm) {
+          let id = $.data(elm).id;
+          competitor.setTeam(id);
+          ctx.updateAllTags();
+          return true;
+        }
+      });
     },
   });
 
@@ -310,6 +354,20 @@ define(function(require, exports, module) {
       }));
     });
     form.insertBefore(groupsElm, form.querySelector('.actions'));
+  }
+
+  function addTeams(form, competitor) {
+    var climber = competitor.climber;
+    var teamsElm = form.querySelector('.Teams');
+
+    Dom.remove(teamsElm);
+    teamsElm = Teams.$autoRender(competitor);
+    form.insertBefore(teamsElm, form.querySelector('.actions'));
+  }
+
+  function addClimber(competitor, climber) {
+    competitor.climber_id = climber._id;
+    competitor.team_ids = climber.team_ids;
   }
 
   return Tpl;

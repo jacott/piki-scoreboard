@@ -72,6 +72,7 @@ isClient && define(function (require, exports, module) {
     },
 
     "test adding new event": function () {
+      let tt = TH.Factory.createList(2, 'createTeamType');
       Route.gotoPage(sut.Index);
 
       assert.dom('#Event', function () {
@@ -80,6 +81,16 @@ isClient && define(function (require, exports, module) {
           TH.input('[name=name]', 'National Cup 1 - Auckland');
           TH.input('[name=date]', '2014-03-14');
           assert.dom('.onOff[data-field=closed]');
+          assert.dom('.teamTypeList', function () {
+            assert.dom('li', {count: 2});
+            assert.dom('li:first-child', function () {
+              assert.dom('.name', tt[0].name);
+              refute.className(this, 'checked');
+              TH.click('.check');
+              assert.className(this, 'checked');
+            });
+
+          });
           TH.click('[type=submit]');
         });
         refute.dom('#AddEvent');
@@ -93,7 +104,8 @@ isClient && define(function (require, exports, module) {
     "select": {
       setUp: function () {
         TH.login();
-        v.event = TH.Factory.createEvent();
+        v.tt = TH.Factory.createList(2, 'createTeamType');
+        v.event = TH.Factory.createEvent({teamType_ids: [v.tt[0]._id]});
 
         v.cats = TH.Factory.createList(3, 'createCategory', function (index, options) {
           options.shortName = 'YA ' + index;
@@ -258,6 +270,27 @@ isClient && define(function (require, exports, module) {
           refute.dom('#EditEvent');
 
           refute(Event.exists(v.event._id));
+        },
+
+        "test shows event teamTypes"() {
+          assert.dom('#EditEvent', function () {
+            assert.dom('.onOff[data-field=closed]');
+            assert.dom('.teamTypeList', function () {
+              assert.dom('li', {count: 2});
+              assert.dom('li.checked', {count: 1});
+              assert.dom('li:first-child', function () {
+                assert.dom('.name', v.tt[0].name);
+                assert.className(this, 'checked');
+                TH.click('.check');
+              });
+            });
+
+            TH.click('[type=submit]');
+            v.event.$reload();
+            assert.equals(v.event.teamType_ids, []);
+
+          });
+
         },
       },
     },

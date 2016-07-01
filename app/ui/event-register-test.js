@@ -13,10 +13,21 @@ isClient && define(function (require, exports, module) {
       test = this;
       v = {};
       v.org =  TH.Factory.createOrg();
-      v.event = TH.Factory.createEvent();
+      v.tt = TH.Factory.createList(2, 'createTeamType');
+      v.teams1 = TH.Factory.createList(2, 'createTeam', function (index, options) {
+        options.teamType_id = v.tt[0]._id;
+      });
+
+      v.teams2 = TH.Factory.createList(2, 'createTeam', function (index, options) {
+        options.teamType_id = v.tt[1]._id;
+      });
+
+      v.event = TH.Factory.createEvent({teamType_ids: [v.tt[0]._id, v.tt[1]._id]});
       var names = ['Bob', 'brendon', 'bobby', 'robert'];
       v.climbers = TH.Factory.createList(4, 'createClimber', function (index, options) {
         options.name = names[index];
+        if (index === 1)
+          options.team_ids = [v.teams1[0]._id];
       });
       v.u16 = TH.Factory.createCategory({group: '1 Youth Lead'});
       v.u18 = TH.Factory.createCategory({group: '1 Youth Lead'});
@@ -61,6 +72,23 @@ isClient && define(function (require, exports, module) {
             TH.trigger(Dom('body>ul>li'), 'mousedown');
           }});
         });
+
+        assert.dom('.Teams', function () {
+          assert.dom('label:first-child', function () {
+            assert.dom('.name', v.tt[0].name);
+
+            assert.dom('button.select', v.teams1[0].name);
+          });
+
+          assert.dom('label:last-child', function () {
+            assert.dom('.name', v.tt[1].name);
+
+            assert.dom('button.select.none', 'Select');
+            TH.selectMenu('button.select', TH.match.field('id', v.teams2[1]._id));
+            assert.dom('button.select:not(.none)', v.teams2[1].name);
+          });
+        });
+
         assert.dom('.Groups', function () {
           assert.dom('h1', {count: 1});
           assert.dom('label .name', {text: '1 Youth Lead', parent: function () {

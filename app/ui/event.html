@@ -113,6 +113,16 @@
     <fieldset class="fields">
       {{labelField "name"}}
       {{labelField "date" placeholder="yyyy-mm-dd"}}
+      <label><span class="name">Select team types for this event</span></label>
+      <ul class="teamTypeList ui-ul">
+        {{each "teamTypes" template="TeamType"}}
+        <template name="TeamType">
+          <li {{checked}}>
+            <button class="check" type="button"></button>
+            <span class="name">{{name}}</span>
+          </li>
+        </template>
+      </ul>
       {{labelField "closed" type="onOff" label="Event state" onLabel="closed" offLabel="open"}}
     </fieldset>
   </template>

@@ -7,7 +7,7 @@ define(function(require, exports, module) {
   const Team = require('./team');
 
   var model = require('model').define(module, {
-    get yearOfBirth() {return this.dateOfBirth && this.dateOfBirth.slice(0, 4)}
+    get yearOfBirth() {return this.dateOfBirth && this.dateOfBirth.slice(0, 4)},
   });
 
   model.defineFields({

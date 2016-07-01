@@ -1,18 +1,19 @@
 define(function(require, exports, module) {
-  var App   = require('./app-base');
-  var Dom   = require('koru/dom');
-  var Route = require('koru/ui/route');
-  var Tpl   = Dom.newTemplate(require('koru/html!./event'));
-  var util  = require('koru/util');
-  var koru = require('koru');
-  var Event = require('models/event');
-  var Val = require('koru/model/validation');
-  var Category = require('models/category');
-  var Result = require('models/result');
-  var Heat = require('models/heat');
-  var makeSubject = require('koru/make-subject');
-  var Form = require('koru/ui/form');
+  const koru        = require('koru');
+  const Dom         = require('koru/dom');
+  const makeSubject = require('koru/make-subject');
+  const Val         = require('koru/model/validation');
+  const Form        = require('koru/ui/form');
+  const Route       = require('koru/ui/route');
+  const util        = require('koru/util');
+  const Category    = require('models/category');
+  const Event       = require('models/event');
+  const Heat        = require('models/heat');
+  const Result      = require('models/result');
+  const TeamType    = require('models/team-type');
+  const App         = require('./app-base');
 
+  var Tpl   = Dom.newTemplate(require('koru/html!./event'));
   var $ = Dom.current;
   var Index = Tpl.Index;
 
@@ -180,6 +181,40 @@ define(function(require, exports, module) {
         if (doc && was) return;
         (doc || was) && callback(doc && cats[doc.category_id], was && cats[was.category_id], compareCategories);
       }));
+    },
+  });
+
+  Tpl.Form.TeamType.$helpers({
+    checked() {
+      let teamType_ids = Tpl.Form.$data().teamType_ids;
+      Dom.setClass('checked', teamType_ids && teamType_ids.indexOf(this._id) !== -1);
+    },
+  });
+
+  Tpl.Form.TeamType.$events({
+    'click .check': function () {
+      Dom.stopEvent();
+
+      let event = Tpl.Form.$data();
+      let checked = Dom.toggleClass(this.parentNode, 'checked');
+      let list = event.$change('teamType_ids');
+      if (! list){
+        event.teamType_ids = list = [];
+      }
+      if (checked) {
+        list.push($.ctx.data._id);
+      } else {
+        util.removeItem(list, $.ctx.data._id);
+      }
+    },
+  });
+
+  Tpl.Form.$helpers({
+    teamTypes(callback) {
+      callback.render({
+        model: TeamType,
+        sort: util.compareByName,
+      });
     },
   });
 
