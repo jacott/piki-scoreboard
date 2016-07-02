@@ -54,6 +54,9 @@ isClient && define(function (require, exports, module) {
 
           TH.click('button.link', 'Competitor categories');
           assert.calledWith(Route.gotoPath, Dom.Category);
+
+          TH.click('button.link', 'Org');
+          assert.calledWith(Route.gotoPath, Dom.Home.ChooseOrg);
         });
       },
 
