@@ -2,9 +2,6 @@
 
 #Event {
   user-select: none;
-  table th:first-child {
-    width: 60%;
-  }
 
   form {
     margin: 10px;
@@ -53,6 +50,9 @@
   }
 
   table.categories {
+    th:first-child {
+      min-width: 40%;
+    }
     tr {
       &:not(:last-child) {
         border-bottom: 1px solid fade(#000, 10%);
