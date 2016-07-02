@@ -37,12 +37,12 @@ define(function(require, exports, module) {
     eventTpl.route.removeBase(Tpl);
   });
 
-  var base = eventTpl.route.addBase(Tpl);
-  base.addTemplate(Add, {
+  var base = eventTpl.route.addBase(module, Tpl);
+  base.addTemplate(module, Add, {
     focus: true,
     defaultPage: true,
   });
-  base.addTemplate(Edit, {
+  base.addTemplate(module, Edit, {
     focus: true,
     data: function (page, pageRoute) {
       return Competitor.findById(pageRoute.append) || Route.abortPage();

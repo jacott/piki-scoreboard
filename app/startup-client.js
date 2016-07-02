@@ -1,19 +1,20 @@
 define(function(require, exports, module) {
-  const koru = require('koru');
-  const session = require('koru/session');
-  const userAccount = require('koru/user-account');
-  const client = require('koru/client');
-  const App = require('ui/app');
+  const koru        = require('koru');
+  const client      = require('koru/client');
+  const session     = require('koru/session');
   require('koru/ui/helpers');
-  require('ui/profile');
-  require('ui/club');
-  require('ui/team');
-  require('ui/climber');
+  const Route       = require('koru/ui/route');
+  const userAccount = require('koru/user-account');
+  const App         = require('ui/app');
   require('ui/category');
+  require('ui/climber');
+  require('ui/club');
   require('ui/event-category');
   require('ui/event-register');
+  require('ui/profile');
   require('ui/reg-upload');
   require('ui/reset-password');
+  require('ui/team');
 
   koru.onunload(module, restart);
 
@@ -41,11 +42,13 @@ define(function(require, exports, module) {
     var location = window.location;
     var href = location.href;
     var state = window.history.state;
+    Route.replacePage(null);
     stop();
     window.history.replaceState(state, '', href);
     if (error) return;
-    require([mod.id], function () {
-      start();
+    var modId = mod.id;
+    window.requestAnimationFrame(function () {
+      require(modId, sc => sc.start && sc.start(_extras));
     });
   }
 

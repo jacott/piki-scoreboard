@@ -17,7 +17,7 @@ define(function(require, exports, module) {
     Route.root.removeTemplate(Tpl);
   });
 
-  Route.root.addTemplate(Tpl, {
+  Route.root.addTemplate(module, Tpl, {
     data: function (page, pageRoute) {
       return {key: pageRoute.append};
     }

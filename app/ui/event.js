@@ -17,7 +17,7 @@ define(function(require, exports, module) {
   var $ = Dom.current;
   var Index = Tpl.Index;
 
-  var base = Route.root.addBase(Tpl, 'eventId');
+  var base = Route.root.addBase(module, Tpl, 'eventId');
   koru.onunload(module, function () {
     Route.root.removeBase(Tpl);
   });
@@ -82,15 +82,15 @@ define(function(require, exports, module) {
     },
   });
 
-  base.addTemplate(Index, {defaultPage: true, path: ''});
-  base.addTemplate(Tpl.Add, {
+  base.addTemplate(module, Index, {defaultPage: true, path: ''});
+  base.addTemplate(module, Tpl.Add, {
     focus: true,
     data: function () {
       return new Event({org_id: App.orgId});
     }
   });
 
-  base.addTemplate(Tpl.Show, {
+  base.addTemplate(module, Tpl.Show, {
     focus: true,
     data: function (page, pageRoute) {
       if (! Tpl.event) Route.abortPage();
@@ -101,7 +101,7 @@ define(function(require, exports, module) {
     }
   });
 
-  base.addTemplate(Tpl.Edit, {
+  base.addTemplate(module, Tpl.Edit, {
     focus: true,
     data: function (page, pageRoute) {
       if (! Tpl.event) Route.abortPage();

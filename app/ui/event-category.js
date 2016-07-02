@@ -21,7 +21,7 @@ define(function(require, exports, module) {
     eventTpl.route.removeTemplate(Tpl);
   });
 
-  eventTpl.route.addTemplate(Tpl, {
+  eventTpl.route.addTemplate(module, Tpl, {
     focus: '.Category [name=selectHeat]',
     data: function (page,pageRoute) {
       if (! eventTpl.event) Route.abortPage();

@@ -13,7 +13,7 @@ define(function(require, exports, module) {
 
   const Tpl = Dom.newTemplate(require('koru/html!./profile'));
 
-  const base = Route.root.addBase(Tpl);
+  const base = Route.root.addBase(module, Tpl);
   koru.onunload(module, function () {
     Route.root.removeBase(Tpl);
   });
@@ -21,12 +21,12 @@ define(function(require, exports, module) {
   var $ = Dom.current;
   var ChangePassword = Tpl.ChangePassword;
 
-  base.addTemplate(Tpl.Index, {
+  base.addTemplate(module, Tpl.Index, {
     focus: true,
     defaultPage: true,
   });
 
-  base.addTemplate(Tpl.ChangePassword, {focus: true});
+  base.addTemplate(module, Tpl.ChangePassword, {focus: true});
 
   Tpl.$helpers({
     systemSetup () {

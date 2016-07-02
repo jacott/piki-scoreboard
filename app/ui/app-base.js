@@ -1,11 +1,15 @@
 define(function(require, exports, module) {
-  var Org = require('models/org');
-  var User = require('models/user');
-  var koru = require('koru');
-  var Dom = require('koru/dom');
+  const koru         = require('koru');
+  const Dom          = require('koru/dom');
+  const localStorage = require('koru/local-storage');
+  const Org          = require('models/org');
+  const User         = require('models/user');
 
   var App = {
     org: function () {
+      if (App.orgId === undefined) {
+        App.orgId = localStorage.getItem('orgId') || null;
+      }
       return App.orgId && Org.findById(App.orgId);
     },
 

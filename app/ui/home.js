@@ -16,14 +16,14 @@ define(function(require, exports, module) {
     Route.root.defaultPage = null;
   });
 
-  Route.root.addTemplate(Tpl, {
+  Route.root.addTemplate(module, Tpl, {
     path: "",
     data: function (page, pageRoute) {
       if (! App.org()) Route.abortPage(ChooseOrg);
     }
   });
 
-  Route.root.addTemplate(ChooseOrg);
+  Route.root.addTemplate(module, ChooseOrg);
   Route.root.defaultPage = Tpl;
 
   ChooseOrg.$helpers({

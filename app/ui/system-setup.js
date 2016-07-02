@@ -12,19 +12,19 @@ define(function(require, exports, module) {
 
   var $ = Dom.current;
 
-  var base = Route.root.addBase(Tpl);
+  var base = Route.root.addBase(module, Tpl);
 
   koru.onunload(module, function () {
     Route.root.removeBase(Tpl);
   });
 
-  base.addTemplate(Tpl.Index, {defaultPage: true});
-  base.addTemplate(Tpl.OrgForm, {
+  base.addTemplate(module, Tpl.Index, {defaultPage: true});
+  base.addTemplate(module, Tpl.OrgForm, {
     data: function (page, pageRoute) {
       return Org.findById(pageRoute.append) || new Org();
     }
   });
-  base.addTemplate(Tpl.UserForm, {
+  base.addTemplate(module, Tpl.UserForm, {
     data: function (page, pageRoute) {
       return User.findById(pageRoute.append) || new User({org_id: App.orgId});
     }

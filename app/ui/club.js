@@ -13,7 +13,7 @@ define(function(require, exports, module) {
 
   var elm;
 
-  var base = Route.root.addBase(Tpl, 'clubId');
+  var base = Route.root.addBase(module, Tpl, 'clubId');
   koru.onunload(module, function () {
     Route.root.removeBase(Tpl);
   });
@@ -44,15 +44,15 @@ define(function(require, exports, module) {
     },
   });
 
-  base.addTemplate(Index, {defaultPage: true, path: ''});
-  base.addTemplate(Tpl.Add, {
+  base.addTemplate(module, Index, {defaultPage: true, path: ''});
+  base.addTemplate(module, Tpl.Add, {
     focus: true,
     data: function () {
       return new Club({org_id: App.orgId});
     }
   });
 
-  base.addTemplate(Tpl.Edit, {
+  base.addTemplate(module, Tpl.Edit, {
     focus: true,
     data: function (page, pageRoute) {
       var doc = Club.findById(pageRoute.clubId);
