@@ -1,13 +1,14 @@
 isClient && define(function (require, exports, module) {
   var test, v;
-  const koru    = require('koru');
-  const Dom     = require('koru/dom');
-  const session = require('koru/session');
-  const publish = require('koru/session/publish');
-  const Route   = require('koru/ui/route');
-  const Spinner = require('ui/spinner');
-  const TH      = require('ui/test-helper');
-  const App     = require('./app');
+  const koru         = require('koru');
+  const Dom          = require('koru/dom');
+  const localStorage = require('koru/local-storage');
+  const session      = require('koru/session');
+  const publish      = require('koru/session/publish');
+  const Route        = require('koru/ui/route');
+  const Spinner      = require('ui/spinner');
+  const TH           = require('ui/test-helper');
+  const App          = require('./app');
 
   TH.testCase(module, {
     setUp() {
@@ -29,7 +30,6 @@ isClient && define(function (require, exports, module) {
 
     "test inits spinner"() {
       App.start();
-
       assert.called(Spinner.init);
     },
 
@@ -84,6 +84,27 @@ isClient && define(function (require, exports, module) {
       assert.calledWithExactly(Route.pageChanged);
     },
 
+    "test uses localStorage orgSN"() {
+      localStorage.setItem('orgSN', 'FUZ');
+      test.stub(publish._pubs, 'Org');
+      Route.replacePath.restore();
+      test.stub(koru, 'getLocation').returns({pathname: '/'});
+
+      v.subOrg = session.interceptSubscribe.withArgs('Org');
+
+      App.start();
+
+      v.subSelf.args(0, 1).callback();
+
+      v.org = TH.Factory.createOrg({shortName: 'FUZ'});
+
+      assert.calledWith(v.subOrg, 'Org');
+      v.subOrg.args(0, 1).callback();
+
+      assert.same(App.orgId, v.org._id);
+
+    },
+
     "test subscribing to Org"() {
       test.stub(publish._pubs, 'Org');
       Route.replacePath.restore();
@@ -113,6 +134,10 @@ isClient && define(function (require, exports, module) {
       assert.className(document.body, 'inOrg');
 
       v.stopStub = test.stub(v.subOrg.args(0, 1), 'stop');
+
+      assert.same(localStorage.getItem('orgSN'), 'FOO');
+
+      localStorage.setItem('orgSN', '');
 
       Route.root.onBaseEntry(null, {});
 

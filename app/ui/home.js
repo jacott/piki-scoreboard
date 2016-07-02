@@ -11,8 +11,6 @@ define(function(require, exports, module) {
   var ChooseOrg = Tpl.ChooseOrg;
 
   koru.onunload(module, function () {
-    Route.root.removeTemplate(Tpl, {path: ""});
-    Route.root.removeTemplate(ChooseOrg);
     Route.root.defaultPage = null;
   });
 

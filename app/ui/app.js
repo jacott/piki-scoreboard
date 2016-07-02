@@ -1,22 +1,23 @@
 define(function(require, exports, module) {
-  const koru            = require('koru');
-  const Dom             = require('koru/dom');
-  const format          = require('koru/format');
-  const session         = require('koru/session');
-  const sessState       = require('koru/session/state');
-  const Route           = require('koru/ui/route');
-  const util            = require('koru/util');
-  const Org             = require('models/org');
-  const User            = require('models/user');
+  const koru           = require('koru');
+  const Dom            = require('koru/dom');
+  const format         = require('koru/format');
+  const localStorage   = require('koru/local-storage');
+  const session        = require('koru/session');
+  const sessState      = require('koru/session/state');
+  const Route          = require('koru/ui/route');
+  const util           = require('koru/util');
+  const Org            = require('models/org');
+  const User           = require('models/user');
   require('publish/publish-event');
   require('publish/publish-org');
   require('publish/publish-self');
-  const ResourceString  = require('resource-string');
-  const Flash           = require('ui/flash');
-  const header          = require('ui/header');
-  const Spinner         = require('ui/spinner');
-  const App             = require('./app-base');
-  const Disconnected    = require('./disconnected');
+  const ResourceString = require('resource-string');
+  const Flash          = require('ui/flash');
+  const header         = require('ui/header');
+  const Spinner        = require('ui/spinner');
+  const App            = require('./app-base');
+  const Disconnected   = require('./disconnected');
   require('./home');
 
   var selfSub, orgSub, orgShortName, pathname, sessStateChange;
@@ -71,6 +72,9 @@ define(function(require, exports, module) {
 
   Route.root.routeVar = 'orgSN';
   Route.root.onBaseEntry = function (page, pageRoute) {
+    if (pageRoute.orgSN === undefined)
+      pageRoute.orgSN = localStorage.getItem('orgSN') || null;
+
     if (pageRoute.orgSN !== orgShortName) {
       subscribeOrg(pageRoute.orgSN);
     }
@@ -110,6 +114,7 @@ define(function(require, exports, module) {
           subscribeOrg();
           return;
         }
+        localStorage.setItem('orgSN', orgShortName);
         App.orgId = doc._id;
         App.setAccess();
         Dom.addClass(document.body, 'inOrg');
