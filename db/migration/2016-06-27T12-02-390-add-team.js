@@ -27,7 +27,7 @@ define(function(require, exports, module) {
           client.query('update "Event" set "teamType_ids" = $2 where org_id = $1', [item._id, client.aryToSqlStr([id])]);
           client.query('select * from "Club" where org_id = $1', [item._id]).forEach(club => {
             client.query('insert into "Team" (_id, org_id, "teamType_id", name, "shortName") values ($1, $2, $3, $4, $5)',
-                         [Random.id(), item._id, id, club.name, club.shortName]);
+                         [club._id, item._id, id, club.name, club.shortName]);
           });
         });
 
