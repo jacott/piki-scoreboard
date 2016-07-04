@@ -43,6 +43,17 @@
       </div>
     </template>
 
+    <template name="AddTeam">
+      <form id="AddTeam">
+        <h1>Add new team </h1>
+        {{> /Team.Form}}
+        <fieldset class="actions">
+          <button type="submit" name="create">Create</button>
+          <button type="button" name="cancel">Cancel</button>
+        </fieldset>
+      </form>
+    </template>
+
     <template name="Groups">
       <div class="Groups">
         <h1>{{climber.name}}</h1>

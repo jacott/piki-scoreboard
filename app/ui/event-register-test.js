@@ -1,12 +1,13 @@
 isClient && define(function (require, exports, module) {
   var test, v;
-  var TH = require('./test-helper');
-  var sut = require('./event-register');
-  var Route = require('koru/ui/route');
-  var Climber = require('models/climber');
-  var App = require('ui/app');
-  var Competitor = require('models/competitor');
-  var Dom = require('koru/dom');
+  const Dom        = require('koru/dom');
+  const Route      = require('koru/ui/route');
+  const Climber    = require('models/climber');
+  const Competitor = require('models/competitor');
+  const Team       = require('models/team');
+  const App        = require('ui/app');
+  const sut        = require('./event-register');
+  const TH         = require('./test-helper');
 
   TH.testCase(module, {
     setUp: function () {
@@ -212,9 +213,19 @@ isClient && define(function (require, exports, module) {
               assert.dom('button.select:not(.none)', v.teams1[0].name);
               TH.selectMenu('button.select', TH.match.field('id', null));
               assert.dom('button.select.none', 'Select');
+
+              TH.selectMenu('button.select', TH.match.field('id', '$new'));
             });
           });
         });
+        assert.dom('#AddTeam', function () {
+          TH.input('[name=name]', 'Dynomites Wellington');
+          TH.input('[name=shortName]', 'Wgtn');
+          TH.click('[type=submit]');
+        });
+        refute.dom('#AddTeam');
+        assert.dom('button.select:not(.none)', 'Dynomites Wellington');
+        assert.same(Team.findBy('name', 'Dynomites Wellington').teamType_id, v.tt[0]._id);
       },
 
       "test change category": function () {

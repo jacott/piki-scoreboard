@@ -2,6 +2,7 @@ define(function(require, exports, module) {
   const koru         = require('koru');
   const Dom          = require('koru/dom');
   const CompleteList = require('koru/ui/complete-list');
+  const Dialog       = require('koru/ui/dialog');
   const Form         = require('koru/ui/form');
   const Route        = require('koru/ui/route');
   const SelectMenu   = require('koru/ui/select-menu');
@@ -11,6 +12,7 @@ define(function(require, exports, module) {
   const Competitor   = require('models/competitor');
   const Team         = require('models/team');
   const TeamType     = require('models/team-type');
+  const TeamTpl      = require('ui/team');
   const App          = require('./app-base');
   require('./climber');
   const eventTpl     = require('./event');
@@ -293,17 +295,34 @@ define(function(require, exports, module) {
       let ctx = $.ctx;
       let competitor = Teams.$data();
       let list = Team.where('teamType_id', $.ctx.data._id).map(team => [team._id, team.name]);
-      list = [{id: null, name: 'none'}, ...list];
+      list = [{id: null, name: Dom.h({i:'none'})}, ...list, {id: '$new', name: Dom.h({i: 'add new team'})}];
       SelectMenu.popup(this, {
         list,
         onSelect(elm) {
           let id = $.data(elm).id;
-          competitor.setTeam(ctx.data._id, id);
-          ctx.updateAllTags();
+          if (id === '$new') {
+            let elm = Tpl.AddTeam.$autoRender(new Team({org_id: App.orgId, teamType_id: ctx.data._id}));
+            Dialog.open(elm);
+            Dom.getCtx(elm).teamData = {competitor, ctx};
+          } else {
+            competitor.setTeam(ctx.data._id, id);
+            ctx.updateAllTags();
+          }
           return true;
         }
       });
     },
+  });
+
+  Tpl.AddTeam.$events({
+    'click [type=submit]': Form.submitFunc('AddTeam', {
+      success(team) {
+        let {competitor, ctx} = Dom.getCtxById('AddTeam').teamData;
+        competitor.setTeam(ctx.data._id, team._id);
+        ctx.updateAllTags();
+        Dialog.close();
+      },
+    }),
   });
 
   catTpl.$helpers({
