@@ -15,20 +15,24 @@ define(function (require, exports, module) {
     },
 
     "test setTeam"() {
+      let tt1 = TH.Factory.createTeamType();
       let team = TH.Factory.createTeam();
       let team2 = TH.Factory.createTeam();
       let tt2 = TH.Factory.createTeamType();
       let team3 = TH.Factory.createTeam();
       let competitor = TH.Factory.createCompetitor({team_ids: null});
 
-      competitor.setTeam(team._id);
+      competitor.setTeam(tt1._id, team._id);
       assert.equals(competitor.changes, {team_ids: [team._id]});
 
-      competitor.setTeam(team2);
+      competitor.setTeam(tt1._id, team2._id);
       assert.equals(competitor.changes, {team_ids: [team2._id]});
 
-      competitor.setTeam(team3);
+      competitor.setTeam(tt2._id, team3._id);
       assert.equals(competitor.changes, {team_ids: [team2._id, team3._id]});
+
+      competitor.setTeam(tt2._id, null);
+      assert.equals(competitor.changes, {team_ids: [team2._id]});
     },
 
     "test team"() {

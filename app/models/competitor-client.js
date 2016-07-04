@@ -13,11 +13,10 @@ define(function(require, exports, module) {
         return groupHash[group];
       },
 
-      setTeam(team) {
-        team = Team.toDoc(team);
+      setTeam(teamType_id, team_id) {
         let map = teamMap(this.team_ids);
-        map[team.teamType_id] = team._id;
-        this.team_ids = util.values(map);
+        map[teamType_id] = team_id;
+        this.team_ids = util.values(map).filter(id => id);
       },
 
       team: Climber.prototype.team,

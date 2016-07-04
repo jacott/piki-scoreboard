@@ -293,11 +293,12 @@ define(function(require, exports, module) {
       let ctx = $.ctx;
       let competitor = Teams.$data();
       let list = Team.where('teamType_id', $.ctx.data._id).map(team => [team._id, team.name]);
+      list = [{id: null, name: 'none'}, ...list];
       SelectMenu.popup(this, {
         list,
         onSelect(elm) {
           let id = $.data(elm).id;
-          competitor.setTeam(id);
+          competitor.setTeam(ctx.data._id, id);
           ctx.updateAllTags();
           return true;
         }

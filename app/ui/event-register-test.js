@@ -193,7 +193,7 @@ isClient && define(function (require, exports, module) {
 
     "edit": {
       setUp: function () {
-        v.oComp = TH.Factory.createCompetitor({climber_id: v.climbers[1]._id});
+        v.oComp = TH.Factory.createCompetitor({climber_id: v.climbers[1]._id, team_ids: [v.teams1[0]._id]});
 
         gotoPage();
 
@@ -203,6 +203,19 @@ isClient && define(function (require, exports, module) {
 
       },
 
+      "test change team"() {
+        assert.dom('#Register form.edit', function () {
+          assert.dom('.Teams', function () {
+            assert.dom('label:first-child', function () {
+              assert.dom('.name', v.tt[0].name);
+
+              assert.dom('button.select:not(.none)', v.teams1[0].name);
+              TH.selectMenu('button.select', TH.match.field('id', null));
+              assert.dom('button.select.none', 'Select');
+            });
+          });
+        });
+      },
 
       "test change category": function () {
         assert.dom('#Register form.edit', function () {
