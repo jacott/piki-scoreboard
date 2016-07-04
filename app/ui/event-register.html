@@ -36,7 +36,7 @@
           <template name="TeamType">
             <label>
               <span class="name">{{name}}</span>
-              <button class="select" type="button">{{teamName}}</button>
+              <button class="select on" type="button">{{teamName}}</button>
             </label>
           </template>
         </div>
@@ -55,13 +55,14 @@
             <button name="editClimber" type="button">Edit Climber</button>
           </fieldset>
         </template>
+        <div class="categoryList"></div>
       </div>
     </template>
 
     <template name="Category">
-      <label>
+      <label class="Category">
         <span class="name">{{groupName}}</span>
-        {{field "category_id" selectList=groupList includeBlank="true"}}
+        <button class="select category on" type="button">{{selectedCategory}}</button>
       </label>
     </template>
 

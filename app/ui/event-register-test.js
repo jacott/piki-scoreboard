@@ -92,20 +92,19 @@ isClient && define(function (require, exports, module) {
         assert.dom('.Groups', function () {
           assert.dom('h1', {count: 1});
           assert.dom('label .name', {text: '1 Youth Lead', parent: function () {
-            assert.dom('select[name=category_id] option:first-child', {
-              value: '', text: ''});
-            assert.dom('select[name=category_id] option:not([selected])', {
-              value: v.u16._id, text: v.u16.name});
-            assert.dom('select[name=category_id] option:not([selected])', {
-                value: v.u18._id, text: v.u18.name, parent: function () {
-                  TH.change(this, v.u18._id);
-                }});
+            assert.dom('button.select.category.none', '---');
+            TH.selectMenu('button.select', TH.match.field('_id', v.u16._id));
+            TH.selectMenu('button.select', TH.match.field('_id', null));
+            assert.dom('button.select.category.none', '---');
+            TH.selectMenu('button.select', TH.match.field('_id', v.u18._id));
+            assert.dom('button.select.category:not(.none)', v.u18.name);
           }});
-          assert.dom('select[name=category_id] option:not([selected])', {
-            value: v.open._id, text: v.open.name, parent: function () {
-              this.focus();
-              TH.change(this, v.open._id);
-            }});
+
+          assert.dom('label .name', {text: '2 Open Lead', parent: function () {
+            TH.selectMenu('button.select', TH.match.field('_id', v.open._id));
+            assert.dom('button.select.category:not(.none)', v.open.name);
+          }});
+
         });
 
         assert.dom('fieldset.fields.climber', function( ){
@@ -208,14 +207,15 @@ isClient && define(function (require, exports, module) {
       "test change category": function () {
         assert.dom('#Register form.edit', function () {
           assert.dom('.Groups', function () {
-            assert.dom('select[name=category_id] option[selected]', {
-              value: v.oComp.category_ids[0]}, function () {
-                TH.change(this, '');
-              });
+            assert.dom('button.select.category:not(.none)', 'Category 4', function () {
+              TH.selectMenu(this, TH.match.field('_id', null));
+              assert.className(this, 'none');
+            });
           });
           TH.click('[type=submit]');
         });
         assert.dom('form.add');
+        assert.equals(v.oComp.$reload().category_ids,[]);
       },
 
       "test cancel": function () {

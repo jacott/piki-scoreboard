@@ -18,6 +18,27 @@
     margin: 5px;
   }
 
+  .multiselect() {
+    margin-top: 10px;
+    align-self: flex-start;
+    flex-shrink: 0;
+    flex-grow: 1;
+    >.name {
+      font-size: .8em;
+      display: block;
+    }
+    >.select {
+      text-align: left;
+      padding: 0;
+      &.none {
+        color: fade(desaturate(@cPrimaryText, 100%), 50%);
+        &:after {
+          color: @cPrimaryText;
+        }
+      }
+    }
+  }
+
   .Groups {
     .clearAfter();
     margin-bottom: 1em;
@@ -46,6 +67,28 @@
         display: block;
       }
     }
+    >.categoryList {
+      .flexFlow(row, wrap);
+      justify-content: space-between;
+      >.Category {
+        flex-basis: 33%;
+        .multiselect();
+      }
+    }
+  }
+
+  .Teams>div {
+    .flexFlow(row, wrap);
+    justify-content: space-between;
+    >label {
+      flex-basis: 50%;
+      .multiselect();
+    }
+
+  }
+
+  .actions {
+    margin-top: 20px;
   }
 
   table {

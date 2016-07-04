@@ -305,6 +305,31 @@ define(function(require, exports, module) {
     },
   });
 
+  catTpl.$helpers({
+    selectedCategory() {
+      Dom.setClass('none', ! this.category_id, $.element.parentNode);
+
+      return this.category_id ? Category.findById(this.category_id).name : '---';
+    },
+  });
+
+  catTpl.$events({
+    'click .select'(event) {
+      Dom.stopEvent();
+      const ctx = $.ctx;
+      const data = ctx.data;
+      SelectMenu.popup(this, {
+        list: data.groupList,
+        onSelect(elm) {
+          data.category_id = $.data(elm)._id;
+          ctx.updateAllTags();
+          return true;
+        }
+      });
+
+    },
+  });
+
   function submit(event) {
     Dom.stopEvent();
 
@@ -323,10 +348,10 @@ define(function(require, exports, module) {
       }
     }
 
-    var groups = form.querySelectorAll('.Groups select');
+    var groups = form.getElementsByClassName('Category');
     for(var i = 0; i < groups.length; ++i) {
-      var row = groups[i];
-      if (row.value) ids.push(row.value);
+      var row = $.data(groups[i]);
+      if (row.category_id) ids.push(row.category_id);
     }
 
     competitor.category_ids = ids;
@@ -346,10 +371,11 @@ define(function(require, exports, module) {
 
     Dom.remove(groupsElm);
     groupsElm = Groups.$autoRender(competitor);
+    let list = groupsElm.querySelector('.categoryList');
     Category.groupApplicable(climber, function (group, docs) {
-      groupsElm.appendChild(catTpl.$autoRender({
+      list.appendChild(catTpl.$autoRender({
         groupName: group,
-        groupList: docs,
+        groupList: [{_id: null, name: '---'}, ...docs],
         category_id: competitor.categoryIdForGroup(group),
       }));
     });
