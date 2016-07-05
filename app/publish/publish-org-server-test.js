@@ -27,9 +27,10 @@ define(function (require, exports, module) {
       var user1 = TH.Factory.createUser();
       var user2 = TH.Factory.createUser();
 
-      var club1 = TH.Factory.createClub();
+      var tt1 = TH.Factory.createTeamType();
+      var team1 = TH.Factory.createTeam();
 
-      var obSpys = 'User Club Climber Event Category'.split(' ').map(function (name) {
+      var obSpys = 'User Climber Event Category Team TeamType'.split(' ').map(function (name) {
         try {
           return test.spy(Model[name], 'observeOrg_id');
         } catch(ex) {
@@ -48,7 +49,8 @@ define(function (require, exports, module) {
       assert.calledWith(v.conn.added, 'User', user2._id, user2.attributes);
 
 
-      assert.calledWith(v.conn.added, 'Club', club1._id, club1.attributes);
+      assert.calledWith(v.conn.added, 'Team', team1._id, team1.attributes);
+      assert.calledWith(v.conn.added, 'TeamType', tt1._id, tt1.attributes);
 
 
       // Test changes
@@ -58,10 +60,10 @@ define(function (require, exports, module) {
       assert.calledWith(v.conn.changed, 'User', user1._id, {name: 'new name'});
 
 
-      club1.name = 'new club name';
-      club1.$$save();
+      team1.name = 'new team name';
+      team1.$$save();
 
-      assert.calledWith(v.conn.changed, 'Club', club1._id, {name: 'new club name'});
+      assert.calledWith(v.conn.changed, 'Team', team1._id, {name: 'new team name'});
 
       // *** test stopping ***
       var stopSpys = obSpys.map(function (spy) {

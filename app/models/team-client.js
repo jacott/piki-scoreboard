@@ -6,7 +6,7 @@ define(function(require, exports, module) {
       let map = {};
       list && list.forEach(id => {
         let team = Team.findById(id);
-        map[team.teamType_id] = team;
+        if (team) map[team.teamType_id] = team;
       });
       return map;
     };

@@ -35,7 +35,7 @@
               <td>{{yearOfBirth}}</td>
               <td>{{gender}}</td>
               <td>{{number}}</td>
-              <td>{{teams}}</td>
+              <td>{{team}}</td>
             </tr>
           </template>
         </table>
@@ -76,8 +76,7 @@
     <fieldset class="fields">
       {{labelField "name"}}
       {{labelField "dateOfBirth" placeholder="yyyy-mm-dd"}}
-      {{labelField "gender" selectList=genderList}}
-      {{labelField "club_id" selectList=clubList includeBlank=""}}
+      {{labelField "gender" selectList=genderList type="selectMenu" class="on"}}
       {{labelField "number"}}
     </fieldset>
   </template>

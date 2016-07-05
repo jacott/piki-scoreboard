@@ -8,7 +8,6 @@ define(function(require, exports, module) {
   var FIELD_SPEC = {
     name: 'string',
     org_id: 'string',
-    club_id: 'string',
     dateOfBirth: 'string',
     gender: 'string',
     number: 'number',

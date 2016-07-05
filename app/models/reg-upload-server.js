@@ -2,16 +2,17 @@ var Future = requirejs.nodeRequire('fibers/future');
 var parse = require('csv-parse');
 
 define(function(require, exports, module) {
-  var session = require('koru/session');
-  var Val = require('koru/model/validation');
-  var User = require('models/user');
-  var Event = require('models/event');
-  var koru = require('koru');
-  var Club = require('models/club');
-  var Climber = require('models/climber');
-  var Category = require('models/category');
-  var Competitor = require('models/competitor');
+  const koru       = require('koru');
+  const Val        = require('koru/model/validation');
+  const session    = require('koru/session');
+  const Category   = require('models/category');
+  const Climber    = require('models/climber');
+  const Competitor = require('models/competitor');
+  const Event      = require('models/event');
   require('models/result');
+  const Team       = require('models/team');
+  const TeamType   = require('models/team-type');
+  const User       = require('models/user');
 
   session.defineRpc('Reg.upload', function (eventId, data) {
     Val.ensureString(eventId);
@@ -29,6 +30,9 @@ define(function(require, exports, module) {
     Val.allowAccessIf(event);
 
     user.isSuperUser() || Val.allowAccessIf(event.org_id === user.org_id);
+
+    const clubTeamType = TeamType.where({org_id:  user.org_id, name: 'Club'}).fetchOne();
+    Val.allowAccessIf(clubTeamType, 'No Team type named Club found for this organization');
 
     var future = new Future();
 
@@ -79,7 +83,7 @@ define(function(require, exports, module) {
 
       var clubName = meta.split(',')[0].trim();
 
-      var club = Club.query.where({name: clubName, org_id: event.org_id}).fetchOne();
+      var club = Team.query.where({name: clubName, teamType_id: clubTeamType._id}).fetchOne();
       if (! club) throw "Can't find club '" + clubName + "'";
 
       var codes = /\[(.+)\]/.exec(meta);
@@ -93,7 +97,7 @@ define(function(require, exports, module) {
 
       if (! climber) {
         climber = Climber.build({
-          name: name, org_id: event.org_id, club_id: club._id,
+          name: name, org_id: event.org_id, team_ids: [club._id],
           dateOfBirth: get('Birth Date').trim(),
           gender: gender,
           uploadId: get('Participant ID'),
@@ -123,7 +127,7 @@ define(function(require, exports, module) {
       });
 
       var competitor = Competitor.query.where({event_id: event._id, climber_id: climber._id}).fetchOne() ||
-            Competitor.build({event_id: event._id, climber_id: climber._id});
+            Competitor.build({event_id: event._id, climber_id: climber._id, team_ids: [club._id]});
 
       competitor.category_ids = category_ids.sort();
       competitor.$$save();

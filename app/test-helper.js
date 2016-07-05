@@ -122,7 +122,7 @@ define(function(require, exports, module) {
 
     matchModel: function (expect) {
       var func = this.match(function (actual) {
-        return actual._id === expect._id;
+        return actual && actual._id === expect._id;
       });
 
       Object.defineProperty(func, 'message', {get: function () {

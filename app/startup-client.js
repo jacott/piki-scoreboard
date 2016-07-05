@@ -8,7 +8,6 @@ define(function(require, exports, module) {
   const App         = require('ui/app');
   require('ui/category');
   require('ui/climber');
-  require('ui/club');
   require('ui/event-category');
   require('ui/event-register');
   require('ui/profile');

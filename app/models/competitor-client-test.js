@@ -36,11 +36,14 @@ define(function (require, exports, module) {
     },
 
     "test team"() {
-      let competitor = TH.Factory.createCompetitor({team_ids: null});
+      let tt1 = TH.Factory.createTeamType();
+      let t1 = TH.Factory.createTeam();
+      let competitor = TH.Factory.createCompetitor({team_ids: [t1._id]});
 
-      assert.same(competitor.team, competitor.climber.team);
-
+      assert.same(competitor.team('foo'), undefined);
+      assert.same(competitor.team(tt1), t1);
     },
+
     "test categoryIdForGroup": function () {
       var aCategories = TH.Factory.createList(3, 'createCategory', function (index, options) {
         options.group = "A";

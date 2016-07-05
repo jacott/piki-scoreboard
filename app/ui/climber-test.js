@@ -18,6 +18,7 @@ isClient && define(function (require, exports, module) {
 
     tearDown: function () {
       TH.tearDown();
+      sut.teamType_id = null;
       v = null;
     },
 
@@ -32,9 +33,13 @@ isClient && define(function (require, exports, module) {
       assert.dom('#Climber', function () {;
         assert.dom('.climbers', function () {
           assert.dom('h1', 'Climbers');
-          assert.dom('label>button.select', 'Select team type');
-          TH.selectMenu('.select', TH.match.field('_id', tt1._id));
+
+          assert.dom('label>[name=selectTeamType].select', 'Select team type');
+          TH.selectMenu('[name=selectTeamType]', TH.match.field('_id', tt1._id));
+          assert.dom('label>[name=selectTeamType].select', tt1.name);
+
           assert.dom('table', function () {
+            assert.dom('th[data-sort=team]', tt1.name);
             assert.dom('tr>td', climber1.name, function () {
               assert.domParent('td', climber1.shortName);
               assert.domParent('td', team.shortName);
@@ -59,14 +64,10 @@ isClient && define(function (require, exports, module) {
         assert.dom('#AddClimber', function () {
           TH.input('[name=name]', 'Magnus Midtbø');
           TH.input('[name=dateOfBirth]', '1988-09-18');
-          assert.dom('[name=team_id]', function () {
-            TH.change(this, team._id);
-            assert.domParent('.name', 'Team');
-          });
 
           TH.input('[name=number]', '123');
 
-          TH.change('[name=gender]', 'm');
+          TH.selectMenu('[name=gender].select.on', 'm');
           TH.click('[type=submit]');
         });
         assert.called(Route.history.back);

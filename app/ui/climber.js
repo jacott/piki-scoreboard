@@ -27,6 +27,10 @@ define(function(require, exports, module) {
 
   Tpl.$extend({
     onBaseEntry: function () {
+      if (Tpl.teamType_id === undefined) {
+        const teamType = TeamType.findBy('name', 'Club');
+        Tpl.teamType_id = teamType ? teamType._id : null;
+      }
       document.body.appendChild(Tpl.$autoRender({}));
     },
 
@@ -59,7 +63,19 @@ define(function(require, exports, module) {
     },
 
     selectedTeamType() {
-      return "Select team type";
+      const tt = TeamType.findById(Tpl.teamType_id);
+      return tt ? tt.name : "Select team type";
+    },
+
+    teamTypeName() {
+      return Tpl.teamType_id && TeamType.findById(Tpl.teamType_id).name;
+    },
+  });
+
+  Index.Row.$helpers({
+    team() {
+      const team = Tpl.teamType_id && this.teamMap[Tpl.teamType_id];
+      return team && Dom.h({span: team.shortName, $title: team.name});
     },
   });
 
@@ -84,7 +100,7 @@ define(function(require, exports, module) {
       SelectMenu.popup(this, {
         list,
         onSelect(elm) {
-          let id = $.data(elm).id;
+          let id = $.data(elm)._id;
           Tpl.teamType_id = id;
           ctx.updateAllTags();
           return true;
@@ -161,9 +177,9 @@ define(function(require, exports, module) {
 
   function setSortFunc() {
     switch (sortField) {
-    case 'club':
+    case 'team':
       return sortFunc = function (a, b) {
-        return util.compareByName(a.club, b.club);
+        return util.compareByName(a.team(Tpl.teamType_id), b.team(Tpl.teamType_id));
       };
     default:
       return sortFunc = util.compareByField(sortField);

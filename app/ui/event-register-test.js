@@ -158,7 +158,6 @@ isClient && define(function (require, exports, module) {
       assert.dom('.Dialog #AddClimber', function () {
         TH.input('[name=dateOfBirth]', '1999-10-12');
         TH.change('[name=gender]', 'm');
-        TH.change('[name=club_id]', v.climbers[0].club_id);
         TH.click('[name=create]');
       });
 

@@ -106,10 +106,6 @@ define(function(require, exports, module) {
   function setSortFunc() {
     sortClimber = true;
     switch (sortField) {
-    case 'club':
-      return sortFunc = function (a, b) {
-        return util.compareByName(a && a.club, b && b.club);
-      };
     case 'cat':
       sortClimber = false;
       return sortFunc = util.compareByField('category_ids');
@@ -190,6 +186,7 @@ define(function(require, exports, module) {
       if (value)  {
         var form = event.currentTarget;
         var competitor = $.data();
+        competitor.$clearCache();
 
         var competitors = Competitor.eventIndex({event_id: competitor.event_id}) || {};
 
@@ -249,6 +246,7 @@ define(function(require, exports, module) {
       Dom.Dialog.close();
       var form = document.querySelector('#Register form.add');
       var competitor = $.data(form);
+      competitor.$clearCache();
       addClimber(competitor, doc);
       addGroups(form, competitor);
       addTeams(form, competitor);
@@ -281,6 +279,7 @@ define(function(require, exports, module) {
     teamName() {
       let competitor = Teams.$data();
       let team = competitor.team(this._id);
+
       Dom.setClass('none', ! team, $.element.parentNode);
       if (team)
         return team.name;

@@ -30,7 +30,7 @@ define(function(require, exports, module) {
         return map;
       },
       team(teamType_id) {
-        return this.teamMap[teamType_id];
+        return this.teamMap[model.toId(teamType_id)];
       },
     });
   };

@@ -6,7 +6,6 @@ define(function(require, exports, module) {
   var Val = require('koru/model/validation');
   var User = require('models/user');
 
-  require('models/club');
   require('models/team');
   require('models/team-type');
   require('models/climber');
@@ -14,7 +13,7 @@ define(function(require, exports, module) {
   require('models/category');
 
 
-  var orgChildren = ['Club', 'Climber', 'Event', 'Category', 'Team', 'TeamType'];
+  var orgChildren = ['Climber', 'Event', 'Category', 'Team', 'TeamType'];
 
   koru.onunload(module, function () {
     publish._destroy('Org');

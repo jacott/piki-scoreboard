@@ -1,14 +1,14 @@
 define(function (require, exports, module) {
   var test, v;
-  var koru = require('koru');
-  var TH = require('test-helper');
+  const koru       = require('koru');
+  const session    = require('koru/session');
+  const Climber    = require('models/climber');
+  const Event      = require('models/event');
+  const Team       = require('models/team');
+  const User       = require('models/user');
+  const TH         = require('test-helper');
+  const Competitor = require('./competitor');
   require('./reg-upload-server');
-  var session = require('koru/session');
-  var Club = require('models/club');
-  var Climber = require('models/climber');
-  var Competitor = require('./competitor');
-  var User = require('models/user');
-  var Event = require('models/event');
 
   TH.testCase(module, {
     setUp: function () {
@@ -17,7 +17,8 @@ define(function (require, exports, module) {
       v.org =TH.Factory.createOrg();
       v.user = TH.Factory.createUser({role: User.ROLE.admin});
       v.event = TH.Factory.createEvent({heats: undefined});
-      v.club = TH.Factory.createClub({name: 'Rock Hoppers'});
+      v.clubType = TH.Factory.createTeamType({name: 'Club'});
+      v.team = TH.Factory.createTeam({name: 'Rock Hoppers'});
       v.fjl = TH.Factory.createCategory({shortName: 'FJL', gender: 'f', name: 'Female Junior Lead', group: 'Youth Lead'});
       v.mjl = TH.Factory.createCategory({shortName: 'MJL', gender: 'm', name: 'Male Junior Lead', group: 'Youth Lead'});
       v.fol = TH.Factory.createCategory({shortName: 'FOL', gender: 'f', name: 'Female Open Lead', group: 'Open Lead'});
@@ -72,7 +73,7 @@ define(function (require, exports, module) {
           'Participant ID': '147'}, "Invalid or missing codes",
       ]]);
 
-      var club = Club.findBy('name', 'Rock Hoppers');
+      var club = Team.findBy('name', 'Rock Hoppers');
       assert(club);
 
       var climber = Climber.findBy('name', 'Anna Smith');
@@ -80,7 +81,7 @@ define(function (require, exports, module) {
 
       assert.same(climber.dateOfBirth, '1996-04-16');
       assert.same(climber.org_id, v.org._id);
-      assert.same(climber.club_id, v.club._id);
+      assert.equals(climber.team_ids, [v.team._id]);
       assert.same(climber.uploadId, '149');
       assert.same(climber.gender, 'f');
 
@@ -88,6 +89,7 @@ define(function (require, exports, module) {
       var competitor = Competitor.findBy('climber_id', climber._id);
       assert(competitor);
 
+      assert.equals(competitor.team_ids, [v.team._id]);
       assert.same(competitor.event_id, v.event._id);
       assert.equals(competitor.category_ids, [v.fjl._id, v.fol._id].sort());
 

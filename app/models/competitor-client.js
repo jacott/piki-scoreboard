@@ -33,7 +33,9 @@ define(function(require, exports, module) {
         this.team_ids = list;
       },
 
-      team: Climber.prototype.team,
+      team(teamType_id) {
+        return this.teamMap[model.toId(teamType_id)];
+      },
     });
   };
 
