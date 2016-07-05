@@ -38,12 +38,6 @@ define(function(require, exports, module) {
         .addField('shortName', 'shortName' in options || Factory.generateName('SN').replace(/\s+/g, ''));
     },
 
-    Club: function (options) {
-      return new Factory.Builder('Club', options).genName()
-        .addRef('org')
-        .addField('shortName', 'shortName' in options || Factory.generateName('SN').replace(/\s+/g, ''));
-    },
-
     TeamType(options) {
       return new Factory.Builder('TeamType', options).genName()
         .addRef('org');
@@ -69,7 +63,6 @@ define(function(require, exports, module) {
     Climber: function (options) {
       return new Factory.Builder('Climber', options).genName()
         .addRef('org')
-        .addRef('club')
         .addField('gender', 'm')
         .addField('dateOfBirth', '2000-01-01')
         .addField('number', 'number' in options || +Factory.generateName('cn').slice(2));

@@ -1,14 +1,15 @@
 define(function(require, exports, module) {
-  var App   = require('./app-base');
-  var Dom   = require('koru/dom');
-  var Route = require('koru/ui/route');
-  var Tpl   = Dom.newTemplate(require('koru/html!./climber'));
-  var util  = require('koru/util');
-  var koru = require('koru');
-  var Climber = require('models/climber');
-  var Club = require('models/club');
-  var Form = require('koru/ui/form');
+  const koru       = require('koru');
+  const Dom        = require('koru/dom');
+  const Form       = require('koru/ui/form');
+  const Route      = require('koru/ui/route');
+  const SelectMenu = require('koru/ui/select-menu');
+  const util       = require('koru/util');
+  const Climber    = require('models/climber');
+  const TeamType   = require('models/team-type');
+  const App        = require('./app-base');
 
+  var Tpl   = Dom.newTemplate(require('koru/html!./climber'));
   var $ = Dom.current;
   var Index = Tpl.Index;
   var sortField = 'name';
@@ -56,6 +57,10 @@ define(function(require, exports, module) {
       Dom.addClass(elm, 'sort');
       asc === -1 &&  Dom.addClass(elm, 'desc');
     },
+
+    selectedTeamType() {
+      return "Select team type";
+    },
   });
 
   Index.$events({
@@ -72,20 +77,27 @@ define(function(require, exports, module) {
       $.ctx.updateAllTags();
     },
 
+    'click [name=selectTeamType]'(event) {
+      Dom.stopEvent();
+      let ctx = $.ctx;
+      let list = TeamType.query.fetch();
+      SelectMenu.popup(this, {
+        list,
+        onSelect(elm) {
+          let id = $.data(elm).id;
+          Tpl.teamType_id = id;
+          ctx.updateAllTags();
+          return true;
+        }
+      });
+    },
+
     'click .climbers tr': function (event) {
       if (! Dom.hasClass(document.body, 'aAccess')) return;
       Dom.stopEvent();
 
       var data = $.data(this);
       Route.gotoPage(Tpl.Edit, {climberId: data._id});
-    },
-  });
-
-  Tpl.Form.$helpers({
-    clubList: function () {
-      return Club.query.fetch().sort(util.compareByName).map(function (doc) {
-        return [doc._id, doc.name];
-      });
     },
   });
 

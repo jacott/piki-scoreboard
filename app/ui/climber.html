@@ -12,6 +12,9 @@
       </nav>
       <section class="climbers">
         <h1>Climbers</h1>
+        <label class="selectTeamType">
+          <button name="selectTeamType" class="select on" type="button">{{selectedTeamType}}</button>
+        </label>
         <table class="select">
           <thead>
             <tr>
@@ -19,7 +22,7 @@
               <th data-sort="dateOfBirth">YOB</th>
               <th data-sort="gender">m/f</th>
               <th data-sort="number">Number</th>
-              <th data-sort="club">Club</th>
+              <th data-sort="team">{{teamTypeName}}</th>
               {{sortOrder}}
             </tr>
           </thead>
@@ -32,7 +35,7 @@
               <td>{{yearOfBirth}}</td>
               <td>{{gender}}</td>
               <td>{{number}}</td>
-              <td>{{club.name}}</td>
+              <td>{{teams}}</td>
             </tr>
           </template>
         </table>

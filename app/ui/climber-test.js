@@ -22,19 +22,25 @@ isClient && define(function (require, exports, module) {
     },
 
     "test rendering": function () {
-      var climbers = TH.Factory.createList(2, 'createClimber');
+      const tt1 = TH.Factory.createTeamType();
+      const team = TH.Factory.createTeam();
+      var climber1 = TH.Factory.createClimber({team_ids: [team._id]});
+      var climber2 = TH.Factory.createClimber();
 
       Route.gotoPage(sut.Index);
 
-      assert.dom('#Climber', function () {
+      assert.dom('#Climber', function () {;
         assert.dom('.climbers', function () {
           assert.dom('h1', 'Climbers');
-          assert.dom('h1+table', function () {
-            assert.dom('tr>td', climbers[0].name, function () {
-              assert.domParent('td', climbers[0].shortName);
+          assert.dom('label>button.select', 'Select team type');
+          TH.selectMenu('.select', TH.match.field('_id', tt1._id));
+          assert.dom('table', function () {
+            assert.dom('tr>td', climber1.name, function () {
+              assert.domParent('td', climber1.shortName);
+              assert.domParent('td', team.shortName);
             });
-            assert.dom('tr>td', climbers[1].name, function () {
-              assert.domParent('td', climbers[1].shortName);
+            assert.dom('tr>td', climber2.name, function () {
+              assert.domParent('td', climber2.shortName);
             });
           });
         });
@@ -43,7 +49,7 @@ isClient && define(function (require, exports, module) {
     },
 
     "test adding new climber": function () {
-      var club = TH.Factory.createClub();
+      var team = TH.Factory.createTeam();
 
       Route.gotoPage(sut.Index);
       test.stub(Route.history, 'back');
@@ -53,9 +59,9 @@ isClient && define(function (require, exports, module) {
         assert.dom('#AddClimber', function () {
           TH.input('[name=name]', 'Magnus Midtbø');
           TH.input('[name=dateOfBirth]', '1988-09-18');
-          assert.dom('[name=club_id]', function () {
-            TH.change(this, club._id);
-            assert.domParent('.name', 'Club');
+          assert.dom('[name=team_id]', function () {
+            TH.change(this, team._id);
+            assert.domParent('.name', 'Team');
           });
 
           TH.input('[name=number]', '123');

@@ -13,24 +13,29 @@ define(function(require, exports, module) {
         return groupHash[group];
       },
 
+      get teamMap() {
+        let map = this.$cache.teamMap;
+        if (! map) {
+          map = this.$cache.teamMap = Team.teamMap(this.team_ids);
+        }
+        return map;
+      },
+
       setTeam(teamType_id, team_id) {
-        let map = teamMap(this.team_ids);
-        map[teamType_id] = team_id;
-        this.team_ids = util.values(map).filter(id => id);
+        const map = this.teamMap;
+        let team = Team.findById(team_id);
+        map[teamType_id] = team;
+        let list = [];
+        for (let ttid in map) {
+          let team = map[ttid];
+          team && list.push(team._id);
+        }
+        this.team_ids = list;
       },
 
       team: Climber.prototype.team,
     });
   };
-
-  function teamMap(list) {
-    let map = {};
-    list && list.forEach(id => {
-      let team = Team.findById(id);
-      map[team.teamType_id] = id;
-    });
-    return map;
-  }
 
   function makeGroupHash(ids) {
     var groupHash = {};

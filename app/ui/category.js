@@ -6,7 +6,6 @@ define(function(require, exports, module) {
   var util  = require('koru/util');
   var koru = require('koru');
   var Category = require('models/category');
-  var Club = require('models/club');
   var Form = require('koru/ui/form');
 
   var $ = Dom.current;

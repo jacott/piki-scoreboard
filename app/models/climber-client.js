@@ -22,15 +22,15 @@ define(function(require, exports, module) {
     });
 
     util.extend(model.prototype, {
-      team(teamType_id) {
-        if (this.team_ids === undefined)
-          return;
-        teamType_id = model.toId(teamType_id);
-        for (let id of this.team_ids) {
-          let team = Team.findById(id);
-          if (team.teamType_id === teamType_id)
-            return team;
+      get teamMap() {
+        let map = this.$cache.teamMap;
+        if (! map) {
+          map = this.$cache.teamMap = Team.teamMap(this.team_ids);
         }
+        return map;
+      },
+      team(teamType_id) {
+        return this.teamMap[teamType_id];
       },
     });
   };

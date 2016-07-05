@@ -9,6 +9,6 @@ define(function(require, exports, module) {
     org_id: 'belongs_to',
   });
 
-  require('koru/env!./club')(TeamType);
+  require('koru/env!./team-type')(TeamType);
 
 });
