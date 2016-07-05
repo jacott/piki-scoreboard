@@ -29,6 +29,7 @@ define(function(require, exports, module) {
   model.defineFields({
     event_id: 'belongs_to',
     climber_id: 'belongs_to',
+    competitor_id: 'belongs_to',
     category_id: 'belongs_to',
     time: 'integer',
     scores: 'object',
@@ -157,6 +158,7 @@ define(function(require, exports, module) {
       var result = model.create({
         category_id: catId, event_id: doc.event_id,
         climber_id: doc.climber_id,
+        competitor_id: doc._id,
         scores: [isClient ? 0 : Math.random()],
       });
     });

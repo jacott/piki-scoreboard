@@ -164,7 +164,8 @@ CREATE TABLE "Result" (
     category_id character varying(24),
     "time" integer,
     scores jsonb,
-    problems jsonb
+    problems jsonb,
+    competitor_id character varying(24)
 );
 
 

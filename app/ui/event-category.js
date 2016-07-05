@@ -1,20 +1,20 @@
 define(function(require, exports, module) {
-  var util = require('koru/util');
-  var Dom   = require('koru/dom');
-  var Route = require('koru/ui/route');
-  var Tpl   = Dom.newTemplate(require('koru/html!./event-category'));
-  var util  = require('koru/util');
-  var koru = require('koru');
-  var Result = require('models/result');
-  var Category = require('models/category');
-  var Heat = require('models/heat');
-  var eventTpl = require('./event');
+  const koru     = require('koru');
+  const Dom      = require('koru/dom');
+  const Route    = require('koru/ui/route');
+  const util     = require('koru/util');
+  const Category = require('models/category');
+  const Heat     = require('models/heat');
+  const Result   = require('models/result');
+  const Team     = require('models/team');
+  const eventTpl = require('./event');
 
-  var $ = Dom.current;
-  var HeatHeader = Tpl.HeatHeader;
-  var Score = Tpl.Score;
-  var BoulderScore = Tpl.BoulderScore;
-  var InvalidInput = Tpl.InvalidInput.$render();
+  const Tpl   = Dom.newTemplate(require('koru/html!./event-category'));
+  const $ = Dom.current;
+  const HeatHeader = Tpl.HeatHeader;
+  const Score = Tpl.Score;
+  const BoulderScore = Tpl.BoulderScore;
+  const InvalidInput = Tpl.InvalidInput.$render();
   var focusField;
 
   koru.onunload(module, function () {
@@ -241,6 +241,20 @@ define(function(require, exports, module) {
   });
 
   Tpl.Result.$helpers({
+    teams() {
+      let frag = document.createDocumentFragment();
+      let teamMap = {};
+      for (let tid of this.competitor.team_ids) {
+        let team = Team.findById(tid);
+        teamMap[team.teamType_id] = team;
+      }
+
+      this.event.sortedTeamTypes.forEach(tt => {
+        let team = teamMap[tt._id];
+        frag.appendChild(Dom.h({span: team ? team.shortName : ""}));
+      });
+      return frag;
+    },
     scores: function () {
       var frag = document.createDocumentFragment();
       var parentCtx = Dom.getCtx($.element.parentNode);

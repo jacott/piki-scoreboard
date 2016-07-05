@@ -70,6 +70,7 @@
       >i {
         font-style: normal;
         float: right;
+        margin-left: 1ex;
         font-size: 0.9em;
         color: #444;
       }
@@ -116,9 +117,16 @@
       }
     }
     td.climber {
-      .club {
-        display: block;
+      .teams {
         float: right;
+        margin-left: 1ex;
+        >span {
+          overflow: hidden;
+          display: inline-block;
+          margin-left: 1ex;
+          width: 5ex;
+          font-size: .8em;
+        }
       }
       .number {
         margin-left: 5px;

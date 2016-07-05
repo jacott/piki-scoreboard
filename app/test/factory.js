@@ -97,6 +97,7 @@ define(function(require, exports, module) {
       return new Factory.Builder('Result', options)
         .addRef('event')
         .addRef('climber')
+        .addRef('competitor')
         .addRef('category')
         .addField('scores', [options.scores || Model.Result.query.count()]);
     },

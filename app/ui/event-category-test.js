@@ -8,15 +8,19 @@ isClient && define(function (require, exports, module) {
   TH.testCase(module, {
     setUp() {
       test = this;
-      v = {};
       v = {
         org: TH.Factory.createOrg(),
         category: TH.Factory.createCategory(),
-        event: TH.Factory.createEvent(),
-        result: TH.Factory.createResult({scores: [0.1]}),
       };
       TH.login();
+      v.tt1 = TH.Factory.createTeamType();
+      v.t1 = TH.Factory.createTeam();
+      v.tt2 = TH.Factory.createTeamType();
+      v.t2 = TH.Factory.createTeam();
+      v.event = TH.Factory.createEvent({teamType_ids: [v.tt1._id, v.tt2._id]});
+      v.result = TH.Factory.createResult({scores: [0.1]});
       TH.Factory.createClimber();
+      TH.Factory.createCompetitor({team_ids: [v.t1._id, v.t2._id]});
       v.result2 = TH.Factory.createResult({scores: [0.3]});
       TH.setOrg(v.org);
       v.eventSub = test.stub(App, 'subscribe').withArgs('Event').returns({stop: v.stop = test.stub()});
@@ -43,6 +47,10 @@ isClient && define(function (require, exports, module) {
           });
           assert.dom('tbody', function () {
             assert.dom('tr:first-child>td.climber>.name', {text: v.result2.climber.name, parent: function () {
+              assert.dom('.teams', function () {
+                assert.dom('span', v.t1.shortName);
+                assert.dom('span', v.t2.shortName);
+              });
               assert.dom('.number', '' + v.result2.climber.number);
             }});
             assert.dom('tr:last-child>td.climber>.name', v.result.climber.name);
@@ -50,9 +58,13 @@ isClient && define(function (require, exports, module) {
         });
         TH.login();
         v.result.setScore(1, "23");
+
         assert.dom('.results>tbody', function () {
           assert.dom('tr:first-child>td.climber>.name', {text: v.result.climber.name, parent: function () {
-            assert.dom('.club', v.result.climber.club.shortName);
+            assert.dom('.teams', function () {
+              assert.dom('span:first-child', "");
+              assert.dom('span', v.t2.shortName);
+            });
             assert.dom(this.parentNode, function () {
               assert.dom('.score:nth-child(2)>span', '1');
               assert.dom('.score>span', {text: "23", parent: function () {

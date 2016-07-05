@@ -31,6 +31,12 @@ define(function (require, exports, module) {
       v = null;
     },
 
+    "test result has competitor"() {
+      let res = Result.where({competitor_id: v.competitor._id}).fetchOne();
+      assert(res);
+      assert.equals(res.event_id, v.competitor.event_id);
+
+    },
 
     "competitor registration": {
       setUp: function () {
