@@ -34,9 +34,8 @@ isClient && define(function (require, exports, module) {
         assert.dom('.climbers', function () {
           assert.dom('h1', 'Climbers');
 
-          assert.dom('label>[name=selectTeamType].select', 'Select team type');
+          assert.dom('[name=selectTeamType]', '');
           TH.selectMenu('[name=selectTeamType]', TH.match.field('_id', tt1._id));
-          assert.dom('label>[name=selectTeamType].select', tt1.name);
 
           assert.dom('table', function () {
             assert.dom('th[data-sort=team]', tt1.name);

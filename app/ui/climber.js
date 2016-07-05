@@ -63,11 +63,6 @@ define(function(require, exports, module) {
     },
 
     selectedTeamType() {
-      const tt = TeamType.findById(Tpl.teamType_id);
-      return tt ? tt.name : "Select team type";
-    },
-
-    teamTypeName() {
       return Tpl.teamType_id && TeamType.findById(Tpl.teamType_id).name;
     },
   });
