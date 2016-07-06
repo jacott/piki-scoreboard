@@ -58,14 +58,11 @@
       <div class="Groups">
         <h1>{{climber.name}}</h1>
 
-        {{> ClimberNumber climber}}
+        <fieldset class="fields">
+          {{labelField "number" label="Competitor number"}}
+          <button name="editClimber" type="button">Edit Climber</button>
+        </fieldset>
 
-        <template name="ClimberNumber">
-          <fieldset class="fields climber">
-            {{labelField "number" label="Competitor number"}}
-            <button name="editClimber" type="button">Edit Climber</button>
-          </fieldset>
-        </template>
         <div class="categoryList"></div>
       </div>
     </template>
@@ -110,7 +107,7 @@
             <td class="extra">{{climber.yearOfBirth}}</td>
             <td>{{climber.gender}}</td>
             <td class="team">{{team}}</td>
-            <td>{{climber.number}}</td>
+            <td>{{number}}</td>
             <td class="extra">{{date createdAt}}</td>
             <td class="cat">{{categories}}</td>
           </tr>

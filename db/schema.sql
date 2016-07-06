@@ -112,7 +112,8 @@ CREATE TABLE "Competitor" (
     climber_id character varying(24),
     category_ids character varying(24)[],
     "createdAt" timestamp without time zone,
-    team_ids character varying(24)[]
+    team_ids character varying(24)[],
+    number integer
 );
 
 
@@ -341,6 +342,7 @@ CREATE INDEX "ChangeLog_createdAt_parent_id" ON "ChangeLog" USING btree ("create
 REVOKE ALL ON SCHEMA public FROM PUBLIC;
 REVOKE ALL ON SCHEMA public FROM postgres;
 GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO geoffj;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 

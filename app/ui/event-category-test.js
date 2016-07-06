@@ -20,7 +20,7 @@ isClient && define(function (require, exports, module) {
       v.event = TH.Factory.createEvent({teamType_ids: [v.tt1._id, v.tt2._id]});
       v.result = TH.Factory.createResult({scores: [0.1]});
       TH.Factory.createClimber();
-      TH.Factory.createCompetitor({team_ids: [v.t1._id, v.t2._id]});
+      TH.Factory.createCompetitor({team_ids: [v.t1._id, v.t2._id], number: 123});
       v.result2 = TH.Factory.createResult({scores: [0.3]});
       TH.setOrg(v.org);
       v.eventSub = test.stub(App, 'subscribe').withArgs('Event').returns({stop: v.stop = test.stub()});
@@ -51,7 +51,7 @@ isClient && define(function (require, exports, module) {
                 assert.dom('span', v.t1.shortName);
                 assert.dom('span', v.t2.shortName);
               });
-              assert.dom('.number', '' + v.result2.climber.number);
+              assert.dom('.number', '' + v.result2.competitor.number);
             }});
             assert.dom('tr:last-child>td.climber>.name', v.result.climber.name);
           });

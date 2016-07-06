@@ -6,17 +6,17 @@ define(function (require, exports, module) {
   const Competitor = require('./competitor');
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.clearDB();
       v = null;
     },
 
-    'test creation': function () {
+    'test creation'() {
       var team = TH.Factory.createTeam();
       var competitor=TH.Factory.createCompetitor();
 
@@ -28,6 +28,26 @@ define(function (require, exports, module) {
       assert(Category.exists({org_id: competitor.event.org_id, _id: competitor.category_ids[0]}));
     },
 
+    'test standard validators': function () {
+      var validators = Competitor._fieldValidators;
+
+      assert.validators(validators.number, {number: [{integer: true, $gt: 0}]});
+    },
+
+
+    "test changing number updates climber"() {
+      let climber = TH.Factory.createClimber({number: 123});
+      let competitor = TH.Factory.buildCompetitor({climber_id: climber._id, number: 345});
+      competitor.$$save();
+      assert.equals(climber.$reload().number, 345);
+
+      competitor.$update('number', 567);
+      assert.equals(climber.$reload().number, 567);
+
+      competitor.$update('number', undefined);
+      assert.equals(climber.$reload().number, undefined);
+    },
+
     "test changing teams updates climber"() {
       let tt1 = TH.Factory.createTeamType();
       let team1 = TH.Factory.createTeam({_id: 'team1'});
@@ -36,7 +56,6 @@ define(function (require, exports, module) {
       let team3 = TH.Factory.createTeam({_id: 'team3'});
       let climber = TH.Factory.createClimber({team_ids: [team3._id, team2._id]});
       TH.Factory.createEvent({teamType_ids: [tt1._id]});
-//      let competitor = TH.Factory.createCompetitor({climber_id: climber._id, team_ids: [team1._id]});
       let competitor = TH.Factory.buildCompetitor({climber_id: climber._id, team_ids: [team1._id]});
       competitor.$$save();
       assert.equals(climber.$reload().team_ids, [team3._id, team1._id]);

@@ -17,7 +17,8 @@ define(function(require, exports, module) {
 
     mig.reversible({
       add(client) {
-        client.query('alter table "Competitor" add column team_ids varchar(24)[]');
+        client.query('alter table "Competitor" add column team_ids varchar(24)[], '+
+                     'add column number integer');
         client.query('alter table "Event" add column "teamType_ids" varchar(24)[]');
         client.query('alter table "Climber" add column "team_ids" varchar(24)[]');
         client.query('alter table "Result" add column "competitor_id" varchar(24)');
@@ -34,13 +35,13 @@ define(function(require, exports, module) {
         });
 
         client.query('update "Climber" set "team_ids" = array[club_id]');
-        client.query('update "Competitor" as co set "team_ids" = array[cl.club_id] from "Climber" as cl where cl._id = co.climber_id');
+        client.query('update "Competitor" as co set "team_ids" = array[cl.club_id], number = cl.number from "Climber" as cl where cl._id = co.climber_id');
         client.query('update "Result" as r set competitor_id=co._id from "Competitor" as co where co.climber_id = r.climber_id'+
                      ' and r.event_id = co.event_id');
       },
 
       revert(client) {
-        client.query('alter table "Competitor" drop column team_ids');
+        client.query('alter table "Competitor" drop column team_ids, drop column number');
         client.query('alter table "Climber" drop column team_ids');
         client.query('alter table "Event" drop column "teamType_ids"');
         client.query('alter table "Result" drop column "competitor_id"');

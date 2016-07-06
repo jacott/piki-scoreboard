@@ -11,6 +11,7 @@ define(function(require, exports, module) {
     var FIELD_SPEC = {
       category_ids: ['id'],
       team_ids: ['id'],
+      number: 'integer',
     };
 
     var NEW_FIELD_SPEC = {

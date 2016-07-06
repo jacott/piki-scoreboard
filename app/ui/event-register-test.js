@@ -113,7 +113,7 @@ isClient && define(function (require, exports, module) {
 
         });
 
-        assert.dom('fieldset.fields.climber', function( ){
+        assert.dom('.Groups>fieldset.fields', function( ){
           assert.dom('label', function () {
             assert.dom('.name', 'Competitor number');
             TH.input('[name=number]', '567a');
@@ -128,6 +128,7 @@ isClient && define(function (require, exports, module) {
         TH.click('fieldset.actions [type=submit]');
         var competitor = Competitor.query.where({climber_id: v.climbers[1]._id}).fetchOne();
         assert.equals(competitor.category_ids, [v.u18._id, v.open._id]);
+        assert.same(competitor.number, 567);
         assert.same(competitor.climber.number, 567);
 
         assert.dom('table>thead', function () {

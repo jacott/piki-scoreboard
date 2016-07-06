@@ -15,28 +15,43 @@ define(function(require, exports, module) {
     climber_id: 'belongs_to',
     team_ids: 'has_many',
     category_ids: 'has_many',
+    number: {type: 'integer', number: {integer: true, $gt: 0}},
     createdAt: 'auto_timestamp',
   });
 
   model.registerObserveField('event_id');
   model.afterLocalChange(model, function (doc, changes) {
-    if (doc && (! changes || doc.$hasChanged('team_ids', changes))) {
+    if (! doc) return;
+
+    const team_idsChanged = (! changes || doc.$hasChanged('team_ids', changes));
+    const numberChanged = (! changes || changes.hasOwnProperty('number'));
+
+    if (team_idsChanged || numberChanged) {
       doc.$cache.teamMap = null;
       let climber = Climber.findById(doc.climber_id);
-      let clTeamMap = climber.teamMap;
-      let coTeamMap = doc.teamMap;
+      let updates = {};
 
-      for (let tt_id in coTeamMap) {
-        clTeamMap[tt_id] = coTeamMap[tt_id];
+      if (team_idsChanged) {
+        let clTeamMap = climber.teamMap;
+        let coTeamMap = doc.teamMap;
+
+        for (let tt_id in coTeamMap) {
+          clTeamMap[tt_id] = coTeamMap[tt_id];
+        }
+
+        let list = [];
+        for (let ttid in clTeamMap) {
+          let team = clTeamMap[ttid];
+          team && list.push(team._id);
+        }
+        updates.team_ids = list;
       }
 
-      let list = [];
-      for (let ttid in clTeamMap) {
-        let team = clTeamMap[ttid];
-        team && list.push(team._id);
+      if (numberChanged) {
+        updates.number = doc.number;
       }
 
-      climber.$update('team_ids', list);
+      climber.$update(updates);
     }
   });
 

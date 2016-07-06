@@ -359,20 +359,11 @@ define(function(require, exports, module) {
   function submit(event) {
     Dom.stopEvent();
 
-    var competitor = $.data();
-    var ids = [];
-    var form = event.currentTarget;
+    const competitor = $.data();
+    const ids = [];
+    const form = event.currentTarget;
 
-    var compNumber = form.querySelector('[name=number]');
-
-    if (compNumber.value) {
-      var climber = competitor.climber;
-      climber.number = compNumber.value;
-      if (! climber.$save()) {
-        Form.renderErrors(climber, compNumber.parentNode);
-        return;
-      }
-    }
+    competitor.number = form.querySelector('[name=number]') || undefined;
 
     var groups = form.getElementsByClassName('Category');
     for(var i = 0; i < groups.length; ++i) {

@@ -37,13 +37,23 @@ define(function (require, exports, module) {
       },
 
       "test allowed": function () {
-        var competitor = TH.Factory.buildCompetitor();
+        test.spy(Val, 'assertDocChanges');
+
+        var competitor = TH.Factory.buildCompetitor({number: 123});
 
         refute.accessDenied(function () {
           competitor.authorize(v.user._id);
         });
 
         assert.calledWith(Val.ensureString, v.event._id);
+        assert.calledWith(Val.assertDocChanges, TH.matchModel(competitor),
+                          {category_ids: ['id'],
+                           team_ids: ['id'],
+                           number: 'integer'},
+                          {_id: 'id',
+                           event_id: 'id',
+                           climber_id: 'id',
+                          });
       },
 
       "test event closed": function () {
