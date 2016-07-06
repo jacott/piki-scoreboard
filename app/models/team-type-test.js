@@ -20,6 +20,8 @@ define(function (require, exports, module) {
       assert(TeamType.exists(teamType._id));
       assert(teamType.name);
       assert(teamType.org);
+      assert.same(teamType.default, false);
+
     },
 
     'test standard validators'() {

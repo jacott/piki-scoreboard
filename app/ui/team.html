@@ -52,6 +52,10 @@
       <h1>Add new team type</h1>
       <fieldset class="fields">
         {{labelField "name"}}
+        <label>
+          <span class="name">Selected by default</span>
+          <button class="check" name="default" type="button" {{checked}}></button>
+        </label>
       </fieldset>
       <fieldset class="actions">
         <button type="submit" name="create">Create</button>

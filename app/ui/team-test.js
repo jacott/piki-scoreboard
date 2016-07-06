@@ -79,11 +79,23 @@ isClient && define(function (require, exports, module) {
 
       assert.dom('#AddTeamType', function () {
         TH.input('[name=name]', 'Club');
+        TH.click(':not(.checked)>[name=default]');
+        assert.dom('.checked>[name=default]');
         TH.click('[type=submit]');
       });
       refute.dom('#AddTeamType');
 
-      assert(TeamType.exists({org_id: v.org._id, name: 'Club'}));
+      assert(TeamType.exists({org_id: v.org._id, name: 'Club', default: true}));
+
+      TH.selectMenu('#Team [name=teamType_id]', TH.match.field('id', '$new'));
+
+      assert.dom('#AddTeamType', function () {
+        TH.input('[name=name]', 'School');
+        TH.click('[type=submit]');
+      });
+      refute.dom('#AddTeamType');
+
+      assert(TeamType.exists({org_id: v.org._id, name: 'School', default: false}));
 
       TH.selectMenu('#Team [name=teamType_id]', TH.match.field('id', '$new'));
       assert.dom('#AddTeamType', function () {

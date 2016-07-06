@@ -189,7 +189,8 @@ CREATE TABLE "Team" (
 CREATE TABLE "TeamType" (
     _id character varying(24) NOT NULL,
     org_id character varying(24),
-    name text
+    name text,
+    "default" boolean
 );
 
 

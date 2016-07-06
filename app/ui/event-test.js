@@ -72,7 +72,8 @@ isClient && define(function (require, exports, module) {
     },
 
     "test adding new event": function () {
-      let tt = TH.Factory.createList(2, 'createTeamType');
+      let tt1 = TH.Factory.createTeamType();
+      let tt2 = TH.Factory.createTeamType({default: true});
       Route.gotoPage(sut.Index);
 
       assert.dom('#Event', function () {
@@ -84,12 +85,18 @@ isClient && define(function (require, exports, module) {
           assert.dom('.teamTypeList', function () {
             assert.dom('li', {count: 2});
             assert.dom('li:first-child', function () {
-              assert.dom('.name', tt[0].name);
+              assert.dom('.name', tt1.name);
               refute.className(this, 'checked');
               TH.click('.check');
               assert.className(this, 'checked');
             });
 
+            assert.dom('li:last-child', function () {
+              assert.dom('.name', tt2.name);
+              assert.className(this, 'checked');
+              TH.click('.check');
+              refute.className(this, 'checked');
+            });
           });
           TH.click('[type=submit]');
         });

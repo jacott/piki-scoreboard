@@ -5,6 +5,7 @@ define(function(require, exports, module) {
     mig.createTable('TeamType', {
       org_id: {type: 'varchar(24)'},
       name: {type: 'text'},
+      default: {type: 'boolean'},
     });
 
     mig.createTable('Team', {
@@ -23,7 +24,7 @@ define(function(require, exports, module) {
 
         client.query('select _id from "Org"').forEach(item => {
           let id = Random.id();
-          client.query('insert into "TeamType" (_id, org_id, name) values ($1, $2, $3)', [id, item._id, 'Club']);
+          client.query('insert into "TeamType" (_id, org_id, name, "default") values ($1, $2, $3, $4)', [id, item._id, 'Club', true]);
 
           client.query('update "Event" set "teamType_ids" = $2 where org_id = $1', [item._id, client.aryToSqlStr([id])]);
           client.query('select * from "Club" where org_id = $1', [item._id]).forEach(club => {

@@ -143,6 +143,12 @@ define(function(require, exports, module) {
   });
 
   Tpl.AddTeamType.$events({
+    'click [name=default]'(event) {
+      Dom.stopEvent();
+
+      Dom.toggleClass(this.parentNode, 'checked');
+    },
+
     'click [name=cancel]'(event) {
       Dialog.close(event.currentTarget);
     },
@@ -152,6 +158,7 @@ define(function(require, exports, module) {
       var doc = $.data();
 
       Form.fillDoc(doc, event.currentTarget);
+      doc.default = !! event.currentTarget.querySelector('label.checked');
 
       if (doc.$save()) {
         Dialog.close(event.currentTarget);

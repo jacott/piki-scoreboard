@@ -7,6 +7,7 @@ define(function(require, exports, module) {
   TeamType.defineFields({
     name: {type:  'text', trim: true, required: true, maxLength: 200, unique: {scope: 'org_id'}},
     org_id: 'belongs_to',
+    default: 'boolean',
   });
 
   require('koru/env!./team-type')(TeamType);

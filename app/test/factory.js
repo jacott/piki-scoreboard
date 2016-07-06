@@ -40,6 +40,7 @@ define(function(require, exports, module) {
 
     TeamType(options) {
       return new Factory.Builder('TeamType', options).genName()
+        .addField('default', false)
         .addRef('org');
     },
 

@@ -86,7 +86,7 @@ define(function(require, exports, module) {
   base.addTemplate(module, Tpl.Add, {
     focus: true,
     data: function () {
-      return new Event({org_id: App.orgId});
+      return new Event({org_id: App.orgId, teamType_ids: TeamType.where('default', true).fetchIds()});
     }
   });
 
