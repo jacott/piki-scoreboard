@@ -122,6 +122,17 @@ define(function(require, exports, module) {
         .addField('date', '2014-04-01');
     },
 
+    Series: function (options) {
+      if (options.teamType_ids === undefined) {
+        var teamType = Factory.last.teamType || Factory.createTeamType();
+        options.teamType_ids = [teamType._id];
+      }
+
+      return new Factory.Builder('Series', options).genName()
+        .addRef('org')
+        .addField('date', '2014-04-01');
+    },
+
     User: function (options) {
       var username = 'username' in options ? options.username : Factory.generateName('user');
 

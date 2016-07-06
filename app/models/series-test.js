@@ -1,0 +1,38 @@
+define(function (require, _, module) {
+  var test, v;
+  const TH   = require('test-helper');
+  const Series  = require('./series');
+
+  TH.testCase(module, {
+    setUp() {
+      test = this;
+      v = {};
+    },
+
+    tearDown() {
+      TH.clearDB();
+      v = null;
+    },
+
+    'test standard validators'() {
+      const validators = Series._fieldValidators;
+
+      assert.validators(validators.name, {maxLength: [200], required: [true], trim: [true], unique: [{scope: 'org_id'}]});
+      assert.validators(validators.date, {inclusion: [{matches: /^\d{4}-[01]\d-[0-3]\d$/ }]});
+      assert.validators(validators.closed, {boolean: ['trueOnly']});
+    },
+
+    'test creation'() {
+      const teamType = TH.Factory.createTeamType({_id: 'tt1'});
+      const series=TH.Factory.createSeries();
+
+      assert(Series.exists(series._id));
+
+      assert(series.org);
+      assert.equals(series.teamType_ids, ['tt1']);
+    },
+
+
+
+  });
+});

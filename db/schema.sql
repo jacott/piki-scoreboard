@@ -171,6 +171,20 @@ CREATE TABLE "Result" (
 
 
 --
+-- Name: Series; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE "Series" (
+    _id character varying(24) NOT NULL,
+    org_id character varying(24),
+    name text,
+    date text,
+    "teamType_ids" character varying(24)[],
+    closed boolean
+);
+
+
+--
 -- Name: Team; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -294,6 +308,14 @@ ALTER TABLE ONLY "Org"
 
 ALTER TABLE ONLY "Result"
     ADD CONSTRAINT "Result_pkey" PRIMARY KEY (_id);
+
+
+--
+-- Name: Series_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY "Series"
+    ADD CONSTRAINT "Series_pkey" PRIMARY KEY (_id);
 
 
 --
