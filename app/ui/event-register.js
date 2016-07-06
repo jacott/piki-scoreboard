@@ -13,6 +13,7 @@ define(function(require, exports, module) {
   const Team         = require('models/team');
   const TeamType     = require('models/team-type');
   const TeamTpl      = require('ui/team');
+  const TeamHelper   = require('ui/team-helper');
   const App          = require('./app-base');
   require('./climber');
   const eventTpl     = require('./event');
@@ -89,6 +90,8 @@ define(function(require, exports, module) {
       Route.replacePath(Tpl);
     },
 
+    'click [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent,
+
     'click th': function (event) {
       Dom.stopEvent();
       var sort = this.getAttribute('data-sort');
@@ -112,6 +115,8 @@ define(function(require, exports, module) {
     case 'createdAt':
       sortClimber = false;
       return sortFunc = util.compareByField('createdAt');
+    case 'team':
+      return sortFunc = TeamHelper.sortBy;
     default:
       return sortFunc = util.compareByField(sortField);
     }
@@ -233,6 +238,8 @@ define(function(require, exports, module) {
       });
       return frag;
     },
+
+    team: TeamHelper.teamTD,
   });
 
   Tpl.Row.$extend({

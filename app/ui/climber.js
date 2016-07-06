@@ -7,6 +7,7 @@ define(function(require, exports, module) {
   const util       = require('koru/util');
   const Climber    = require('models/climber');
   const TeamType   = require('models/team-type');
+  const TeamHelper = require('ui/team-helper');
   const App        = require('./app-base');
 
   var Tpl   = Dom.newTemplate(require('koru/html!./climber'));
@@ -27,10 +28,6 @@ define(function(require, exports, module) {
 
   Tpl.$extend({
     onBaseEntry: function () {
-      if (Tpl.teamType_id === undefined) {
-        const teamType = TeamType.findBy('name', 'Club');
-        Tpl.teamType_id = teamType ? teamType._id : null;
-      }
       document.body.appendChild(Tpl.$autoRender({}));
     },
 
@@ -61,17 +58,10 @@ define(function(require, exports, module) {
       Dom.addClass(elm, 'sort');
       asc === -1 &&  Dom.addClass(elm, 'desc');
     },
-
-    selectedTeamType() {
-      return Tpl.teamType_id && TeamType.findById(Tpl.teamType_id).name;
-    },
   });
 
   Index.Row.$helpers({
-    team() {
-      const team = Tpl.teamType_id && this.teamMap[Tpl.teamType_id];
-      return team && Dom.h({span: team.shortName, $title: team.name});
-    },
+    team: TeamHelper.teamTD,
   });
 
   Index.$events({
@@ -88,23 +78,12 @@ define(function(require, exports, module) {
       $.ctx.updateAllTags();
     },
 
-    'click [name=selectTeamType]'(event) {
-      Dom.stopEvent();
-      let ctx = $.ctx;
-      let list = TeamType.query.fetch();
-      SelectMenu.popup(this, {
-        list,
-        onSelect(elm) {
-          let id = $.data(elm)._id;
-          Tpl.teamType_id = id;
-          ctx.updateAllTags();
-          return true;
-        }
-      });
-    },
+    'click [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent,
 
     'click .climbers tr': function (event) {
+
       if (! Dom.hasClass(document.body, 'aAccess')) return;
+      _koru_.debug('XX');
       Dom.stopEvent();
 
       var data = $.data(this);
@@ -173,9 +152,7 @@ define(function(require, exports, module) {
   function setSortFunc() {
     switch (sortField) {
     case 'team':
-      return sortFunc = function (a, b) {
-        return util.compareByName(a.team(Tpl.teamType_id), b.team(Tpl.teamType_id));
-      };
+      return sortFunc = TeamHelper.sortBy;
     default:
       return sortFunc = util.compareByField(sortField);
     }

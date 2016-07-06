@@ -1,10 +1,11 @@
 isClient && define(function (require, exports, module) {
   var test, v;
-  var TH = require('./test-helper');
-  var sut = require('./climber');
-  var Route = require('koru/ui/route');
-  var Climber = require('models/climber');
-  var App = require('ui/app');
+  const Route      = require('koru/ui/route');
+  const Climber    = require('models/climber');
+  const App        = require('ui/app');
+  const TeamHelper = require('ui/team-helper');
+  const sut        = require('./climber');
+  const TH         = require('./test-helper');
 
   TH.testCase(module, {
     setUp: function () {
@@ -18,7 +19,7 @@ isClient && define(function (require, exports, module) {
 
     tearDown: function () {
       TH.tearDown();
-      sut.teamType_id = null;
+      TeamHelper.teamType_id = null;
       v = null;
     },
 
@@ -92,10 +93,12 @@ isClient && define(function (require, exports, module) {
       "test change name": function () {
         test.stub(Route.history, 'back');
 
+        assert.dom(document.body, function () {
         assert.dom('#EditClimber', function () {
           assert.dom('h1', 'Edit ' + v.climber.name);
           TH.input('[name=name]', {value: v.climber.name}, 'new name');
           TH.click('[type=submit]');
+        });
         });
 
         assert.called(Route.history.back);

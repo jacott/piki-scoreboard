@@ -6,6 +6,7 @@ isClient && define(function (require, exports, module) {
   const Competitor = require('models/competitor');
   const Team       = require('models/team');
   const App        = require('ui/app');
+  const TeamHelper = require('ui/team-helper');
   const sut        = require('./event-register');
   const TH         = require('./test-helper');
 
@@ -14,7 +15,10 @@ isClient && define(function (require, exports, module) {
       test = this;
       v = {};
       v.org =  TH.Factory.createOrg();
-      v.tt = TH.Factory.createList(2, 'createTeamType');
+      v.tt = TH.Factory.createList(2, 'createTeamType', (index, options) => {
+        options.name = index ? 'School' : 'Club';
+      });
+      TeamHelper.teamType_id = v.tt[0]._id;
       v.teams1 = TH.Factory.createList(2, 'createTeam', function (index, options) {
         options.teamType_id = v.tt[0]._id;
       });
@@ -41,6 +45,7 @@ isClient && define(function (require, exports, module) {
 
     tearDown: function () {
       TH.tearDown();
+      TeamHelper.teamType_id = null;
       v = null;
     },
 
@@ -125,9 +130,16 @@ isClient && define(function (require, exports, module) {
         assert.equals(competitor.category_ids, [v.u18._id, v.open._id]);
         assert.same(competitor.climber.number, 567);
 
+        assert.dom('table>thead', function () {
+          assert.dom('th[data-sort=team]', 'Club');
+        });
 
-        assert.dom('table td', 'brendon', {parent: function () {
-          assert.dom('td', [v.u18.shortName, v.open.shortName].join(', '));
+        assert.dom('table td', {text: 'brendon', parent: function () {
+          assert.dom('td.team', v.teams1[0].shortName);
+          assert.dom('td.cat', function () {
+            assert.dom('abbr', v.u18.shortName);
+            assert.dom('abbr+abbr', v.open.shortName);
+          });
         }});
 
         refute.dom('.Groups');
