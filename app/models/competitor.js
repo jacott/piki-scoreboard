@@ -19,7 +19,52 @@ define(function(require, exports, module) {
   });
 
   model.registerObserveField('event_id');
+  model.afterLocalChange(model, function (doc, changes) {
+    if (doc && (! changes || doc.$hasChanged('team_ids', changes))) {
+      doc.$cache.teamMap = null;
+      let climber = Climber.findById(doc.climber_id);
+      let clTeamMap = climber.teamMap;
+      let coTeamMap = doc.teamMap;
 
+      for (let tt_id in coTeamMap) {
+        clTeamMap[tt_id] = coTeamMap[tt_id];
+      }
+
+      let list = [];
+      for (let ttid in clTeamMap) {
+        let team = clTeamMap[ttid];
+        team && list.push(team._id);
+      }
+
+      climber.$update('team_ids', list);
+    }
+  });
+
+  util.extend(model.prototype, {
+    get teamMap() {
+      let map = this.$cache.teamMap;
+      if (! map) {
+        map = this.$cache.teamMap = Team.teamMap(this.team_ids);
+      }
+      return map;
+    },
+
+    setTeam(teamType_id, team_id) {
+      const map = this.teamMap;
+      let team = Team.findById(team_id);
+      map[teamType_id] = team;
+      let list = [];
+      for (let ttid in map) {
+        let team = map[ttid];
+        team && list.push(team._id);
+      }
+      this.team_ids = list;
+    },
+
+    team(teamType_id) {
+      return this.teamMap[model.toId(teamType_id)];
+    },
+  });
   require('koru/env!./competitor')(model);
 
   return model;

@@ -28,5 +28,24 @@ define(function (require, exports, module) {
       assert(Category.exists({org_id: competitor.event.org_id, _id: competitor.category_ids[0]}));
     },
 
+    "test changing teams updates climber"() {
+      let tt1 = TH.Factory.createTeamType();
+      let team1 = TH.Factory.createTeam({_id: 'team1'});
+      let team2 = TH.Factory.createTeam({_id: 'team2'});
+      let tt2 = TH.Factory.createTeamType();
+      let team3 = TH.Factory.createTeam({_id: 'team3'});
+      let climber = TH.Factory.createClimber({team_ids: [team3._id, team2._id]});
+      TH.Factory.createEvent({teamType_ids: [tt1._id]});
+//      let competitor = TH.Factory.createCompetitor({climber_id: climber._id, team_ids: [team1._id]});
+      let competitor = TH.Factory.buildCompetitor({climber_id: climber._id, team_ids: [team1._id]});
+      competitor.$$save();
+      assert.equals(climber.$reload().team_ids, [team3._id, team1._id]);
+
+      competitor.$update('team_ids', [team2._id]);
+      assert.equals(climber.$reload().team_ids, [team3._id, team2._id]);
+
+      competitor.$update('team_ids', []);
+      assert.equals(climber.$reload().team_ids, [team3._id, team2._id]);
+    },
   });
 });

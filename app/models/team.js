@@ -12,6 +12,15 @@ define(function(require, exports, module) {
     org_id: 'belongs_to',
   });
 
+  Team.teamMap = function (list) {
+    let map = {};
+    list && list.forEach(id => {
+      let team = Team.findById(id);
+      if (team) map[team.teamType_id] = team;
+    });
+    return map;
+  };
+
   require('koru/env!./team')(Team);
 
 });

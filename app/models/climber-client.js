@@ -21,17 +21,6 @@ define(function(require, exports, module) {
       },
     });
 
-    util.extend(model.prototype, {
-      get teamMap() {
-        let map = this.$cache.teamMap;
-        if (! map) {
-          map = this.$cache.teamMap = Team.teamMap(this.team_ids);
-        }
-        return map;
-      },
-      team(teamType_id) {
-        return this.teamMap[model.toId(teamType_id)];
-      },
-    });
+
   };
 });
