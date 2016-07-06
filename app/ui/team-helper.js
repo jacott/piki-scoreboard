@@ -11,7 +11,7 @@ define(function(require, exports, module) {
   util.extend(exports, {
     get teamType_id() {
       if (teamType_id === undefined) {
-        const teamType = TeamType.findBy('name', 'Club');
+        const teamType = TeamType.findBy('default', true);
         teamType_id = teamType ? teamType._id : null;
       }
       return teamType_id;

@@ -81,9 +81,8 @@ define(function(require, exports, module) {
     'click [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent,
 
     'click .climbers tr': function (event) {
-
       if (! Dom.hasClass(document.body, 'aAccess')) return;
-      _koru_.debug('XX');
+
       Dom.stopEvent();
 
       var data = $.data(this);

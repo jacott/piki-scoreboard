@@ -11,6 +11,7 @@
         <span>Team type</span>
         <button name="teamType_id" type="button" class="select">{{teamTypePrompt}}</button>
       </label>
+      <button name="EditTeamType" type="button">Edit</button>
       <nav>
         {{pageLink class="adminAccess" name="addTeam" value=addTeamText template="Team.Add"}}
       </nav>
@@ -36,10 +37,10 @@
     </div>
   </template>
 
-  <template name="Add">
-    <form id="AddTeam">
-      <h1>Add new team</h1>
-      {{> /Team.Form}}
+  <template name="AddTeamType">
+    <form id="AddTeamType">
+      <h1>Add new team type</h1>
+      {{> /Team.TeamTypeForm}}
       <fieldset class="actions">
         <button type="submit" name="create">Create</button>
         <button type="button" name="cancel">Cancel</button>
@@ -47,9 +48,18 @@
     </form>
   </template>
 
-  <template name="AddTeamType">
-    <form id="AddTeamType">
-      <h1>Add new team type</h1>
+  <template name="EditTeamType">
+    <form id="EditTeamType">
+      <h1>Edit {{name}}</h1>
+      {{> /Team.TeamTypeForm}}
+      <fieldset class="actions">
+        <button type="submit" name="update">Save</button>
+        <button type="button" name="cancel">Cancel</button>
+      </fieldset>
+    </form>
+  </template>
+
+  <template name="TeamTypeForm">
       <fieldset class="fields">
         {{labelField "name"}}
         <label>
@@ -57,6 +67,12 @@
           <button class="check" name="default" type="button" {{checked}}></button>
         </label>
       </fieldset>
+  </template>
+
+  <template name="Add">
+    <form id="AddTeam">
+      <h1>Add new team</h1>
+      {{> /Team.Form}}
       <fieldset class="actions">
         <button type="submit" name="create">Create</button>
         <button type="button" name="cancel">Cancel</button>

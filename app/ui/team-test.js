@@ -1,11 +1,12 @@
 isClient && define(function (require, exports, module) {
   var test, v;
-  const Route    = require('koru/ui/route');
-  const Team     = require('models/team');
-  const TeamType = require('models/team-type');
-  const App      = require('ui/app');
-  const sut      = require('./team');
-  const TH       = require('./test-helper');
+  const Route      = require('koru/ui/route');
+  const Team       = require('models/team');
+  const TeamType   = require('models/team-type');
+  const App        = require('ui/app');
+  const TeamHelper = require('ui/team-helper');
+  const sut        = require('./team');
+  const TH         = require('./test-helper');
 
   TH.testCase(module, {
     setUp: function () {
@@ -21,7 +22,7 @@ isClient && define(function (require, exports, module) {
     tearDown: function () {
       TH.tearDown();
       v = null;
-      sut.teamType_id = null;
+      TeamHelper.teamType_id = null;
     },
 
     "test rendering": function () {
@@ -102,6 +103,32 @@ isClient && define(function (require, exports, module) {
         TH.click('[name=cancel]');
       });
       refute.dom('#AddTeamType');
+    },
+
+    "test edit teamType"() {
+      let tt = TH.Factory.createTeamType({default: true});
+      Route.gotoPage(sut.Index);
+      TH.selectMenu('#Team [name=teamType_id]', TH.match.field('id', tt._id));
+
+      TH.click('[name=EditTeamType]');
+
+      assert.dom('#EditTeamType', function () {
+        assert.dom('h1', 'Edit ' + tt.name);
+        TH.click('[name=cancel]');
+      });
+      refute.dom('#EditTeamType');
+
+      TH.click('[name=EditTeamType]');
+
+      assert.dom('#EditTeamType', function () {
+        assert.dom('h1', 'Edit ' + tt.name);
+        TH.input('[name=name]', {value: tt.name}, 'new name');
+        TH.click('label.checked>[name=default]');
+        TH.click('[type=submit]');
+      });
+      refute.dom('#EditTeamType');
+
+      assert(TeamType.exists({org_id: tt.org_id, name: 'new name', default: false}));
     },
 
     "edit": {

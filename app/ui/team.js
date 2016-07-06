@@ -8,6 +8,7 @@ define(function(require, exports, module) {
   const util       = require('koru/util');
   const Team       = require('models/team');
   const TeamType   = require('models/team-type');
+  const TeamHelper = require('ui/team-helper');
   const App        = require('./app-base');
 
   var Tpl   = Dom.newTemplate(require('koru/html!./team'));
@@ -43,21 +44,21 @@ define(function(require, exports, module) {
         sort: function (a, b) {
           return sortFunc(a, b) * asc;
         },
-        params: {teamType_id: Tpl.teamType_id},
+        params: {teamType_id: TeamHelper.teamType_id},
       });
     },
 
     teamTypePrompt() {
-      let tt = TeamType.findById(Tpl.teamType_id);
+      let tt = TeamType.findById(TeamHelper.teamType_id);
       return tt ? tt.name : 'Please select';
     },
 
     hasTeamTypeClass() {
-      Dom.setClass('noTeamType', ! TeamType.findById(Tpl.teamType_id));
+      Dom.setClass('noTeamType', ! TeamType.findById(TeamHelper.teamType_id));
     },
 
     addTeamText() {
-      let teamType = TeamType.findById(Tpl.teamType_id);
+      let teamType = TeamType.findById(TeamHelper.teamType_id);
       return teamType && 'Add new ' + teamType.name;
     },
 
@@ -76,6 +77,13 @@ define(function(require, exports, module) {
   });
 
   Index.$events({
+    'click [name=EditTeamType]'(event) {
+      Dom.stopEvent();
+      let teamType = TeamType.findById(TeamHelper.teamType_id);
+
+      teamType && Dialog.open(Tpl.EditTeamType.$autoRender(teamType));
+    },
+
     'click .teams tr': function (event) {
       if (! Dom.hasClass(document.body, 'aAccess')) return;
       Dom.stopEvent();
@@ -109,7 +117,7 @@ define(function(require, exports, module) {
           if (id === '$new') {
             Dialog.open(Tpl.AddTeamType.$autoRender(new TeamType({org_id: App.orgId})));
           } else {
-            Tpl.teamType_id = id;
+            TeamHelper.teamType_id = id;
             ctx.updateAllTags();
           }
           return true;
@@ -122,7 +130,7 @@ define(function(require, exports, module) {
   base.addTemplate(module, Tpl.Add, {
     focus: true,
     data: function () {
-      return new Team({org_id: App.orgId, teamType_id: Tpl.teamType_id});
+      return new Team({org_id: App.orgId, teamType_id: TeamHelper.teamType_id});
     }
   });
 
@@ -143,31 +151,33 @@ define(function(require, exports, module) {
   });
 
   Tpl.AddTeamType.$events({
+    'click [name=cancel]'(event) {
+      Dialog.close(event.currentTarget);
+    },
+
+    'click [type=submit]': teamTypeSubmitFunc,
+  });
+
+  Tpl.EditTeamType.$events({
+    'click [name=cancel]'(event) {
+      Dialog.close(event.currentTarget);
+    },
+
+    'click [type=submit]': teamTypeSubmitFunc,
+  });
+
+  Tpl.TeamTypeForm.$helpers({
+    checked() {
+      Dom.setClass('checked', this.default, $.element.parentNode);
+    },
+  });
+
+  Tpl.TeamTypeForm.$events({
     'click [name=default]'(event) {
       Dom.stopEvent();
 
       Dom.toggleClass(this.parentNode, 'checked');
     },
-
-    'click [name=cancel]'(event) {
-      Dialog.close(event.currentTarget);
-    },
-
-    'click [type=submit]'(event) {
-      Dom.stopEvent();
-      var doc = $.data();
-
-      Form.fillDoc(doc, event.currentTarget);
-      doc.default = !! event.currentTarget.querySelector('label.checked');
-
-      if (doc.$save()) {
-        Dialog.close(event.currentTarget);
-      } else {
-        Form.renderErrors(doc, event.currentTarget);
-      }
-
-
-    }
   });
 
   Tpl.Edit.$events({
@@ -206,6 +216,20 @@ define(function(require, exports, module) {
 
   function setSortFunc() {
     return sortFunc = util.compareByField(sortField);
+  }
+
+  function teamTypeSubmitFunc(event) {
+    Dom.stopEvent();
+    var doc = $.data();
+
+    Form.fillDoc(doc, event.currentTarget);
+    doc.default = !! event.currentTarget.querySelector('label.checked');
+
+    if (doc.$save()) {
+      Dialog.close(event.currentTarget);
+    } else {
+      Form.renderErrors(doc, event.currentTarget);
+    }
   }
 
   return Tpl;
