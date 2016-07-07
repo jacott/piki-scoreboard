@@ -147,7 +147,7 @@ isClient && define(function (require, exports, module) {
       },
 
       "test no time column"() {
-        TH.change('select[name=selectHeat]', 2);
+        TH.selectMenu('button[name=selectHeat]', 2);
 
         assert.dom('#Event .Category', function () {
           assert.dom('.rank table.results', function () {
@@ -164,7 +164,7 @@ isClient && define(function (require, exports, module) {
       },
 
       "test rendering qual round"() {
-        TH.change('select[name=selectHeat]', 1);
+        TH.selectMenu('button[name=selectHeat]', 1);
 
         assert.dom('#Event .Category', function () {
           assert.dom('.rank table.results', function () {
@@ -245,7 +245,7 @@ isClient && define(function (require, exports, module) {
       "test clicking on time in results mode"() {
         TH.login();
 
-        TH.change('select[name=selectHeat]', 3);
+        TH.selectMenu('button[name=selectHeat]', 3);
         assert.dom('tr#Result_'+ v.result._id, function () {
           TH.trigger('td.heat99', 'mousedown');
         });
@@ -289,10 +289,12 @@ isClient && define(function (require, exports, module) {
       "test selecting heat"() {
         TH.login();
 
-        assert.dom('select[name=selectHeat]', function () {
-          assert.dom('option[selected]', {value: "-1", text: 'General'});
-          assert.dom('option:not([selected])', {value: "1", text: 'Qual 1'});
-          TH.change(this, "2");
+        TH.selectMenu('button[name=selectHeat]', 2, function () {
+          assert.dom(this.parentNode, function () {
+            assert.dom('li.selected', {text: 'General', data: TH.match.field('id', -1)});
+            assert.dom('li:not(.selected)', {text: 'Qual 1', data: TH.match.field('id', 1)});
+          });
+          TH.click(this);
         });
 
         assert.dom('h1', 'Qual 2 - Results');
