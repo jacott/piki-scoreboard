@@ -28,6 +28,8 @@
 @cPrimary: #08a;
 @cPrimaryText: darken(@cPrimary, 10%);
 @cButtonSel: desaturate(@cPrimary, 30%);
+@cSecondary: #f50;
+@cSecondaryText: darken(@cSecondary, 10%);
 @cWarn: #d40000;
 @cDisabledFG: #757575;
 @cDisabledBG: #9a9a9a;

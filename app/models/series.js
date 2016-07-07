@@ -11,4 +11,7 @@ define(function(require, Series, module) {
     closed: {type: 'boolean', boolean: 'trueOnly'},
     teamType_ids: 'has_many',
   });
+
+  require('koru/env!./series')(Series);
+
 });

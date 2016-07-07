@@ -10,6 +10,7 @@ define(function(require, exports, module) {
   const Event       = require('models/event');
   const Heat        = require('models/heat');
   const Result      = require('models/result');
+  const Series      = require('models/series');
   const TeamType    = require('models/team-type');
   const App         = require('./app-base');
 
@@ -26,7 +27,7 @@ define(function(require, exports, module) {
   var eventSub, resultOb;
 
   Tpl.$extend({
-    onBaseEntry: function (page, pageRoute) {
+    onBaseEntry(page, pageRoute) {
       var elm = Tpl.$autoRender({});
       document.body.appendChild(elm);
 
@@ -52,19 +53,31 @@ define(function(require, exports, module) {
       if (! Tpl.event) Dom.addClass(elm, 'noEvent');
     },
 
-    onBaseExit: function (page, pageRoute) {
+    onBaseExit(page, pageRoute) {
       Dom.removeId('Event');
     },
   });
 
   Index.$helpers({
-    events: function (callback) {
-      callback.render({model: Event, sort: sortByDate});
+    list(callback) {
+      callback.render({model: $.ctx.tab === 'series' ? Series : Event, sort: sortByDate});
+    },
+
+    addLink() {
+      return Form.pageLink({
+        class: 'adminAccess action', name: 'add',
+        value: 'Add new '+$.ctx.tab,
+        template: $.ctx.tab === 'series' ? 'Event.AddSeries' : 'Event.Add'});
+    },
+
+    selectedTab(type) {
+      Dom.setClass("selected", type === $.ctx.tab);
+      Dom.addClass($.element, type);
     },
   });
 
   Index.Row.$helpers({
-    classes: function () {
+    classes() {
       return this.$equals(Tpl.event) ? "selected" : "";
     },
   });
@@ -74,25 +87,49 @@ define(function(require, exports, module) {
   }
 
   Index.$events({
-    'click .events tr': function (event) {
+    'click .list tr'(event) {
       Dom.stopEvent();
 
       var data = $.data(this);
+
       Route.gotoPage(Tpl.Show, {eventId: data._id});
+    },
+
+    'click button:not(.selected).tab'(event) {
+      Dom.stopEvent();
+
+      Route.replacePage(Tpl.Index, {hash: '#'+this.getAttribute('name')});
     },
   });
 
-  base.addTemplate(module, Index, {defaultPage: true, path: ''});
+  Index.$extend({
+    $created(ctx, elm) {
+      ctx.tab = (ctx.data.hash || '#event').slice(1);
+      ctx.data = {};
+    }
+  });
+
+  base.addTemplate(module, Index, {
+    defaultPage: true,
+    path: '',
+    data: (page, pageRoute) => pageRoute,
+  });
   base.addTemplate(module, Tpl.Add, {
     focus: true,
-    data: function () {
+    data() {
       return new Event({org_id: App.orgId, teamType_ids: TeamType.where('default', true).fetchIds()});
+    }
+  });
+  base.addTemplate(module, Tpl.AddSeries, {
+    focus: true,
+    data() {
+      return new Series({org_id: App.orgId, teamType_ids: TeamType.where('default', true).fetchIds()});
     }
   });
 
   base.addTemplate(module, Tpl.Show, {
     focus: true,
-    data: function (page, pageRoute) {
+    data(page, pageRoute) {
       if (! Tpl.event) Route.abortPage();
 
       Tpl.Show.results = Route.searchParams(pageRoute).type !== 'startlists';
@@ -103,7 +140,7 @@ define(function(require, exports, module) {
 
   base.addTemplate(module, Tpl.Edit, {
     focus: true,
-    data: function (page, pageRoute) {
+    data(page, pageRoute) {
       if (! Tpl.event) Route.abortPage();
 
       return Tpl.event;
@@ -112,13 +149,18 @@ define(function(require, exports, module) {
 
   Tpl.Add.$events({
     'click [name=cancel]': cancel,
-    'click [type=submit]': Form.submitFunc('AddEvent', Tpl),
+    'click [type=submit]': Form.submitFunc('AddEvent', 'back'),
+  });
+
+  Tpl.AddSeries.$events({
+    'click [name=cancel]': cancel,
+    'click [type=submit]': Form.submitFunc('AddSeries', 'back'),
   });
 
 
   Tpl.Edit.$events({
     'click [name=cancel]': cancel,
-    'click [name=delete]': function (event) {
+    'click [name=delete]'(event) {
       var doc = $.data();
 
       Dom.stopEvent();
@@ -127,7 +169,7 @@ define(function(require, exports, module) {
         classes: 'warn',
         okay: 'Delete',
         content: Tpl.ConfirmDelete,
-        callback: function(confirmed) {
+        callback(confirmed) {
           if (confirmed) {
             doc.$remove();
             Route.gotoPage(Tpl);
@@ -138,7 +180,7 @@ define(function(require, exports, module) {
     },
     'click [type=submit]': Form.submitFunc('EditEvent', Tpl),
 
-    'change [name=changeFormat]': function (event) {
+    'change [name=changeFormat]'(event) {
       var cat = $.data(this);
       var ev = Tpl.event;
 
@@ -156,7 +198,7 @@ define(function(require, exports, module) {
   });
 
   Tpl.Edit.$helpers({
-    categories: function (callback) {
+    categories(callback) {
       var cats = Category.docs;
       var eventCats = catList()
             .forEach(function (doc) {doc && callback(doc)});
@@ -186,16 +228,16 @@ define(function(require, exports, module) {
 
   Tpl.Form.TeamType.$helpers({
     checked() {
-      let teamType_ids = Tpl.Form.$data().teamType_ids;
+      let teamType_ids = $.ctx.parentCtx.data.teamType_ids;
       Dom.setClass('checked', teamType_ids && teamType_ids.indexOf(this._id) !== -1);
     },
   });
 
   Tpl.Form.TeamType.$events({
-    'click .check': function () {
+    'click .check'() {
       Dom.stopEvent();
 
-      let event = Tpl.Form.$data();
+      let event = $.ctx.parentCtx.data;
       let checked = Dom.toggleClass(this.parentNode, 'checked');
       let list = event.$change('teamType_ids');
       if (! list){
@@ -210,22 +252,28 @@ define(function(require, exports, module) {
   });
 
   Tpl.Form.$helpers({
-    teamTypes(callback) {
-      callback.render({
-        model: TeamType,
-        sort: util.compareByName,
-      });
-    },
+    teamTypes,
   });
 
+  Tpl.SeriesForm.$helpers({
+    teamTypes,
+  });
+
+  function teamTypes(callback) {
+    callback.render({
+      model: TeamType,
+      sort: util.compareByName,
+    });
+  }
+
   Tpl.Edit.$extend({
-    $destroyed: function (ctx, elm) {
+    $destroyed(ctx, elm) {
       ctx.data.$clearChanges();
     }
   });
 
   Tpl.Edit.Cat.$helpers({
-    eventFormat: function () {
+    eventFormat() {
     var event = $.ctx.parentCtx.data;
     var format = event.heats[this._id];
     if (format)
@@ -233,18 +281,18 @@ define(function(require, exports, module) {
     else
       return this.heatFormat; // not yet copied to event
     } ,
-    describeFormat: function () {
+    describeFormat() {
       var event = $.ctx.parentCtx.data;
       return Event.describeFormat(event.heats[this._id] || this.type+this.heatFormat);
     }
   });
 
   Tpl.CatList.$helpers({
-    catID: function () {
+    catID() {
       return "cat_"+this._id;
     },
 
-    heats: function () {
+    heats() {
       var cat = this;
       var frag = document.createDocumentFragment();
       var counts = Tpl.scoreCounts[cat._id] || [];
@@ -317,11 +365,11 @@ define(function(require, exports, module) {
   }
 
   Tpl.Show.$helpers({
-    listType: function () {
+    listType() {
       return Tpl.Show.results ? "results" : "start lists";
     },
 
-    eachCategory: function () {
+    eachCategory() {
       if ($.element.tagName === 'TABLE') {
         buildTable($.element);
         return;
@@ -348,7 +396,7 @@ define(function(require, exports, module) {
   });
 
   Tpl.Show.$events({
-    'click .select': function (event) {
+    'click .select'(event) {
       Dom.stopEvent();
       var me = Dom.getClosest(this, 'tr');
       var parent = event.currentTarget;
@@ -396,7 +444,7 @@ define(function(require, exports, module) {
       Dom.getCtx(action).updateAllTags({fmt: firstFormat});
     },
 
-    'click .printResults': function (event) {
+    'click .printResults'(event) {
       Dom.stopEvent();
       var heatNumber = +this.getAttribute('data-heat');
       var parent = event.currentTarget;
@@ -419,13 +467,13 @@ define(function(require, exports, module) {
   });
 
   Tpl.Show.$extend({
-    $created: function (ctx) {
+    $created(ctx) {
       Dom.autoUpdate(ctx);
     },
   });
 
   Tpl.Show.Action.$helpers({
-    content: function () {
+    content() {
       if (this.fmt) {
         var frag = document.createDocumentFragment();
         var elm = document.createElement('span');
