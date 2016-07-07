@@ -235,7 +235,9 @@ define(function(require, exports, module) {
         results.sort(sortByHeat);
 
       } else {
-        results.sort(this.compareResults(rso ? 1 : 0, x, rso));
+        let comparitor = this.compareResults(rso ? 1 : 0, x, rso);
+        results.sort(comparitor);
+        setPoints(results, comparitor);
       }
       return results;
 
@@ -255,6 +257,25 @@ define(function(require, exports, module) {
         if (aScore == null) aScore = -5;
         if (bScore == null) bScore = -5;
         return aScore == bScore ? 0 : aScore > bScore ? -1 : 1;
+      }
+
+      function setPoints(results, comparitor) {
+        let previ = 0;
+        let sumPoints = Heat.pointsTable[0];
+        for (let i = 1; i <= results.length; ++i) {
+
+          if (! results[i] || comparitor(results[previ], results[i])) {
+            for(var j = previ; j < i; ++j) {
+              results[j].sPoints = Math.floor(sumPoints / (i-previ));
+            }
+            sumPoints = 0;
+            previ = i;
+          }
+          sumPoints += Heat.pointsTable[i];
+        }
+        for(var j = previ; j < i; ++j) {
+          // results[j].sPoints = sumPoints / (i-previ);
+        }
       }
     },
 
@@ -324,7 +345,15 @@ define(function(require, exports, module) {
         callback(num === this.rankIndex ? -2 : num, 'Previous heat');
       }
     },
+
   };
+
+
+  Heat.pointsTable = [
+    100, 80, 65, 55, 51, 47, 43, 40, 37, 34,
+    31,  28, 26, 24, 22, 20, 18, 16, 14, 12,
+    10,  9,  8,  7,  6,  5,  4,  3,  2,  1,
+  ];
 
   return Heat;
 });

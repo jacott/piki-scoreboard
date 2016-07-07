@@ -1,7 +1,8 @@
 define(function (require, exports, module) {
   var test, v;
-  var TH = require('test-helper');
-  var Heat = require('./heat');
+  const util = require('koru/util');
+  const TH   = require('test-helper');
+  const Heat = require('./heat');
 
   TH.testCase(module, {
     setUp: function () {
@@ -335,6 +336,22 @@ define(function (require, exports, module) {
 
           assert.equals(v.run(), [v.r3, v.r1, v.r2]);
         },
+
+
+        "test sPoints"() {
+          v.run();
+
+          assert.same(v.r2.sPoints, 100);
+          assert.same(v.r3.sPoints, 80);
+          assert.same(v.r1.sPoints, 65);
+
+          v.r3.scores = util.shallowCopy(v.r1.scores);
+          v.run();
+
+          assert.same(v.r3.sPoints, 72);
+          assert.same(v.r3.sPoints, 72);
+        },
+
       },
 
       "test sorting methods": function () {
@@ -417,5 +434,13 @@ define(function (require, exports, module) {
       },
     },
 
+    "test points table"() {
+      assert.equals(Heat.pointsTable,[
+        100, 80, 65, 55, 51, 47, 43, 40, 37, 34,
+        31,  28, 26, 24, 22, 20, 18, 16, 14, 12,
+        10,  9,  8,  7,  6,  5,  4,  3,  2,  1,
+      ]);
+      assert.same(Heat.pointsTable.length, 30);
+    },
   });
 });
