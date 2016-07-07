@@ -65,22 +65,6 @@ define(function (require, exports, module) {
 
     },
 
-    "//test Team score simple"() {
-      let tt1 = TH.Factory.createTeamType();
-      let team1 = TH.Factory.createTeam();
-      let team2 = TH.Factory.createTeam();
-      let tt2 = TH.Factory.createTeamType();
-      let team3 = TH.Factory.createTeam();
-      let cat1 = TH.Factory.createCategory();
-      let cat2 = TH.Factory.createCategory();
-
-
-      let event = TH.Factory.createEvent({teamType_ids: [tt1._id, tt2._id]});
-      let compet1 = TH.Factory.createCompetitor({team_ids: [team1._id, team3._id], category_ids: [cat1._id, cat2._id]});
-      let compet2 = TH.Factory.createCompetitor({team_ids: [team2._id], category_ids: [cat1._id]});
-      let compet3 = TH.Factory.createCompetitor({team_ids: [team1._id, team3._id]});
-    },
-
     "heat validation": {
       setUp: function () {
         v.oOrg = TH.Factory.createOrg();

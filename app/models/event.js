@@ -1,11 +1,10 @@
 define(function(require, exports, module) {
-  const koru     = require('koru');
-  const Val      = require('koru/model/validation');
-  const util     = require('koru/util');
-  const TeamType = require('models/team-type');
-  const Category = require('./category');
-  const Heat     = require('./heat');
-  const Org      = require('./org');
+  const koru       = require('koru');
+  const Val        = require('koru/model/validation');
+  const util       = require('koru/util');
+  const TeamType   = require('models/team-type');
+  const Category   = require('./category');
+  const Org        = require('./org');
 
   var model = require('model').define(module, {
     validate: function () {
