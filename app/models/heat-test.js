@@ -352,6 +352,21 @@ define(function (require, exports, module) {
           assert.same(v.r3.sPoints, 72);
         },
 
+        "test sPoints smore than 30"() {
+          v.results = [];
+          for (let i = 0; i < 31; ++i) {
+            v.results.push(v['r'+i] = {scores: [0.1, -100*i]});
+          }
+
+          v.run();
+
+          for (let i = 0; i < 30; ++i) {
+            assert.same(v['r'+i].sPoints, Heat.pointsTable[i]);
+          }
+          assert.same(v.r30.sPoints, 0);
+
+        },
+
       },
 
       "test sorting methods": function () {

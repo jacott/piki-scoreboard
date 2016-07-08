@@ -263,7 +263,6 @@ define(function(require, exports, module) {
         let previ = 0;
         let sumPoints = Heat.pointsTable[0];
         for (let i = 1; i <= results.length; ++i) {
-
           if (! results[i] || comparitor(results[previ], results[i])) {
             for(var j = previ; j < i; ++j) {
               results[j].sPoints = Math.floor(sumPoints / (i-previ));
@@ -271,10 +270,7 @@ define(function(require, exports, module) {
             sumPoints = 0;
             previ = i;
           }
-          sumPoints += Heat.pointsTable[i];
-        }
-        for(var j = previ; j < i; ++j) {
-          // results[j].sPoints = sumPoints / (i-previ);
+          sumPoints += Heat.pointsTable[i] || 0;
         }
       }
     },
