@@ -168,3 +168,8 @@
     content: "check_box";
   }
 }
+
+.sortableWidth(@width) {
+  width: @width;
+  &.sort {width: @width + 2}
+}
