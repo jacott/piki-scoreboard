@@ -51,7 +51,7 @@ define(function(require, exports, module) {
             });
             Dom.Flash.loading();
             var loadingArgs = Route.loadingArgs;
-            page.title = Tpl.event.name;
+            page.title = Tpl.event.displayName;
             Dom.setTitleLink([Tpl]);
             Route.abortPage();
           }
@@ -264,13 +264,9 @@ define(function(require, exports, module) {
 
     seriesName() {
       const series = this.series;
-      return series ? series.name : noSeries();
+      return series && series.name;
     },
-
-    noSeries,
   });
-
-  function noSeries() {return Dom.h({i: 'none'});}
 
   Tpl.SeriesForm.$helpers({
     teamTypes,

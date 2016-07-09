@@ -23,6 +23,12 @@ define(function(require, exports, module) {
     heatTypes: function (cat_id) {
       return this.attributes.heats[cat_id];
     },
+
+    get displayName() {
+      const series = this.series;
+      if (series) return `${series.name} - ${this.name}`;
+      return this.name;
+    },
   });
 
   model.defineFields({

@@ -65,6 +65,15 @@ define(function (require, exports, module) {
 
     },
 
+    "test series"() {
+      const series = TH.Factory.createSeries();
+      const ev = TH.Factory.createEvent({series_id: series._id});
+      const ev2 = TH.Factory.createEvent();
+
+      assert.same(ev.displayName, 'Series 1 - Event 1');
+      assert.same(ev2.displayName, 'Event 2');
+    },
+
     "heat validation": {
       setUp: function () {
         v.oOrg = TH.Factory.createOrg();

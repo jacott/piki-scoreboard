@@ -10,6 +10,7 @@ if test -e npm-shrinkwrap.json;then
     if test -e tmp/npm-shrinkwrap.json && diff -q npm-shrinkwrap.json tmp/npm-shrinkwrap.json >/dev/null;then
         echo 'node_modules okay'
     else
+        echo 'Running npm install'
         npm install
         cp npm-shrinkwrap.json tmp/npm-shrinkwrap.json
     fi

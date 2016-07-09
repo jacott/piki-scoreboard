@@ -3,7 +3,9 @@ define(function(require, Series, module) {
   const Org      = require('models/org');
   const TeamType = require('models/team-type');
 
-  module.exports = Series = Model.define(module);
+  module.exports = Series = Model.define(module, {
+    get displayName() {return this.name},
+  });
   Series.defineFields({
     name: {type:  'text', trim: true, required: true, maxLength: 200, unique: {scope: 'org_id'}},
     org_id: 'belongs_to',

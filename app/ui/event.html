@@ -34,7 +34,7 @@
             </tbody>
             <template name="Row">
               <tr class="{{classes}}">
-                <td>{{name}}</td><td>{{date}}</td>
+                <td>{{displayName}}</td><td>{{date}}</td>
               </tr>
             </template>
           </table>
@@ -45,7 +45,7 @@
   <template name="Show">
     <section id="Show">
       <div>
-        <h1>{{name}} - Category {{listType}}</h1>
+        <h1>{{displayName}} - Category {{listType}}</h1>
         {{eachCategory}}
 
         {{>Action ""}}
@@ -131,7 +131,7 @@
     <fieldset class="fields">
       {{labelField "name"}}
       {{labelField "date" placeholder="yyyy-mm-dd"}}
-      {{labelField "series_id" includeBlank=noSeries type="selectMenu" displayValue=seriesName selectList=lazySeriesList}}
+      {{labelField "series_id" includeBlank="none" type="selectMenu" displayValue=seriesName selectList=lazySeriesList popupClass="seriesMenu"}}
       <label><span class="name">Select team types for this event</span></label>
       <ul class="teamTypeList ui-ul">
         {{each "teamTypes" template="TeamType"}}

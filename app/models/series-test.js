@@ -30,9 +30,7 @@ define(function (require, _, module) {
 
       assert(series.org);
       assert.equals(series.teamType_ids, ['tt1']);
+      assert.same(series.displayName, 'Series 1');
     },
-
-
-
   });
 });
