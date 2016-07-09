@@ -40,12 +40,28 @@
     display: none;
   }
 
-  .events {
-    h1 {
-      font-size: 1.4em;
+  .tabbed.list {
+    .tabNames {
+      .tab {
+        font-size: 1.2em;
+        font-weight: 500;
+        padding: 12px 24px;
+        color: fade(#000, 50%);
+          border-bottom: 2px solid fade(#000, 0%);
+        &.selected {
+          color: @cPrimaryText;
+          border-color: @cSecondaryText;
+        }
+      }
     }
-    &>nav {
-      margin: 1em;
+    .tabBody {
+      background-color: #f6f6f6;
+      padding: 2px 4px;
+
+      nav {
+        .flexFlow(row);
+        justify-content: flex-end;
+      }
     }
   }
 

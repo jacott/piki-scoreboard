@@ -30,7 +30,7 @@ define(function (require, exports, module) {
       var tt1 = TH.Factory.createTeamType();
       var team1 = TH.Factory.createTeam();
 
-      var obSpys = 'User Climber Event Category Team TeamType'.split(' ').map(function (name) {
+      var obSpys = 'User Climber Event Series Category Team TeamType'.split(' ').map(function (name) {
         try {
           return test.spy(Model[name], 'observeOrg_id');
         } catch(ex) {

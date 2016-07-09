@@ -4,9 +4,9 @@
       <nav class="menu">
         {{pageLink name="show" value="Results" template="Event.Show" search="type=results"}}
         {{pageLink name="show" value="Start lists" template="Event.Show" search="type=startlists"}}
-        {{pageLink class="adminAccess" name="register" value="Registrations" template="Event.Register"}}
-        {{pageLink class="adminAccess" name="edit" value="Edit event" template="Event.Edit"}}
-        {{pageLink class="adminAccess" name="edit" value="Upload registrations" template="Event.RegUpload"}}
+        {{pageLink class="adminAccess link" name="register" value="Registrations" template="Event.Register"}}
+        {{pageLink class="adminAccess link" name="edit" value="Edit event" template="Event.Edit"}}
+        {{pageLink class="adminAccess link" name="edit" value="Upload registrations" template="Event.RegUpload"}}
      </nav>
       <section class="body">
       </section>
@@ -14,26 +14,31 @@
   </section>
   <template name="Index">
     <div>
-      <section class="events">
-        <h1>Events</h1>
-        <nav>
-          {{pageLink class="adminAccess" name="add" value="Add new event" template="Event.Add"}}
-        </nav>
-        <table class="select">
-          <thead>
-            <tr>
-              <th>Name</th><th>Start Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {{each "events" template="Row"}}
-          </tbody>
-          <template name="Row">
-            <tr class="{{classes}}">
-              <td>{{name}}</td><td>{{date}}</td>
-            </tr>
-          </template>
-        </table>
+      <section class="tabbed list">
+        <div class="tabNames">
+          <button class="tab" name="event" type="button" {{selectedTab "event"}}>Events</button>
+          <button class="tab" name="series" type="button" {{selectedTab "series"}}>Series</button>
+        </div>
+        <div class="tabBody">
+          <nav>
+            {{addLink}}
+          </nav>
+          <table class="select">
+            <thead>
+              <tr>
+                <th>Name</th><th>Start Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{each "list" template="Row"}}
+            </tbody>
+            <template name="Row">
+              <tr class="{{classes}}">
+                <td>{{name}}</td><td>{{date}}</td>
+              </tr>
+            </template>
+          </table>
+        </div>
       </section>
     </div>
   </template>
@@ -65,6 +70,17 @@
     <form id="AddEvent">
       <h1>Add new event</h1>
       {{> /Event.Form}}
+      <fieldset class="actions">
+        <button type="submit" name="create">Create</button>
+        <button type="button" name="cancel">Cancel</button>
+      </fieldset>
+    </form>
+  </template>
+
+  <template name="AddSeries">
+    <form id="AddSeries">
+      <h1>Add new series</h1>
+      {{> /Event.SeriesForm}}
       <fieldset class="actions">
         <button type="submit" name="create">Create</button>
         <button type="button" name="cancel">Cancel</button>
@@ -124,6 +140,18 @@
             <span class="name">{{name}}</span>
           </li>
         </template>
+      </ul>
+      {{labelField "closed" type="onOff" label="Event state" onLabel="closed" offLabel="open"}}
+    </fieldset>
+  </template>
+
+  <template name="SeriesForm">
+    <fieldset class="fields">
+      {{labelField "name"}}
+      {{labelField "date" placeholder="yyyy-mm-dd"}}
+      <label><span class="name">Select team types for this event</span></label>
+      <ul class="teamTypeList ui-ul">
+        {{each "teamTypes" template="../Form.TeamType"}}
       </ul>
       {{labelField "closed" type="onOff" label="Event state" onLabel="closed" offLabel="open"}}
     </fieldset>

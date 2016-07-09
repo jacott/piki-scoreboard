@@ -2,8 +2,8 @@
   <div class="{{classes}}">
     <h1>{{category.name}}</h1>
     <nav class="viewMenu">
-      <button name="toggleStartOrder">{{modeSwitchLabel}}</button>
-      {{field "selectHeat" selectList=heats}}
+      <button name="toggleStartOrder" class="on">{{modeSwitchLabel}}</button>
+      {{field "selectHeat" selectList=heats type="selectMenu"}}
     </nav>
     <h1 class="selectedHeat">{{heat.name}} - {{mode}}</h1>
     <table class="select results">

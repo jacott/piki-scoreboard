@@ -1,14 +1,15 @@
 isClient && define(function (require, exports, module) {
   var test, v;
-  var TH = require('./test-helper');
-  var sut = require('./event');
-  var Route = require('koru/ui/route');
-  var Climber = require('models/climber');
-  var App = require('ui/app');
-  var Result = require('models/result');
-  var Event = require('models/event');
+  const Route   = require('koru/ui/route');
+  const Climber = require('models/climber');
+  const Event   = require('models/event');
+  const Result  = require('models/result');
+  const Series  = require('models/series');
+  const App     = require('ui/app');
+  const sut     = require('./event');
   require('./event-category');
   require('./event-register');
+  const TH      = require('./test-helper');
 
   TH.testCase(module, {
     setUp: function () {
@@ -56,8 +57,9 @@ isClient && define(function (require, exports, module) {
       Route.gotoPage(sut.Index);
 
       assert.dom('#Event', function () {
-        assert.dom('.events', function () {
-          assert.dom('h1', 'Events');
+        assert.dom('button.selected.event.tab', 'Events');
+        assert.dom('button:not(.selected).series.tab', 'Series');
+        assert.dom('.list', function () {
           assert.dom('nav', 'Add new event');
           assert.dom('table', function () {
             assert.dom('tr>td', events[0].name, function () {
@@ -69,6 +71,45 @@ isClient && define(function (require, exports, module) {
           });
         });
       });
+    },
+
+    "test showing series tab"() {
+      var series = TH.Factory.createList(2, 'createSeries', function (index, options) {
+        options.date = "2014/01/0"+(6+index);
+      });
+      Route.gotoPage(sut.Index, {hash: '#series'});
+
+      assert.dom('#Event', function () {
+        assert.dom('button:not(.selected).event.tab', 'Events');
+        assert.dom('button.selected.series.tab', 'Series');
+        assert.dom('.list', function () {
+          assert.dom('nav', 'Add new series');
+          assert.dom('table', function () {
+            assert.dom('tr>td', series[0].name, function () {
+              assert.domParent('td', series[0].date);
+            });
+            assert.dom('tr:first-child>td', series[1].name, function () {
+              assert.domParent('td', series[1].date);
+            });
+          });
+        });
+      });
+    },
+
+    "test switching tabs"() {
+      Route.gotoPage(sut.Index);
+
+      test.spy(Route, 'replacePage');
+
+      TH.click('button:not(.selected).series.tab');
+      assert.dom('button.selected.series.tab');
+      assert.calledWith(Route.replacePage, sut.Index, TH.match.field('hash', '#series'));
+
+      Route.replacePage.reset();
+
+      TH.click('button:not(.selected).event.tab');
+      assert.dom('button.selected.event.tab');
+      assert.calledWith(Route.replacePage, sut.Index, TH.match.field('hash', '#event'));
     },
 
     "test adding new event": function () {
@@ -98,14 +139,56 @@ isClient && define(function (require, exports, module) {
               refute.className(this, 'checked');
             });
           });
+          test.spy(Route.history, 'back');
           TH.click('[type=submit]');
         });
-        refute.dom('#AddEvent');
+        assert.called(Route.history.back);
       });
 
       assert(Event.exists({org_id: v.org._id, name: 'National Cup 1 - Auckland', date: '2014-03-14'}));
+    },
 
-      assert.dom('#Event [name=add]');
+    "test adding new series"() {
+      let tt1 = TH.Factory.createTeamType();
+      let tt2 = TH.Factory.createTeamType({default: true});
+      Route.gotoPage(sut.Index, {hash: '#series'});
+
+      assert.dom('#Event', function () {
+        TH.click('[name=add]');
+        assert.dom('#AddSeries', function () {
+          TH.input('[name=name]', 'National Cup Series 2015');
+          TH.input('[name=date]', '2014-03-14');
+          assert.dom('.onOff[data-field=closed]');
+          assert.dom('.teamTypeList', function () {
+            assert.dom('li', {count: 2});
+            assert.dom('li:first-child', function () {
+              assert.dom('.name', tt1.name);
+              refute.className(this, 'checked');
+              TH.click('.check');
+              assert.className(this, 'checked');
+            });
+
+            assert.dom('li:last-child', function () {
+              assert.dom('.name', tt2.name);
+              assert.className(this, 'checked');
+              TH.click('.check');
+              refute.className(this, 'checked');
+            });
+          });
+
+          test.spy(Route.history, 'back');
+          TH.click('[type=submit]');
+        });
+      });
+
+      assert.called(Route.history.back);
+      let series = Series.findBy("name", 'National Cup Series 2015');
+      assert(series);
+      assert.same(series.org, v.org);
+
+      // assert(Event.exists({org_id: v.org._id, name: 'National Cup 1 - Auckland', date: '2014-03-14'}));
+
+      // assert.dom('#Event [name=add]');
     },
 
     "select": {
@@ -127,7 +210,10 @@ isClient && define(function (require, exports, module) {
 
         Route.gotoPage(sut.Index);
 
-        TH.click('td', v.event.name);
+        assert.dom('#Event', function () {
+          TH.click('td', v.event.name);
+        });
+
         v.eventSub.yield();
       },
 

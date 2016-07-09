@@ -11,9 +11,10 @@ define(function(require, exports, module) {
   require('models/climber');
   require('models/event');
   require('models/category');
+  require('models/series');
 
 
-  var orgChildren = ['Climber', 'Event', 'Category', 'Team', 'TeamType'];
+  var orgChildren = ['Climber', 'Event', 'Series', 'Category', 'Team', 'TeamType'];
 
   koru.onunload(module, function () {
     publish._destroy('Org');
