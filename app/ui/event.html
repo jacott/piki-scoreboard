@@ -131,6 +131,7 @@
     <fieldset class="fields">
       {{labelField "name"}}
       {{labelField "date" placeholder="yyyy-mm-dd"}}
+      {{labelField "series_id" includeBlank=noSeries type="selectMenu" displayValue=seriesName selectList=lazySeriesList}}
       <label><span class="name">Select team types for this event</span></label>
       <ul class="teamTypeList ui-ul">
         {{each "teamTypes" template="TeamType"}}

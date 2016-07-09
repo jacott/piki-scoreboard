@@ -1,6 +1,7 @@
 isClient && define(function (require, exports, module) {
   var test, v;
   const Route   = require('koru/ui/route');
+  const util    = require('koru/util');
   const Climber = require('models/climber');
   const Event   = require('models/event');
   const Result  = require('models/result');
@@ -12,7 +13,7 @@ isClient && define(function (require, exports, module) {
   const TH      = require('./test-helper');
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
       v.org =  TH.Factory.createOrg();
@@ -21,12 +22,12 @@ isClient && define(function (require, exports, module) {
       v.eventSub = test.stub(App, 'subscribe').withArgs('Event').returns({stop: v.stop = test.stub()});
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.tearDown();
       v = null;
     },
 
-    "test event subscribing": function () {
+    "test event subscribing"() {
       var events = TH.Factory.createList(2, 'createEvent', function (index, options) {
         options.date = "2014/01/0"+(8-index);
       });
@@ -49,7 +50,7 @@ isClient && define(function (require, exports, module) {
       assert.calledWith(App.subscribe, 'Event', events[1]._id);
     },
 
-    "test rendering": function () {
+    "test rendering"() {
       var events = TH.Factory.createList(2, 'createEvent', function (index, options) {
         options.date = "2014/01/0"+(6+index);
       });
@@ -112,7 +113,7 @@ isClient && define(function (require, exports, module) {
       assert.calledWith(Route.replacePage, sut.Index, TH.match.field('hash', '#event'));
     },
 
-    "test adding new event": function () {
+    "test adding new event"() {
       let tt1 = TH.Factory.createTeamType();
       let tt2 = TH.Factory.createTeamType({default: true});
       Route.gotoPage(sut.Index);
@@ -192,7 +193,7 @@ isClient && define(function (require, exports, module) {
     },
 
     "select": {
-      setUp: function () {
+      setUp() {
         TH.login();
         v.tt = TH.Factory.createList(2, 'createTeamType');
         v.event = TH.Factory.createEvent({teamType_ids: [v.tt[0]._id]});
@@ -217,7 +218,7 @@ isClient && define(function (require, exports, module) {
         v.eventSub.yield();
       },
 
-      "test team ranking"() {
+      "//test team ranking"() {
         assert.dom('#Event #Show', function () {
           TH.click('.link[name=teamResults]');
         });
@@ -225,7 +226,7 @@ isClient && define(function (require, exports, module) {
         assert.dom('#Event');
       },
 
-      "test rendering": function () {
+      "test rendering"() {
         var result = Result.query.where({event_id: v.event._id, category_id: v.cats[0]._id, climber_id: v.c1.climber_id}).fetchOne();
 
         result.setScore(1, '13');
@@ -269,7 +270,7 @@ isClient && define(function (require, exports, module) {
         assert.dom('.link', "Qual 2");
       },
 
-      "test add category": function () {
+      "test add category"() {
         v.cats[2].$update('heatFormat', 'QQQF3F4');
         var comp = TH.Factory.buildCompetitor({event_id: v.event._id, category_ids: [v.cats[2]._id]});
         assert.dom('.categories', function () {
@@ -284,7 +285,7 @@ isClient && define(function (require, exports, module) {
         });
       },
 
-      "test selecting category": function () {
+      "test selecting category"() {
         TH.click('.categories .link', v.cats[0].name);
 
         assert.dom('#Event .Category', function () {
@@ -292,7 +293,7 @@ isClient && define(function (require, exports, module) {
         });
       },
 
-      "test registration link": function () {
+      "test registration link"() {
         TH.click('[name=register]');
 
         assert.dom('body', function () {
@@ -301,11 +302,11 @@ isClient && define(function (require, exports, module) {
       },
 
       "Edit": {
-        setUp: function () {
+        setUp() {
           TH.click('[name=edit]');
         },
 
-        "test changing format": function () {
+        "test changing format"() {
           assert.dom('.categories input[name=changeFormat]', {value: "QQF8"}, function () {
             assert.dom(this.parentNode, function () {
               assert.dom('.desc', "Qualifier 1; Qualifier 2; Final (8 competitors)");
@@ -319,7 +320,7 @@ isClient && define(function (require, exports, module) {
           assert.equals(v.event.$reload().heats[v.cats[0]._id], 'LQQF8F2');
         },
 
-        "test format error": function () {
+        "test format error"() {
           assert.dom('.categories input[name=changeFormat]', {value: "QQF8"}, function () {
             TH.change(this, 'QQF8FX');
           });
@@ -329,7 +330,7 @@ isClient && define(function (require, exports, module) {
           assert.equals(v.event.$reload().heats[v.cats[0]._id], 'LQQF8');
         },
 
-        "test add category": function () {
+        "test add category"() {
           var comp = TH.Factory.buildCompetitor({category_ids: [v.cats[2]._id]});
           assert.dom('.categories', function () {
             refute.dom('label span', 'Youth A 2');
@@ -338,7 +339,17 @@ isClient && define(function (require, exports, module) {
           });
         },
 
-        "test change name": function () {
+        "test add series"() {
+          const series = TH.Factory.createSeries();
+          assert.dom('#EditEvent', function () {
+            TH.selectMenu('[name=series_id].select', series._id);
+            TH.click('[type=submit]');
+          });
+
+          assert.same(v.event.$reload().series, series);
+        },
+
+        "test change name"() {
           assert.dom('#EditEvent', function () {
             assert.dom('h1', 'Edit ' + v.event.name);
             TH.input('[name=name]', {value: v.event.name}, 'new name');
@@ -348,7 +359,7 @@ isClient && define(function (require, exports, module) {
           assert.dom('#Event td', 'new name');
         },
 
-        "test delete": function () {
+        "test delete"() {
           assert.dom('#EditEvent', function () {
             TH.click('[name=delete]');
           });

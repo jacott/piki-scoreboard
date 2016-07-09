@@ -18,6 +18,14 @@ define(function(require, exports, module) {
   var $ = Dom.current;
   var Index = Tpl.Index;
 
+  Dom.registerHelpers({
+    lazySeriesList() {
+      return function () {
+        return Series.query.fetch().sort(util.compareByName);
+      };
+    },
+  });
+
   var base = Route.root.addBase(module, Tpl, 'eventId');
   koru.onunload(module, function () {
     Route.root.removeBase(Tpl);
@@ -253,7 +261,16 @@ define(function(require, exports, module) {
 
   Tpl.Form.$helpers({
     teamTypes,
+
+    seriesName() {
+      const series = this.series;
+      return series ? series.name : noSeries();
+    },
+
+    noSeries,
   });
+
+  function noSeries() {return Dom.h({i: 'none'});}
 
   Tpl.SeriesForm.$helpers({
     teamTypes,
