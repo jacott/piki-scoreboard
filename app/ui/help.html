@@ -23,10 +23,10 @@
     </p>
   </template>
   <template name="SelectCategoriesToPrint">
-    Only categories with the same number of qualification heats and the same number of final heats can be selected together; categories with different numbers of qualification or final heats must be selected and printed separately.
+    Only categories with the same competition format (the same number of qualification routes/rounds and the same number of final rounds) can be selected together; categories with different competition formats must be selected and printed separately.
   </template>
-  <template name="JudgesForms">
-    are intended for use as <b>judges' forms</b>, which judges use for recording results by hand during climbing (those results then to be copied into Piki). The Bouldering start lists contain a wide column to the right of the competitors' names for entering results tallies by hand, so that judges who are judging more than one boulder can rule lines by hand to create multiple columns: one column for each boulder the judge is judging. Label each column with the boulder number so that when the data is copied into Piki it can be entered for the correct boulder.
+  <template name="Judgingsheets">
+    are intended for use as judging sheets, for recording results by hand during climbing.
   </template>
   <template name="NavGoToEditEvent">
     <p>
@@ -47,37 +47,37 @@
       </ol>
     </p>
   </template>
-  <template name="HeatFormatLead">
+  <template name="CompFormatLead">
     <section>
-      <h1>Heat format codes for Lead categories</h1>
+      <h1>Competition format codes for Lead categories</h1>
       <p>
         Enter:
         <ul>
-          <li>“<b>Q</b>” for every qualification heat; followed by</li>
-          <li>“<b>F<i>n</i></b>” for every restricted heat, where <i>n</i> = the quota of competitors qualifying for the round.</li>
+          <li>“<b>Q</b>” for each route in the Qualification round; followed by</li>
+          <li>“<b>F<i>n</i></b>” for each restricted round, where <i>n</i> = the quota of competitors qualifying for the round.</li>
         </ul>
         For example, for a competition with:
         <ul>
-          <li>Two qualification heats</li>
-          <li>A semifinal heat limited to 26 competitors</li>
-          <li>A final heat limited to 8 competitors</li>
+          <li>A qualification round of two routes</li>
+          <li>A semifinal limited to 26 competitors</li>
+          <li>A final limited to 8 competitors</li>
         </ul>
         Enter “QQF26F8”.
       </p>
     </section>
   </template>
-  <template name="HeatFormatBoulder">
+  <template name="CompFormatBoulder">
     <section>
-      <h1>Heat format codes for Boulder categories</h1>
+      <h1>Competition format codes for Boulder categories</h1>
       <p>
         Enter:
         <ul>
-          <li>“<b>Q:<i>b</i></b>” for every qualification heat, where <i>b</i> = the number of boulders in the course for that heat; followed by</li>
-          <li>“<b>F<i>n</i>:<i>b</i></b>” for every restricted heat, where <i>n</i> = the quota of competitors qualifying for the round, and <i>b</i> = the number of boulders in the course for that heat.</li>
+          <li>“<b>Q:<i>b</i></b>” for every qualification round, where <i>b</i> = the number of boulders in the course for that round; followed by</li>
+          <li>“<b>F<i>n</i>:<i>b</i></b>” for every restricted round, where <i>n</i> = the quota of competitors qualifying for the round, and <i>b</i> = the number of boulders in the course for that round.</li>
         </ul>
         For example, for a competition with:
         <ul>
-          <li>One qualification heat of 5 boulders</li>
+          <li>A qualification round of 5 boulders</li>
           <li>A semifinal round of 4 boulders limited to 20 competitors</li>
           <li>A final round of 3 boulders limited to 6 competitors</li>
         </ul>
@@ -121,49 +121,29 @@
     <section name="general-info">
       <h1>General Information</h1>
       <ul>
-        <li>Piki is a results-management system for <a href="https://www.ifsc-climbing.org">IFSC</a>-format climbing competitions. Piki allows some customization for organizations who wish to modify the <b>competition format</b>: administrators can designate the number of rounds in the competition, the quota of competitors for each round, and the number of boulders for each round in a Boulder competition. Piki's <b>scoring system</b> follows the IFSC rules and is not customizable.</li>
-        <li>Piki is in <b>beta</b> indefinitely:
+        <li>Piki is a results-management system for <a href="https://www.ifsc-climbing.org">IFSC</a>-format climbing competitions. Piki allows some customization for organizations who wish to modify the <i>competition format</i>: administrators can designate the number of rounds in the competition, the quota of competitors for each round, and the number of boulders for each round in a Boulder competition. Piki's <i>scoring system</i> follows the IFSC rules and is not customizable.</li>
+        <li>Piki is in <b>beta</b>:
           <ul>
             <li>New features are being added which may change the way Piki works.</li>
-            <li>You can expect defects and issues to arise as you use the system in real events.</li>
+            <li>You can expect defects and issues to arise as you use the system.</li>
           </ul>
         </li>
         <li>Piki is developed and tested only for use with the <a href="https://www.google.com/intl/en/chrome/browser/">Google Chrome</a> web browser. Piki may or may not work with other web browsers.</li>
-        <li>The developers intend to release Piki under the <a href="http://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public Licence</a> in 2015, making the system available at <a href="https://github.com/">GitHub</a>.</li>
+        <li>The developers intend to release Piki under the <a href="http://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public Licence</a>, making the system available at <a href="https://github.com/">GitHub</a>.</li>
       </ul>
     </section>
 
     <section name="view-and-print">
-      <h1>View and print start lists and results</h1>
-      <span name="go-to-results-start-lists-1">
-        {{> NavResultsStartLists}}
-        <p>To <b>print</b>:
-          <ol>
-            <li>
-              <inlinehelp>
-                <a href="#go-to-results-start-lists-1">
-                  Go to the <i>Results</i> or <i>Start lists</i> page</a><popup>{{> NavResultsStartLists}}</popup>
-              </inlinehelp>
-              for an event.
-            </li>
-            <li>Select categories to print.<br>
-              <b>Note:</b> {{> SelectCategoriesToPrint}}
-            </li>
-          </ol>
-          Alternatively, from the any page on Piki, use your browser's commands or menus to print.
-        </p>
+      <h1>Print judging sheets</h1>
         <p>
-          <b>Note:</b> printed start lists {{> JudgesForms}}
+          Printed start lists {{> Judgingsheets}}
         </p>
     </section>
 
     <section name="org-reg">
       <h1>Apply to register as an organization</h1>
-      <ol>
-        <li>Please read the <a href="#disclaimer">Disclaimer</a> and <a href="#general-info">General information</a>.</li>
-        <li>Please <a href="mailto:piki@getobeya.com?subject=Application%20to%20register%20as%20an%20organization%20on%20Piki&body=Organization%20name:%20%0a%0aOrganization%20website:%20%0a%0aOrganization%20email%20address:%20%0a%0aName%20of%20person%20to%20be%20my%20organization's%20Piki%20admin:%20%0a%0aThe%20email%20address%20that%20person%20wishes%20to%20use%20to%20sign%20in:%20%0a%0aName%20and%20date%20of%20the%20first%20event%20where%20we%20would%20like%20to%20test%20Piki:%20%0a%0aMy%20organization%20_____________________________%20(insert%20organization%20name)%20understands%20and%20accepts%20the%20Disclaimer%20and%20General%20Information%20in%20the%20Help%20on%20the%20Piki%20website.%0a%0aHow%20we%20heard%20about%20Piki:%20%0a%0aAny%20further%20information:%20">apply to register as an organization</a>.
-        </li>
-      </ol>
+      <p>Please read the <a href="#disclaimer">Disclaimer</a> and <a href="#general-info">General information</a>, and then <a href="mailto:piki@getobeya.com?subject=Application%20to%20register%20as%20an%20organization%20on%20Piki&body=Organization%20name:%20%0a%0aOrganization%20website:%20%0a%0aOrganization%20email%20address:%20%0a%0aName%20of%20person%20to%20be%20my%20organization's%20Piki%20admin:%20%0a%0aThe%20email%20address%20that%20person%20wishes%20to%20use%20to%20sign%20in:%20%0a%0aName%20and%20date%20of%20the%20first%20event%20where%20we%20would%20like%20to%20test%20Piki:%20%0a%0aMy%20organization%20_____________________________%20(insert%20organization%20name)%20understands%20and%20accepts%20the%20Disclaimer%20and%20General%20Information%20in%20the%20Help%20on%20the%20Piki%20website.%0a%0aHow%20we%20heard%20about%20Piki:%20%0a%0aAny%20further%20information:%20">apply to register as an organization</a>.
+        </p>
     </section>
 
     <section name="user-reg">
@@ -174,16 +154,6 @@
         added as a Piki user.
       <p>
         When you have been added as a user, a <i>Reset password</i> link will be sent to the email address entered for you.
-      </p>
-    </section>
-
-    <section name="user-sign-in">
-      <h1>Sign in as a user</h1>
-      <p>
-        Click <i>Sign in</i> (top right-hand of page), and sign in.
-      </p>
-      <p>
-        If you do not know your password, click <i>Sign in</i>, then click <i>Forgot password</i>.
       </p>
     </section>
 
@@ -222,7 +192,7 @@
     </section>
 
     <section name="clubs">
-      <h1>Add and edit clubs</h1>
+      <h1>Add and edit teams and team types</h1>
       <p>
         Organization admins only.
       </p>
@@ -231,17 +201,17 @@
       </p>
       <ol>
         <li>Go to your organization's Piki home page by clicking your organization's name at the top left of the page.</li>
-        <li>Click <i>Clubs</i> in the main menu.</li>
-        <li>Add and edit clubs.</li>
+        <li>Click <i>Teams</i> in the main menu.</li>
+        <li>Add and edit teams and team types.</li>
       </ol>
       <p>
-        <b>Note:</b> if your organization will be <a href="#upload-registrations">uploading registrations from file</a> then the club name or code ("short name") used here must be the same as the club name or code used in the upload file.
+        <b>Note:</b> if your organization will be <a href="#upload-registrations">uploading registrations from file</a> then the team name or code ("short name") used here must be the same as the team name or code used in the upload file.
       </p>
       <p>
         <b>Warning:</b>
         <ul>
-          <li><b>Do not delete clubs</b> until further notice. Deleting clubs causes loss of data from past events. Piki's developers intend to fix this. If you have any questions, please contact your organization administrator.</li>
-          <li>Editing a club's details changes those details in all past, current and future events.</li>
+          <li><b>Do not delete teams or team types</b> until further notice. Deleting teams causes loss of data from past events. Piki's developers intend to fix this. If you have any questions, please contact your organization administrator.</li>
+          <li>Editing a team's details changes those details in all past, current and future events.</li>
         </ul>
       </p>
     </section>
@@ -316,7 +286,7 @@
 
             <li>Enter the
               <inlinehelp>
-                <a href="#heat-format-lead"><b>heat format</b></a><popup>{{> HeatFormatLead}}{{> HeatFormatBoulder}}</popup>
+                <a href="#comp-format-lead"><b>comp format</b></a><popup>{{> CompFormatLead}}{{> CompFormatBoulder}}</popup>
               </inlinehelp>.
             </li>
 
@@ -329,14 +299,14 @@
         <b>Warning:</b>
         <ul>
           <li><b>Do not delete competitor categories</b> until further notice. Deleting competitor categories causes loss of data from past events. Piki's developers intend to fix this. If you have any questions, please contact your organization administrator.</li>
-          <li>Editing any of a competitor category's details except heat format changes those details in all past, current and future events.</li>
-          <li>Editing a competitor category's heat format changes the heat format for new events.</li>
+          <li>Editing any of a competitor category's details except <i>competition format</i> changes those details in all past, current and future events.</li>
+          <li>Editing a competitor category's <i>competition format</i> changes the <i>competition format</i> for new events.</li>
         </ul>
       </p>
     </section>
 
-    <section name="heat-format">
-      <h1>Heat format</h1>
+    <section name="comp-format">
+      <h1>Competition format</h1>
       <p>
         Organization admins only.
       </p>
@@ -344,24 +314,24 @@
         You must be signed in.
       </p>
       <p>
-        To set the heat format for a category:<br>
+        To set the competition format for a category:<br>
         <ul>
           <li>For an existing event,
             <inlinehelp>
               <a href="#go-to-edit-event">go to the <i>Edit event</i> page</a><popup>{{> NavGoToEditEvent}}</popup>
             </inlinehelp>
-            for that event, and enter a heat format code as detailed below.</li>
+            for that event, and enter a competition format code as detailed below.</li>
           <li>For new events,
             <inlinehelp>
               <a href="#go-to-comp-cat">go to <i>Competitor categories</i></a><popup>{{> NavGoToCompCat}}</popup>
-            </inlinehelp>, select a competitor category, and enter a heat format code as detailed below.
+            </inlinehelp>, select a competitor category, and enter a competition format code as detailed below.
           </li>
         </ul>
       </p>
-      <span name="heat-format-lead">
-        {{> HeatFormatLead}}
-        <span name="heat-format-boulder">
-          {{> HeatFormatBoulder}}
+      <span name="comp-format-lead">
+        {{> CompFormatLead}}
+        <span name="comp-format-boulder">
+          {{> CompFormatBoulder}}
     </section>
 
     <section name="event-add">
@@ -382,9 +352,6 @@
 
     <section name="event-edit">
       <h1>Edit and delete events</h1>
-      <p>Edit an event's name or date.<br>
-        Edit the heat formats for an event.<br>
-        Delete an event.
       <p>
         Organization admins only.
       </p>
@@ -400,11 +367,11 @@
         </li>
         <li>On the <i>Edit event</i> page, edit the event’s name or date, edit the
           <inlinehelp>
-            <a href="#heat-format-lead">heat format</a><popup>{{> HeatFormatLead}}{{> HeatFormatBoulder}}</popup>
+            <a href="#comp-format-lead">competition format</a><popup>{{> CompFormatLead}}{{> CompFormatBoulder}}</popup>
           </inlinehelp>
           of any of the competitor categories, and click <i>Save</i> to confirm.<br>
           Or, to delete the event, click <i>Delete</i>, and confirm in the pop-up box.<br>
-          <b>Note:</b> only categories in which there is a competitor registered will show in the list for editing heat format.
+          <b>Note:</b> only categories in which there is a competitor registered will show in the list for editing competition format.
         </li>
       </ol>
     </section>
@@ -422,8 +389,6 @@
         <span name="upload-registrations">
           <h1>Upload multiple registrations from file</h1>
           <p>The current <i>Upload registrations</i> feature is designed for use with Climbing NZ's registration system. Climbing NZ users, please contact your organization administrator for instructions.
-          </p>
-          <p>In the future, Piki's developers may add a generalized <i>Upload registrations</i> feature for other organizations to use.
           </p>
       </section>
 
@@ -494,7 +459,7 @@
     <section name="results">
       <h1>Enter and edit results</h1>
       <p>
-        <b>Note: </b>printed <a href="#view-and-print">start lists</a> {{> JudgesForms}}
+        <b>Note: </b>printed <a href="#view-and-print">start lists</a> {{> Judgingsheets}}
       </p>
       <p>
         Organization admins and judges only.
@@ -507,17 +472,12 @@
           <inlinehelp>
             <a href="#go-to-results-start-lists">Go to the <i>Start lists</i> page</a><popup>{{> NavStartLists}}</popup>
           </inlinehelp>
-          for the event.
+          for the event, and click on the desired round or route.</br>
+          Alternatively, from the <i>Results</i> page for the desired round or route, click <i>Show start order</i> at the top right of the page, or click in one of the <i>score</i> cells.
         </li>
-        <li>On the <i>Start lists</i> page, to go to the start list for the desired heat:
-          <ul>
-            <li>Click on the desired heat, or if the desired heat is not displayed, click on the relevant category and then select the desired heat from the dropdown menu at the top right of the page.
-            </li>
-            <li>Alternatively, from the <i>Results</i> page for the desired heat, click <i>Show start order</i> at the top right of the page, or click in one of the <i>score</i> cells for the heat.
-            </li>
           </ul>
         </li>
-        <li>On the start list for the heat, click in the appropriate cell in the
+        <li>At the start list, click in the appropriate cell in the
           table and type the score (see <i>Lead scores</i> and <i>Boulder scores</i> below for details).</li>
         <li>Press <i>Tab</i> to move to the next cell.</li>
       </ol>
@@ -532,7 +492,7 @@
             <li><tt><b>dnc</b></tt> (indicates "did not climb")</li>
           </ul>
           To record time taken in a Lead final (to use in scoring in case
-          of a tie after countback), enter the time taken in the format:
+          of a tie after countback), enter the time taken:
           <ul>
             <li><tt><b>m:ss</b> (e.g. 7:33)</li>
           </ul>
@@ -597,14 +557,26 @@
       <h1>Navigate Piki</h1>
       <span name="go-to-results-start-lists">
         {{> NavResultsStartLists}}
-        <span name="go-to-edit-event">
-          {{> NavGoToEditEvent}}
-          <span name="go-to-registrations">
-            {{> NavGoToReg}}
-            <span name="go-to-comp-cat">
-              {{> NavGoToCompCat}}
-              <span name="go-to-climbers">
-                {{> NavGoToClimbers}}
+      </span>
+      <span name="user-sign-in">
+        <p>To <b><i>sign in</i></b> as a user:</p>
+        <ul>
+          <li>Click <i>Sign in</i> (top right-hand of page), and sign in.</li>
+          <li>If you do not know your password, click <i>Sign in</i>, then click <i>Forgot password</i>.</li>
+        </ul>
+      </span>
+      <span name="go-to-edit-event">
+        {{> NavGoToEditEvent}}
+      </span>
+      <span name="go-to-registrations">
+        {{> NavGoToReg}}
+      </span>
+      <span name="go-to-comp-cat">
+        {{> NavGoToCompCat}}
+      </span>
+      <span name="go-to-climbers">
+        {{> NavGoToClimbers}}
+      </span>
     </section>
 
     <section name="disclaimer">
@@ -618,13 +590,13 @@
           <li>To endeavour to fix known defects.</li>
           <li>That Piki will function as described in this <i>Help</i> document or in other communications.</li>
           <li>That Piki organizations and users will continue to have access to their Piki accounts.</li>
-          <li>That data entered into the Piki system will be kept private. We will endeavour, but do not undertake, to ensure that only Piki's developers and the organization's users with admin status can access:
+          <li>That data entered into the Piki system will be kept private. We will endeavour to ensure, but do not undertake, that only Piki's developers and the organization's users with admin status can access:
             <ul>
               <li>Competitors' birth dates</li>
               <li>Users' email addresses</li>
             </ul>
           </li>
-          <li>That data entered into Piki will be saved and will continue to be available to the organization. We will endeavour, but do not undertake, to ensure that data entered into Piki is saved and backed up.</li>
+          <li>That data entered into Piki will be saved and will continue to be available to the organization. We will endeavour to ensure, but do not undertake, that data stored in Piki is backed up.</li>
           <li>To accept applications to register as an organization.</li>
           <li>To provide training, help or support.</li>
         </ul>
@@ -639,10 +611,10 @@
       <p>
         <a href="mailto:piki@getobeya.com?subject=Application%20to%20register%20as%20an%20organization%20on%20Piki&body=Organization%20name:%20%0a%0aOrganization%20website:%20%0a%0aOrganization%20email%20address:%20%0a%0aName%20of%20person%20to%20be%20my%20organization's%20Piki%20admin:%20%0a%0aThe%20email%20address%20that%20person%20wishes%20to%20use%20to%20sign%20in:%20%0a%0aName%20and%20date%20of%20the%20first%20event%20where%20we%20would%20like%20to%20test%20Piki:%20%0a%0aMy%20organization%20_____________________________%20(insert%20organization%20name)%20understands%20and%20accepts%20the%20Disclaimer%20and%20General%20Information%20in%20the%20Help%20on%20the%20Piki%20website.%0a%0aHow%20we%20heard%20about%20Piki:%20%0a%0aAny%20further%20information:%20">Apply to register as an organization</a>. (Please read the <a href="#disclaimer">Disclaimer</a> and <a href="#general-info">General information</a>.)
       </p>
-      <p>To arrange to be added as a <b>Piki user</b> to manage your organization’s events, contact your
+      <p>To arrange to be added as a <b>Piki user</b> to manage your organization’s events, please contact your
         organization administrator.
       </p>
-      <p>If you have feedback, suggestions, or questions not answered in the Help, please <a href="mailto:piki@getobeya.com?subject=enquiry%20from%20website">email Piki</a>.
+      <p>If you have feedback, suggestions, or questions not answered in the Help, please <a href="mailto:piki@getobeya.com?subject=enquiry%20from%20website">email Piki</a>. We have a long list of improvements we'd like to make to Piki; it's very helpful to hear from Piki's users which improvements and new features would be most useful to you.
       </p>
     </section>
 
@@ -669,9 +641,9 @@
         <p>Some pages currently do not display well on tablet or phone. Piki's developers intend to address this issue.
         </p>
 
-        <h1>Where are the judges' forms for entering scores by hand during climbing?</h1>
+        <h1>Where are the judging sheets for entering scores by hand during climbing?</h1>
         <p>
-          Printed <a href="#view-and-print">start lists</a> {{> JudgesForms}}
+          Printed <a href="#view-and-print">start lists</a> {{> Judgingsheets}}
         </p>
 
         <h1>What does a score of <i>DNC</i> or <i>nc</i> mean?</h1>
@@ -687,17 +659,17 @@
         </p>
 
         <h1>I can't select all of the categories I want to print</h1>
-        <p>Only categories with the same number of qualification and final heats can be selected together; categories with different numbers of qualification or final heats must be selected and printed separately.
+        <p>{{> SelectCategoriesToPrint}}
         </p>
 
-        <h1>A competitor did not climb in a qualification heat, and I
+        <h1>A competitor did not climb a qualification route or round, and I
           would like their qualification rank to be displayed in the
           results</h1>
         <p><b>Lead</b><br>
-          Enter "<tt>dnc</tt>" (did not climb) as the competitor's score for the heat(s) in which they did not climb.
+          Enter "<tt>dnc</tt>" (did not climb) as the competitor's score for the route(s) in which they did not climb.
         </p>
         <p><b>Bouldering</b><br>
-          Enter "<tt>nc</tt>" (did not climb) as the competitor's score in one of the cells for at least one of the boulders of the heat.
+          Enter "<tt>nc</tt>" (did not climb) as the competitor's score in one of the cells for at least one of the boulders of the round.
         </p>
 
       </section>
