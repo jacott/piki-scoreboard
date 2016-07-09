@@ -4,7 +4,7 @@ set -e
 . `dirname "$0"`/environ.sh
 init demo
 
-pg_dump -O -s piki${branch} >db/schema.sql
+pg_dump -O -s -x piki${branch} >db/schema.sql
 
 echo "Reset test"
 ./scripts/reset-test

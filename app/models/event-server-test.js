@@ -7,7 +7,7 @@ define(function (require, exports, module) {
   const User  = require('./user');
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
       v.rpc = TH.mockRpc();
@@ -16,13 +16,13 @@ define(function (require, exports, module) {
       test.stub(koru, 'info');
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.clearDB();
       v = null;
     },
 
     "authorize": {
-      "test wrong org denied": function () {
+      "test wrong org denied"() {
         var oOrg = TH.Factory.createOrg();
         var oUser = TH.Factory.createUser();
 
@@ -33,7 +33,7 @@ define(function (require, exports, module) {
         });
       },
 
-      "test allowed": function () {
+      "test allowed"() {
         var event = TH.Factory.buildEvent();
 
         refute.accessDenied(function () {
@@ -41,14 +41,27 @@ define(function (require, exports, module) {
         });
       },
 
-      'test permitParams': function () {
+      "test series_id"() {
+        const ev = TH.Factory.createEvent();
+        ev.changes.series_id = 'bad';
+
+        assert.accessDenied(() => ev.authorize(v.user._id));
+
+        ev.changes.series_id = TH.Factory.createSeries()._id;
+        ev.authorize(v.user._id);
+
+        const org = TH.Factory.createOrg();
+        ev.changes.series_id = TH.Factory.createSeries()._id;
+        assert.accessDenied(() => ev.authorize(v.user._id));
+      },
+
+      'test permitParams'() {
         var event = TH.Factory.buildEvent();
 
         event.attributes = event.changes;
         event.changes = {'name': 'new name'};
         assert.docChanges(event, {
           name: 'string',
-          org_id: 'id',
           teamType_ids: ['id'],
           date: 'string',
           closed: TH.match(arg => {
@@ -57,13 +70,16 @@ define(function (require, exports, module) {
               && arg.$test("f") && ! arg.$test(1);
           }),
           heats: 'baseObject',
+          series_id: 'id',
+        }, {
+          org_id: 'id',
         }, function () {
           event.authorize(v.user._id);
         });
 
       },
 
-      "test closing": function () {
+      "test closing"() {
         var event = TH.Factory.buildEvent();
         event.attributes = event.changes;
         event.changes = {closed: true};
@@ -73,7 +89,7 @@ define(function (require, exports, module) {
         });
       },
 
-      "test change on closed": function () {
+      "test change on closed"() {
         var event = TH.Factory.buildEvent({closed: true});
         event.attributes = event.changes;
         event.changes = {name: 'bob'};
@@ -83,7 +99,7 @@ define(function (require, exports, module) {
         });
       },
 
-      "test opening": function () {
+      "test opening"() {
         var event = TH.Factory.buildEvent({closed: false});
         event.attributes = event.changes;
         event.changes = {closed: 'true'};

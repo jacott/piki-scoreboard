@@ -9,5 +9,15 @@ define(function(require, exports, module) {
       teamType_ids: {type: 'varchar(24)[]'},
       closed: {type: 'boolean'},
     });
+
+    mig.reversible({
+      add(client) {
+        client.query('alter table "Event" add column "series_id" varchar(24)');
+      },
+
+      revert(client) {
+        client.query('alter table "Event" drop column "series_id"');
+      },
+    });
   };
 });

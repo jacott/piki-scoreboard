@@ -129,7 +129,8 @@ CREATE TABLE "Event" (
     date text,
     errors jsonb,
     closed boolean,
-    "teamType_ids" character varying(24)[]
+    "teamType_ids" character varying(24)[],
+    series_id character varying(24)
 );
 
 
@@ -358,9 +359,6 @@ CREATE INDEX "ChangeLog_createdAt_parent_id" ON "ChangeLog" USING btree ("create
 
 
 --
--- Name: public; Type: ACL; Schema: -; Owner: -
---
-
---
 -- PostgreSQL database dump complete
 --
+

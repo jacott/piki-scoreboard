@@ -1,17 +1,21 @@
 define(function(require, exports, module) {
-  var util = require('koru/util');
-  var ChangeLog = require('./change-log');
-  var User = require('./user');
-  var Val = require('koru/model/validation');
-  var match = require('koru/match');
+  const match     = require('koru/match');
+  const Val       = require('koru/model/validation');
+  const util      = require('koru/util');
+  const ChangeLog = require('./change-log');
+  const User      = require('./user');
 
-  var FIELD_SPEC = {
+  const FIELD_SPEC = {
     name: 'string',
-    org_id: 'id',
     teamType_ids: ['id'],
     date: 'string',
     closed: match.or(match.boolean, match.string, match.nil),
     heats: 'baseObject',
+    series_id: 'id',
+  };
+
+  const NEW_FIELD_SPEC = {
+    org_id: 'id',
   };
 
   return function (model) {
@@ -21,18 +25,18 @@ define(function(require, exports, module) {
 
     util.extend(model.prototype, {
       authorize: function (userId) {
-        User.fetchAdminister(userId, this);
+        const user = User.fetchAdminister(userId, this);
 
         var changes = this.changes;
 
-        Val.assertDocChanges(this, FIELD_SPEC);
+        Val.assertDocChanges(this, FIELD_SPEC, NEW_FIELD_SPEC);
 
         if (changes.hasOwnProperty('closed'))
           Val.allowAccessIf(Object.keys(changes).length === 1);
         else
-          Val.allowAccessIf(! this.closed &&
-                            (this.$isNewRecord() || ! changes.hasOwnProperty('org_id')));
+          Val.allowAccessIf(! this.closed);
 
+        this.changes.series_id && Val.allowAccessIf(this.series && user.canAdminister(this.series));
       },
     });
 

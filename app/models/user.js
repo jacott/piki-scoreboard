@@ -68,7 +68,7 @@ define(function(require, exports, module) {
     },
 
     fetchAdminister: function (userId, doc) {
-      var user = model.findById(userId);
+      var user = model.toDoc(userId);
       Val.allowAccessIf(user && user.canAdminister(doc));
       return user;
     },

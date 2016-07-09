@@ -1,10 +1,11 @@
 define(function(require, exports, module) {
-  const koru       = require('koru');
-  const Val        = require('koru/model/validation');
-  const util       = require('koru/util');
-  const TeamType   = require('models/team-type');
-  const Category   = require('./category');
-  const Org        = require('./org');
+  const koru     = require('koru');
+  const Val      = require('koru/model/validation');
+  const util     = require('koru/util');
+  const Series   = require('models/series');
+  const TeamType = require('models/team-type');
+  const Category = require('./category');
+  const Org      = require('./org');
 
   var model = require('model').define(module, {
     validate: function () {
@@ -32,6 +33,7 @@ define(function(require, exports, module) {
     errors: 'object',
     closed: {type: 'boolean', boolean: 'trueOnly'},
     teamType_ids: 'has_many',
+    series_id: 'belongs_to',
   });
 
   model.describeFormat = function (format) {
