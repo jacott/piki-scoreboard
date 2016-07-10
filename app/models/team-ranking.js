@@ -24,7 +24,7 @@ define(function(require, TeamRanking, module) {
       for(var i = 0; i < Math.min(results.length, 30); ++i) {
         let result = results[i];
         var team_ids = Competitor.findById(result.competitor_id).team_ids;
-        team_ids.forEach(tid => {
+        team_ids && team_ids.forEach(tid => {
           let team = Team.findById(tid);
 
           if (! teamCounts[team._id]) {

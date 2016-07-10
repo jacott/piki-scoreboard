@@ -3,6 +3,7 @@
     <div>
       <nav class="menu">
         {{pageLink name="show" value="Results" template="Event.Show" search="type=results"}}
+        {{pageLink name="teamResults" value="Team results" template="Event.TeamResults"}}
         {{pageLink name="show" value="Start lists" template="Event.Show" search="type=startlists"}}
         {{pageLink class="adminAccess link" name="register" value="Registrations" template="Event.Register"}}
         {{pageLink class="adminAccess link" name="edit" value="Edit event" template="Event.Edit"}}
@@ -54,7 +55,6 @@
             {{content}}
           </div>
         </template>
-        {{pageLink name="teamResults" value="Team results" template="Event.teamResults"}}
       </div>
     </section>
   </template>

@@ -36,5 +36,5 @@ define(function(require, exports, module) {
 
   Dom.setTitleLink = function (args) {
     titleArgs = args;
-  }
+  };
 });

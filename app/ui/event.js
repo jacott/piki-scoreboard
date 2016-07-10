@@ -34,6 +34,7 @@ define(function(require, exports, module) {
   let eventSub, resultOb;
 
   Tpl.$extend({
+    base,
     onBaseEntry(page, pageRoute) {
       var elm = Tpl.$autoRender({});
       document.body.appendChild(elm);

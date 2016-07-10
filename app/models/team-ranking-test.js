@@ -35,13 +35,16 @@ define(function (require, _, module) {
       let compet1 = TH.Factory.createCompetitor({team_ids: [team1._id, team3._id], category_ids: [cat1._id, cat2._id]});
       let compet2 = TH.Factory.createCompetitor({team_ids: [team2._id], category_ids: [cat1._id]});
       let compet3 = TH.Factory.createCompetitor({team_ids: [team1._id, team3._id]});
+      let compet4 = TH.Factory.createCompetitor({team_ids: null});
 
       TH.Factory.createResult({competitor_id: compet1._id, category_id: cat1._id, scores: [0.1]});
       TH.Factory.createResult({competitor_id: compet1._id, category_id: cat2._id, scores: [0.1]});
       TH.Factory.createResult({competitor_id: compet2._id, category_id: cat2._id, scores: [0.5]});
       TH.Factory.createResult({competitor_id: compet3._id, category_id: cat1._id, scores: [0.5]});
 
-      assert.equals(sut.getTeamScores(event), {tt1: {team1: 260, team2: 100}, tt2: {team3: 260}});
+      TH.Factory.createResult({competitor_id: compet4._id, category_id: cat1._id, scores: [0.7]});
+
+      assert.equals(sut.getTeamScores(event), {tt1: {team1: 225, team2: 100}, tt2: {team3: 225}});
     },
 
     "test more than 30"() {

@@ -218,14 +218,6 @@ isClient && define(function (require, exports, module) {
         v.eventSub.yield();
       },
 
-      "//test team ranking"() {
-        assert.dom('#Event #Show', function () {
-          TH.click('.link[name=teamResults]');
-        });
-
-        assert.dom('#Event');
-      },
-
       "test rendering"() {
         var result = Result.query.where({event_id: v.event._id, category_id: v.cats[0]._id, climber_id: v.c1.climber_id}).fetchOne();
 
