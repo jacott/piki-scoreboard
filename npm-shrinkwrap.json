@@ -559,9 +559,9 @@
       "resolved": "https://registry.npmjs.org/json5/-/json5-0.4.0.tgz"
     },
     "koru": {
-      "version": "0.4.1",
+      "version": "0.5.2",
       "from": "git+ssh://git@dev.obeya.co:/home/git/koru.git#master",
-      "resolved": "git+ssh://git@dev.obeya.co:/home/git/koru.git#45f51fcc8e296f760ff94b7a0cb3cda5d1a7d27f"
+      "resolved": "git+ssh://git@dev.obeya.co:/home/git/koru.git#97a27035cf5dc00ac3cbb6dd5070b61a95880f75"
     },
     "less": {
       "version": "2.7.1",

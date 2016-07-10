@@ -26,7 +26,7 @@ define(function(require, exports, module) {
       return this.event && this.event.org_id;
     }
   }
-  module.exports = Result.$init({
+  module.exports = Result.define({
     module,
     fields: {
       event_id: 'belongs_to',

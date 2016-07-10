@@ -22,7 +22,7 @@ define(function(require, exports, module) {
     }
   }
 
-  module.exports = Climber.$init({
+  module.exports = Climber.define({
     module,
     fields: {
       name: {type:  'text', trim: true, required: true, maxLength: 200, unique: {scope: 'org_id'}},
