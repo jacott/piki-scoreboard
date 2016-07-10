@@ -11,7 +11,7 @@ isClient && define(function (require, exports, module) {
       test = this;
       v = {};
 
-      document.body.appendChild(Dom.html({id: 'Spinner'}));
+      document.body.appendChild(Dom.h({id: 'Spinner'}));
     },
 
     tearDown: function () {

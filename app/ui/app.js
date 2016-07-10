@@ -143,7 +143,7 @@ define(function(require, exports, module) {
   }
 
   document.addEventListener(isTouch ? 'touchstart' : 'mousedown', ripple, true);
-  var rippleElm = Dom.html({class: 'ripple', html: {}});
+  var rippleElm = Dom.h({div: {}, class: 'ripple'});
 
   function ripple(event) {
     var button = event.target;

@@ -14,9 +14,9 @@ define(function(require, exports, module) {
   const TeamType    = require('models/team-type');
   const App         = require('./app-base');
 
-  var Tpl   = Dom.newTemplate(require('koru/html!./event'));
-  var $ = Dom.current;
-  var Index = Tpl.Index;
+  const Tpl   = Dom.newTemplate(require('koru/html!./event'));
+  const $ = Dom.current;
+  const Index = Tpl.Index;
 
   Dom.registerHelpers({
     lazySeriesList() {
@@ -26,13 +26,12 @@ define(function(require, exports, module) {
     },
   });
 
-  var base = Route.root.addBase(module, Tpl, 'eventId');
+  const base = Route.root.addBase(module, Tpl, 'eventId');
   koru.onunload(module, function () {
     Route.root.removeBase(Tpl);
   });
 
-  var Index = Tpl.Index;
-  var eventSub, resultOb;
+  let eventSub, resultOb;
 
   Tpl.$extend({
     onBaseEntry(page, pageRoute) {
@@ -350,7 +349,7 @@ define(function(require, exports, module) {
     return "type=" + (Tpl.Show.results ? "results" : "startlists");
   }
 
-  var FORMAT_ROW = Dom.html({tag: 'tr', class: 'fmt', content: [{tag: 'td', colspan: 8}]});
+  const FORMAT_ROW = Dom.h({class: 'fmt', tr: {td: '', $colspan: 8}});
 
   function buildTable(table) {
     var cats = Category.docs;
