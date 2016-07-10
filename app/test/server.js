@@ -12,8 +12,8 @@ define(function(require, exports, module) {
   require('koru/server-rc');
 
   return function () {
-    stubber.spy(Model._modelProperties, 'addUniqueIndex');
-    stubber.spy(Model._modelProperties, 'addIndex');
+    stubber.spy(Model.BaseModel, 'addUniqueIndex');
+    stubber.spy(Model.BaseModel, 'addIndex');
 
     fileWatch.watch(path.join(koru.libDir, 'app/koru'), path.join(koru.libDir, 'app'));
 

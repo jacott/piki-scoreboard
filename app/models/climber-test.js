@@ -1,20 +1,20 @@
 define(function (require, exports, module) {
   var test, v;
-  var TH = require('test-helper');
-  var Climber = require('./climber');
+  const TH      = require('test-helper');
+  const Climber = require('./climber');
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.clearDB();
       v = null;
     },
 
-    'test creation': function () {
+    'test creation'() {
       var climber=TH.Factory.createClimber({team_ids: ['tm1']});
 
       assert(Climber.exists(climber._id));
@@ -25,7 +25,7 @@ define(function (require, exports, module) {
       assert(climber.org);
     },
 
-    'test standard validators': function () {
+    'test standard validators'() {
       var validators = Climber._fieldValidators;
 
       assert.validators(validators.name, {maxLength: [200], required: [true], trim: [true], unique: [{scope: 'org_id'}]});

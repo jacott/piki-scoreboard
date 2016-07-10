@@ -1,15 +1,15 @@
 define(function(require, exports, module) {
-  var util = require('koru/util');
-  var ChangeLog = require('./change-log');
-  var User = require('./user');
-  var Val = require('koru/model/validation');
-  var Event = require('models/event');
+  const Val       = require('koru/model/validation');
+  const util      = require('koru/util');
+  const Event     = require('models/event');
+  const ChangeLog = require('./change-log');
+  const User      = require('./user');
 
-  return function (model) {
-    ChangeLog.logChanges(model, {parent: Event});
+  return function (Result) {
+    ChangeLog.logChanges(Result, {parent: Event});
 
-    util.extend(model.prototype, {
-      authorize: function (userId) {
+    util.extend(Result.prototype, {
+      authorize(userId) {
         User.fetchAdminister(userId, this);
         Val.allowAccessIf(! this.event.closed);
       },

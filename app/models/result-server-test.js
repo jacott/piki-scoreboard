@@ -1,13 +1,13 @@
 define(function (require, exports, module) {
   var test, v;
-  var TH = require('test-helper');
-  var Result = require('./result');
-  var Org = require('./org');
-  var User = require('./user');
-  var koru = require('koru');
+  const koru   = require('koru');
+  const TH     = require('test-helper');
+  const Org    = require('./org');
+  const Result = require('./result');
+  const User   = require('./user');
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
       v.org = TH.Factory.createOrg();
@@ -15,13 +15,13 @@ define(function (require, exports, module) {
       test.stub(koru, 'info');
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.clearDB();
       v = null;
     },
 
     "authorize": {
-      "test denied": function () {
+      "test denied"() {
         var oOrg = TH.Factory.createOrg();
         var oUser = TH.Factory.createUser();
 
@@ -32,7 +32,7 @@ define(function (require, exports, module) {
         });
       },
 
-      "test allowed": function () {
+      "test allowed"() {
         var result = TH.Factory.buildResult();
 
         refute.accessDenied(function () {
@@ -40,7 +40,7 @@ define(function (require, exports, module) {
         });
       },
 
-      "test event closed": function () {
+      "test event closed"() {
         var event = TH.Factory.createEvent({closed: true});
         var result = TH.Factory.buildResult();
 

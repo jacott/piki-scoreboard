@@ -1,57 +1,55 @@
-define(function(require, exports, module) {
-  function Heat(number, format) {
-    this.number = number;
+define(function(require) {
+  const FINAL_NAMES = ['Final', 'Semi final', 'Quarter final'];
 
-    var rounds = format.split(/[QF]/);
-    format = format.replace(/:\d+/g, '');
-    this.cutoffs = format.split('F').slice(1);
+  class Heat {
+    constructor(number, format) {
+      this.number = number;
 
-    format = format.replace(/\d+/g,'');
-    this.type = format[0];
-    format = format.slice(1);
-    this.total = format.length;
-    this.rankIndex = format.indexOf('F');
+      var rounds = format.split(/[QF]/);
+      format = format.replace(/:\d+/g, '');
+      this.cutoffs = format.split('F').slice(1);
 
-    var pnum = 5;
-    for(var i = 1; i <= this.total; ++i) {
-      var p = rounds[i];
-      if (p) p = p.replace(/^\d*:?/, '');
-      if (p)
-        pnum = +p;
+      format = format.replace(/\d+/g,'');
+      this.type = format[0];
+      format = format.slice(1);
+      this.total = format.length;
+      this.rankIndex = format.indexOf('F');
 
-      rounds[i] = pnum;
-      if (i === this.rankIndex)
-        pnum = 4;
+      var pnum = 5;
+      for(var i = 1; i <= this.total; ++i) {
+        var p = rounds[i];
+        if (p) p = p.replace(/^\d*:?/, '');
+        if (p)
+          pnum = +p;
+
+        rounds[i] = pnum;
+        if (i === this.rankIndex)
+          pnum = 4;
+      }
+
+      this._rounds = rounds;
     }
-
-    this._rounds = rounds;
-  };
-
-  var FINAL_NAMES = ['Final', 'Semi final', 'Quarter final'];
-
-  Heat.prototype = {
-    constructor: Heat,
 
     get problems() {
       return this._rounds[this.number];
-    },
+    }
 
     get name() {
       return this.getName(this.number);
-    },
+    }
 
-    isFinalRound: function () {
+    isFinalRound() {
       return this.number === this.total;
-    },
+    }
 
-    className: function(number) {
+    className(number) {
       if (number == null) number = this.number;
       if (number < 0) return 'general';
       else if (number <= this.rankIndex) return 'qual';
       return 'final';
-    },
+    }
 
-    getName: function (number) {
+    getName(number) {
       if (number === -2) return "Qual points";
       if (number === -1) return "General";
       if (number === 0) return "Start order";
@@ -62,9 +60,9 @@ define(function(require, exports, module) {
       }
 
       return heatName;
-    },
+    }
 
-    numberToScore: function (score, index) {
+    numberToScore(score, index) {
       if (index === 0) {
         return score;
       }
@@ -97,9 +95,9 @@ define(function(require, exports, module) {
         }
         return result;
       }
-    },
+    }
 
-    scoreToNumber: function (score, index) {
+    scoreToNumber(score, index) {
       if (score.trim() === '') return;
 
       if (index === 99) {
@@ -135,22 +133,22 @@ define(function(require, exports, module) {
         if (score.match(/^\s*0\s*$/)) return 0;
       }
       return false;
-    },
+    }
 
-    boulderScoreToNumber: function (b, ba, t, ta) {
+    boulderScoreToNumber(b, ba, t, ta) {
       if (b == null) return null;
       return t*1000000 + (99-ta)*10000 + b*100 + (99 - ba);
-    },
+    }
 
-    list: function () {
+    list() {
       var results = [];
       for(var i = this.total; i >= -1; --i) {
         i && results.push([i, this.getName(i)]);
       }
       return results;
-    },
+    }
 
-    sortByStartOrder: function (results) {
+    sortByStartOrder(results) {
       if (results.length === 0) return results;
 
       var x = this.number;
@@ -199,9 +197,9 @@ define(function(require, exports, module) {
         Array.prototype.push.apply(results, bottom);
       }
       return results;
-    },
+    }
 
-    sort: function (results, number, rso) {
+    sort(results, number, rso) {
       if (results.length === 0) return results;
 
 
@@ -273,9 +271,9 @@ define(function(require, exports, module) {
           sumPoints += Heat.pointsTable[i] || 0;
         }
       }
-    },
+    }
 
-    compareResults: function (min, max, rso) {
+    compareResults(min, max, rso) {
       // FIXME if min zero then need to to a pseduo random sort for ties
       if (min == null) min = 1;
       if (max == null) max = this.number;
@@ -316,9 +314,9 @@ define(function(require, exports, module) {
 
         return rso ? rso(aScores[0], bScores[0]) : 0;
       };
-    },
+    }
 
-    headers: function (callback) {
+    headers(callback) {
       var num = this.number;
 
       if (num === -1) {
@@ -340,7 +338,7 @@ define(function(require, exports, module) {
         --num;
         callback(num === this.rankIndex ? -2 : num, 'Previous heat');
       }
-    },
+    }
 
   };
 

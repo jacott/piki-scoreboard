@@ -1,50 +1,53 @@
 define(function(require, exports, module) {
-  var Val = require('koru/model/validation');
-  var util = require('koru/util');
-  var koru = require('koru');
-  var User = require('./user');
-  var Heat = require('./heat');
-  var Competitor = require('./competitor');
-  var Event = require('./event');
-  var Category = require('./category');
+  const koru        = require('koru');
+  const {BaseModel} = require('koru/model');
+  const Val         = require('koru/model/validation');
+  const util        = require('koru/util');
+  const Category    = require('./category');
+  const Competitor  = require('./competitor');
+  const Event       = require('./event');
+  const Heat        = require('./heat');
+  const User        = require('./user');
 
-  var model = require('model').define(module, {
-    unscoredHeat: function () {
+  class Result extends BaseModel {
+    unscoredHeat() {
       return this.scores.length;
-    },
+    }
 
-    displayTimeTaken: function () {
+    displayTimeTaken() {
       if (this.time == null) return '';
       var minutes = this.time % 60;
       if (minutes < 10)
         minutes = '0' + minutes;
       return Math.floor(this.time / 60) + ':' + minutes;
-    },
+    }
 
     get org_id() {
       return this.event && this.event.org_id;
     }
+  }
+  module.exports = Result.$init({
+    module,
+    fields: {
+      event_id: 'belongs_to',
+      climber_id: 'belongs_to',
+      competitor_id: 'belongs_to',
+      category_id: 'belongs_to',
+      time: 'integer',
+      scores: 'object',
+      problems: 'object',
+    },
   });
 
-  model.defineFields({
-    event_id: 'belongs_to',
-    climber_id: 'belongs_to',
-    competitor_id: 'belongs_to',
-    category_id: 'belongs_to',
-    time: 'integer',
-    scores: 'object',
-    problems: 'object',
-  });
+  Result.registerObserveField('event_id');
 
-  model.registerObserveField('event_id');
-
-  model.remote({
-    setScore: function (id, index, score) {
+  Result.remote({
+    setScore(id, index, score) {
       Val.ensureString(id, score);
       Val.ensureNumber(index);
 
       var user = User.findById(this.userId);
-      var result = model.findById(id);
+      var result = Result.findById(id);
       var event = result.event;
 
       Val.allowAccessIf(! event.closed && user && (user.isSuperUser() || user.org_id === event.org_id));
@@ -54,7 +57,7 @@ define(function(require, exports, module) {
       if (index === 99) {
         var time =  heat.scoreToNumber(score, 99);
         Val.allowAccessIf(time !== false);
-        model.query.onId(id).update({time: time});
+        Result.query.onId(id).update({time: time});
         return;
       }
 
@@ -63,10 +66,10 @@ define(function(require, exports, module) {
       var changes = {};
       score = heat.scoreToNumber(score) || null;
       changes['scores.' + index] = score;
-      model.query.onId(id).update(changes);
+      Result.query.onId(id).update(changes);
     },
 
-    setBoulderScore: function (id, index, problem, bonus, top) {
+    setBoulderScore(id, index, problem, bonus, top) {
       Val.ensureString(id);
       if (bonus === "dnc" || bonus == null)
         Val.ensureNumber(index, problem);
@@ -74,7 +77,7 @@ define(function(require, exports, module) {
         Val.ensureNumber(index, problem, bonus, top);
 
       var user = User.findById(this.userId);
-      var result = model.findById(id);
+      var result = Result.findById(id);
       var event = result.event;
 
       Val.allowAccessIf(user && (user.isSuperUser() || user.org_id === event.org_id));
@@ -133,15 +136,15 @@ define(function(require, exports, module) {
       changes['problems.' + (index-1)] = round;
       changes['scores.' + index] = dnc === "dnc" ? -1 : score = heat.boulderScoreToNumber(b, ba, t, ta);
 
-      model.query.onId(id).update(changes);
+      Result.query.onId(id).update(changes);
     },
   });
 
-  model.beforeCreate(Competitor, function (doc) {
+  Result.beforeCreate(Competitor, function (doc) {
     addResults(doc.category_ids || [], doc);
   });
 
-  model.beforeUpdate(Competitor, function (doc) {
+  Result.beforeUpdate(Competitor, function (doc) {
     var added = util.diff(doc.changes.category_ids || [], doc.attributes.category_ids || []);
 
     addResults(added, doc);
@@ -149,13 +152,13 @@ define(function(require, exports, module) {
     removeResults(removed, doc);
   });
 
-  model.beforeRemove(Competitor, function (doc) {
+  Result.beforeRemove(Competitor, function (doc) {
     removeResults(doc.category_ids || [], doc);
   });
 
   function addResults(ids, doc) {
     ids.forEach(function (catId) {
-      var result = model.create({
+      var result = Result.create({
         category_id: catId, event_id: doc.event_id,
         climber_id: doc.climber_id,
         competitor_id: doc._id,
@@ -166,18 +169,18 @@ define(function(require, exports, module) {
 
   function removeResults(ids, doc) {
     ids.forEach(function (catId) {
-      model.query.where({climber_id: doc.climber_id, category_id: catId, event_id: doc.event_id}).remove();
+      Result.query.where({climber_id: doc.climber_id, category_id: catId, event_id: doc.event_id}).remove();
     });
   }
 
-  model.beforeCreate(model, function (doc) {
+  Result.beforeCreate(Result, function (doc) {
     var event = Event.findById(doc.event_id);
     if (event.heats && doc.category_id in event.heats) return;
     Event.query.onId(doc.event_id).update(buildHeat(doc, ! event.heats));
     });
 
-  model.beforeRemove(model, function (doc) {
-    if (model.query.where({event_id: doc.event_id, category_id: doc.category_id}).whereNot('_id', doc._id).count(1))
+  Result.beforeRemove(Result, function (doc) {
+    if (Result.query.where({event_id: doc.event_id, category_id: doc.category_id}).whereNot('_id', doc._id).count(1))
       return;
 
     var heat = {};
@@ -200,7 +203,5 @@ define(function(require, exports, module) {
     }
   }
 
-  require('koru/env!./result')(model);
-
-  return model;
+  require('koru/env!./result')(Result);
 });

@@ -1,11 +1,11 @@
-define(function(require, exports, module) {
-  var util = require('koru/util');
-  var ChangeLog = require('./change-log');
-  var User = require('./user');
-  var Val = require('koru/model/validation');
-  var Model = require('model');
+define(function(require) {
+  const Val       = require('koru/model/validation');
+  const util      = require('koru/util');
+  const Model     = require('model');
+  const ChangeLog = require('./change-log');
+  const User      = require('./user');
 
-  var FIELD_SPEC = {
+  const FIELD_SPEC = {
     name: 'string',
     org_id: 'string',
     dateOfBirth: 'string',
@@ -14,13 +14,13 @@ define(function(require, exports, module) {
     disabled: 'boolean',
   };
 
-  return function (model) {
-    ChangeLog.logChanges(model);
+  return function (Climber) {
+    ChangeLog.logChanges(Climber);
 
-    model.registerObserveField('org_id');
+    Climber.registerObserveField('org_id');
 
-    util.extend(model.prototype, {
-      authorize: function (userId, options) {
+    util.extend(Climber.prototype, {
+      authorize(userId, options) {
         Val.assertDocChanges(this, FIELD_SPEC);
         User.fetchAdminister(userId, this);
 

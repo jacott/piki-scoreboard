@@ -1,21 +1,21 @@
 define(function (require, exports, module) {
   var test, v;
-  var TH = require('test-helper');
-  var Result = require('./result');
-  var session = require('koru/session');
+  const session = require('koru/session');
+  const TH      = require('test-helper');
+  const Result  = require('./result');
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.clearDB();
       v = null;
     },
 
-    "test setScore number": function () {
+    "test setScore number"() {
       TH.login();
       var result = TH.Factory.createResult({scores: [1]});
 
@@ -31,7 +31,7 @@ define(function (require, exports, module) {
       refute.msg('should not update').called(rpc);
     },
 
-    "test setScore time": function () {
+    "test setScore time"() {
       TH.login();
       var result = TH.Factory.createResult({scores: [1]});
 
@@ -48,7 +48,7 @@ define(function (require, exports, module) {
     },
 
     "setBoulderScore": {
-      setUp: function () {
+      setUp() {
         TH.login();
         TH.Factory.createCategory({type: 'B'});
         v.result = TH.Factory.createResult({scores: [1]});
@@ -56,7 +56,7 @@ define(function (require, exports, module) {
         v.rpc = test.spy(session._rpcs, 'Result.setBoulderScore');
       },
 
-      "test dnc": function () {
+      "test dnc"() {
         v.result.setBoulderScore(1, 2, "dnc");
         assert.calledWith(v.rpc, v.result._id, 1, 2, "dnc");
 
@@ -66,7 +66,7 @@ define(function (require, exports, module) {
         refute.msg('should not update').called(v.rpc);
       },
 
-      "test clear": function () {
+      "test clear"() {
         v.result.setBoulderScore(1, 2);
         assert.calledWith(v.rpc, v.result._id, 1);
 
@@ -76,7 +76,7 @@ define(function (require, exports, module) {
         refute.msg('should not update').called(v.rpc);
       },
 
-      "test set attempts": function () {
+      "test set attempts"() {
         v.result.setBoulderScore(1, 2, 3, 4);
 
         assert.calledWith(v.rpc, v.result._id, 1, 2, 3, 4);
@@ -88,7 +88,7 @@ define(function (require, exports, module) {
       },
     },
 
-    "test index": function () {
+    "test index"() {
       var result = TH.Factory.createResult();
 
       assert.equals(Result.eventCatIndex({

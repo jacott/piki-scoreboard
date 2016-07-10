@@ -5,22 +5,22 @@ define(function (require, exports, module) {
   const Heat = require('./heat');
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
     },
 
-    tearDown: function () {
+    tearDown() {
       v = null;
     },
 
-    "test type": function () {
+    "test type"() {
       var heat = new Heat(1, 'LQQF26F26F8');
 
       assert.same(heat.type, 'L');
     },
 
-    "test rankIndex": function () {
+    "test rankIndex"() {
       var heat = new Heat(1, 'LQ:8QF26F26F8');
       assert.same(heat.rankIndex, 2);
 
@@ -28,7 +28,7 @@ define(function (require, exports, module) {
       assert.same(heat.rankIndex, 3);
     },
 
-    "test isFinalRound": function () {
+    "test isFinalRound"() {
       var heat = new Heat(1, 'LQQF26F26F8');
       assert.isFalse(heat.isFinalRound());
 
@@ -37,14 +37,14 @@ define(function (require, exports, module) {
     },
 
     "problem count": {
-      setUp: function () {
+      setUp() {
         v.assert = function (heatNum, expect) {
           v.heat = new Heat(heatNum, v.format);
           assert.same(v.heat.problems, expect);
         };
       },
 
-      "test mixed count": function () {
+      "test mixed count"() {
         v.format = 'BQQ:3QF26F26:2F8';
 
         v.assert(1, 5);
@@ -55,14 +55,14 @@ define(function (require, exports, module) {
         v.assert(6, 2);
       },
 
-      "test defaults": function () {
+      "test defaults"() {
         v.format = 'BQF';
 
         v.assert(1, 5);
         v.assert(2, 4);
       },
 
-      "test all set": function () {
+      "test all set"() {
         v.format = 'BQ:8F6:3';
 
         v.assert(1, 8);
@@ -70,7 +70,7 @@ define(function (require, exports, module) {
       },
     },
 
-    "test name": function () {
+    "test name"() {
       var heat = new Heat(-1, 'LQQF26F26F8');
 
       assert.same(heat.name, 'General');
@@ -97,7 +97,7 @@ define(function (require, exports, module) {
       assert.same(heat.name, 'Final');
     },
 
-    "test lead scoreToNumber": function () {
+    "test lead scoreToNumber"() {
       var heat = new Heat(1, 'LQQF26F26F8');
 
       assert.same(heat.scoreToNumber(' 23.5+'   ),  235005);
@@ -111,7 +111,7 @@ define(function (require, exports, module) {
       assert.same(heat.scoreToNumber(' 1:09 ',99),      69);
     },
 
-    "test lead numberToScore": function () {
+    "test lead numberToScore"() {
       var heat = new Heat(1, 'LQQF26F26F8');
 
       assert.same(heat.numberToScore( 235005   ),  '23.5+');
@@ -124,7 +124,7 @@ define(function (require, exports, module) {
       assert.same(heat.numberToScore(1.535, -2 ), 1.54);
     },
 
-    "test boulder scoreToNumber": function () {
+    "test boulder scoreToNumber"() {
       var heat = new Heat(1, 'BFF');
 
       assert.same(heat.scoreToNumber(' 3t3 4b6 ' ), 3960493);
@@ -135,7 +135,7 @@ define(function (require, exports, module) {
       assert.same(heat.scoreToNumber(' dnc '     ),      -1);
     },
 
-    "test boulder numberToScore": function () {
+    "test boulder numberToScore"() {
       var heat = new Heat(1, 'BFF');
 
       assert.same(heat.numberToScore(3960493   ), '3t3 4b6');
@@ -149,7 +149,7 @@ define(function (require, exports, module) {
     },
 
     "sortByStartOrder": {
-      setUp: function () {
+      setUp() {
         v.call = function (number, results) {
           v.heat = new Heat(number, 'LQQF26F8');
 
@@ -157,7 +157,7 @@ define(function (require, exports, module) {
         };
       },
 
-      "test final tie": function () {
+      "test final tie"() {
         v.heat = new Heat(3, 'LQF8F2');
         var results = [v.r1 = {scores: [0.21, 300, 300]}, v.r2 = {scores: [0.42, 400, 300]}, v.r3 = {scores: [0.33, 300, 300]}, v.r4 = {scores: [0.14, 50, 300, 500]}];
 
@@ -173,7 +173,7 @@ define(function (require, exports, module) {
         assert.equals(r2, [v.r1, v.r3, v.r2]);
       },
 
-      "test final no tie": function () {
+      "test final no tie"() {
         v.heat = new Heat(3, 'LQF8F2');
         var results = [v.r1 = {scores: [0.2, 400, 300]}, v.r2 = {scores: [0.4, 400, 100]}, v.r3 = {scores: [0.3, 300, 300]}, v.r4 = {scores: [0.1, 50, 300, 500]}];
 
@@ -184,7 +184,7 @@ define(function (require, exports, module) {
 
       },
 
-      "test nulls in scores": function () {
+      "test nulls in scores"() {
         v.heat = new Heat(3, 'LQQF2');
         var results = [v.r0 = {scores: [0.53, 340000, 430000]},
                        v.r1 = {scores: [0.98,  30000, 320000, null]},
@@ -197,14 +197,14 @@ define(function (require, exports, module) {
         assert.equals(results, [v.r3, v.r2, v.r0]);
       },
 
-      "test odd": function () {
+      "test odd"() {
         var results = [v.r1 = {scores: [0.2]}, v.r2 = {scores: [0.4]}, v.r3 = {scores: [0.3]}];
         assert.equals(v.call(1, results), [v.r2, v.r3, v.r1]);
 
         assert.equals(v.call(2, results), [v.r1, v.r2, v.r3]);
       },
 
-      "test even": function () {
+      "test even"() {
         var results = [v.r1 = {scores: [0.2]}, v.r2 = {scores: [0.4]}];
         assert.equals(v.call(1, results), [v.r2, v.r1]);
 
@@ -213,7 +213,7 @@ define(function (require, exports, module) {
     },
 
     "sort": {
-      setUp: function () {
+      setUp() {
         v.call = function (number, results) {
           v.heat = new Heat(number, 'LQQF26F8');
 
@@ -221,13 +221,13 @@ define(function (require, exports, module) {
         };
       },
 
-      "test empty": function () {
+      "test empty"() {
         assert.equals(v.call(-1, []), []);
       },
 
 
 
-      "test final": function () {
+      "test final"() {
         var results = [v.r1 = {time: 30, scores: [0.2, 200, 300, 400, 300]},
                        v.r2 = {time: 123, scores: [0.3, 100, 300, 400, 400]},
                        v.r3 = {time: 100, scores: [0.3, 100, 300, 400, 400]}];
@@ -239,7 +239,7 @@ define(function (require, exports, module) {
         assert.equals(v.call(4, results), [v.r2, v.r3, v.r1]);
       },
 
-      "test General Result": function () {
+      "test General Result"() {
         var results = [v.r1 = {scores: [0.2]}, v.r2 = {scores: [0.4]}];
         assert.equals(v.call(-1, results), [v.r2, v.r1]);
 
@@ -255,7 +255,7 @@ define(function (require, exports, module) {
       },
 
       "Ranking general result": {
-        setUp: function () {
+        setUp() {
           v.results =[v.r1 = {scores: v.s1 = [0.2]},
                       v.r2 = {scores: v.s2 = [0.4]},
                       v.r3 = {scores: v.s3 = [0.3]},
@@ -265,7 +265,7 @@ define(function (require, exports, module) {
           };
         },
 
-        "test no scores": function () {
+        "test no scores"() {
           v.run();
 
           assert.same(v.r1.rank1, 2);
@@ -274,14 +274,14 @@ define(function (require, exports, module) {
           assert.same(v.r2.rankMult, 4);
         },
 
-        "test diff length": function () {
+        "test diff length"() {
           v.s1.push(null);
           v.run();
 
           assert.same(v.r1.rankMult, 4);
         },
 
-        "test semis 2 null": function () {
+        "test semis 2 null"() {
           v.s1.push(500, 10, 999);
           v.s2.push(500, 10, null);
           v.s3.push(500, 10);
@@ -289,7 +289,7 @@ define(function (require, exports, module) {
           assert.equals(v.run(), [v.r1, v.r2, v.r3]);
         },
 
-        "test semis 3 null": function () {
+        "test semis 3 null"() {
           v.s1.push(500, 10, 999);
           v.s2.push(500, 10);
           v.s3.push(500, 10, null);
@@ -297,7 +297,7 @@ define(function (require, exports, module) {
           assert.equals(v.run(), [v.r1, v.r2, v.r3]);
         },
 
-        "test quals": function () {
+        "test quals"() {
           v.s1.push(500, 300);
           v.s2.push(500, 30);
           v.s3.push(50, 400);
@@ -317,7 +317,7 @@ define(function (require, exports, module) {
           assert.same(v.r3.rankMult, 3);
         },
 
-        "test finals split by time": function () {
+        "test finals split by time"() {
           v.s1.push(500, 300, 200);
           v.s2.push(500, 300, 200);
           v.s3.push(500, 300, 200);
@@ -369,7 +369,7 @@ define(function (require, exports, module) {
 
       },
 
-      "test sorting methods": function () {
+      "test sorting methods"() {
         var results = [v.r1 = {scores: [0.2, 500, 300]}, v.r2 = {scores: [0.3, 500, 30]}, v.r3 = {scores: [0.1, 50, 400]}];
 
         assert.equals(v.call(2, results), [v.r3, v.r1, v.r2]);
@@ -382,7 +382,7 @@ define(function (require, exports, module) {
     },
 
     "headers": {
-      setUp: function () {
+      setUp() {
         v.call = function (number) {
           v.heat = new Heat(number, v.format || 'LQQF26F8');
 
@@ -396,7 +396,7 @@ define(function (require, exports, module) {
         };
       },
 
-      "test General": function () {
+      "test General"() {
         assert.equals(v.call(-1), [
           {number: -2, name: 'Rank'},
           {number: 4, name: 'Final'},
@@ -407,7 +407,7 @@ define(function (require, exports, module) {
         ]);
       },
 
-      "test Final boulder": function () {
+      "test Final boulder"() {
         v.format = "BQF6";
 
         assert.equals(v.call(2), [
@@ -417,7 +417,7 @@ define(function (require, exports, module) {
         ]);
       },
 
-      "test Final": function () {
+      "test Final"() {
         assert.equals(v.call(4), [
           {number: 99, name: 'Time taken'},
           {number: 4, name: 'Result'},
@@ -425,14 +425,14 @@ define(function (require, exports, module) {
         ]);
       },
 
-      "test Semi Final": function () {
+      "test Semi Final"() {
         assert.equals(v.call(3), [
           {number: 3, name: 'Result'},
           {number: -2, name: 'Previous heat'},
         ]);
       },
 
-      "test Qual": function () {
+      "test Qual"() {
         assert.equals(v.call(2), [
           {number: 2, name: 'Result'},
         ]);
@@ -442,7 +442,7 @@ define(function (require, exports, module) {
         ]);
       },
 
-      "test Start order": function () {
+      "test Start order"() {
         assert.equals(v.call(0), [
           {number: 0, name: 'Start order'},
         ]);

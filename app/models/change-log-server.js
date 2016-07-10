@@ -6,7 +6,7 @@ define(function(require, exports, module) {
   var User = require('./user');
 
   return function (model) {
-    Model.prototype.$parentId = parentId;
+    Model.BaseModel.prototype.$parentId = parentId;
 
     util.extend(model, {
       logChanges: function (subject, options) {
@@ -19,9 +19,9 @@ define(function(require, exports, module) {
 
       create: function (attributes) {
         var now = util.newDate();
-        Model._updateTimestamps(attributes, model.updateTimestamps, now);
+        Model._support._updateTimestamps(attributes, model.updateTimestamps, now);
         attributes._id = Random.id();
-        Model._updateTimestamps(attributes, model.createTimestamps, now);
+        Model._support._updateTimestamps(attributes, model.createTimestamps, now);
         model.docs.insert(attributes);
         return new model(attributes);
       },
