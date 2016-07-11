@@ -60,7 +60,9 @@ isClient && define(function (require, exports, module) {
       TH.selectMenu('#Team [name=teamType_id]', TH.match.field('id', 'tt1'));
       assert.dom('#Team', function () {
         TH.click('[name=addTeam]');
-        assert.dom('#AddTeam', function () {
+      });
+      assert.dom('body', function () {
+        assert.dom('.Dialog #AddTeam', function () {
           TH.input('[name=name]', 'Dynomites Wellington');
           TH.input('[name=shortName]', 'Wgtn');
           TH.click('[type=submit]');

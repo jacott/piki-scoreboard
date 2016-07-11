@@ -8,12 +8,13 @@
   <template name="Index">
     <div id="TeamIndex" {{hasTeamTypeClass}}>
       <label class="teamType">
-        <span>Team type</span>
+        <span>Team type:</span>
         <button name="teamType_id" type="button" class="select">{{teamTypePrompt}}</button>
       </label>
-      <button name="EditTeamType" type="button">Edit</button>
+      <button name="EditTeamType" type="button" class="adminAccess link">Edit {{teamTypePrompt}} team type</button>
       <nav>
-        {{pageLink class="adminAccess link" name="addTeam" value=addTeamText template="Team.Add"}}
+        <button name="addTeamType" type="button" class="adminAccess link">Add new team type</button>
+        <button class="adminAccess link" type="button" name="addTeam">{{addTeamText}}</button>
       </nav>
       <section class="teams">
         <table class="select">

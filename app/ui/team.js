@@ -84,6 +84,16 @@ define(function(require, exports, module) {
       teamType && Dialog.open(Tpl.EditTeamType.$autoRender(teamType));
     },
 
+    'click [name=addTeamType]': function (event) {
+      Dom.stopEvent();
+      openAddTeamType();
+    },
+
+    'click [name=addTeam]': function (event) {
+      Dom.stopEvent();
+      openAddTeam();
+    },
+
     'click .teams tr': function (event) {
       if (! Dom.hasClass(document.body, 'aAccess')) return;
       Dom.stopEvent();
@@ -115,7 +125,7 @@ define(function(require, exports, module) {
         onSelect(elm) {
           let id = $.data(elm).id;
           if (id === '$new') {
-            Dialog.open(Tpl.AddTeamType.$autoRender(new TeamType({org_id: App.orgId})));
+            openAddTeamType();
           } else {
             TeamHelper.teamType_id = id;
             ctx.updateAllTags();
@@ -126,7 +136,16 @@ define(function(require, exports, module) {
     },
   });
 
+  function openAddTeamType() {
+    Dialog.open(Tpl.AddTeamType.$autoRender(new TeamType({org_id: App.orgId})));
+  }
+
+  function openAddTeam() {
+    Dialog.open(Tpl.Add.$autoRender(new Team({org_id: App.orgId, teamType_id: TeamHelper.teamType_id})));
+  }
+
   base.addTemplate(module, Index, {defaultPage: true, path: ''});
+
   base.addTemplate(module, Tpl.Add, {
     focus: true,
     data: function () {
@@ -146,8 +165,10 @@ define(function(require, exports, module) {
   });
 
   Tpl.Add.$events({
-    'click [name=cancel]': cancel,
-    'click [type=submit]': Form.submitFunc('AddTeam', Tpl),
+    'click [name=cancel]'(event) {
+      Dialog.close(event.currentTarget);
+    },
+    'click [type=submit]': Form.submitFunc('AddTeam', () => Dialog.close()),
   });
 
   Tpl.AddTeamType.$events({
