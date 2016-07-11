@@ -233,9 +233,8 @@ define(function(require) {
         results.sort(sortByHeat);
 
       } else {
-        let comparitor = this.compareResults(rso ? 1 : 0, x, rso);
-        results.sort(comparitor);
-        setPoints(results, comparitor);
+        results.sort(this.compareResults(rso ? 1 : 0, x, rso));
+        setPoints(results, this.compareResults());
       }
       return results;
 

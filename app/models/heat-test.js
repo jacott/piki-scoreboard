@@ -338,7 +338,19 @@ define(function (require, exports, module) {
         },
 
 
-        "test sPoints"() {
+        "test sPoints noScores"() {
+          v.run();
+
+          assert.same(v.r2.sPoints, 81);
+          assert.same(v.r3.sPoints, 81);
+          assert.same(v.r1.sPoints, 81);
+        },
+
+        "test sPoints three scores"() {
+          v.results =[v.r1 = {scores: v.s1 = [0.2, 200]},
+                      v.r2 = {scores: v.s2 = [0.4, 400]},
+                      v.r3 = {scores: v.s3 = [0.3, 300]},
+                     ];
           v.run();
 
           assert.same(v.r2.sPoints, 100);
@@ -352,7 +364,7 @@ define(function (require, exports, module) {
           assert.same(v.r3.sPoints, 72);
         },
 
-        "test sPoints smore than 30"() {
+        "test sPoints more than 30"() {
           v.results = [];
           for (let i = 0; i < 31; ++i) {
             v.results.push(v['r'+i] = {scores: [0.1, -100*i]});

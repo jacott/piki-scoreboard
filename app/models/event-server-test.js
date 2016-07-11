@@ -72,6 +72,7 @@ define(function (require, exports, module) {
           heats: 'baseObject',
           series_id: 'id',
         }, {
+          _id: 'id',
           org_id: 'id',
         }, function () {
           event.authorize(v.user._id);

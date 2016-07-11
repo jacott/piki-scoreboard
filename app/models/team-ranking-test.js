@@ -30,19 +30,29 @@ define(function (require, _, module) {
       let cat1 = TH.Factory.createCategory({_id: 'cat1'});
       let cat2 = TH.Factory.createCategory({_id: 'cat2'});
 
-      let event = TH.Factory.createEvent({teamType_ids: [tt1._id, tt2._id],
-                                          heats: {cat1: cat1.heatFormat, cat2: cat2.heatFormat}});
-      let compet1 = TH.Factory.createCompetitor({team_ids: [team1._id, team3._id], category_ids: [cat1._id, cat2._id]});
-      let compet2 = TH.Factory.createCompetitor({team_ids: [team2._id], category_ids: [cat1._id]});
-      let compet3 = TH.Factory.createCompetitor({team_ids: [team1._id, team3._id]});
-      let compet4 = TH.Factory.createCompetitor({team_ids: null});
+      let event = TH.Factory.createEvent({
+        teamType_ids: [tt1._id, tt2._id],
+        heats: {cat1: cat1.heatFormat, cat2: cat2.heatFormat},
+      });
+      let compet1 = TH.Factory.createCompetitor({
+        team_ids: [team1._id, team3._id], category_ids: [cat1._id, cat2._id]});
+      let compet2 = TH.Factory.createCompetitor({
+        team_ids: [team2._id], category_ids: [cat1._id]});
+      let compet3 = TH.Factory.createCompetitor({
+        team_ids: [team1._id, team3._id]});
+      let compet4 = TH.Factory.createCompetitor({
+        team_ids: null});
 
-      TH.Factory.createResult({competitor_id: compet1._id, category_id: cat1._id, scores: [0.1]});
-      TH.Factory.createResult({competitor_id: compet1._id, category_id: cat2._id, scores: [0.1]});
-      TH.Factory.createResult({competitor_id: compet2._id, category_id: cat2._id, scores: [0.5]});
-      TH.Factory.createResult({competitor_id: compet3._id, category_id: cat1._id, scores: [0.5]});
-
-      TH.Factory.createResult({competitor_id: compet4._id, category_id: cat1._id, scores: [0.7]});
+      TH.Factory.createResult({competitor_id: compet1._id, category_id: cat1._id,
+                               scores: [0.1, 100]});
+      TH.Factory.createResult({competitor_id: compet1._id, category_id: cat2._id,
+                               scores: [0.2, 100]});
+      TH.Factory.createResult({competitor_id: compet2._id, category_id: cat2._id,
+                               scores: [0.5, 500]});
+      TH.Factory.createResult({competitor_id: compet3._id, category_id: cat1._id,
+                               scores: [0.7, 500]});
+      TH.Factory.createResult({competitor_id: compet4._id, category_id: cat1._id,
+                               scores: [0.3, 700]});
 
       assert.equals(sut.getTeamScores(event), {tt1: {team1: 225, team2: 100}, tt2: {team3: 225}});
     },

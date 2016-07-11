@@ -15,6 +15,7 @@ define(function(require, exports, module) {
   };
 
   const NEW_FIELD_SPEC = {
+    _id: 'id',
     org_id: 'id',
   };
 
