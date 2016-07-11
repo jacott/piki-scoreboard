@@ -91,6 +91,9 @@ isClient && define(function (require, exports, module) {
             });
             assert.dom('tr:first-child>td', series[1].name, function () {
               assert.domParent('td', series[1].date);
+              test.stub(Route, 'gotoPath');
+              TH.click(this);
+              assert.calledWith(Route.gotoPath, 'series/'+series[1]._id);
             });
           });
         });

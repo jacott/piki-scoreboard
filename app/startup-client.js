@@ -13,6 +13,7 @@ define(function(require, exports, module) {
   require('ui/profile');
   require('ui/reg-upload');
   require('ui/reset-password');
+  require('ui/series');
   require('ui/team');
   require('ui/team-results');
 

@@ -19,13 +19,13 @@ define(function(require, exports, module) {
     org_id: 'id',
   };
 
-  return function (model) {
-    ChangeLog.logChanges(model);
+  return function (Event) {
+    ChangeLog.logChanges(Event);
 
-    model.registerObserveField('org_id');
+    Event.registerObserveField('org_id');
 
-    util.extend(model.prototype, {
-      authorize: function (userId) {
+    util.extend(Event.prototype, {
+      authorize(userId) {
         const user = User.fetchAdminister(userId, this);
 
         var changes = this.changes;

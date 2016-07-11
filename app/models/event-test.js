@@ -1,22 +1,22 @@
 define(function (require, exports, module) {
   var test, v;
-  var TH = require('test-helper');
-  var Event = require('./event');
-  var koru = require('koru');
+  const koru  = require('koru');
+  const TH    = require('test-helper');
+  const Event = require('./event');
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
       test.stub(koru, 'info');
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.clearDB();
       v = null;
     },
 
-    'test creation': function () {
+    'test creation'() {
       var teamType = TH.Factory.createTeamType({_id: 'tt1'});
       var event=TH.Factory.createEvent();
 
@@ -26,7 +26,7 @@ define(function (require, exports, module) {
       assert.equals(event.teamType_ids, ['tt1']);
     },
 
-    'test standard validators': function () {
+    'test standard validators'() {
       var validators = Event._fieldValidators;
 
       assert.validators(validators.name, {maxLength: [200], required: [true], trim: [true], unique: [{scope: 'org_id'}]});
@@ -34,7 +34,7 @@ define(function (require, exports, module) {
       assert.validators(validators.closed, {boolean: ['trueOnly']});
     },
 
-    "test describeFormat": function () {
+    "test describeFormat"() {
       // All types of rounds included
       assert.same(Event.describeFormat('LQQF201F101F90F26F8'), 'Qualifier 1; Qualifier 2; Round of 201 competitors; '+
                   'Round of 101 competitors; Quarter-final (90 competitors); Semi-final (26 competitors); Final (8 competitors)');
@@ -75,7 +75,7 @@ define(function (require, exports, module) {
     },
 
     "heat validation": {
-      setUp: function () {
+      setUp() {
         v.oOrg = TH.Factory.createOrg();
         v.oCat = TH.Factory.createCategory();
 
@@ -86,13 +86,13 @@ define(function (require, exports, module) {
         v.heats = v.event.$change('heats');
       },
 
-      "test okay": function () {
+      "test okay"() {
         v.heats[v.cat._id] = 'LQF8F2';
 
         assert(v.event.$isValid(), TH.showErrors(v.event));
       },
 
-      "test wrong org": function () {
+      "test wrong org"() {
         delete v.heats[v.cat._id];
         v.heats[v.oCat._id] = 'LQF8F2';
 
@@ -101,7 +101,7 @@ define(function (require, exports, module) {
         });
       },
 
-      "test wrong heat format": function () {
+      "test wrong heat format"() {
         v.heats[v.cat._id] = 'LQF8F2X';
 
         refute(v.event.$isValid());
@@ -109,7 +109,7 @@ define(function (require, exports, module) {
         assert.modelErrors(v.event, {heats: 'is_invalid'});
       },
 
-      "test wrong category type": function () {
+      "test wrong category type"() {
         v.heats[v.cat._id] = 'BQF8F2';
 
         refute(v.event.$isValid());

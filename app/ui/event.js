@@ -100,7 +100,10 @@ define(function(require, exports, module) {
 
       var data = $.data(this);
 
-      Route.gotoPage(Tpl.Show, {eventId: data._id});
+      if ($.ctx.tab === 'series')
+        Route.gotoPath('series/'+data._id);
+      else
+        Route.gotoPage(Tpl.Show, {eventId: data._id});
     },
 
     'click button:not(.selected).tab'(event) {

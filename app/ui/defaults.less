@@ -518,6 +518,87 @@ ol.ui-ul, ul.ui-ul {
   }
 }
 
+.tabbed.list {
+  .tabNames {
+    .tab {
+      font-size: 1.2em;
+      font-weight: 500;
+      padding: 12px 24px;
+      color: fade(#000, 50%);
+      border-bottom: 2px solid fade(#000, 0%);
+      &.selected {
+        color: @cPrimaryText;
+        border-color: @cSecondaryText;
+      }
+    }
+  }
+  .tabBody {
+    background-color: #f6f6f6;
+    padding: 2px 4px;
+
+    nav {
+      .flexFlow(row);
+      justify-content: flex-end;
+    }
+  }
+}
+
+table.categories {
+  th:first-child {
+    min-width: 40%;
+  }
+  tr {
+    &:not(:last-child) {
+      border-bottom: 1px solid fade(#000, 10%);
+    }
+    &.fmt {
+      >td {
+        padding-top: 20px;
+        padding-bottom: 8px;
+      }
+      &.L>td:before {
+        content: "Lead ";
+      }
+      &.B>td:before {
+        content: "Bouldering ";
+      }
+      &.L, &.B {
+        >td:before {
+          display: block;
+          font-size: 1.2em;
+          font-weight: bold;
+        }
+      }
+      color: #000;
+      font-size: 1.1em;
+      border-bottom: none;
+    }
+    &.selected {
+      background-color: #aff;
+
+      .select:before {
+        content: "check_box";
+      }
+    }
+    &.B+.L {
+      border-top: 1em solid fade(#fff, 0%);
+    }
+    button {
+      text-align: left;
+    }
+    .select {
+      display: inline-block;
+      width: 1.2em;
+      height: 1.2em;
+      &:before {
+        .md-inline-icon("check_box_outline_blank"; @fontSize: 1em);
+        vertical-align: top;
+      }
+    }
+  }
+}
+
+
 
 @media print {
   select, button:not(.print), .no-print {

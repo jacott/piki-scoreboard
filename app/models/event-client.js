@@ -2,8 +2,8 @@ define(function(require, exports, module) {
   const util     = require('koru/util');
   const TeamType = require('models/team-type');
 
-  return function (model) {
-    util.extend(model.prototype, {
+  return function (Event) {
+    util.extend(Event.prototype, {
       get sortedTeamTypes() {
         let list = this.$cache.sortedTeamTypes;
         if (! list) {

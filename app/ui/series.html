@@ -1,0 +1,74 @@
+<template name="Series">
+  <section id="Series">
+    <div>
+      <section class="tabbed list">
+        <div class="tabNames">
+          <button name="events" type="button" class="tab">Events</button>
+          <button name="results" type="button" class="tab">Results</button>
+        </div>
+        <div class="tabBody body">
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <template name="Events">
+    <div class="Events">
+      <table class="select">
+        <thead>
+          <tr>
+            <th>Name</th><th>Start Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{each "list" template="Row"}}
+        </tbody>
+        <template name="Row">
+          <tr>
+            <td>{{displayName}}</td><td>{{date}}</td>
+          </tr>
+        </template>
+      </table>
+    </div>
+  </template>
+
+  <template name="Results">
+    <div id="Results" class="loading">
+      {{>Action ""}}
+      <template name="Action">
+        <div class="action">
+          {{content}}
+        </div>
+      </template>
+    </div>
+  </template>
+
+  <template name="CatList">
+    <tr class="cat">
+      <td><span class="select"></span></td>
+      <td>{{name}}</td>
+    </tr>
+  </template>
+
+  <template name="CatResult">
+    <div class="CatResult">
+      <table class="list">
+        <thead>
+          <tr>
+            <th class="name">Climber</th>
+            <th class="total">Points</th>
+          </tr>
+        </thead>
+        <tbody>
+        {{each "climbers" template="Row"}}
+        <template name="Row">
+          <tr>
+            <td class="name">{{climber.name}}</td>
+            <td class="total">{{total}}</td>
+          </tr>
+        </template>
+        </tbody>
+      </table>
+    </div>
+  </template>
+</template>

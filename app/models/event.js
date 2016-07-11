@@ -1,14 +1,30 @@
 define(function(require, exports, module) {
-  const koru     = require('koru');
-  const Val      = require('koru/model/validation');
-  const util     = require('koru/util');
-  const Series   = require('models/series');
-  const TeamType = require('models/team-type');
-  const Category = require('./category');
-  const Org      = require('./org');
+  const koru        = require('koru');
+  const {BaseModel} = require('koru/model');
+  const Val         = require('koru/model/validation');
+  const util        = require('koru/util');
+  const Series      = require('models/series');
+  const TeamType    = require('models/team-type');
+  const Category    = require('./category');
+  const Org         = require('./org');
 
-  var model = require('model').define(module, {
-    validate: function () {
+  class Event extends BaseModel {
+    static describeFormat(format) {
+      var compFormatList = [];
+      var re = /[QF][\d:]*/g;
+      var compFormat = format.slice(1);
+
+      var m;
+      while ((m = re.exec(compFormat)) !== null) {
+        compFormatList.push(m[0]);
+      }
+      if (format[0] === 'L')
+        return describeLeadFormat(compFormatList);
+      else
+        return describeBoulderFormat(compFormatList);
+    }
+
+    validate() {
       var  heats = this.changes.heats;
       if (heats) for(var id in heats) {
         var cat = Category.findById(id);
@@ -18,44 +34,34 @@ define(function(require, exports, module) {
           Val.addError(this, 'heats', 'is_invalid');
         }
       }
-    },
+    }
 
-    heatTypes: function (cat_id) {
+    heatTypes(cat_id) {
       return this.attributes.heats[cat_id];
-    },
+    }
 
     get displayName() {
       const series = this.series;
       if (series) return `${series.name} - ${this.name}`;
       return this.name;
+    }
+  }
+
+  module.exports = Event.define({
+    module,
+    fields: {
+      name: {type:  'text', trim: true, required: true, maxLength: 200, unique: {scope: 'org_id'}},
+      org_id: 'belongs_to',
+      heats: 'object',
+      date: {type: 'text', inclusion: {matches: /^\d{4}-[01]\d-[0-3]\d$/}},
+      errors: 'object',
+      closed: {type: 'boolean', boolean: 'trueOnly'},
+      teamType_ids: 'has_many',
+      series_id: 'belongs_to',
     },
   });
 
-  model.defineFields({
-    name: {type:  'text', trim: true, required: true, maxLength: 200, unique: {scope: 'org_id'}},
-    org_id: 'belongs_to',
-    heats: 'object',
-    date: {type: 'text', inclusion: {matches: /^\d{4}-[01]\d-[0-3]\d$/}},
-    errors: 'object',
-    closed: {type: 'boolean', boolean: 'trueOnly'},
-    teamType_ids: 'has_many',
-    series_id: 'belongs_to',
-  });
 
-  model.describeFormat = function (format) {
-    var compFormatList = [];
-    var re = /[QF][\d:]*/g;
-    var compFormat = format.slice(1);
-
-    var m;
-    while ((m = re.exec(compFormat)) !== null) {
-      compFormatList.push(m[0]);
-    }
-    if (format[0] === 'L')
-      return describeLeadFormat(compFormatList);
-    else
-      return describeBoulderFormat(compFormatList);
-  };
 
   var FINALS_PREFIX = ['Final', 'Semi-final', 'Quarter-final'];
 
@@ -95,7 +101,5 @@ define(function(require, exports, module) {
     }).join('; ');
   }
 
-  require('koru/env!./event')(model);
-
-  return model;
+  require('koru/env!./event')(Event);
 });
