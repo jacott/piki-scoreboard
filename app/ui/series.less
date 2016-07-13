@@ -9,7 +9,50 @@
     padding: 8px;
   }
 
-  #Results>.CatResult ~ * {
-    display: none;
+  #Results {
+    &>.CatResult {
+      & ~ * {display: none}
+      table.list {
+        border: 1px solid fade(#000, 30%);
+        width: inherit;
+        margin: auto;
+        font-size: 1.1em;
+        th, td {
+          padding: 8px 12px;
+        }
+        thead {
+          color: #fff;
+          background-color: #08a;
+          border-bottom: 1px solid #000;
+          th {
+            text-align: left;
+            &:not(:first-child) {
+              border-left: 1px solid fade(#000, 20%);
+            }
+          }
+        }
+        tbody {
+          td:not(:first-child) {
+            border-left: 1px solid fade(#000, 20%);
+          }
+          tr:nth-child(even) {
+            background-color: fade(#000, 10%);
+          }
+          tbody tr:hover {
+            background-color: #0ff;
+          }
+        }
+      }
+    }
+
+    .categories .name {
+      cursor: pointer;
+    }
   }
+
+  .Events table.select>thead th {
+    cursor: auto;
+  }
+
+
 }

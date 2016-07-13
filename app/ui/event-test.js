@@ -23,6 +23,7 @@ isClient && define(function (require, exports, module) {
     },
 
     tearDown() {
+      sut.stop();
       TH.tearDown();
       v = null;
     },

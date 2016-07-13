@@ -43,9 +43,8 @@ define(function(require, exports, module) {
     Dom.removeClass(ctx.tabButton, 'selected');
   }
 
-  const ResultsBodyBase = base.addBase(module, Tpl.Results, {
-    async: true,
-  });
+  const ResultsBodyBase = base.addBase(module, Tpl.Results);
+  ResultsBodyBase.async = true;
 
   ResultsBodyBase.addTemplate(module, Tpl.CatResult, {
     data(page, pageRoute) {
@@ -93,6 +92,14 @@ define(function(require, exports, module) {
     },
   });
 
+  Tpl.Events.Row.$events({
+    'click'(event) {
+      Dom.stopEvent();
+
+      Route.gotoPage(Dom.Event.Show, {eventId: $.ctx.data._id});
+    },
+  });
+
   Tpl.Events.$extend({
     $destroyed: tabClosed,
   });
@@ -134,8 +141,12 @@ define(function(require, exports, module) {
   });
 
   Tpl.CatResult.$helpers({
+    events(callback) {
+      for (let row of this.events)
+        callback(row);
+    },
     climbers(callback) {
-      for (let row of this)
+      for (let row of this.climbers)
         callback(row);
     },
   });
@@ -151,9 +162,13 @@ define(function(require, exports, module) {
       const climberMap = {};
 
       const category_id = ctx.data.append;
-      const climbers = ctx.data = [];
+      const climbers = [];
+      const events = [];
+
+      ctx.data = {climbers, events};
 
       if (results) for (let ev of results) {
+        events.push(Event.findById(ev.event_id));
         for (let cat of ev.cats) {
           if (cat.category_id === category_id) {
             for (let [climber_id, points] of cat.results) {
@@ -172,7 +187,17 @@ define(function(require, exports, module) {
         }
       }
 
+      events.sort(util.compareByField('date', -1));
       climbers.sort(util.compareByField('total', -1));
+    },
+  });
+
+  Tpl.CatResult.Row.$helpers({
+    events(callback) {
+      const eventMap = this.events;
+
+      for (let row of $.ctx.parentCtx.data.events)
+        callback({_id: row._id, points: eventMap[row._id]});
     },
   });
 

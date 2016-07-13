@@ -1,9 +1,11 @@
 isClient && define(function (require, exports, module) {
   var test, v;
-  const session = require('koru/session');
-  const Route   = require('koru/ui/route');
-  const sut     = require('./series');
-  const TH      = require('./test-helper');
+  const session  = require('koru/session');
+  const Route    = require('koru/ui/route');
+  const App      = require('ui/app');
+  const EventTpl = require('ui/event');
+  const sut      = require('./series');
+  const TH       = require('./test-helper');
 
   TH.testCase(module, {
     setUp() {
@@ -13,19 +15,19 @@ isClient && define(function (require, exports, module) {
       TH.login();
       TH.setOrg(v.org);
       v.series = TH.Factory.createSeries();
-      v.ev1 = TH.Factory.createEvent({series_id: v.series._id});
-      v.ev2 = TH.Factory.createEvent({series_id: v.series._id});
+      v.ev1 = TH.Factory.createEvent({_id: 'ev1', series_id: v.series._id, date: '2015-01-01'});
+      v.ev2 = TH.Factory.createEvent({_id: 'ev2', series_id: v.series._id, date: '2015-05-01'});
       v.evOther = TH.Factory.createEvent();
     },
 
     tearDown() {
+      EventTpl.stop();
       TH.tearDown();
       v = null;
     },
 
     "test events list"() {
       Route.gotoPage(sut, {seriesId: v.series._id});
-      assert.same(Route.currentHref, `/#SN1/series/${v.series._id}/events`);
       assert.dom('#Series', function () {
         assert.dom('.tabbed.list', function () {
           assert.dom('.tabNames', function () {
@@ -38,9 +40,23 @@ isClient && define(function (require, exports, module) {
               assert.dom('thead>tr>th', 'Start Date');
               assert.dom('tbody', function () {
                 assert.dom('tr', {count: 2});
+                test.stub(App, 'subscribe');
+                TH.click('tr:last-child>td', v.ev1.displayName);
               });
             });
           });
+        });
+      });
+      assert.calledWith(App.subscribe, 'Event', 'ev1');
+      assert.dom('#Event');
+    },
+
+    "test switching tabs"() {
+      Route.gotoPage(sut, {seriesId: v.series._id});
+      assert.same(Route.currentHref, `/#SN1/series/${v.series._id}/events`);
+      assert.dom('#Series', function () {
+        assert.dom('.tabbed.list .tabNames', function () {
+
           test.stub(session, 'rpc').yields();
           TH.click('.tab[name=results]');
         });
@@ -105,8 +121,6 @@ isClient && define(function (require, exports, module) {
       let cl3 = TH.Factory.createClimber({_id: 'cl3'});
       let cat1 = TH.Factory.createCategory({_id: 'cat1', type: 'B'});
       let cat2 = TH.Factory.createCategory({_id: 'cat2', type: 'L'});
-      let ev1 = TH.Factory.createEvent({_id: 'ev1'});
-      let ev2 = TH.Factory.createEvent({_id: 'ev2'});
       v.results = [{
         event_id: 'ev1',
         cats: [{
@@ -130,14 +144,22 @@ isClient && define(function (require, exports, module) {
 
       assert.dom('#Series', function () {
         assert.dom('.CatResult:first-child', function () {
+          assert.dom('table.list>thead', function () {
+            assert.dom('th.event', v.ev2.name);
+            assert.dom('th.event+th.event', v.ev1.name);
+          });
           assert.dom('table.list>tbody', function () {
             assert.dom('tr:first-child', function () {
               assert.dom('td.name', cl3.name);
-              assert.dom('td.total', 165);
+              assert.dom('td.total', '165');
+              assert.dom('td.event', '100');
+              assert.dom('td.event+td.event', '65');
             });
             assert.dom('tr:last-child:nth-child(3)', function () {
               assert.dom('td.name', cl2.name);
-              assert.dom('td.total', 80);
+              assert.dom('td.total', '80');
+              assert.dom('td.event', '');
+              assert.dom('td.event+td.event', '80');
             });
           });
         });

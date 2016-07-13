@@ -46,7 +46,7 @@
   <template name="CatList">
     <tr class="cat">
       <td><span class="select"></span></td>
-      <td>{{name}}</td>
+      <td class="name">{{name}}</td>
     </tr>
   </template>
 
@@ -57,6 +57,10 @@
           <tr>
             <th class="name">Climber</th>
             <th class="total">Points</th>
+            {{each "events" template="EventHeader"}}
+            <template name="EventHeader">
+              <th class="event">{{name}}</th>
+            </template>
           </tr>
         </thead>
         <tbody>
@@ -65,6 +69,10 @@
           <tr>
             <td class="name">{{climber.name}}</td>
             <td class="total">{{total}}</td>
+            {{each "events" template="EventPoints"}}
+            <template name="EventPoints">
+              <td class="event">{{points}}</td>
+            </template>
           </tr>
         </template>
         </tbody>

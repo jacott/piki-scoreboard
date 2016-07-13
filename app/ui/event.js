@@ -27,6 +27,7 @@ define(function(require, exports, module) {
   });
 
   const base = Route.root.addBase(module, Tpl, 'eventId');
+  base.async = true;
   koru.onunload(module, function () {
     Route.root.removeBase(Tpl);
   });
@@ -35,9 +36,10 @@ define(function(require, exports, module) {
 
   Tpl.$extend({
     base,
-    onBaseEntry(page, pageRoute) {
+    onBaseEntry(page, pageRoute, callback) {
       var elm = Tpl.$autoRender({});
       document.body.appendChild(elm);
+      const currentSub = eventSub;
 
       if (pageRoute.eventId) {
         if (! Tpl.event || Tpl.event._id !== pageRoute.eventId) {
@@ -47,27 +49,33 @@ define(function(require, exports, module) {
             eventSub && eventSub.stop();
             eventSub = App.subscribe('Event', pageRoute.eventId, function () {
               Dom.removeId('Flash');
-              Route.replacePath.apply(Route, loadingArgs);
+              callback();
             });
             Dom.Flash.loading();
-            var loadingArgs = Route.loadingArgs;
-            Route.title = page.title = Tpl.event.displayName;
             Dom.setTitleLink([Tpl]);
-            Route.abortPage();
           }
         }
       }
 
-      if (Tpl.event)
+      if (Tpl.event) {
+        pageRoute.eventId = Tpl.event._id;
         Route.title = page.title = Tpl.event.displayName;
-      else
+      } else
         Dom.addClass(elm, 'noEvent');
+
+      if (eventSub === currentSub)
+        callback();
     },
 
     onBaseExit(page, pageRoute) {
       Dom.removeId('Event');
       Route.title = null;
     },
+
+    stop() {
+      eventSub && eventSub.stop();
+      Tpl.event = null;
+    }
   });
 
   Index.$helpers({
@@ -90,7 +98,7 @@ define(function(require, exports, module) {
 
   Index.Row.$helpers({
     classes() {
-      return this.$equals(Tpl.event) ? "selected" : "";
+      return this === Tpl.event ? "selected" : "";
     },
   });
 
@@ -527,19 +535,19 @@ define(function(require, exports, module) {
   function observeScores() {
     resultOb && resultOb.stop();
 
-    var counts = Tpl.scoreCounts = {};
+    const counts = Tpl.scoreCounts = {};
 
     makeSubject(counts);
 
     resultOb = Result.onChange(calcScores);
 
-    var docs = Result.docs;
-    for(var id in docs)
+    const docs = Result.docs;
+    for (let id in docs)
       calcScores(docs[id], null);
 
     function calcScores(doc, was) {
       var res = doc || was;
-      if (res.event_id !== Tpl.event._id) return;
+      if (res.event_id !== (Tpl.event && Tpl.event._id)) return;
 
       var oldScores = (was && (doc ? doc.$withChanges(was) : was).scores) || [];
       var newScores = (doc && doc.scores) || [];
