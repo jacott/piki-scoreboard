@@ -28,7 +28,13 @@ define(function (require, exports, module) {
       assert(Category.exists({org_id: competitor.event.org_id, _id: competitor.category_ids[0]}));
     },
 
-    'test standard validators': function () {
+    "test null team_ids"() {
+      const competitor = new Competitor();
+
+      assert.equals(competitor.team_ids, []);
+    },
+
+    'test standard validators'() {
       var validators = Competitor._fieldValidators;
 
       assert.validators(validators.number, {number: [{integer: true, $gt: 0}]});
