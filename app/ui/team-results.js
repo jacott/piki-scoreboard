@@ -16,8 +16,6 @@ define(function(require, exports, module) {
     focus: true,
     data(page, pageRoute) {
       if (! EventTpl.event) Route.abortPage();
-
-      page.title = EventTpl.event.displayName;
       return EventTpl.event;
     }
   });

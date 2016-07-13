@@ -51,18 +51,22 @@ define(function(require, exports, module) {
             });
             Dom.Flash.loading();
             var loadingArgs = Route.loadingArgs;
-            page.title = Tpl.event.displayName;
+            Route.title = page.title = Tpl.event.displayName;
             Dom.setTitleLink([Tpl]);
             Route.abortPage();
           }
         }
       }
 
-      if (! Tpl.event) Dom.addClass(elm, 'noEvent');
+      if (Tpl.event)
+        Route.title = page.title = Tpl.event.displayName;
+      else
+        Dom.addClass(elm, 'noEvent');
     },
 
     onBaseExit(page, pageRoute) {
       Dom.removeId('Event');
+      Route.title = null;
     },
   });
 

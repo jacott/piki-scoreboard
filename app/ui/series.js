@@ -70,13 +70,16 @@ define(function(require, exports, module) {
     onBaseEntry(page, pageRoute) {
       const series = Series.findById(pageRoute.seriesId);
       if (! series) Route.abortPage('events/#series');
-      page.title = series.name;
+      Route.title = page.title = series.name;
       const elm = Tpl.$autoRender();
       const ctx = Dom.myCtx(elm);
       document.body.appendChild(elm);
     },
 
-    onBaseExit() {Dom.removeId('Series')},
+    onBaseExit() {
+      Dom.removeId('Series');
+      Route.title = null;
+    },
   });
 
   Tpl.Events.$helpers({
