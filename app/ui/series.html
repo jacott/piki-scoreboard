@@ -6,12 +6,35 @@
           <button name="Events" type="button" class="tab">Events</button>
           <button name="Results" type="button" class="tab">Individual Results</button>
           <button name="TeamResults" type="button" class="tab">Team Results</button>
+          <button name="Edit" type="button" class="adminAccess tab">Edit</button>
         </div>
         <div class="tabBody body">
         </div>
       </section>
     </div>
   </section>
+
+  <template name="Edit">
+    <form id="Edit">
+      <h1>Edit series</h1>
+      {{> ../Form}}
+      <fieldset class="actions">
+        <button type="submit" name="update">Update</button>
+        <button type="button" name="cancel">Cancel</button>
+      </fieldset>
+    </form>
+  </template>
+
+
+  <template name="Form">
+    <fieldset class="fields">
+      {{labelField "name"}}
+      {{labelField "date" placeholder="yyyy-mm-dd"}}
+      <label><span class="name">Select team types for this series</span></label>
+      {{> /TeamHelper.AssignTeamTypes}}
+      {{labelField "closed" type="onOff" label="Event state" onLabel="closed" offLabel="open"}}
+    </fieldset>
+  </template>
 
   <template name="Events">
     <div class="Events">

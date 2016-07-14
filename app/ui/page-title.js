@@ -28,7 +28,7 @@ define(function(require, exports, module) {
   });
 
   Dom.setTitle = function (title) {
-    title = title || 'Piki';
+    Route.title = title = title || 'Piki';
     var ctx = Dom.getCtx(titleElm);
     if (! ctx) return;
     ctx.data.title = title;

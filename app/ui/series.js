@@ -2,6 +2,7 @@ define(function(require, exports, module) {
   const koru        = require('koru');
   const Dom         = require('koru/dom');
   const session     = require('koru/session');
+  const Form        = require('koru/ui/form');
   const Route       = require('koru/ui/route');
   const util        = require('koru/util');
   const Category    = require('models/category');
@@ -32,6 +33,8 @@ define(function(require, exports, module) {
   base.addTemplate(module, Tpl.Events, Object.create(commonPageOptions, {
     defaultPage: {value: true},
   }));
+
+  base.addTemplate(module, Tpl.Edit, Object.create(commonPageOptions));
 
   function tabOpened(elm, pageRoute) {
     const button = document.querySelector(`#Series .tab[name="${this.name}"]`);
@@ -73,10 +76,11 @@ define(function(require, exports, module) {
     onBaseEntry(page, pageRoute) {
       const series = Series.findById(pageRoute.seriesId);
       if (! series) Route.abortPage('events/#series');
-      Route.title = page.title = series.name;
+      Route.title = series.name;
       const elm = Tpl.$autoRender();
       const ctx = Dom.myCtx(elm);
       document.body.appendChild(elm);
+      ctx.onDestroy(Series.observeId(series._id, doc => Dom.setTitle(doc && doc.name)));
     },
 
     onBaseExit() {
@@ -105,6 +109,17 @@ define(function(require, exports, module) {
   });
 
   Tpl.Events.$extend({
+    $destroyed: tabClosed,
+  });
+
+  Tpl.Edit.$events({
+    'click [name=cancel]': cancel,
+    'click [type=submit]': Form.submitFunc('Edit', doc => {
+      Route.replacePage(Tpl);
+    }),
+  });
+
+  Tpl.Edit.$extend({
     $destroyed: tabClosed,
   });
 
@@ -359,6 +374,17 @@ define(function(require, exports, module) {
       }
     },
   });
+
+  Tpl.Form.$helpers({
+    teamTypes: TeamHelper.eachTeamTypes,
+  });
+
+  function cancel(event) {
+    Dom.stopEvent();
+    Route.history.back();
+  }
+
+
 
   return Tpl;
 });

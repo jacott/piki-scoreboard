@@ -4,6 +4,7 @@ define(function(require, exports, module) {
   const util       = require('koru/util');
   const TeamType   = require('models/team-type');
 
+  const Tpl = Dom.newTemplate(module, require('koru/html!./team-helper'));
   const $ = Dom.current;
 
   let teamType_id = undefined;
@@ -49,6 +50,46 @@ define(function(require, exports, module) {
       return exports.teamType_id && TeamType.findById(teamType_id)[field];
     }
   });
+
+  Tpl.AssignTeamTypes.$helpers({
+    teamTypes,
+  });
+
+  function teamTypes(callback) {
+    callback.render({
+      model: TeamType,
+      sort: util.compareByName,
+    });
+  }
+
+
+  Tpl.AssignTeamTypes.TeamType.$helpers({
+    checked() {
+      let teamType_ids = $.ctx.parentCtx.data.teamType_ids;
+      Dom.setClass('checked', teamType_ids && teamType_ids.indexOf(this._id) !== -1);
+    },
+  });
+
+  Tpl.AssignTeamTypes.TeamType.$events({
+    'click .check'() {
+      Dom.stopEvent();
+
+      let event = $.ctx.parentCtx.data;
+      let checked = Dom.toggleClass(this.parentNode, 'checked');
+      let list = event.$change('teamType_ids');
+      if (! list){
+        event.teamType_ids = list = [];
+      }
+      if (checked) {
+        list.push($.ctx.data._id);
+      } else {
+        util.removeItem(list, $.ctx.data._id);
+      }
+    },
+  });
+
+
+
 
   Dom.registerHelpers({
     selectedTeamType() {

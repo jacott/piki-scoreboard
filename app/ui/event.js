@@ -13,6 +13,7 @@ define(function(require, exports, module) {
   const Series      = require('models/series');
   const TeamType    = require('models/team-type');
   const PrintHelper = require('ui/print-helper');
+  const SeriesTpl   = require('ui/series');
   const App         = require('./app-base');
 
   const Tpl   = Dom.newTemplate(require('koru/html!./event'));
@@ -39,6 +40,9 @@ define(function(require, exports, module) {
     base,
     onBaseEntry(page, pageRoute, callback) {
       var elm = Tpl.$autoRender({});
+      pageRoute.eventId &&
+        Dom.myCtx(elm).onDestroy(Event.observeId(pageRoute.eventId, doc => Dom.setTitle(doc && doc.displayName)));
+
       document.body.appendChild(elm);
       const currentSub = eventSub;
 
@@ -60,7 +64,7 @@ define(function(require, exports, module) {
 
       if (Tpl.event) {
         pageRoute.eventId = Tpl.event._id;
-        Route.title = page.title = Tpl.event.displayName;
+        Route.title = Tpl.event.displayName;
       } else
         Dom.addClass(elm, 'noEvent');
 
@@ -250,50 +254,12 @@ define(function(require, exports, module) {
     },
   });
 
-  Tpl.Form.TeamType.$helpers({
-    checked() {
-      let teamType_ids = $.ctx.parentCtx.data.teamType_ids;
-      Dom.setClass('checked', teamType_ids && teamType_ids.indexOf(this._id) !== -1);
-    },
-  });
-
-  Tpl.Form.TeamType.$events({
-    'click .check'() {
-      Dom.stopEvent();
-
-      let event = $.ctx.parentCtx.data;
-      let checked = Dom.toggleClass(this.parentNode, 'checked');
-      let list = event.$change('teamType_ids');
-      if (! list){
-        event.teamType_ids = list = [];
-      }
-      if (checked) {
-        list.push($.ctx.data._id);
-      } else {
-        util.removeItem(list, $.ctx.data._id);
-      }
-    },
-  });
-
   Tpl.Form.$helpers({
-    teamTypes,
-
     seriesName() {
       const series = this.series;
       return series && series.name;
     },
   });
-
-  Tpl.SeriesForm.$helpers({
-    teamTypes,
-  });
-
-  function teamTypes(callback) {
-    callback.render({
-      model: TeamType,
-      sort: util.compareByName,
-    });
-  }
 
   Tpl.Edit.$extend({
     $destroyed(ctx, elm) {

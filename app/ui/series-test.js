@@ -1,5 +1,6 @@
 isClient && define(function (require, exports, module) {
   var test, v;
+  const Dom        = require('koru/dom');
   const session    = require('koru/session');
   const Route      = require('koru/ui/route');
   const App        = require('ui/app');
@@ -25,6 +26,27 @@ isClient && define(function (require, exports, module) {
       EventTpl.stop();
       TH.tearDown();
       v = null;
+    },
+
+    "test edit series"() {
+      Route.gotoPage(sut, {seriesId: v.series._id});
+      assert.dom('#Series', function () {
+        assert.dom('.tabbed.list', function () {
+          assert.dom('.tabNames', function () {
+            TH.click('button.adminAccess.tab[name=Edit]', 'Edit');
+          });
+        });
+        assert.dom('#Edit', function () {
+          TH.input('[name=name]', 'new name');
+          test.spy(Dom, 'setTitle');
+          TH.click('[type=submit]');
+          assert.calledWith(Dom.setTitle, 'new name');
+        });
+        assert.same(v.series.$reload().name, 'new name');
+
+        refute.dom('#Edit');
+      });
+
     },
 
     "test events list"() {

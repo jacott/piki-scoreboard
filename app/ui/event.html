@@ -80,7 +80,7 @@
   <template name="AddSeries">
     <form id="AddSeries">
       <h1>Add new series</h1>
-      {{> /Event.SeriesForm}}
+      {{> /Series.Form}}
       <fieldset class="actions">
         <button type="submit" name="create">Create</button>
         <button type="button" name="cancel">Cancel</button>
@@ -133,27 +133,7 @@
       {{labelField "date" placeholder="yyyy-mm-dd"}}
       {{labelField "series_id" includeBlank="none" type="selectMenu" displayValue=seriesName selectList=lazySeriesList popupClass="seriesMenu"}}
       <label><span class="name">Select team types for this event</span></label>
-      <ul class="teamTypeList ui-ul">
-        {{each "teamTypes" template="TeamType"}}
-        <template name="TeamType">
-          <li {{checked}}>
-            <button class="check" type="button"></button>
-            <span class="name">{{name}}</span>
-          </li>
-        </template>
-      </ul>
-      {{labelField "closed" type="onOff" label="Event state" onLabel="closed" offLabel="open"}}
-    </fieldset>
-  </template>
-
-  <template name="SeriesForm">
-    <fieldset class="fields">
-      {{labelField "name"}}
-      {{labelField "date" placeholder="yyyy-mm-dd"}}
-      <label><span class="name">Select team types for this event</span></label>
-      <ul class="teamTypeList ui-ul">
-        {{each "teamTypes" template="../Form.TeamType"}}
-      </ul>
+      {{> /TeamHelper.AssignTeamTypes}}
       {{labelField "closed" type="onOff" label="Event state" onLabel="closed" offLabel="open"}}
     </fieldset>
   </template>

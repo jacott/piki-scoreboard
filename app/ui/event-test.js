@@ -1,16 +1,17 @@
 isClient && define(function (require, exports, module) {
   var test, v;
-  const Route   = require('koru/ui/route');
-  const util    = require('koru/util');
-  const Climber = require('models/climber');
-  const Event   = require('models/event');
-  const Result  = require('models/result');
-  const Series  = require('models/series');
-  const App     = require('ui/app');
-  const sut     = require('./event');
+  const Route      = require('koru/ui/route');
+  const util       = require('koru/util');
+  const Climber    = require('models/climber');
+  const Event      = require('models/event');
+  const Result     = require('models/result');
+  const Series     = require('models/series');
+  const App        = require('ui/app');
+  const TeamHelper = require('ui/team-helper');
+  const sut        = require('./event');
   require('./event-category');
   require('./event-register');
-  const TH      = require('./test-helper');
+  const TH         = require('./test-helper');
 
   TH.testCase(module, {
     setUp() {

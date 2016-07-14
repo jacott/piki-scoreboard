@@ -1,0 +1,13 @@
+<template name="TeamHelper">
+  <template name="AssignTeamTypes">
+    <ul class="teamTypeList ui-ul">
+      {{each "teamTypes" template="TeamType"}}
+      <template name="TeamType">
+        <li {{checked}}>
+          <button class="check" type="button"></button>
+          <span class="name">{{name}}</span>
+        </li>
+      </template>
+    </ul>
+  </template>
+</template>
