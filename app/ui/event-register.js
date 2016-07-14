@@ -321,6 +321,10 @@ define(function(require, exports, module) {
   });
 
   Tpl.AddTeam.$events({
+    'click [name=cancel]'(event) {
+      Dom.stopEvent();
+      Dialog.close();
+    },
     'click [type=submit]': Form.submitFunc('AddTeam', {
       success(team) {
         let {competitor, ctx} = Dom.getCtxById('AddTeam').teamData;

@@ -231,6 +231,11 @@ isClient && define(function (require, exports, module) {
           });
         });
         assert.dom('#AddTeam', function () {
+          TH.click('[name=cancel]');
+        });
+        refute.dom('#AddTeam');
+        TH.selectMenu('.Teams label:first-child button.select', TH.match.field('id', '$new'));
+        assert.dom('#AddTeam', function () {
           TH.input('[name=name]', 'Dynomites Wellington');
           TH.input('[name=shortName]', 'Wgtn');
           TH.click('[type=submit]');
