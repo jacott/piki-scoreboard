@@ -12,6 +12,11 @@ define(function(require, exports, module) {
     closed: match.or(match.boolean, match.string, match.nil),
   };
 
+  const NEW_FIELD_SPEC = {
+    _id: 'id',
+    org_id: 'id',
+  };
+
   return function (Series) {
     Series.registerObserveField('org_id');
     util.extend(Series.prototype, {
@@ -20,7 +25,7 @@ define(function(require, exports, module) {
 
         const changes = this.changes;
 
-        Val.assertDocChanges(this, FIELD_SPEC);
+        Val.assertDocChanges(this, FIELD_SPEC, NEW_FIELD_SPEC);
 
         if (changes.hasOwnProperty('closed'))
           Val.allowAccessIf(Object.keys(changes).length === 1);

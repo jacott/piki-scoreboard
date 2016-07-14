@@ -3,7 +3,9 @@ define(function (require, exports, module) {
   const koru       = require('koru');
   const Competitor = require('models/competitor');
   const TH         = require('test-helper');
-  const Category   = require('./category');
+  const Org        = require('./org');
+  const Team       = require('./team');
+  const User       = require('./user');
 
   TH.testCase(module, {
     setUp() {
@@ -11,6 +13,7 @@ define(function (require, exports, module) {
       v = {};
       v.org = TH.Factory.createOrg();
       v.user = TH.Factory.createUser();
+      test.stub(koru, 'info');
     },
 
     tearDown() {
@@ -23,41 +26,40 @@ define(function (require, exports, module) {
         var oOrg = TH.Factory.createOrg();
         var oUser = TH.Factory.createUser();
 
-        var category = TH.Factory.buildCategory();
+        var team = TH.Factory.buildTeam();
 
-        test.stub(koru, 'info');
         assert.accessDenied(function () {
-          category.authorize(v.user._id);
+          team.authorize(v.user._id);
         });
       },
 
       "test allowed"() {
-        var category = TH.Factory.buildCategory();
+        var team = TH.Factory.buildTeam();
 
         refute.accessDenied(function () {
-          category.authorize(v.user._id);
+          team.authorize(v.user._id);
         });
       },
 
       "test okay to remove"() {
-        var category = TH.Factory.createCategory();
+        var team = TH.Factory.createTeam();
 
         refute.accessDenied(function () {
-          category.authorize(v.user._id, {remove: true});
+          team.authorize(v.user._id, {remove: true});
         });
 
       },
 
       "test remove in use"() {
-        var category = TH.Factory.createCategory();
+        var team = TH.Factory.createTeam();
         var competitor = TH.Factory.createCompetitor();
 
-        TH.noInfo();
         assert.accessDenied(function () {
-          category.authorize(v.user._id, {remove: true});
+          team.authorize(v.user._id, {remove: true});
         });
 
       },
     },
+
   });
 });

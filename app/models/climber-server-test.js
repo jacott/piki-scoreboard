@@ -1,14 +1,14 @@
 define(function (require, exports, module) {
   var test, v;
-  var TH = require('test-helper');
-  var Climber = require('./climber');
-  var Org = require('./org');
-  var User = require('./user');
-  var koru = require('koru');
-  var Result = require('./result');
+  const koru    = require('koru');
+  const TH      = require('test-helper');
+  const Climber = require('./climber');
+  const Org     = require('./org');
+  const Result  = require('./result');
+  const User    = require('./user');
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
       v.org = TH.Factory.createOrg();
@@ -16,13 +16,13 @@ define(function (require, exports, module) {
       test.stub(koru, 'info');
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.clearDB();
       v = null;
     },
 
     "authorize": {
-      "test denied": function () {
+      "test denied"() {
         var oOrg = TH.Factory.createOrg();
         var oUser = TH.Factory.createUser();
 
@@ -33,7 +33,7 @@ define(function (require, exports, module) {
         });
       },
 
-      "test allowed": function () {
+      "test allowed"() {
         var climber = TH.Factory.buildClimber();
 
         refute.accessDenied(function () {
@@ -41,7 +41,7 @@ define(function (require, exports, module) {
         });
       },
 
-      "test okay to remove": function () {
+      "test okay to remove"() {
         var climber = TH.Factory.createClimber();
 
         refute.accessDenied(function () {
@@ -50,9 +50,9 @@ define(function (require, exports, module) {
 
       },
 
-      "test remove in use": function () {
+      "test remove in use"() {
         var climber = TH.Factory.createClimber();
-        var result = TH.Factory.createResult();
+        var competitor = TH.Factory.createCompetitor();
 
         assert.accessDenied(function () {
           climber.authorize(v.user._id, {remove: true});

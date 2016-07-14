@@ -1,14 +1,36 @@
 define(function(require, exports, module) {
-  var util = require('koru/util');
-  var User = require('./user');
-  var Val = require('koru/model/validation');
+  const Model = require('koru/model');
+  const Val   = require('koru/model/validation');
+  const util  = require('koru/util');
+  const User  = require('./user');
 
-  return function (model) {
-    model.registerObserveField('org_id');
+  const FIELD_SPEC = {
+    name: 'string',
+    group: 'string',
+    shortName: 'string',
+    gender: 'string',
+    type: 'string',
+    heatFormat: 'string',
+    minAge: 'integer',
+    maxAge: 'integer',
+  };
 
-    util.extend(model.prototype, {
-      authorize: function (userId) {
+  const NEW_FIELD_SPEC = {
+    _id: 'id',
+    org_id: 'id',
+  };
+
+  return function (Category) {
+    Category.registerObserveField('org_id');
+
+    util.extend(Category.prototype, {
+      authorize(userId, options) {
+        Val.assertDocChanges(this, FIELD_SPEC, NEW_FIELD_SPEC);
         User.fetchAdminister(userId, this);
+
+        if (options && options.remove) {
+          Val.allowAccessIf(! Model.Competitor.exists({category_ids: this._id}));
+        }
       },
     });
   };

@@ -7,11 +7,15 @@ define(function(require) {
 
   const FIELD_SPEC = {
     name: 'string',
-    org_id: 'string',
     dateOfBirth: 'string',
     gender: 'string',
     number: 'number',
     disabled: 'boolean',
+  };
+
+  const NEW_FIELD_SPEC = {
+    _id: 'id',
+    org_id: 'id',
   };
 
   return function (Climber) {
@@ -21,11 +25,11 @@ define(function(require) {
 
     util.extend(Climber.prototype, {
       authorize(userId, options) {
-        Val.assertDocChanges(this, FIELD_SPEC);
+        Val.assertDocChanges(this, FIELD_SPEC, NEW_FIELD_SPEC);
         User.fetchAdminister(userId, this);
 
         if (options && options.remove) {
-          Val.allowAccessIf(! Model.Result.exists({climber_id: this._id}));
+          Val.allowAccessIf(! Model.Competitor.exists({climber_id: this._id}));
         }
       },
     });
