@@ -3,8 +3,9 @@
     <div>
       <section class="tabbed list">
         <div class="tabNames">
-          <button name="events" type="button" class="tab">Events</button>
-          <button name="results" type="button" class="tab">Results</button>
+          <button name="Events" type="button" class="tab">Events</button>
+          <button name="Results" type="button" class="tab">Individual Results</button>
+          <button name="TeamResults" type="button" class="tab">Team Results</button>
         </div>
         <div class="tabBody body">
         </div>
@@ -34,12 +35,42 @@
 
   <template name="Results">
     <div id="Results" class="loading">
-      {{>Action ""}}
-      <template name="Action">
-        <div class="action">
-          {{content}}
-        </div>
-      </template>
+      <div class="action">
+        {{content}}
+      </div>
+    </div>
+  </template>
+
+  <template name="TeamResults">
+    <div id="TeamResults" class="loading">
+      <table class="list">
+        <thead>
+          <tr>
+            <th class="name">
+              <span>{{selectedTeamType}}</span>
+              <button class="icon" name="selectTeamType" type="button"></button>
+            </th>
+            <th class="total">Total</th>
+            {{each "events" template="Header"}}
+            <template name="Header">
+              <th class="event">{{name}}</th>
+            </template>
+          </tr>
+        </thead>
+        <tbody>
+          {{each "teams" template="Row"}}
+          <template name="Row">
+            <tr>
+              <td class="name">{{team.name}}</td>
+              <td class="total">{{total}}</td>
+              {{each "events" template="Event"}}
+              <template name="Event">
+                <td class="event">{{points}}</td>
+              </template>
+            </tr>
+          </template>
+        </tbody>
+      </table>
     </div>
   </template>
 
@@ -52,6 +83,7 @@
 
   <template name="CatResult">
     <div class="CatResult">
+      <h1>{{category.name}}</h1>
       <table class="list">
         <thead>
           <tr>

@@ -7,7 +7,7 @@ define(function (require, _, module) {
   const Team       = require('models/team');
   const TeamType   = require('models/team-type');
   const TH         = require('test-helper');
-  const sut        = require('./team-ranking');
+  const sut        = require('./ranking');
 
   TH.testCase(module, {
     setUp() {
@@ -101,8 +101,10 @@ define(function (require, _, module) {
       TH.Factory.createResult({competitor_id: competitors[0]._id, category_id: 'cat2', scores: [0.1, 1000]});
       TH.Factory.createResult({competitor_id: competitors[1]._id, category_id: 'cat2', scores: [0.1, 1000]});
 
-      assert.equals(sut.getTeamScores(event, 3), {tt1: {team1: 380, team2: 100}});
-      assert.equals(sut.getTeamScores(event, 1), {tt1: {team1: 170, team2: 100}});
+      event.maxTeamEnties = 3;
+      assert.equals(sut.getTeamScores(event), {tt1: {team1: 380, team2: 100}});
+      event.maxTeamEnties = 1;
+      assert.equals(sut.getTeamScores(event), {tt1: {team1: 170, team2: 100}});
     },
   });
 });

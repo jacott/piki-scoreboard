@@ -1,6 +1,6 @@
 define(function (require, exports, module) {
   var test, v;
-  const TH      = require('test-helper');
+  const TH   = require('test-helper');
   const Team = require('./team');
 
   TH.testCase(module, {

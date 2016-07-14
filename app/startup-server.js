@@ -2,6 +2,7 @@ define(function(require, exports, module) {
   const koru        = require('koru');
   require('koru/server');
   const UserAccount = require('koru/user-account');
+  const Ranking     = require('models/ranking');
   require('models/reg-upload-server');
   require('publish/publish-event');
   require('publish/publish-org');

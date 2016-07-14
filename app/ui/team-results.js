@@ -1,13 +1,13 @@
 define(function(require, exports, module) {
-  const Dom         = require('koru/dom');
-  const Route       = require('koru/ui/route');
-  const util        = require('koru/util');
-  const Team        = require('models/team');
-  const TeamRanking = require('models/team-ranking');
-  const TeamType    = require('models/team-type');
-  const App         = require('ui/app');
-  const EventTpl    = require('ui/event');
-  const TeamHelper  = require('ui/team-helper');
+  const Dom        = require('koru/dom');
+  const Route      = require('koru/ui/route');
+  const util       = require('koru/util');
+  const Ranking    = require('models/ranking');
+  const Team       = require('models/team');
+  const TeamType   = require('models/team-type');
+  const App        = require('ui/app');
+  const EventTpl   = require('ui/event');
+  const TeamHelper = require('ui/team-helper');
 
   const Tpl = Dom.newTemplate(module, require('koru/html!./team-results'));
   const $ = Dom.current;
@@ -22,7 +22,7 @@ define(function(require, exports, module) {
 
   Tpl.$helpers({
     teams(callback) {
-      const scores = TeamRanking.getTeamScores(EventTpl.event)[TeamHelper.teamType_id] || {};
+      const scores = Ranking.getTeamScores(EventTpl.event)[TeamHelper.teamType_id] || {};
       callback.clear();
 
       Object.keys(scores).map(id => {

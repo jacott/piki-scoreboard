@@ -1,39 +1,39 @@
 define(function(require, exports, module) {
-  const koru     = require('koru');
-  const Dom      = require('koru/dom');
-  const session  = require('koru/session');
-  const Route    = require('koru/ui/route');
-  const util     = require('koru/util');
-  const Category = require('models/category');
-  const Climber  = require('models/climber');
-  const Event    = require('models/event');
-  const Series   = require('models/series');
+  const koru       = require('koru');
+  const Dom        = require('koru/dom');
+  const session    = require('koru/session');
+  const Route      = require('koru/ui/route');
+  const util       = require('koru/util');
+  const Category   = require('models/category');
+  const Climber    = require('models/climber');
+  const Event      = require('models/event');
+  const Series     = require('models/series');
+  const Team       = require('models/team');
+  const TeamHelper = require('ui/team-helper');
 
   const Tpl = Dom.newTemplate(module, require('koru/html!./series'));
   const $ = Dom.current;
-
-  const Tabs = {
-    events: Tpl.Events,
-    results: Tpl.Results,
-  };
 
   const base = Route.root.addBase(module, Tpl, {
     focus: true,
     routeVar: 'seriesId',
   });
 
-  base.addTemplate(module, Tpl.Events, {
-    defaultPage: true,
-    data(page, pageRoute) {
-      return Series.findById(pageRoute.seriesId);
-    },
+  const commonPageOptions = {
+    data: seriesFromRouteVar,
     afterRendered: tabOpened,
-  });
+  };
+
+  function seriesFromRouteVar(page, pageRoute) {
+    return Series.findById(pageRoute.seriesId);
+  }
+
+  base.addTemplate(module, Tpl.Events, Object.create(commonPageOptions, {
+    defaultPage: {value: true},
+  }));
 
   function tabOpened(elm, pageRoute) {
-    const tab = this.name.toLowerCase();
-
-    const button = document.querySelector(`#Series .tab[name=${tab}]`);
+    const button = document.querySelector(`#Series .tab[name="${this.name}"]`);
     const ctx = Dom.ctx(elm);
     ctx.tabButton = button;
     Dom.addClass(button, 'selected');
@@ -48,7 +48,6 @@ define(function(require, exports, module) {
 
   ResultsBodyBase.addTemplate(module, Tpl.CatResult, {
     data(page, pageRoute) {
-      pageRoute.hash = '#results';
       return pageRoute;
     },
     insertPage(elm) {
@@ -57,11 +56,15 @@ define(function(require, exports, module) {
     },
   });
 
+  base.addTemplate(module, Tpl.TeamResults, Object.create(commonPageOptions));
+
+  const sortByDate = util.compareByField('date', -1);
+
   Tpl.$events({
     'click button.tab'(event) {
       Dom.stopEvent();
 
-      Route.replacePage(Tabs[this.getAttribute('name')]);
+      Route.replacePage(Tpl[this.getAttribute('name')]);
     },
   });
 
@@ -112,7 +115,7 @@ define(function(require, exports, module) {
       parent.insertBefore(elm, parent.firstChild);
       tabOpened.call(Tpl.Results, elm, pageRoute);
       const ctx = Dom.myCtx(elm);
-      session.rpc("Series.results", series._id, (err, results) => {
+      session.rpc("Ranking.seriesResult", series._id, (err, results) => {
         if (err) {
           koru.globalErrorCatch(err);
           return;
@@ -141,6 +144,9 @@ define(function(require, exports, module) {
   });
 
   Tpl.CatResult.$helpers({
+    category() {
+      return Category.findById(this.category_id);
+    },
     events(callback) {
       for (let row of this.events)
         callback(row);
@@ -165,7 +171,7 @@ define(function(require, exports, module) {
       const climbers = [];
       const events = [];
 
-      ctx.data = {climbers, events};
+      ctx.data = {climbers, events, category_id};
 
       if (results) for (let ev of results) {
         events.push(Event.findById(ev.event_id));
@@ -187,7 +193,7 @@ define(function(require, exports, module) {
         }
       }
 
-      events.sort(util.compareByField('date', -1));
+      events.sort(sortByDate);
       climbers.sort(util.compareByField('total', -1));
     },
   });
@@ -226,9 +232,84 @@ define(function(require, exports, module) {
   }
 
 
-  function sortByDate(a, b) {
-    return a.date === b.date ? 0 : a.date < b.date ? 1 : -1;
-  }
+  Tpl.TeamResults.$helpers({
+    events(callback) {
+      callback.clear();
+      if (this.events) for (let row of this.events) {
+        callback(row);
+      }
+    },
+
+    teams(callback) {
+      callback.clear();
+      if (this.teams) for (let row of this.teams) {
+        if (row.team.teamType_id === TeamHelper.teamType_id)
+          callback(row);
+      }
+    },
+  });
+
+  Tpl.TeamResults.$events({
+    'click [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent,
+  });
+
+
+  Tpl.TeamResults.$extend({
+    $created(ctx, elm) {
+      const series = ctx.data;
+      ctx.data = {};
+
+      const parent = document.querySelector('#Series .tabBody');
+      parent.insertBefore(elm, parent.firstChild);
+      session.rpc("Ranking.teamResults", series._id, (err, results) => {
+        if (err) {
+          koru.globalErrorCatch(err);
+          return;
+        }
+        Dom.removeClass(elm, 'loading');
+
+        const teams = [];
+        const teamMap = {};
+        const events = results.map(row => {
+          for (let ttid in row.scores) {
+            const tScores = row.scores[ttid];
+            for (let team_id in tScores) {
+              let team = teamMap[team_id];
+              if (! team) {
+                teams.push(team = teamMap[team_id] = {
+                  _id: team_id,
+                  team: Team.findById(team_id),
+                  total: 0,
+                  events: {},
+                });
+              }
+              const points = tScores[team_id];
+              team.total += points;
+              team.events[row.event_id] = points;
+            }
+          }
+          return Event.findById(row.event_id);
+        });
+
+        teams.sort(util.compareByField('total', -1));
+        events.sort(util.compareByField('date', -1));
+
+        ctx.updateAllTags({events, teams});
+      });
+    },
+
+    $destroyed: tabClosed,
+  });
+
+  Tpl.TeamResults.Row.$helpers({
+    events(callback) {
+      const eventMap = this.events;
+      const {events} = $.ctx.parentCtx.data;
+      for (let event of events) {
+        callback({_id: event._id, event, points: eventMap[event._id]});
+      }
+    },
+  });
 
   return Tpl;
 });

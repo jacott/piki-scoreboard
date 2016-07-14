@@ -1,7 +1,7 @@
 isClient && define(function (require, _, module) {
   var test, v;
   const Route       = require('koru/ui/route');
-  const TeamRanking = require('models/team-ranking');
+  const Ranking = require('models/ranking');
   const App         = require('ui/app');
   const EventTpl    = require('ui/event');
   const TeamHelper  = require('ui/team-helper');
@@ -25,7 +25,7 @@ isClient && define(function (require, _, module) {
 
       v.eventSub = test.stub(App, 'subscribe').withArgs('Event').returns({stop: v.stop = test.stub()});
       v.results = {tt1: {team1: 260, team2: 300}, tt2: {team3: 160}};
-      test.stub(TeamRanking, 'getTeamScores').withArgs(v.event).returns(v.results);
+      test.stub(Ranking, 'getTeamScores').withArgs(v.event).returns(v.results);
     },
 
     tearDown() {
@@ -41,6 +41,12 @@ isClient && define(function (require, _, module) {
       });
 
       assert.dom('#TeamResults', function () {
+        assert.dom('table.list>thead', function () {
+          assert.dom('th.name', function () {
+            assert.dom('span', v.tt1.name);
+            assert.dom('[name=selectTeamType]');
+          });
+        });
         assert.dom('table.list>tbody', function () {
           assert.dom('tr:first-child', function () {
             assert.dom('td.name', v.team2.name);
@@ -53,6 +59,8 @@ isClient && define(function (require, _, module) {
         });
 
         TH.selectMenu('[name=selectTeamType]', 'tt2');
+
+        assert.dom('th.name>span', v.tt2.name);
 
          assert.dom('table.list>tbody', function () {
           assert.dom('tr:first-child', function () {

@@ -21,6 +21,9 @@
     font-size: 1.2em;
     th, td {
       padding: 8px 12px;
+      &:not(:first-child) {
+        border-left: 1px solid fade(#000, 20%);
+      }
     }
     thead {
       color: #fff;
@@ -31,9 +34,6 @@
       }
     }
     tbody {
-      td.points {
-        border-left: 1px solid fade(#000, 20%);
-      }
       tr:nth-child(even) {
         background-color: fade(#000, 10%);
       }

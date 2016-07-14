@@ -45,12 +45,14 @@
     }
     td, th {
       cursor: initial;
+      &:not(:first-child) {
+        border-left: 1px solid fade(#000, 20%);
+      }
     }
     border: 1px solid fade(#000, 30%);
     width: inherit;
     margin: auto;
     td.score {
-      border-left: 1px solid fade(#000, 20%);
       padding: 4px;
       input {
         width: 4em;

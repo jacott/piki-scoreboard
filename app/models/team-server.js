@@ -4,12 +4,12 @@ define(function(require, exports, module) {
   const ChangeLog = require('./change-log');
   const User      = require('./user');
 
-  return function (model) {
-    ChangeLog.logChanges(model);
+  return function (Team) {
+    ChangeLog.logChanges(Team);
 
-    model.registerObserveField('org_id');
+    Team.registerObserveField('org_id');
 
-    util.extend(model.prototype, {
+    util.extend(Team.prototype, {
       authorize: function (userId) {
         User.fetchAdminister(userId, this);
       },
