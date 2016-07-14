@@ -3,6 +3,7 @@ isClient && define(function (require, exports, module) {
   const Dom        = require('koru/dom');
   const session    = require('koru/session');
   const Route      = require('koru/ui/route');
+  const Event      = require('models/event');
   const App        = require('ui/app');
   const EventTpl   = require('ui/event');
   const TeamHelper = require('ui/team-helper');
@@ -46,6 +47,29 @@ isClient && define(function (require, exports, module) {
 
         refute.dom('#Edit');
       });
+    },
+
+    "test add event"() {
+      const tt1 = TH.Factory.createTeamType({_id: 'tt1'});
+      v.series.$update({teamType_ids: ['tt1']});
+      Route.gotoPage(sut, {seriesId: v.series._id});
+      assert.dom('#Series', function () {
+        TH.click('[name=addEvent]');
+      });
+      assert.dom('#AddEvent', function () {
+        TH.input("[name=name]", 'my new event');
+        TH.input("[name=date]", "2016-10-05");
+        TH.click("[type=submit]");
+      });
+      refute.dom('#AddEvent');
+
+      const event = Event.findBy('name', 'my new event');
+      assert(event);
+
+      assert.same(event.date, '2016-10-05');
+      assert.same(event.org_id, v.series.org_id);
+      assert.same(event.series_id, v.series._id);
+      assert.equals(event.teamType_ids, ['tt1']);
 
     },
 

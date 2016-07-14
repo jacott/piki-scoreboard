@@ -2,6 +2,7 @@ define(function(require, exports, module) {
   const koru        = require('koru');
   const Dom         = require('koru/dom');
   const session     = require('koru/session');
+  const Dialog      = require('koru/ui/dialog');
   const Form        = require('koru/ui/form');
   const Route       = require('koru/ui/route');
   const util        = require('koru/util');
@@ -100,16 +101,35 @@ define(function(require, exports, module) {
     },
   });
 
+  Tpl.Events.$events({
+    'click [name=addEvent]'() {
+      Dom.stopEvent();
+
+      const series = $.ctx.data;
+      let event = Event.build({org_id: series.org_id, series_id: series._id, teamType_ids: series.teamType_ids});
+
+      Dialog.open(Tpl.AddEvent.$autoRender(event));
+    },
+  });
+
+  Tpl.AddEvent.$events({
+    'click [name=cancel]'() {
+      Dom.stopEvent();
+      Dialog.close();
+    },
+    'click [type=submit]': Form.submitFunc('AddEvent', () => Dialog.close()),
+  });
+
+  Tpl.Events.$extend({
+    $destroyed: tabClosed,
+  });
+
   Tpl.Events.Row.$events({
     'click'(event) {
       Dom.stopEvent();
 
       Route.gotoPage(Dom.Event.Show, {eventId: $.ctx.data._id});
     },
-  });
-
-  Tpl.Events.$extend({
-    $destroyed: tabClosed,
   });
 
   Tpl.Edit.$events({
