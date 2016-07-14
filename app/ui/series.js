@@ -1,15 +1,16 @@
 define(function(require, exports, module) {
-  const koru       = require('koru');
-  const Dom        = require('koru/dom');
-  const session    = require('koru/session');
-  const Route      = require('koru/ui/route');
-  const util       = require('koru/util');
-  const Category   = require('models/category');
-  const Climber    = require('models/climber');
-  const Event      = require('models/event');
-  const Series     = require('models/series');
-  const Team       = require('models/team');
-  const TeamHelper = require('ui/team-helper');
+  const koru        = require('koru');
+  const Dom         = require('koru/dom');
+  const session     = require('koru/session');
+  const Route       = require('koru/ui/route');
+  const util        = require('koru/util');
+  const Category    = require('models/category');
+  const Climber     = require('models/climber');
+  const Event       = require('models/event');
+  const Series      = require('models/series');
+  const Team        = require('models/team');
+  const PrintHelper = require('ui/print-helper');
+  const TeamHelper  = require('ui/team-helper');
 
   const Tpl = Dom.newTemplate(module, require('koru/html!./series'));
   const $ = Dom.current;
@@ -107,10 +108,58 @@ define(function(require, exports, module) {
     $destroyed: tabClosed,
   });
 
+  Tpl.Results.$helpers({
+    content() {
+      const selected = document.querySelector('#Results>.categories>.cat.selected');
+      if (selected)
+        return Dom.h([{button: "Print selection", class: 'link printResults'},
+                      {button: "Clear selection", class: 'link clearSelected'}]);
+      return "Select categories to print";
+    },
+  });
+
+  Tpl.Results.$events({
+    'click .select': PrintHelper.clickSelect(function (me, selected, parent) {
+      Dom.forEach(parent, '.heading.selected',
+                  elm => Dom.removeClass(elm, 'selected'));
+
+      const action = parent.getElementsByClassName('action')[0];
+
+      $.ctx.updateAllTags();
+    }),
+
+    'click .clearSelected'(event) {
+      Dom.stopEvent();
+      var parent = event.currentTarget;
+      var selected = parent.getElementsByClassName('selected');
+      while (selected.length)
+        Dom.removeClass(selected[0], 'selected');
+    },
+
+    'click .printResults'(event) {
+      Dom.stopEvent();
+      var parent = event.currentTarget;
+      var selected = parent.getElementsByClassName('selected');
+
+      var elm = Dom.h({section: '', class: 'print-only'});
+      for(var i = 0; i < selected.length; ++i) {
+        elm.appendChild(Tpl.CatResult.$render({append: $.data(selected[i])._id}));
+      }
+      parent.parentNode.appendChild(elm);
+      Dom.addClass(parent, 'no-print');
+
+      window.print();
+
+      Dom.remove(elm);
+      Dom.removeClass(parent, 'no-print');
+    },
+
+  });
+
   Tpl.Results.$extend({
     onBaseEntry(page, pageRoute, callback) {
       const series = Series.findById(pageRoute.seriesId);
-      const elm = Tpl.Results.$autoRender();
+      const elm = Tpl.Results.$autoRender({});
       const parent = document.querySelector('#Series .tabBody');
       parent.insertBefore(elm, parent.firstChild);
       tabOpened.call(Tpl.Results, elm, pageRoute);
@@ -134,7 +183,7 @@ define(function(require, exports, module) {
   });
 
   Tpl.CatList.$events({
-    'click'(event) {
+    'click .name'(event) {
       Dom.stopEvent();
       const series = Series.findById(Route.currentPageRoute.seriesId);
       const cat = $.ctx.data;

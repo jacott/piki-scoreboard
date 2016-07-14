@@ -13,54 +13,95 @@
     margin-top: 24px;
   }
 
-  #Results {
-    &>.CatResult {
-      h1 {
-        padding: 12px 24px;
-        text-align: center;
+  .CatResult {
+    h1 {
+      padding: 12px 24px;
+      text-align: center;
+    }
+    table.list {
+      border: 1px solid fade(#000, 30%);
+      width: inherit;
+      margin: auto;
+      font-size: 1.1em;
+      th, td {
+        padding: 8px 12px;
       }
-      & ~ * {display: none}
-      table.list {
-        border: 1px solid fade(#000, 30%);
-        width: inherit;
-        margin: auto;
-        font-size: 1.1em;
-        th, td {
-          padding: 8px 12px;
-        }
-        thead {
-          color: #fff;
-          background-color: #08a;
-          border-bottom: 1px solid #000;
-          th {
-            text-align: left;
-            &:not(:first-child) {
-              border-left: 1px solid fade(#000, 20%);
-            }
-          }
-        }
-        tbody {
-          td:not(:first-child) {
+      thead {
+        color: #fff;
+        background-color: #08a;
+        border-bottom: 1px solid #000;
+        th {
+          text-align: left;
+          &:not(:first-child) {
             border-left: 1px solid fade(#000, 20%);
           }
-          tr:nth-child(even) {
-            background-color: fade(#000, 10%);
-          }
-          tbody tr:hover {
-            background-color: #0ff;
-          }
+        }
+      }
+      tbody {
+        td:not(:first-child) {
+          border-left: 1px solid fade(#000, 20%);
+        }
+        tr:nth-child(even) {
+          background-color: fade(#000, 10%);
+        }
+        tbody tr:hover {
+          background-color: #0ff;
         }
       }
     }
+  }
 
+  #Results {
+    user-select: none;
     .categories .name {
       cursor: pointer;
+    }
+    &>.CatResult ~ * {display: none}
+
+    .action {
+      margin-top: 24px;
+      :not(:first-child) {
+        margin-left: 2em;
+      }
     }
   }
 
   .Events table.select>thead th {
     cursor: auto;
   }
+}
 
+@media print {
+  #Series .CatResult {
+    page-break-inside: avoid;
+    .results {
+      thead {
+        background-color: #fff;
+        color: #aaa;
+      }
 
+      tr {
+        page-break-inside: avoid;
+      }
+    }
+
+    &.start.B .results {
+      width: 100%;
+      th:not(:first-child) {
+        font-size: 0px;
+      }
+
+      th:first-child, td:first-child {
+        border-right: 1px solid fade(#000, 20%);
+      }
+
+      td:not(:first-child) {
+        border: none;
+
+        >* {
+          display: none;
+        }
+      }
+    }
+  }
 }
