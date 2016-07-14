@@ -164,7 +164,7 @@ define(function(require) {
           return a == b ? 0 : a > b ? 1 : -1;
         });
         (x-1) === this.rankIndex && results.sort(function (a, b) {
-          return a.rankMult === b.rankMult ? 0 :
+          return a.rankMult === b.rankMult ? a.scores[0] - b.scores[0] :
             a.rankMult < b.rankMult ? -1 : 1; // lower rank is better
         });
 
@@ -253,7 +253,7 @@ define(function(require) {
         var aScore = a.scores[x], bScore = b.scores[x];
         if (aScore == null) aScore = -5;
         if (bScore == null) bScore = -5;
-        return aScore == bScore ? 0 : aScore > bScore ? -1 : 1;
+        return aScore == bScore ? a.scores[0] - b.scores[0] : aScore > bScore ? -1 : 1;
       }
 
       function setPoints(results, comparitor) {

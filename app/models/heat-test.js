@@ -286,7 +286,7 @@ define(function (require, exports, module) {
           v.s2.push(500, 10, null);
           v.s3.push(500, 10);
 
-          assert.equals(v.run(), [v.r1, v.r2, v.r3]);
+          assert.equals(v.run(), [v.r1, v.r3, v.r2]);
         },
 
         "test semis 3 null"() {
@@ -294,7 +294,7 @@ define(function (require, exports, module) {
           v.s2.push(500, 10);
           v.s3.push(500, 10, null);
 
-          assert.equals(v.run(), [v.r1, v.r2, v.r3]);
+          assert.equals(v.run(), [v.r1, v.r3, v.r2]);
         },
 
         "test quals"() {
@@ -322,7 +322,7 @@ define(function (require, exports, module) {
           v.s2.push(500, 300, 200);
           v.s3.push(500, 300, 200);
 
-          assert.equals(v.run(), [v.r1, v.r2, v.r3]);
+          assert.equals(v.run(), [v.r1, v.r3, v.r2]);
 
           v.r1.time = 123;
           v.r2.time = 122;
