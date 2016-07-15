@@ -4,7 +4,7 @@ window.history.replaceState(null, document.title = 'Piki Test Mode', '/');
 
 
 define(function(require, exports, module) {
-  var koru = require('koru/main-client');
+  var koru = require('koru/main');
   require('koru/test/client');
   koru.onunload(module, 'reload');
 });

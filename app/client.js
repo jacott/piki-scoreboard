@@ -1,6 +1,6 @@
-window.requirejs = window.yaajs
+window.requirejs = window.yaajs;
 define(function(require, exports, module) {
-  var koru = require('koru/main-client');
+  var koru = require('koru/main');
   var startup = require('startup-client');
 
   require(module.config().extraRequires || [], function () {

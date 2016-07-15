@@ -1,4 +1,4 @@
-define(function(require, Ranking, module) {
+define(function(require, exports, module) {
   const util       = require('koru/util');
   const Competitor = require('models/competitor');
   const Heat       = require('models/heat');
@@ -13,7 +13,7 @@ define(function(require, Ranking, module) {
     return Result.where({category_id, event_id}).fetch();
   }
 
-  Ranking.getTeamScores = function(event, options={findCompetitorTeamIds, findResults}) {
+  exports.getTeamScores = function(event, options={findCompetitorTeamIds, findResults}) {
     const number = event.maxTeamEnties || 30;
     let category_ids = Object.keys(event.heats);
     let scores = {};
@@ -50,5 +50,5 @@ define(function(require, Ranking, module) {
     return scores;
   };
 
-  require('koru/env!./ranking')(Ranking);
+  require('koru/env!./ranking')(exports);
 });

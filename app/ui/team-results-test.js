@@ -1,4 +1,4 @@
-isClient && define(function (require, _, module) {
+isClient && define(function (require, exports, module) {
   var test, v;
   const Route       = require('koru/ui/route');
   const Ranking = require('models/ranking');

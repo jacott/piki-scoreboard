@@ -1,4 +1,4 @@
-define(function (require, _, module) {
+define(function (require, exports, module) {
   var test, v;
   const Category   = require('models/category');
   const Competitor = require('models/competitor');

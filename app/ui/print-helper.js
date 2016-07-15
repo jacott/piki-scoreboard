@@ -1,8 +1,8 @@
-define(function(require, PrintHelper, module) {
+define(function(require, exports, module) {
   const Dom  = require('koru/dom');
   const util = require('koru/util');
 
-  PrintHelper.clickSelect = function (onChange) {
+  exports.clickSelect = function (onChange) {
     return function (event) {
       Dom.stopEvent();
       var me = Dom.getClosest(this, 'tr');
