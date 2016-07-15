@@ -1,1 +1,0 @@
-../node_modules/koru/scripts/geddon-test.js

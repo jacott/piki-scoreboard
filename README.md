@@ -41,10 +41,10 @@ To run the tests kill any running server and:
 ./scripts/start-dev test
 ```
 
-In another terminal:
+Then in another terminal:
 
 ```sh
-./scripts/run-tests
+./scripts/test
 ```
 
 ## License
