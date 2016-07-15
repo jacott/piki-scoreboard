@@ -1,35 +1,39 @@
 define(function(require, exports, module) {
-  var Dom = require('koru/dom');
-  var util = require('koru/util');
-  var koru = require('koru');
+  const koru = require('koru');
+  const Dom  = require('koru/dom');
+  const util = require('koru/util');
 
   var Tpl = Dom.newTemplate(require('koru/html!./flash'));
 
   Tpl.$events({
-    'click .m': function (event) {
+    'click .m'(event) {
       Dom.stopEvent();
-      Dom.remove(event.currentTarget);
+      Dom.hideAndRemove(event.currentTarget);
     },
   });
 
   util.extend(Tpl, {
-    error: function (message) {
+    $created(ctx, elm) {
+      ctx.onDestroy(koru.afTimeout(function () {
+        Dom.hideAndRemove(elm);
+      }, 7000));
+    },
+    error(message) {
       return this.notice(message, 'error');
     },
 
-    notice: function (message, classes) {
+    notice(message, classes) {
       Dom.removeId('Flash');
       document.body.appendChild(Tpl.$autoRender({message: message, classes: classes || 'notice'}));
     },
 
-    loading: function () {
+    loading() {
       this.notice('Loading...', 'loading');
     }
   });
 
-
   koru.globalErrorCatch = function (e) {
-    koru.error(util.extractError(e));
+    koru.error(e.error < 500 ? e : util.extractError(e));
     Tpl.error(e.reason || "Unexpected error");
     return true;
   };

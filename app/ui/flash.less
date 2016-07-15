@@ -1,0 +1,57 @@
+@import "global.lessimport";
+
+@keyframes flash-in {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+}
+
+@keyframes flash-out {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(-120%);
+  }
+}
+
+
+#Flash {
+  position: fixed;
+  left: 5px;
+  bottom: 5px;
+  margin: auto;
+  z-index: 3000;
+
+  &:not(.remElm) {
+    animation: flash-in 1s;
+  }
+
+  &.remElm {
+    animation: flash-out .5s;
+  }
+
+  >.m {
+    cursor: pointer;
+    border: 1px solid #333;
+    padding: 6px 0px 6px 8px;
+    display: inline-block;
+    background-color: #ff8;
+    border-radius: @fixedBorderRadius;
+    .box-shadow-level(3);
+    &:before {
+      .md-inline-icon("cancel");
+      font-size: 18px;
+      position: relative;
+      float: right;
+      margin-right: 4px;
+      margin-left: 10px;
+    }
+  }
+  &.error>.m {
+    background-color: #f88;
+  }
+}

@@ -1,8 +1,9 @@
 isClient && define(function (require, exports, module) {
   var test, v;
-  var TH = require('./test-helper');
-  var Dom = require('koru/dom');
-  var Flash = require('./flash');
+  const koru  = require('koru');
+  const Dom   = require('koru/dom');
+  const Flash = require('./flash');
+  const TH    = require('./test-helper');
 
   TH.testCase(module, {
     setUp: function () {
@@ -11,8 +12,35 @@ isClient && define(function (require, exports, module) {
     },
 
     tearDown: function () {
-      Dom.removeId('Flash');
+      TH.tearDown();
       v = null;
+      Dom.removeId('Flash');
+    },
+
+    "test click close": function () {
+      Flash.notice('click to close');
+
+      test.spy(Dom, 'hideAndRemove');
+
+      assert.dom('#Flash', function () {
+        TH.click('.m');
+        assert.calledWith(Dom.hideAndRemove, this);
+      });
+    },
+
+    "test close after seven seconds": function () {
+      test.stub(koru, 'afTimeout');
+
+      Flash.notice('7 seconds to go');
+
+      assert.calledWith(koru.afTimeout, TH.match.func, 7000);
+
+      test.spy(Dom, 'hideAndRemove');
+
+      assert.dom('#Flash', function () {
+        koru.afTimeout.yield();
+        assert.calledWith(Dom.hideAndRemove, this);
+      });
     },
 
     "test loading": function () {

@@ -31,8 +31,20 @@ define(function(require, exports, module) {
     },
   }, TH);
 
-  exports.setAccess = App.setAccess, // used by TH.loginAs
+  exports.setAccess = App.setAccess; // used by TH.loginAs
 
+  var onAnimationEnd;
+
+  TH.geddon.onStart(function () {
+    onAnimationEnd = Dom.Ctx.prototype.onAnimationEnd;
+    Dom.Ctx.prototype.onAnimationEnd = function (func, repeat) {
+      func(this, this.element());
+    };
+  });
+
+  TH.geddon.onEnd(function () {
+    Dom.Ctx.prototype.onAnimationEnd = onAnimationEnd;
+  });
 
   util.reverseExtend(exports, koruTH);
 });
