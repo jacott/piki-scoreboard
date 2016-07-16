@@ -76,7 +76,7 @@ define(function(require, exports, module) {
   Tpl.$extend({
     onBaseEntry(page, pageRoute) {
       const series = Series.findById(pageRoute.seriesId);
-      if (! series) Route.abortPage('events/#series');
+      if (! series) Route.abortPage('/'+pageRoute.orgSN+'/events/#series');
       Route.title = series.name;
       const elm = Tpl.$autoRender();
       const ctx = Dom.myCtx(elm);
