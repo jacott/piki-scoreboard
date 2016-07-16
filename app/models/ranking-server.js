@@ -12,7 +12,7 @@ define(function(require, exports, module) {
       const series = Series.findById(series_id);
       const ans = [];
       let ce, ce_id, cc, cc_id, fmt;
-      Series.db.query(`select event_id, climber_id, category_id, scores, e.heats->>category_id as fmt
+      Series.db.query(`select climber_id, event_id, category_id, scores, time, e.heats->>category_id as fmt
 from "Result", "Event" as e
 where e.series_id = $1 and e._id = event_id order by event_id, category_id
 `,
@@ -41,8 +41,6 @@ where e.series_id = $1 and e._id = event_id order by event_id, category_id
       function sumCat() {
         if (! cc) return;
 
-        const heat = new Heat(-1, fmt);
-
         cc && ce.cats.push({
           category_id: cc_id,
           fmt,
@@ -57,7 +55,7 @@ where e.series_id = $1 and e._id = event_id order by event_id, category_id
 
       let competitorToTeamsMap;
       let ce, ce_id, results, cc_id, resultsMap;
-      Series.db.query(`select r.event_id, category_id, scores, e.heats, cp.team_ids, r.competitor_id
+      Series.db.query(`select r.event_id, category_id, scores, time, e.heats, cp.team_ids, r.competitor_id
 from "Result" as r, "Event" as e, "Competitor" as cp
 where e.series_id = $1 and e._id = r.event_id and cp._id = competitor_id
 order by r.event_id, category_id
@@ -85,7 +83,7 @@ order by r.event_id, category_id
 
       function sumResults() {
         if (! ce) return;
-        const scores = Ranking.getTeamScores(ce, {findCompetitorTeamIds, findResults,});
+        const scores = Ranking.getTeamScores(ce, {findCompetitorTeamIds, findResults});
         ans.push({event_id: ce_id, scores});
       }
 

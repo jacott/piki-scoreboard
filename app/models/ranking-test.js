@@ -57,6 +57,19 @@ define(function (require, exports, module) {
       assert.equals(sut.getTeamScores(event), {tt1: {team1: 225, team2: 100}, tt2: {team3: 225}});
     },
 
+    "test not started"() {
+      let tt = TH.Factory.createTeamType({_id: 'tt1'});
+      let team = TH.Factory.createTeam({_id: 'team1'});
+      let cat = TH.Factory.createCategory({_id: 'cat'});
+      let event = TH.Factory.createEvent({_id: 'ev1', teamType_ids: [tt._id],
+                                          heats: {cat: 'F1'}});
+      let competitors = TH.Factory.createCompetitor({_id: 'comp1', team_ids: ['team1'], category_ids: ['cat']});
+      let res1 = TH.Factory.createResult({_id: 'res1', scores: [0.1]});
+      let res2 = TH.Factory.createResult({_id: 'res2', scores: [0.2]});
+
+      assert.equals(sut.getTeamScores(event), {});
+    },
+
     "test more than 30"() {
       let tt = TH.Factory.createTeamType({_id: 'tt1'});
       let team = TH.Factory.createTeam({_id: 'team1'});

@@ -50,7 +50,7 @@ define(function(require, exports, module) {
   module.exports = Event.define({
     module,
     fields: {
-      name: {type:  'text', trim: true, required: true, maxLength: 200, unique: {scope: 'org_id'}},
+      name: {type:  'text', trim: true, required: true, maxLength: 200, unique: {scope: ['org_id', 'series_id']}},
       org_id: 'belongs_to',
       heats: 'object',
       date: {type: 'text', inclusion: {matches: /^\d{4}-[01]\d-[0-3]\d$/}},

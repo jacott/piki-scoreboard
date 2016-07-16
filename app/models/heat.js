@@ -156,16 +156,10 @@ define(function(require) {
       if (x <= 0) x = 1;
 
       if (x > this.rankIndex) {
-        this.sort(results, x - 1, function rso(a, b) {
-          a = a * 10;
-          a = a - Math.floor(a);
-          b= b * 10;
-          b = b - Math.floor(b);
-          return a == b ? 0 : a > b ? 1 : -1;
-        });
+        this.sort(results, x - 1, altStartOrder);
         (x-1) === this.rankIndex && results.sort(function (a, b) {
           return a.rankMult === b.rankMult ? a.scores[0] - b.scores[0] :
-            a.rankMult < b.rankMult ? -1 : 1; // lower rank is better
+            a.rankMult - b.rankMult; // lower rank is better
         });
 
         var cutoff = +this.cutoffs[x - this.rankIndex - 1];
@@ -204,7 +198,7 @@ define(function(require) {
 
 
       if (number == null) number = this.number;
-      var rankIndex = this.rankIndex;
+      const rankIndex = this.rankIndex;
 
       for(var i = 0; i < results.length; ++i) {
         results[i].rankMult = 1;
@@ -234,15 +228,15 @@ define(function(require) {
 
       } else {
         results.sort(this.compareResults(rso ? 1 : 0, x, rso));
-        setPoints(results, this.compareResults());
+        setPoints(results, this.compareResults(0));
       }
       return results;
 
 
       function setRanks(from , to) {
-        var rank = (to - from - 1)/2 + from + 1;
+        const rank = (to - from - 1)/2 + from + 1;
 
-        for(var i = from; i < to; ++i) {
+        for(let i = from; i < to; ++i) {
           var row = results[i];
           row[rankName] = rank;
           row.rankMult = row.rankMult * rank;
@@ -250,19 +244,22 @@ define(function(require) {
       }
 
       function sortByHeat(a, b) {
-        var aScore = a.scores[x], bScore = b.scores[x];
+        let aScore = a.scores[x], bScore = b.scores[x];
         if (aScore == null) aScore = -5;
         if (bScore == null) bScore = -5;
-        return aScore == bScore ? a.scores[0] - b.scores[0] : aScore > bScore ? -1 : 1;
+        return aScore === bScore ? a.scores[0] - b.scores[0] : bScore - aScore;
       }
 
       function setPoints(results, comparitor) {
         let previ = 0;
         let sumPoints = Heat.pointsTable[0];
+
         for (let i = 1; i <= results.length; ++i) {
           if (! results[i] || comparitor(results[previ], results[i])) {
-            for(var j = previ; j < i; ++j) {
-              results[j].sPoints = Math.floor(sumPoints / (i-previ));
+            for(let j = previ; j < i; ++j) {
+                results[j].sPoints =
+                (results[j].scores.length === 1) ? null :
+                Math.floor(sumPoints / (i-previ));
             }
             sumPoints = 0;
             previ = i;
@@ -273,11 +270,10 @@ define(function(require) {
     }
 
     compareResults(min, max, rso) {
-      // FIXME if min zero then need to to a pseduo random sort for ties
       if (min == null) min = 1;
       if (max == null) max = this.number;
-      var rankIndex = this.rankIndex;
-      var last = this.total;
+      const rankIndex = this.rankIndex;
+      const last = this.total;
 
       return function (a, b) {
         var aScores = a.scores, bScores = b.scores;
@@ -286,9 +282,9 @@ define(function(require) {
 
         for(; mLen >= min; --mLen) {
           if (mLen === rankIndex) {
-            if (a.rankMult == b.rankMult) {
-              if ((max == last || max === -1) && a.time != b.time ) { // final by time
-                return (a.time || 0) < (b.time || 0) ? -1 : 1; // lower time is better
+            if (a.rankMult === b.rankMult) {
+              if ((max === last || max === -1) && a.time !== b.time ) { // final by time
+                return (a.time || 0) - (b.time || 0); // lower time is better
               } else
                 return rso ? rso(aScores[0], bScores[0]) : 0;
             } else {
@@ -296,18 +292,18 @@ define(function(require) {
               bs = b.rankMult;
               if (as == null) as = -5;
               if (bs == null) bs = -5;
-              return as < bs ? -1 : 1; // lower rank is better
+              return as - bs; // lower rank is better
             }
           }
 
           as = aScores[mLen];
           bs = bScores[mLen];
 
-          if (as != bs) {
+          if (as !== bs) {
             if (as == null) as = -5;
             if (bs == null) bs = -5;
 
-            return as > bs ? -1 : 1;
+            return bs - as;
           }
         }
 
@@ -340,6 +336,11 @@ define(function(require) {
     }
 
   };
+
+  function altStartOrder(a, b) {
+    // pseudo randomize for final ties
+    return ((a * 100000000) % 104659)+a - ((b * 100000000) % 104659)+b;
+  }
 
 
   Heat.pointsTable = [

@@ -27,6 +27,7 @@ define(function(require, exports, module) {
 
       for(let i = 0; i < Math.min(results.length, 30); ++i) {
         let result = results[i];
+        if (result.sPoints === null) continue;
         var team_ids = options.findCompetitorTeamIds(result.competitor_id);
         team_ids && team_ids.forEach(team_id => {
           const {teamType_id} = Team.findById(team_id);

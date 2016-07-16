@@ -164,13 +164,13 @@ define(function (require, exports, module) {
         var r2 = v.heat.sortByStartOrder(results.slice(0));
 
         assert.same(r2.length, 3);
-        assert.equals(r2, [v.r3, v.r1, v.r2]);
+        assert.equals(r2, [v.r1, v.r3, v.r2]);
 
-        v.r1.scores[0] = 0.25;
+        v.r1.scores[0] = 0.22;
 
         r2 = v.heat.sortByStartOrder(results.slice(0));
 
-        assert.equals(r2, [v.r1, v.r3, v.r2]);
+        assert.equals(r2, [v.r3, v.r1, v.r2]);
       },
 
       "test final no tie"() {
@@ -233,10 +233,16 @@ define(function (require, exports, module) {
                        v.r3 = {time: 100, scores: [0.3, 100, 300, 400, 400]}];
 
         assert.equals(v.call(4, results), [v.r3, v.r2, v.r1]);
+        assert.same(v.r3.sPoints, 100);
+        assert.same(v.r2.sPoints, 80);
+        assert.same(v.r1.sPoints, 65);
 
         v.r3.time = 200;
 
         assert.equals(v.call(4, results), [v.r2, v.r3, v.r1]);
+        assert.same(v.r2.sPoints, 100);
+        assert.same(v.r3.sPoints, 80);
+        assert.same(v.r1.sPoints, 65);
       },
 
       "test General Result"() {
@@ -252,6 +258,17 @@ define(function (require, exports, module) {
 
         var results = [v.r1 = {scores: [0.2, 200, 300]}, v.r2 = {scores: [0.3, 100, 300]}, v.r3 = {scores: [0.1, 50, 400]}];
         assert.equals(v.call(-1, results), [v.r1, v.r3, v.r2]);
+      },
+
+      "test points with time split"() {
+        var results = [
+          v.r1 = {time: 30, scores: [0.2, 100]},
+          v.r2 = {time: 123, scores: [0.3, 100]},
+        ];
+
+        assert.equals(new Heat(-1, 'LF4').sort(results), [v.r1, v.r2]);
+        assert.same(v.r1.sPoints, 100);
+        assert.same(v.r2.sPoints, 80);
       },
 
       "Ranking general result": {
@@ -322,28 +339,40 @@ define(function (require, exports, module) {
           v.s2.push(500, 300, 200);
           v.s3.push(500, 300, 200);
 
-          assert.equals(v.run(), [v.r1, v.r3, v.r2]);
+          let ans = v.run();
+          assert.equals(ans, [v.r1, v.r3, v.r2]);
+          assert.same(v.r1.sPoints, 81);
+          assert.same(v.r2.sPoints, 81);
+
 
           v.r1.time = 123;
           v.r2.time = 122;
           v.r3.time = 224;
 
-          assert.equals(v.run(), [v.r2, v.r1, v.r3]);
+          ans = v.run();
+          assert.equals(ans, [v.r2, v.r1, v.r3]);
+          assert.same(v.r1.sPoints, 80);
+          assert.same(v.r2.sPoints, 100);
+          assert.same(v.r3.sPoints, 65);
 
           v.r1.time = 123;
           v.r2.time = 124;
           v.r3.time = 24;
 
-          assert.equals(v.run(), [v.r3, v.r1, v.r2]);
+          ans = v.run();
+          assert.equals(ans, [v.r3, v.r1, v.r2]);
+          assert.same(v.r1.sPoints, 80);
+          assert.same(v.r2.sPoints, 65);
+          assert.same(v.r3.sPoints, 100);
         },
 
 
         "test sPoints noScores"() {
           v.run();
 
-          assert.same(v.r2.sPoints, 81);
-          assert.same(v.r3.sPoints, 81);
-          assert.same(v.r1.sPoints, 81);
+          assert.same(v.r2.sPoints, null);
+          assert.same(v.r3.sPoints, null);
+          assert.same(v.r1.sPoints, null);
         },
 
         "test sPoints three scores"() {
@@ -376,9 +405,7 @@ define(function (require, exports, module) {
             assert.same(v['r'+i].sPoints, Heat.pointsTable[i]);
           }
           assert.same(v.r30.sPoints, 0);
-
         },
-
       },
 
       "test sorting methods"() {
