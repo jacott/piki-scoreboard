@@ -8,39 +8,29 @@ define(function(require, exports, module) {
   const util       = require('koru/util');
   const Team       = require('models/team');
   const TeamType   = require('models/team-type');
+  const CrudPage   = require('ui/crud-page');
   const TeamHelper = require('ui/team-helper');
   const App        = require('./app-base');
 
-  var Tpl   = Dom.newTemplate(require('koru/html!./team'));
-  var $ = Dom.current;
-  var Index = Tpl.Index;
-  var sortField = 'name';
-  var asc = 1;
-  var sortFunc;
-
-  setSortFunc();
-
-  var elm;
-
-  var base = Route.root.addBase(module, Tpl, 'teamId');
-  koru.onunload(module, function () {
-    Route.root.removeBase(Tpl);
-  });
+  const Tpl = CrudPage.newTemplate(module, Team, require('koru/html!./team'));
+  const $ = Dom.current;
+  const Index = Tpl.Index;
 
   Tpl.$extend({
-    onBaseEntry: function () {
+    onBaseEntry() {
       document.body.appendChild(Tpl.$autoRender({}));
     },
 
-    onBaseExit: function () {
+    onBaseExit() {
       Dom.removeId('Team');
     },
   });
 
   Index.$helpers({
-    teams: function (callback) {
+    rows: function (callback) {
+      const {sortFunc, asc} = $.template.sorting;
       callback.render({
-        model: Team,
+        model: $.template.parent.model,
         sort: function (a, b) {
           return sortFunc(a, b) * asc;
         },
@@ -61,19 +51,6 @@ define(function(require, exports, module) {
       let teamType = TeamType.findById(TeamHelper.teamType_id);
       return teamType && 'Add new ' + teamType.name;
     },
-
-    sortOrder() {
-      var parent = $.element.parentNode;
-      var ths = parent.getElementsByTagName('th');
-      for(var i = 0; i < ths.length; ++i) {
-        Dom.removeClass(ths[i], 'sort');
-        Dom.removeClass(ths[i], 'desc');
-      }
-
-      var elm = parent.querySelector('[data-sort="'+sortField+'"]');
-      Dom.addClass(elm, 'sort');
-      asc === -1 &&  Dom.addClass(elm, 'desc');
-    },
   });
 
   Index.$events({
@@ -84,38 +61,25 @@ define(function(require, exports, module) {
       teamType && Dialog.open(Tpl.EditTeamType.$autoRender(teamType));
     },
 
-    'click [name=addTeamType]': function (event) {
+    'click [name=addTeamType]'(event) {
       Dom.stopEvent();
       openAddTeamType();
     },
 
-    'click [name=addTeam]': function (event) {
+    'click [name=addTeam]'(event) {
       Dom.stopEvent();
       openAddTeam();
     },
 
-    'click .teams tr': function (event) {
+    'click .teams tr'(event) {
       if (! Dom.hasClass(document.body, 'aAccess')) return;
       Dom.stopEvent();
 
       var data = $.data(this);
-      Route.gotoPage(Tpl.Edit, {teamId: data._id});
+      Route.gotoPage(Tpl.Edit, {modelId: data._id});
     },
 
-    'click th': function (event) {
-      Dom.stopEvent();
-      var sort = this.getAttribute('data-sort');
-      if (sortField === sort)
-        asc = asc * -1;
-      else {
-        sortField = sort;
-        asc = 1;
-      }
-      setSortFunc();
-      $.ctx.updateAllTags();
-    },
-
-    'click [name=teamType_id]': function (event) {
+    'click [name=teamType_id]'(event) {
       Dom.stopEvent();
       let ctx = $.ctx;
       let list = TeamType.query.map(doc => [doc._id, doc.name]);
@@ -143,26 +107,6 @@ define(function(require, exports, module) {
   function openAddTeam() {
     Dialog.open(Tpl.Add.$autoRender(new Team({org_id: App.orgId, teamType_id: TeamHelper.teamType_id})));
   }
-
-  base.addTemplate(module, Index, {defaultPage: true, path: ''});
-
-  base.addTemplate(module, Tpl.Add, {
-    focus: true,
-    data: function () {
-      return new Team({org_id: App.orgId, teamType_id: TeamHelper.teamType_id});
-    }
-  });
-
-  base.addTemplate(module, Tpl.Edit, {
-    focus: true,
-    data: function (page, pageRoute) {
-      var doc = Team.findById(pageRoute.teamId);
-
-      if (!doc) Route.abortPage();
-
-      return doc;
-    }
-  });
 
   Tpl.Add.$events({
     'click [name=cancel]'(event) {
@@ -203,7 +147,7 @@ define(function(require, exports, module) {
 
   Tpl.Edit.$events({
     'click [name=cancel]': cancel,
-    'click [name=delete]': function (event) {
+    'click [name=delete]'(event) {
       var doc = $.data();
 
       Dom.stopEvent();
@@ -221,11 +165,11 @@ define(function(require, exports, module) {
       });
 
     },
-    'click [type=submit]': Form.submitFunc('EditTeam', Tpl),
+    'click [type=submit]': Form.submitFunc('Edit', Tpl),
   });
 
   Tpl.Edit.$extend({
-    $destroyed: function (ctx, elm) {
+    $destroyed(ctx, elm) {
       ctx.data.$clearChanges();
     }
   });
@@ -233,10 +177,6 @@ define(function(require, exports, module) {
   function cancel(event) {
     Dom.stopEvent();
     Route.gotoPage(Tpl);
-  }
-
-  function setSortFunc() {
-    return sortFunc = util.compareByField(sortField);
   }
 
   function teamTypeSubmitFunc(event) {

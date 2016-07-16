@@ -1,11 +1,5 @@
-<template name="Category">
-  <section id="Category">
-    <div>
-      <section class="body">
-      </section>
-    </div>
-  </section>
-  <template name="Index">
+<template name="Category" extends="/CrudPage">
+  <template name="Index" extends="/CrudPage.Index">
     <div>
       <nav>
         {{pageLink name="addCategory" value="Add new category" template="Category.Add"}}
@@ -15,11 +9,15 @@
         <table class="select">
           <thead>
             <tr>
-              <th>Name</th><th>Short name</th><th>Group</th><th>Format</th>
+              <th data-sort="name">Name</th>
+              <th data-sort="shortName">Short name</th>
+              <th data-sort="group">Group</th>
+              <th data-sort="heatFormat">Format</th>
             </tr>
+            {{sortOrder}}
           </thead>
           <tbody>
-            {{each "categories" template="Row"}}
+            {{each "rows" template="Row"}}
           </tbody>
           <template name="Row">
             <tr>

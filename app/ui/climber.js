@@ -7,56 +7,23 @@ define(function(require, exports, module) {
   const util       = require('koru/util');
   const Climber    = require('models/climber');
   const TeamType   = require('models/team-type');
+  const CrudPage   = require('ui/crud-page');
   const TeamHelper = require('ui/team-helper');
   const App        = require('./app-base');
 
-  var Tpl   = Dom.newTemplate(require('koru/html!./climber'));
-  var $ = Dom.current;
-  var Index = Tpl.Index;
-  var sortField = 'name';
-  var asc = 1;
-  var sortFunc;
+  const Tpl = CrudPage.newTemplate(module, Climber, require('koru/html!./climber'));
+  const $ = Dom.current;
+  const Index = Tpl.Index;
 
-  setSortFunc();
-
-  var elm;
-
-  var base = Route.root.addBase(module, Tpl, 'climberId');
-  koru.onunload(module, function () {
-    Route.root.removeBase(Tpl);
-  });
-
-  Tpl.$extend({
-    onBaseEntry: function () {
-      document.body.appendChild(Tpl.$autoRender({}));
-    },
-
-    onBaseExit: function () {
-      Dom.removeId('Climber');
-    },
-  });
-
-  Index.$helpers({
-    climbers: function (callback) {
-      callback.render({
-        model: Climber,
-        sort: function (a, b) {
-          return sortFunc(a, b) * asc;
-        },
-      });
-    },
-
-    sortOrder: function () {
-      var parent = $.element.parentNode;
-      var ths = parent.getElementsByTagName('th');
-      for(var i = 0; i < ths.length; ++i) {
-        Dom.removeClass(ths[i], 'sort');
-        Dom.removeClass(ths[i], 'desc');
+  Index.$extend({
+    setSortFunc() {
+      const {sorting} = this;
+      switch (sorting.sortField) {
+      case 'team':
+        return sorting.sortFunc = TeamHelper.sortBy;
+      default:
+        return this.__proto__.setSortFunc.call(this);
       }
-
-      var elm = parent.querySelector('[data-sort="'+sortField+'"]');
-      Dom.addClass(elm, 'sort');
-      asc === -1 &&  Dom.addClass(elm, 'desc');
     },
   });
 
@@ -65,19 +32,6 @@ define(function(require, exports, module) {
   });
 
   Index.$events({
-    'click th': function (event) {
-      Dom.stopEvent();
-      var sort = this.getAttribute('data-sort');
-      if (sortField === sort)
-        asc = asc * -1;
-      else {
-        sortField = sort;
-        asc = 1;
-      }
-      setSortFunc();
-      $.ctx.updateAllTags();
-    },
-
     'click [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent,
 
     'click .climbers tr': function (event) {
@@ -86,7 +40,7 @@ define(function(require, exports, module) {
       Dom.stopEvent();
 
       var data = $.data(this);
-      Route.gotoPage(Tpl.Edit, {climberId: data._id});
+      Route.gotoPage(Tpl.Edit, {modelId: data._id});
     },
   });
 
@@ -124,37 +78,9 @@ define(function(require, exports, module) {
     }
   });
 
-  base.addTemplate(module, Index, {defaultPage: true, path: ''});
-  base.addTemplate(module, Tpl.Add, {
-    focus: true,
-    data: function () {
-      return new Climber({org_id: App.orgId});
-    }
-  });
-
-  base.addTemplate(module, Tpl.Edit, {
-    focus: true,
-    data: function (page, pageRoute) {
-      var doc = Climber.findById(pageRoute.climberId);
-
-      if (!doc) Route.abortPage();
-
-      return doc;
-    }
-  });
-
   function cancel(event) {
     Dom.stopEvent();
     Route.history.back();
-  }
-
-  function setSortFunc() {
-    switch (sortField) {
-    case 'team':
-      return sortFunc = TeamHelper.sortBy;
-    default:
-      return sortFunc = util.compareByField(sortField);
-    }
   }
 
   return Tpl;

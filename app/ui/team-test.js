@@ -9,7 +9,7 @@ isClient && define(function (require, exports, module) {
   const TH         = require('./test-helper');
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
       v.org =  TH.Factory.createOrg();
@@ -19,13 +19,13 @@ isClient && define(function (require, exports, module) {
       App.setAccess();
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.tearDown();
       v = null;
       TeamHelper.teamType_id = null;
     },
 
-    "test rendering": function () {
+    "test rendering"() {
       var teams = TH.Factory.createList(2, 'createTeam');
       TH.Factory.createTeamType();
       var other = TH.Factory.createTeam();
@@ -54,7 +54,7 @@ isClient && define(function (require, exports, module) {
       });
     },
 
-    "test adding new team": function () {
+    "test adding new team"() {
       Route.gotoPage(sut.Index);
 
       TH.selectMenu('#Team [name=teamType_id]', TH.match.field('id', 'tt1'));
@@ -134,7 +134,7 @@ isClient && define(function (require, exports, module) {
     },
 
     "edit": {
-      setUp: function () {
+      setUp() {
         v.team = TH.Factory.createTeam();
         v.team2 = TH.Factory.createTeam();
 
@@ -144,8 +144,8 @@ isClient && define(function (require, exports, module) {
         TH.click('td', v.team.name);
       },
 
-      "test change name": function () {
-        assert.dom('#EditTeam', function () {
+      "test change name"() {
+        assert.dom('#Edit', function () {
           assert.dom('h1', 'Edit ' + v.team.name);
           TH.input('[name=name]', {value: v.team.name}, 'new name');
           TH.click('[type=submit]');
@@ -154,8 +154,8 @@ isClient && define(function (require, exports, module) {
         assert.dom('#Team td', 'new name');
       },
 
-      "test delete": function () {
-        assert.dom('#EditTeam', function () {
+      "test delete"() {
+        assert.dom('#Edit', function () {
           TH.click('[name=delete]');
         });
 
@@ -168,13 +168,13 @@ isClient && define(function (require, exports, module) {
 
         assert(Team.exists(v.team._id));
 
-        TH.click('#EditTeam [name=delete]');
+        TH.click('#Edit [name=delete]');
 
         assert.dom('.Dialog', function () {
           TH.click('[name=okay]', 'Delete');
         });
 
-        refute.dom('#EditTeam');
+        refute.dom('#Edit');
 
         refute(Team.exists(v.team._id));
       },

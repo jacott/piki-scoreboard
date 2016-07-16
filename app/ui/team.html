@@ -1,11 +1,5 @@
-<template name="Team">
-  <section id="Team">
-    <div>
-      <section class="body">
-      </section>
-    </div>
-  </section>
-  <template name="Index">
+<template name="Team" extends="/CrudPage">
+  <template name="Index" extends="/CrudPage.Index">
     <div id="TeamIndex" {{hasTeamTypeClass}}>
       <label class="teamType">
         <span>Team type:</span>
@@ -26,7 +20,7 @@
             </tr>
           </thead>
           <tbody>
-            {{each "teams" template="Row"}}
+            {{each "rows" template="Row"}}
           </tbody>
           <template name="Row">
             <tr>
@@ -82,7 +76,7 @@
   </template>
 
   <template name="Edit">
-    <form id="EditTeam">
+    <form id="Edit">
       <h1>Edit {{name}}</h1>
       {{> /Team.Form}}
       <fieldset class="actions">

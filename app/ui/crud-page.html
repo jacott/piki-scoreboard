@@ -1,0 +1,39 @@
+<template name="CrudPage">
+  <section id="{{templateName}}" class="CrudPage">
+    <div>
+      <section class="body">
+      </section>
+    </div>
+  </section>
+
+  <template name="Index">
+  </template>
+
+  <template name="Add">
+    <form id="AddModel">
+      {{addForm}}
+      <fieldset class="actions">
+        <button type="submit" name="create">Create</button>
+        <button type="button" name="cancel">Cancel</button>
+      </fieldset>
+    </form>
+  </template>
+
+  <template name="Edit">
+    <form id="EditModel">
+      {{editForm}}
+      <fieldset class="actions">
+        <button type="submit" name="update">Save</button>
+        <button type="button" name="delete">Delete</button>
+        <button type="button" name="cancel">Cancel</button>
+      </fieldset>
+    </form>
+  </template>
+
+  <template name="ConfirmDelete">
+    <div>
+      <h1>Delete {{name}}?</h1>
+      <span>Are you sure you want to delete this {{instanceName}}?</span>
+    </div>
+  </template>
+</template>

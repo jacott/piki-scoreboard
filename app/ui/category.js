@@ -1,80 +1,30 @@
 define(function(require, exports, module) {
-  var App   = require('./app-base');
-  var Dom   = require('koru/dom');
-  var Route = require('koru/ui/route');
-  var Tpl   = Dom.newTemplate(require('koru/html!./category'));
-  var util  = require('koru/util');
-  var koru = require('koru');
-  var Category = require('models/category');
-  var Form = require('koru/ui/form');
+  const koru     = require('koru');
+  const Dom      = require('koru/dom');
+  const Form     = require('koru/ui/form');
+  const Route    = require('koru/ui/route');
+  const util     = require('koru/util');
+  const Category = require('models/category');
+  const CrudPage = require('ui/crud-page');
+  const App      = require('./app-base');
 
-  var $ = Dom.current;
+  const Tpl = CrudPage.newTemplate(module, Category, require('koru/html!./category'));
+  const $ = Dom.current;
+  const Index = Tpl.Index;
 
-  var Index = Tpl.Index;
-  var category;
-  var elm;
-
-  var base = Route.root.addBase(module, Tpl, 'categoryId');
-  koru.onunload(module, function () {
-    Route.root.removeBase(Tpl);
-  });
-
-  Tpl.$extend({
-    onBaseEntry: function () {
-      document.body.appendChild(Tpl.$autoRender({}));
-    },
-
-    onBaseExit: function () {
-      Dom.removeId('Category');
-    },
-  });
-
-  var typeNameComparitor = util.compareBy(['type', 'heatFormat', 'name']);
-
-  Index.$helpers({
-    categories: function (callback) {
-      callback.render({model: Category, sort: typeNameComparitor});
-    },
-  });
+  const typeNameComparitor = util.compareBy(['type', 'heatFormat', 'name']);
 
   Index.$events({
-    'click .categories tr': function (event) {
+    'click .categories tr'(event) {
       Dom.stopEvent();
 
       var data = $.data(this);
-      Route.gotoPage(Tpl.Edit, {categoryId: data._id});
+      Route.gotoPage(Tpl.Edit, {modelId: data._id});
     },
   });
 
-  base.addTemplate(module, Index, {defaultPage: true, path: ''});
-  base.addTemplate(module, Tpl.Add, {
-    focus: true,
-    data: function () {
-      var attrs = category ? category.attributes : {};
-      category = new Category({
-        org_id: App.orgId,
-        type: attrs.type,
-        heatFormat: attrs.heatFormat,
-        gender: attrs.gender,
-        group: attrs.group,
-      });
-      return category;
-    }
-  });
-
-  base.addTemplate(module, Tpl.Edit, {
-    focus: true,
-    data: function (page, pageRoute) {
-      var doc = Category.findById(pageRoute.categoryId);
-
-      if (!doc) Route.abortPage();
-
-      return doc;
-    }
-  });
-
   Tpl.Form.$helpers({
-    typeList: function () {
+    typeList() {
       return [['', ''], ["L", "Lead"], ["B", "Boulder"]];
     },
   });
@@ -86,7 +36,7 @@ define(function(require, exports, module) {
 
   Tpl.Edit.$events({
     'click [name=cancel]': cancel,
-    'click [name=delete]': function (event) {
+    'click [name=delete]'(event) {
       var doc = $.data();
 
       Dom.stopEvent();
@@ -108,7 +58,7 @@ define(function(require, exports, module) {
   });
 
   Tpl.Edit.$extend({
-    $destroyed: function (ctx, elm) {
+    $destroyed(ctx, elm) {
       ctx.data.$clearChanges();
     }
   });

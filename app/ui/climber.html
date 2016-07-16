@@ -1,11 +1,5 @@
-<template name="Climber">
-    <section id="Climber">
-    <div>
-      <section class="body">
-      </section>
-    </div>
-  </section>
-  <template name="Index">
+<template name="Climber" extends="/CrudPage">
+  <template name="Index" extends="/CrudPage.Index">
     <div>
       <nav>
         {{pageLink class="adminAccess link" name="addClimber" value="Add new climber" template="Climber.Add"}}
@@ -27,7 +21,7 @@
             </tr>
           </thead>
           <tbody>
-            {{each "climbers" template="Row"}}
+            {{each "rows" template="Row"}}
           </tbody>
           <template name="Row">
             <tr>

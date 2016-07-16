@@ -1,0 +1,110 @@
+define(function(require, exports, module) {
+  const Dom   = require('koru/dom');
+  const Route = require('koru/ui/route');
+  const util  = require('koru/util');
+  const App   = require('ui/app');
+
+  const Tpl = module.exports = Dom.newTemplate(module, require('koru/html!./crud-page'));
+  const $ = Dom.current;
+
+  Tpl.$helpers({
+    templateName() {
+      return $.template.name;
+    },
+  });
+
+  Tpl.$extend({
+    newTemplate(subm, model, html) {
+      html.nodes = util.deepCopy(Tpl.nodes);
+      const subTpl = Dom.newTemplate(subm, html);
+      subTpl.model = model;
+      const base = Route.root.addBase(subm, subTpl, 'modelId');
+
+      base.addTemplate(subm, subTpl.Index, {defaultPage: true, path: ''});
+      base.addTemplate(subm, subTpl.Add, {
+        focus: true,
+        data: function () {
+          return new model({org_id: App.orgId});
+        }
+      });
+
+      base.addTemplate(subm, subTpl.Edit, {
+        focus: true,
+        data: function (page, pageRoute) {
+
+          const doc = model.findById(pageRoute.modelId);
+          if (doc) return doc;
+
+          Route.abortPage(subTpl);
+        }
+      });
+
+      subTpl.Index.sorting = {
+        sortField: 'name',
+        asc: 1,
+        sortFunc: null,
+      };
+
+      Tpl.Index.setSortFunc.call(subTpl.Index);
+
+      subTpl.Index.$events({
+        'click th': function (event) {
+          Dom.stopEvent();
+          const {sorting} = subTpl.Index;
+          const sort = this.getAttribute('data-sort');
+          if (sorting.sortField === sort)
+            sorting.asc *= -1;
+          else {
+            sorting.sortField = sort;
+            sorting.asc = 1;
+          }
+          subTpl.Index.setSortFunc();
+          $.ctx.updateAllTags();
+        },
+      });
+
+      return subTpl;
+    },
+
+    onBaseEntry: function () {
+      document.body.appendChild(this.$autoRender({}));
+    },
+
+    onBaseExit: function () {
+      Dom.removeId(this.name);
+    },
+  });
+
+  Tpl.Index.$helpers({
+    rows: function (callback) {
+      const {sortFunc, asc} = $.template.sorting;
+      callback.render({
+        model: $.template.parent.model,
+        sort: function (a, b) {
+          return sortFunc(a, b) * asc;
+        },
+      });
+    },
+
+    sortOrder: function () {
+      const parent = $.element.parentNode;
+      const ths = parent.getElementsByTagName('th');
+      const {sortField, asc} = $.template.sorting;
+      for(var i = 0; i < ths.length; ++i) {
+        Dom.removeClass(ths[i], 'sort');
+        Dom.removeClass(ths[i], 'desc');
+      }
+
+      var elm = parent.querySelector('[data-sort="'+sortField+'"]');
+      Dom.addClass(elm, 'sort');
+      asc === -1 &&  Dom.addClass(elm, 'desc');
+    },
+  });
+
+  Tpl.Index.$extend({
+    setSortFunc() {
+      const {sorting} = this;
+      return sorting.sortFunc = util.compareByField(sorting.sortField);
+    },
+  });
+});
