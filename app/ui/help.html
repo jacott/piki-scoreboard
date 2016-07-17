@@ -28,6 +28,7 @@
       <ol>
         <li>Click <i>Series</i> in the main menu. If the page is blank, click <i>Series</i> in the main menu again.</li>
         <li>Click on the desired series in the list.</li>
+        <li>Click <i>Individual results</i>.</li>
       </ol>
     </p>
   </template>
@@ -37,11 +38,11 @@
       <ul>
         <li>If you are on a page relating to the event/series, click <i>Team results</i> in the main menu.</li>
         <li>If the event/series name is displayed in the page header (the page header shows the event/series visited last), click that, then click <i>Team results</i> in the main menu.</li>
-        <li>Otherwise, go to your organization's Piki home page by clicking your organization's name at the top left of page, and click <i>Events</i> or <i>Series</i> in the main menu. Click on the desired event/series in the list. This takes you to the <i>Results</i> page for the event/series. Click <i>Team results</i> in the main menu.</li>
+        <li>Otherwise, go to your organization's Piki home page by clicking your organization's name at the top left of page, and click <i>Events</i> or <i>Series</i> in the main menu. Click on the desired event/series in the list. Click <i>Team results</i> in the main menu.</li>
       </ul>
     </p>
     <p>
-      If there is more than one team type, for example club and school, toggle between the team results for each team type by clicking on the ellipsis next to the default team type in the table heading.
+      If there is more than one team type, for example club and school, toggle between the team results for each team type by clicking on the ellipsis next to the team type in the table heading.
     </p>
   </template>
   <template name="SelectCategoriesToPrint">
@@ -132,7 +133,9 @@
     <h1>Piki Help</h1>
 
     <abstract>
-      Results-management system for climbing competitions.
+      <p>
+        Results-management system for climbing competitions.
+      </p>
     </abstract>
 
     <nav>
@@ -143,7 +146,7 @@
     <section name="general-info">
       <h1>General Information</h1>
       <ul>
-        <li>Piki is a results-management system for <a href="https://www.ifsc-climbing.org">IFSC</a>-format climbing competitions. Piki allows some customization for organizations who wish to modify the <i>competition format</i>: administrators can designate the number of rounds in the competition, the quota of competitors for each round, and the number of boulders for each round in a Boulder competition. Piki's <i>scoring system</i> follows the IFSC rules and is not customizable.</li>
+        <li>Piki is a results-management system for <a href="https://www.ifsc-climbing.org">IFSC</a>-format climbing competitions. Piki allows some customization of the <i>competition format</i>: administrators can designate the number of rounds in the competition, the quota of competitors for each round, and the number of boulders for each round in a Boulder competition. Piki's <i>scoring system</i> follows the IFSC rules and is not customizable.</li>
         <li>Piki is in <b>beta</b>:
           <ul>
             <li>New features are being added which may change the way Piki works.</li>
@@ -151,7 +154,7 @@
           </ul>
         </li>
         <li>Piki is developed and tested only for use with the <a href="https://www.google.com/intl/en/chrome/browser/">Google Chrome</a> web browser. Piki may or may not work with other web browsers.</li>
-        <li>The developers intend to release Piki under the <a href="http://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public Licence</a>, making the system available at <a href="https://github.com/">GitHub</a>.</li>
+        <li>The <a href="https://github.com/jacott/piki-scoreboard">Piki code</a> is published under the <a href="http://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public Licence</a>.</li>
       </ul>
     </section>
 
@@ -202,7 +205,7 @@
         <li>Click <i>System setup</i>.</li>
         <li>Select the user's name.</li>
         <li>Edit the user's details and click <i>Save</i>.<br>
-          Or, to delete the user, click <i>Delete</i>, and confirm in the pop-up box.</li>
+          Or, to delete the user, click <i>Delete</i>, and confirm in the popup box.</li>
       </ol>
     </section>
 
@@ -221,7 +224,7 @@
           Add and edit teams for each team type.</li>
       </ol>
       <p>
-        <b>Note:</b> if your organization will be <a href="#upload-registrations">uploading registrations from file</a> then the team name or code ("short name") used here must be the same as the team name or code used in the upload file.
+        If your organization will be <a href="#upload-registrations">uploading registrations from file</a> then the team name or code ("short name") used here must be the same as the team name or code used in the upload file.
       </p>
       <p>
         To designate which team types competitors may represent at a given event,
@@ -389,7 +392,7 @@
       <p>
         To add an existing event to a series:
         <ol>
-          <li><a href="#go-to-edit-event">Go to the <i>Edit event</i> page for the event</a>.</li>
+          <li><a href="#go-to-edit-event">Go to the <i>Edit event</i> page</a> for the event.</li>
           <li>Select the desired series from the dropdown <i>Series</i> menu.</li>
           <li>Click <i>Save</i>.</li>
         </ol>
@@ -441,7 +444,7 @@
             <a href="#comp-format-lead">competition format</a><popup>{{> CompFormatLead}}{{> CompFormatBoulder}}</popup>
           </inlinehelp>
           of any of the competitor categories, and click <i>Save</i> to confirm.<br>
-          Or, to delete the event, click <i>Delete</i>, and confirm in the pop-up box.<br>
+          Or, to delete the event, click <i>Delete</i>, and confirm in the popup box.<br>
           <b>Note:</b> only categories in which there is a competitor registered will show in the list for editing competition format.
         </li>
       </ol>
@@ -474,7 +477,7 @@
           </li>
           <li>On the <i>Registrations</i> page, begin entering the climber’s name in the cell provided.</li>
           <li>Select the climber’s name from the dropdown list.<br>
-            Or, if the climber's name is not in the dropdown list (that is, the climber has not been added to your organization's <i>Climbers</i> list), continue typing the climber's name until <i>Add [climber's name]</i> shows in the dropdown list. Select this and enter the climber's details in the pop-up form. Click <i>Create</i> to confirm the climber's details. This adds the climber to your organization's <i>Climbers</i> list; the climber can now be registered for the event.
+            Or, if the climber's name is not in the dropdown list (that is, the climber has not been added to your organization's <i>Climbers</i> list), continue typing the climber's name until <i>Add [climber's name]</i> shows in the dropdown list. Select this and enter the climber's details in the popup form. Click <i>Create</i> to confirm the climber's details. This adds the climber to your organization's <i>Climbers</i> list; the climber can now be registered for the event.
           </li>
           <li>Enter a competitor number if desired, and select the competitor's categories from the dropdown lists.</li>
           <li>Click <i>Register</i> to confirm registration.</li>
@@ -498,7 +501,8 @@
           for the event.
         </li>
         <li>On the <i>Registrations</i> page, click on the competitor’s name.</li>
-        <li>Change the competitor's registration, or deregister the competitor.</li>
+        <li>Change the competitor's registration, and click <i>Save</i> to confirm.<br>
+            Or deregister the competitor and confirm in the popup box.</li>
       </ol>
     </section>
 
@@ -688,18 +692,6 @@
       </p>
     </section>
 
-    <section name="contact-us">
-      <h1>Contact us</h1>
-      <p>
-        <a href="mailto:piki@getobeya.com?subject=Application%20to%20register%20as%20an%20organization%20on%20Piki&body=Organization%20name:%20%0a%0aOrganization%20website:%20%0a%0aOrganization%20email%20address:%20%0a%0aName%20of%20person%20to%20be%20my%20organization's%20Piki%20admin:%20%0a%0aThe%20email%20address%20that%20person%20wishes%20to%20use%20to%20sign%20in:%20%0a%0aName%20and%20date%20of%20the%20first%20event%20where%20we%20would%20like%20to%20test%20Piki:%20%0a%0aMy%20organization%20_____________________________%20(insert%20organization%20name)%20understands%20and%20accepts%20the%20Disclaimer%20and%20General%20Information%20in%20the%20Help%20on%20the%20Piki%20website.%0a%0aHow%20we%20heard%20about%20Piki:%20%0a%0aAny%20further%20information:%20">Apply to register as an organization</a>. (Please read the <a href="#disclaimer">Disclaimer</a> and <a href="#general-info">General information</a>.)
-      </p>
-      <p>To arrange to be added as a <b>Piki user</b> to manage your organization’s events, please contact your
-        organization administrator.
-      </p>
-      <p>If you have feedback, suggestions, or questions not answered in the Help, please <a href="mailto:piki@getobeya.com?subject=enquiry%20from%20website">email Piki</a>. We have a long list of improvements we'd like to make to Piki; it's very helpful to hear from Piki's users which improvements and new features would be most useful to you.
-      </p>
-    </section>
-
     <section name="trouble-shooting">
       <h1>Trouble shooting</h1>
 
@@ -736,8 +728,8 @@
         <p>The competitor attempted the boulder and did not achieve the bonus.
         </p>
 
-        <h1>I don't understand how the rankings are calculated</h1>
-        <p>Piki calculates rankings as set out in the <a href="https://www.ifsc-climbing.org">IFSC</a> rules.
+        <h1>I don't understand how the rankings or series results or team results are calculated</h1>
+        <p>Piki calculates rankings, series results and team results as set out in the <a href="https://www.ifsc-climbing.org">IFSC</a> rules.
         </p>
 
         <h1>I can't select all of the categories I want to print</h1>
@@ -755,6 +747,18 @@
         </p>
 
       </section>
+    </section>
+
+    <section name="contact-us">
+      <h1>Contact us</h1>
+      <p>
+        <a href="mailto:piki@getobeya.com?subject=Application%20to%20register%20as%20an%20organization%20on%20Piki&body=Organization%20name:%20%0a%0aOrganization%20website:%20%0a%0aOrganization%20email%20address:%20%0a%0aName%20of%20person%20to%20be%20my%20organization's%20Piki%20admin:%20%0a%0aThe%20email%20address%20that%20person%20wishes%20to%20use%20to%20sign%20in:%20%0a%0aName%20and%20date%20of%20the%20first%20event%20where%20we%20would%20like%20to%20test%20Piki:%20%0a%0aMy%20organization%20_____________________________%20(insert%20organization%20name)%20understands%20and%20accepts%20the%20Disclaimer%20and%20General%20Information%20in%20the%20Help%20on%20the%20Piki%20website.%0a%0aHow%20we%20heard%20about%20Piki:%20%0a%0aAny%20further%20information:%20">Apply to register as an organization</a>. (Please read the <a href="#disclaimer">Disclaimer</a> and <a href="#general-info">General information</a>.)
+      </p>
+      <p>To arrange to be added as a <b>Piki user</b> to manage your organization’s events, please contact your
+        organization administrator.
+      </p>
+      <p>If you have feedback, suggestions, or questions not answered in the Help, please <a href="mailto:piki@getobeya.com?subject=enquiry%20from%20website">email Piki</a>. We have a long list of improvements we'd like to make to Piki; it's very helpful to hear from Piki's users which improvements and new features would be most useful to you.
+      </p>
     </section>
 
   </div>
