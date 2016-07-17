@@ -21,6 +21,7 @@ isClient && define(function (require, exports, module) {
       TeamHelper.teamType_id = v.tt[0]._id;
       v.teams1 = TH.Factory.createList(2, 'createTeam', function (index, options) {
         options.teamType_id = v.tt[0]._id;
+        options.name = 'Team '+ (5 - index);
       });
 
       v.teams2 = TH.Factory.createList(2, 'createTeam', function (index, options) {
@@ -234,7 +235,15 @@ isClient && define(function (require, exports, module) {
               assert.dom('.name', v.tt[0].name);
 
               assert.dom('button.select:not(.none)', v.teams1[0].name);
-              TH.selectMenu('button.select', TH.match.field('id', null));
+              TH.selectMenu('button.select', TH.match.field('id', null), function () {
+                assert.dom(this.parentNode, function () {
+                  assert.dom('li:first-child>i', 'none');
+                  assert.dom('li:nth-child(2)', 'Team 4');
+                  assert.dom('li:nth-last-child(2)', 'Team 5');
+                  assert.dom('li:last-child', 'add new team');
+                });
+                TH.click(this);
+              });
               assert.dom('button.select.none', 'Select');
 
               TH.selectMenu('button.select', TH.match.field('id', '$new'));

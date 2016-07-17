@@ -278,6 +278,7 @@ define(function(require, exports, module) {
     teamTypes(callback) {
       callback.render({
         model: TeamType,
+        sort: util.compareByName,
       });
     },
   });
@@ -300,7 +301,8 @@ define(function(require, exports, module) {
 
       let ctx = $.ctx;
       let competitor = Teams.$data();
-      let list = Team.where('teamType_id', $.ctx.data._id).map(team => [team._id, team.name]);
+      let list = Team.where('teamType_id', $.ctx.data._id).sort('name').map(team => [team._id, team.name]);
+
       list = [{id: null, name: Dom.h({i:'none'})}, ...list, {id: '$new', name: Dom.h({i: 'add new team'})}];
       SelectMenu.popup(this, {
         list,
