@@ -83,7 +83,7 @@ define(function (require, exports, module) {
       "test closing"() {
         var event = TH.Factory.buildEvent();
         event.attributes = event.changes;
-        event.changes = {closed: true};
+        event.changes = {closed: true, name: 'new Name'};
 
         refute.accessDenied(function () {
           event.authorize(v.user._id);

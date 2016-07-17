@@ -552,9 +552,9 @@
       "resolved": "https://registry.npmjs.org/json5/-/json5-0.4.0.tgz"
     },
     "koru": {
-      "version": "0.5.8",
-      "from": "koru@>=0.5.8 <0.6.0",
-      "resolved": "https://registry.npmjs.org/koru/-/koru-0.5.8.tgz"
+      "version": "0.5.9",
+      "from": "koru@>=0.5.9 <0.6.0",
+      "resolved": "https://registry.npmjs.org/koru/-/koru-0.5.9.tgz"
     },
     "less": {
       "version": "2.7.1",

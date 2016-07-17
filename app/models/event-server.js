@@ -32,9 +32,7 @@ define(function(require, exports, module) {
 
         Val.assertDocChanges(this, FIELD_SPEC, NEW_FIELD_SPEC);
 
-        if (changes.hasOwnProperty('closed'))
-          Val.allowAccessIf(Object.keys(changes).length === 1);
-        else
+        if (! changes.hasOwnProperty('closed'))
           Val.allowAccessIf(! this.closed);
 
         this.changes.series_id && Val.allowAccessIf(this.series && user.canAdminister(this.series));
