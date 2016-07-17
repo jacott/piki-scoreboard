@@ -1,0 +1,12 @@
+{
+  "name": "Piki - Sport Climbing Scoreboard",
+  "short_name": "Piki",
+  "theme_color": "#000000",
+  "icons": [{"src": "/images/icon.png",
+             "type": "image/png",
+             "sizes": "500x500"}],
+  "scope": "./",
+  "start_url": "/",
+  "background_color": "#0ff",
+  "display": "standalone"
+}
