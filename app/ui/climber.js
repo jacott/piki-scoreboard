@@ -32,7 +32,7 @@ define(function(require, exports, module) {
   });
 
   Index.$events({
-    'click [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent,
+    'click [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent(ctx => TeamType.query.fetch()),
 
     'click .climbers tr': function (event) {
       if (! Dom.hasClass(document.body, 'aAccess')) return;

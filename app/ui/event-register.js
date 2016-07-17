@@ -90,7 +90,7 @@ define(function(require, exports, module) {
       Route.replacePath(Tpl);
     },
 
-    'click [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent,
+    'click [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent(teamTypeList),
 
     'click th': function (event) {
       Dom.stopEvent();
@@ -105,6 +105,11 @@ define(function(require, exports, module) {
       $.ctx.updateAllTags();
     },
   });
+
+  function teamTypeList(ctx) {
+    return TeamType.where({_id: ctx.data.teamType_ids}).fetch();
+  }
+
 
   function setSortFunc() {
     sortClimber = true;
@@ -278,6 +283,7 @@ define(function(require, exports, module) {
     teamTypes(callback) {
       callback.render({
         model: TeamType,
+        params: {_id: this.event.teamType_ids},
         sort: util.compareByName,
       });
     },

@@ -15,8 +15,8 @@ isClient && define(function (require, exports, module) {
       test = this;
       v = {};
       v.org =  TH.Factory.createOrg();
-      v.tt = TH.Factory.createList(2, 'createTeamType', (index, options) => {
-        options.name = index ? 'School' : 'Club';
+      v.tt = TH.Factory.createList(3, 'createTeamType', (index, options) => {
+        options.name = ['Club', 'School', 'Country'][index];
       });
       TeamHelper.teamType_id = v.tt[0]._id;
       v.teams1 = TH.Factory.createList(2, 'createTeam', function (index, options) {
@@ -87,11 +87,13 @@ isClient && define(function (require, exports, module) {
             assert.dom('button.select', v.teams1[0].name);
           });
 
+          refute.dom('span.name', 'Country');
+
           assert.dom('label:last-child', function () {
             assert.dom('.name', v.tt[1].name);
 
             assert.dom('button.select.none', 'Select');
-            TH.selectMenu('button.select', TH.match.field('id', v.teams2[1]._id));
+            TH.selectMenu('button.select', v.teams2[1]._id);
             assert.dom('button.select:not(.none)', v.teams2[1].name);
           });
         });
@@ -100,15 +102,15 @@ isClient && define(function (require, exports, module) {
           assert.dom('h1', {count: 1});
           assert.dom('label .name', {text: '1 Youth Lead', parent: function () {
             assert.dom('button.select.category.none', '---');
-            TH.selectMenu('button.select', TH.match.field('_id', v.u16._id));
+            TH.selectMenu('button.select', v.u16._id);
             TH.selectMenu('button.select', TH.match.field('_id', null));
             assert.dom('button.select.category.none', '---');
-            TH.selectMenu('button.select', TH.match.field('_id', v.u18._id));
+            TH.selectMenu('button.select', v.u18._id);
             assert.dom('button.select.category:not(.none)', v.u18.name);
           }});
 
           assert.dom('label .name', {text: '2 Open Lead', parent: function () {
-            TH.selectMenu('button.select', TH.match.field('_id', v.open._id));
+            TH.selectMenu('button.select', v.open._id);
             assert.dom('button.select.category:not(.none)', v.open.name);
           }});
 
@@ -134,6 +136,12 @@ isClient && define(function (require, exports, module) {
 
         assert.dom('table>thead', function () {
           assert.dom('th[data-sort=team]', 'Club');
+          TH.selectMenu('th[data-sort=team]>[name=selectTeamType]', TH.match.field('name', 'School'), function () {
+            assert.dom(this.parentNode, function () {
+              assert.dom('li', {count: 2});
+              assert.dom('li:first-child', 'Club');
+            });
+          });
         });
 
         assert.dom('table td', {text: 'brendon', parent: function () {
@@ -246,7 +254,7 @@ isClient && define(function (require, exports, module) {
               });
               assert.dom('button.select.none', 'Select');
 
-              TH.selectMenu('button.select', TH.match.field('id', '$new'));
+              TH.selectMenu('button.select', '$new');
             });
           });
         });
@@ -254,7 +262,7 @@ isClient && define(function (require, exports, module) {
           TH.click('[name=cancel]');
         });
         refute.dom('#AddTeam');
-        TH.selectMenu('.Teams label:first-child button.select', TH.match.field('id', '$new'));
+        TH.selectMenu('.Teams label:first-child button.select', '$new');
         assert.dom('#AddTeam', function () {
           TH.input('[name=name]', 'Dynomites Wellington');
           TH.input('[name=shortName]', 'Wgtn');

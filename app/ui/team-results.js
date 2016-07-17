@@ -34,8 +34,12 @@ define(function(require, exports, module) {
   });
 
   Tpl.$events({
-    'click [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent,
+    'click [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent(teamTypeList),
   });
+
+  function teamTypeList(ctx) {
+    return TeamType.where({_id: ctx.data.teamType_ids}).fetch();
+  }
 
   return Tpl;
 });

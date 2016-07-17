@@ -2,6 +2,7 @@ define(function(require, exports, module) {
   const Dom        = require('koru/dom');
   const SelectMenu = require('koru/ui/select-menu');
   const util       = require('koru/util');
+  const Series     = require('models/series');
   const TeamType   = require('models/team-type');
 
   const Tpl = Dom.newTemplate(module, require('koru/html!./team-helper'));
@@ -22,19 +23,38 @@ define(function(require, exports, module) {
       teamType_id = value;
     },
 
-    chooseTeamTypeEvent(event) {
-      Dom.stopEvent();
-      let ctx = $.ctx;
-      let list = TeamType.query.fetch();
-      SelectMenu.popup(this, {
-        list,
-        onSelect(elm) {
-          let id = $.data(elm)._id;
-          exports.teamType_id = id;
-          ctx.updateAllTags();
-          return true;
-        }
-      });
+    setSeriesTeamType(series, value) {
+      series = Series.toDoc(series);
+      value = TeamType.toId(value);
+
+      const {teamType_ids} = series;
+
+      if (value && teamType_ids && teamType_ids.indexOf(value) !== -1)
+        return teamType_id = value;
+
+      if (teamType_ids.indexOf(teamType_id) !== -1)
+        return teamType_id;
+
+      const tt = TeamType.where({_id: teamType_ids}).sort('default', -1).fetchOne();
+      if (tt)
+        return teamType_id = tt._id;
+    },
+
+    chooseTeamTypeEvent(listBuilder) {
+      return function () {
+        Dom.stopEvent();
+        let ctx = $.ctx;
+
+        SelectMenu.popup(this, {
+          list: listBuilder(ctx).sort(util.compareByName),
+          onSelect(elm) {
+            let id = $.data(elm)._id;
+            exports.teamType_id = id;
+            ctx.updateAllTags();
+            return true;
+          }
+        });
+      };
     },
 
     teamTD() {

@@ -22,6 +22,7 @@ isClient && define(function (require, exports, module) {
       v.team3 = TH.Factory.createTeam({_id: 'team3'});
       TeamHelper.teamType_id = 'tt1';
       v.event = TH.Factory.createEvent({teamType_ids: ['tt1', 'tt2']});
+      v.tt3 = TH.Factory.createTeamType({_id: 'tt3'});
 
       v.eventSub = test.stub(App, 'subscribe').withArgs('Event').returns({stop: v.stop = test.stub()});
       v.results = {tt1: {team1: 260, team2: 300}, tt2: {team3: 160}};
@@ -29,6 +30,7 @@ isClient && define(function (require, exports, module) {
     },
 
     tearDown() {
+      TeamHelper.teamType_id = null;
       TH.tearDown();
       v = null;
     },
@@ -58,7 +60,13 @@ isClient && define(function (require, exports, module) {
           });
         });
 
-        TH.selectMenu('[name=selectTeamType]', 'tt2');
+        TH.selectMenu('[name=selectTeamType]', 'tt2', function () {
+          assert.dom(this.parentNode, function () {
+            assert.dom('li', {count: 2});
+            assert.dom('li', v.tt1.name);
+          });
+          TH.click(this);
+        });
 
         assert.dom('th.name>span', v.tt2.name);
 

@@ -228,6 +228,8 @@ isClient && define(function (require, exports, module) {
       TeamHelper.teamType_id = tt2._id;
       const teams = TH.Factory.createList(3, 'createTeam',
                                           (index, options) => options._id = 'team'+index);
+      const tt3 = TH.Factory.createTeamType({_id: 'tt3'});
+      v.series.$update('teamType_ids', ['tt1', 'tt2']);
       v.results = [{
         event_id: 'ev1',
         scores: {tt2: {team1: 900, team0: 400}}
@@ -238,7 +240,9 @@ isClient && define(function (require, exports, module) {
 
       const rpc = test.stub(session, 'rpc').withArgs('Ranking.teamResults', v.series._id);
 
+      test.spy(TeamHelper, 'setSeriesTeamType');
       Route.gotoPage(sut, {seriesId: v.series._id});
+      assert.calledWith(TeamHelper.setSeriesTeamType, TH.matchModel(v.series));
 
       assert.dom('#Series', function () {
         assert.dom('button.selected.tab[name=TeamResults]', 'Team Results');
@@ -271,7 +275,13 @@ isClient && define(function (require, exports, module) {
             });
           });
 
-          TH.selectMenu('[name=selectTeamType]', 'tt1');
+          TH.selectMenu('[name=selectTeamType]', 'tt1', function () {
+            assert.dom(this.parentNode, function () {
+              assert.dom('li', {count: 2});
+              assert.dom('li+li', tt2.name);
+            });
+            TH.click(this);
+          });
 
           assert.dom('th.name>span', tt1.name);
 

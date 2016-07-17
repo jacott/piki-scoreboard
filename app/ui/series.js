@@ -11,6 +11,7 @@ define(function(require, exports, module) {
   const Event       = require('models/event');
   const Series      = require('models/series');
   const Team        = require('models/team');
+  const TeamType    = require('models/team-type');
   const PrintHelper = require('ui/print-helper');
   const TeamHelper  = require('ui/team-helper');
 
@@ -333,14 +334,19 @@ define(function(require, exports, module) {
   });
 
   Tpl.TeamResults.$events({
-    'click [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent,
+    'click [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent(teamTypeList),
   });
+
+  function teamTypeList(ctx) {
+    return TeamType.where({_id: ctx.data.series.teamType_ids}).fetch();
+  }
 
 
   Tpl.TeamResults.$extend({
     $created(ctx, elm) {
       const series = ctx.data;
       ctx.data = {};
+      TeamHelper.setSeriesTeamType(series);
 
       const parent = document.querySelector('#Series .tabBody');
       parent.insertBefore(elm, parent.firstChild);
@@ -377,7 +383,7 @@ define(function(require, exports, module) {
         teams.sort(util.compareByField('total', -1));
         events.sort(util.compareByField('date', -1));
 
-        ctx.updateAllTags({events, teams});
+        ctx.updateAllTags({events, teams, series});
       });
     },
 
