@@ -22,6 +22,28 @@
       </ul>
     </p>
   </template>
+  <template name="NavSeriesResults">
+    <p>
+      To go to <b><i>Series results</i></b>:
+      <ol>
+        <li>Click <i>Series</i> in the main menu. If the page is blank, click <i>Series</i> in the main menu again.</li>
+        <li>Click on the desired series in the list.</li>
+      </ol>
+    </p>
+  </template>
+  <template name="NavTeamResults">
+    <p>
+      To go to <b><i>Team results</i></b> for a particular event or series:
+      <ul>
+        <li>If you are on a page relating to the event/series, click <i>Team results</i> in the main menu.</li>
+        <li>If the event/series name is displayed in the page header (the page header shows the event/series visited last), click that, then click <i>Team results</i> in the main menu.</li>
+        <li>Otherwise, go to your organization's Piki home page by clicking your organization's name at the top left of page, and click <i>Events</i> or <i>Series</i> in the main menu. Click on the desired event/series in the list. This takes you to the <i>Results</i> page for the event/series. Click <i>Team results</i> in the main menu.</li>
+      </ul>
+    </p>
+    <p>
+      If there is more than one team type, for example club and school, toggle between the team results for each team type by clicking on the ellipsis next to the default team type in the table heading.
+    </p>
+  </template>
   <template name="SelectCategoriesToPrint">
     Only categories with the same competition format (the same number of qualification routes/rounds and the same number of final rounds) can be selected together; categories with different competition formats must be selected and printed separately.
   </template>
@@ -131,13 +153,6 @@
         <li>Piki is developed and tested only for use with the <a href="https://www.google.com/intl/en/chrome/browser/">Google Chrome</a> web browser. Piki may or may not work with other web browsers.</li>
         <li>The developers intend to release Piki under the <a href="http://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public Licence</a>, making the system available at <a href="https://github.com/">GitHub</a>.</li>
       </ul>
-    </section>
-
-    <section name="view-and-print">
-      <h1>Print judging sheets</h1>
-        <p>
-          Printed start lists {{> Judgingsheets}}
-        </p>
     </section>
 
     <section name="org-reg">
@@ -314,12 +329,12 @@
       <p>
         To set the competition format for a category:<br>
         <ul>
-          <li>For an existing event,
+          <li>For an event in which there are already competitors registered in the category,
             <inlinehelp>
               <a href="#go-to-edit-event">go to the <i>Edit event</i> page</a><popup>{{> NavGoToEditEvent}}</popup>
             </inlinehelp>
             for that event, and enter a competition format code as detailed below.</li>
-          <li>For new events,
+          <li>For new events and events in which there are not yet competitors registered in the category,
             <inlinehelp>
               <a href="#go-to-comp-cat">go to <i>Competitor categories</i></a><popup>{{> NavGoToCompCat}}</popup>
             </inlinehelp>, select a competitor category, and enter a competition format code as detailed below.
@@ -330,6 +345,64 @@
         {{> CompFormatLead}}
         <span name="comp-format-boulder">
           {{> CompFormatBoulder}}
+    </section>
+
+    <section name="series-add">
+      <h1>Add series</h1>
+      <p>
+        Organization admins only.
+      </p>
+      <p>
+        You must be signed in.
+      </p>
+      <ol>
+        <li>Go to your organization's Piki home page by clicking your organization's name at the top left of the page.</li>
+        <li>Click <i>Series</i> in the main menu.</li>
+        <li>Click <i>Add new series</i>.</li>
+        <li>Add series.</li>
+      </ol>
+    </section>
+
+    <section name="series-edit">
+      <h1>Edit series</h1>
+      <p>
+        Organization admins only.
+      </p>
+      <p>
+        You must be signed in.
+      </p>
+      <ol>
+        <li><a href="#go-to-series-results">Go to the series</a>.</li>
+        <li>Click <i>Edit</i> in the main menu.</li>
+        <li>Edit the series' details.</li>
+      </ol>
+    </section>
+
+    <section name="series-add-event">
+      <h1>Add an event to a series</h1>
+      <p>
+        Organization admins only.
+      </p>
+      <p>
+        You must be signed in.
+      </p>
+      <p>
+        To add an existing event to a series:
+        <ol>
+          <li><a href="#go-to-edit-event">Go to the <i>Edit event</i> page for the event</a>.</li>
+          <li>Select the desired series from the dropdown <i>Series</i> menu.</li>
+          <li>Click <i>Save</i>.</li>
+        </ol>
+      </p>
+      <p>
+        To create a new event and add it to a series:
+        <ol>
+          <li><a href="#go-to-series-results">Go to the series</a>.</li>
+          <li>Click <i>Events</i> in the main menu.</li>
+          <li>Click the <i>Add new event</i> button.</li>
+          <li>Add event.</li>
+        </ol>
+      </p>
     </section>
 
     <section name="event-add">
@@ -454,11 +527,16 @@
 
     </section>
 
+    <section name="view-and-print">
+      <h1>Print judging sheets</h1>
+        <p>
+          Printed <a href="#go-to-results-start-lists">start lists</a> {{> Judgingsheets}}
+        </p>
+    </section>
+
     <section name="results">
+
       <h1>Enter and edit results</h1>
-      <p>
-        <b>Note: </b>printed <a href="#view-and-print">start lists</a> {{> Judgingsheets}}
-      </p>
       <p>
         Organization admins and judges only.
       </p>
@@ -556,6 +634,12 @@
       <span name="go-to-results-start-lists">
         {{> NavResultsStartLists}}
       </span>
+      <span name="go-to-team-results">
+        {{> NavTeamResults}}
+      </span>
+      <span name="go-to-series-results">
+        {{> NavSeriesResults}}
+      </span>
       <span name="user-sign-in">
         <p>To <b><i>sign in</i></b> as a user:</p>
         <ul>
@@ -641,7 +725,7 @@
 
         <h1>Where are the judging sheets for entering scores by hand during climbing?</h1>
         <p>
-          Printed <a href="#view-and-print">start lists</a> {{> Judgingsheets}}
+          Printed <a href="#go-to-results-start-lists">start lists</a> {{> Judgingsheets}}
         </p>
 
         <h1>What does a score of <i>DNC</i> or <i>nc</i> mean?</h1>
