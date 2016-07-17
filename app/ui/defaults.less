@@ -528,11 +528,10 @@ ol.ui-ul, ul.ui-ul {
   }
   .tabBody {
     background-color: #f6f6f6;
-    padding: 2px 4px;
-
-    nav {
-      .flexFlow(row);
-      justify-content: flex-end;
+    padding: 8px;
+    >nav:first-child,
+    >:first-child>nav:first-child {
+      margin-bottom: 10px;
     }
   }
 }
