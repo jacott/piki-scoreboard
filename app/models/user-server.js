@@ -4,7 +4,7 @@ define(function(require, exports, module) {
   const UserAccount = require('koru/user-account');
   const util        = require('koru/util');
 
-  return function (model) {
+  return function (User) {
     const FIELD_SPEC = {
       name: 'string',
       email: 'string',
@@ -14,33 +14,33 @@ define(function(require, exports, module) {
     };
 
     require(['./change-log'], function (ChangeLog) {
-      ChangeLog.logChanges(model);
+      ChangeLog.logChanges(User);
     });
 
-    model.registerObserveField('org_id');
+    User.registerObserveField('org_id');
 
-    model.onChange(function (doc, was) {
+    User.onChange(function (doc, was) {
       if (was === null) {
         UserAccount.createUserLogin({email: doc.email, userId: doc._id});
         UserAccount.sendResetPasswordEmail(doc);
       }
     });
 
-    util.extend(model, {
-      guestUser: function () {
-        return model.findById('guest') || (
-          model.docs.insert({_id: 'guest', role: 'g'}),
-          model.findById('guest'));
+    util.extend(User, {
+      guestUser() {
+        return User.findById('guest') || (
+          User.docs.insert({_id: 'guest', role: 'g'}),
+          User.findById('guest'));
       },
     });
 
-    util.extend(model.prototype, {
-      authorize: function (userId) {
-        var role = model.ROLE;
+    util.extend(User.prototype, {
+      authorize(userId) {
+        var role = User.ROLE;
 
         Val.assertDocChanges(this, FIELD_SPEC);
 
-        var authUser = model.query.where({
+        var authUser = User.query.where({
           _id: userId,
           role: {$in: [role.superUser, role.admin]},
         }).fetchOne();
@@ -64,7 +64,7 @@ define(function(require, exports, module) {
 
       email = email.addresses[0].toLowerCase();
 
-      var user = model.findBy('email', email);
+      var user = User.findBy('email', email);
       if (user) {
         var accUser = UserAccount.model.findBy('userId', user._id);
         accUser && UserAccount.sendResetPasswordEmail(user);

@@ -1,22 +1,22 @@
 define(function (require, exports, module) {
   var test, v;
-  var TH = require('test-helper');
-  var util = require('koru/util');
-  var User = require('./user');
-  var koru = require('koru');
+  const koru = require('koru');
+  const util = require('koru/util');
+  const TH   = require('test-helper');
+  const User = require('./user');
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.clearDB();
       v = null;
     },
 
-    "test org_id required": function () {
+    "test org_id required"() {
       TH.loginAs(TH.Factory.createUser('su'));
       var user = TH.Factory.buildUser({role: 's', org_id: null});
 
@@ -26,7 +26,7 @@ define(function (require, exports, module) {
       refute(user.$isValid());
     },
 
-    "test isSuperUser": function () {
+    "test isSuperUser"() {
       var user = TH.Factory.buildUser('su');
 
       assert.isFalse(user.isSuperUser());
@@ -38,7 +38,7 @@ define(function (require, exports, module) {
       assert.isFalse(user.isSuperUser());
     },
 
-    "test canAdminister": function () {
+    "test canAdminister"() {
       var doc = new User({org_id: '123'});
       doc.attributes.role = User.ROLE.superUser;
 
@@ -55,10 +55,12 @@ define(function (require, exports, module) {
       doc.attributes.role = User.ROLE.judge;
       doc.changes.role = User.ROLE.superUser;
 
+      assert.same(doc.safeRole, User.ROLE.judge);
+
       refute(doc.canAdminister());
     },
 
-    "test fetchAdminister": function () {
+    "test fetchAdminister"() {
       test.stub(koru, 'info');
       var user = TH.Factory.createUser();
 
@@ -80,19 +82,19 @@ define(function (require, exports, module) {
       assert.same(User.fetchAdminister(user._id)._id, user._id);
     },
 
-    "test emailWithName": function () {
+    "test emailWithName"() {
       var user = TH.Factory.buildUser();
       assert.same(user.emailWithName(), 'fn user 1 <email-user.1@test.co>');
 
     },
-    'test creation': function () {
+    'test creation'() {
       var user=TH.Factory.createUser();
       var us = User.findById(user._id);
 
       assert(us);
     },
 
-    'test standard validators': function () {
+    'test standard validators'() {
       var validators = User._fieldValidators;
 
       assert.validators(validators.name, {

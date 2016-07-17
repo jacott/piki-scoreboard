@@ -1,10 +1,11 @@
 define(function(require, exports, module) {
-  var Val = require('koru/model/validation');
-  var util = require('koru/util');
-  var koru = require('koru');
-  var Org = require('./org');
+  const koru        = require('koru');
+  const {BaseModel} = require('koru/model');
+  const Val         = require('koru/model/validation');
+  const util        = require('koru/util');
+  const Org         = require('./org');
 
-  var ROLE = {
+  const ROLE = {
     superUser: 's',
     spectator: 'p',
     climber: 'c',
@@ -12,13 +13,13 @@ define(function(require, exports, module) {
     admin: 'a',
   };
 
-  var model = require('model').define(module, {
-    accessClasses: function (orgId) {
+  class User extends BaseModel {
+    accessClasses(orgId) {
       if (! this.isSuperUser() && this.org_id !== orgId)
         return "readOnly";
 
-      var classes = "";
-      switch(this.role) {
+      let classes = "";
+      switch(this.safeRole) {
       case 's':
         classes += "sAccess ";
       case 'a':
@@ -28,27 +29,32 @@ define(function(require, exports, module) {
       }
 
       return classes + " p";
-    },
-    emailWithName: function () {
+    }
+
+    emailWithName() {
       return this.name.replace('/<>/','')+" <"+this.email+">";
-    },
+    }
 
-    isSuperUser: function () {
-      return this.attributes.role === ROLE.superUser;
-    },
+    get safeRole() {
+      return this.attributes.role;
+    }
 
-    canAdminister: function (doc) {
-      switch(this.attributes.role) {
+    isSuperUser() {
+      return this.safeRole === ROLE.superUser;
+    }
+
+    canAdminister(doc) {
+      switch(this.safeRole) {
       case ROLE.superUser:
         return true;
       case ROLE.admin:
         return ! doc || (doc.attributes.org_id || doc.org_id) === this.org_id;
       }
       return false;
-    },
+    }
 
-    validate: function () {
-      var me = model.me();
+    validate() {
+      var me = User.me();
       if (me && me.isSuperUser()) return;
       if (!me) {
         Val.addError(this, '_id', 'not_allowed');
@@ -59,34 +65,33 @@ define(function(require, exports, module) {
       if (('org_id' in this.changes) &&
           (! this.$isNewRecord() || this.org_id !== me.org_id))
         Val.addError(this, 'org_id', 'is_invalid');
-    },
-  });
+    }
+    static me() {
+      return koru.userId() && User.findById(koru.userId());
+    }
 
-  util.extend(model, {
-    me: function () {
-      return koru.userId() && model.findById(koru.userId());
-    },
-
-    fetchAdminister: function (userId, doc) {
-      var user = model.toDoc(userId);
+    static fetchAdminister(userId, doc) {
+      var user = User.toDoc(userId);
       Val.allowAccessIf(user && user.canAdminister(doc));
       return user;
+    }
+  }
+
+  User.ROLE = ROLE;
+
+  module.exports = User.define({
+    module,
+    fields: {
+      name: {type:  'text', trim: true, required: true, maxLength: 200},
+      email: {type:  'text', trim: true, required: true, maxLength: 200,
+              inclusion: {allowBlank: true, matches: util.EMAIL_RE },  normalize: 'downcase' , unique: true},
+      initials: {type: 'text', trim: true, required: true, maxLength: 3},
+      org_id: {type: 'belongs_to', required() {return this.role !== ROLE.superUser}},
+      role: {type: 'text', inclusion: {in: util.values(ROLE)}},
     },
   });
 
+  require('koru/env!./user')(User);
 
-  model.ROLE = ROLE;
-
-  model.defineFields({
-    name: {type:  'text', trim: true, required: true, maxLength: 200},
-    email: {type:  'text', trim: true, required: true, maxLength: 200,
-            inclusion: {allowBlank: true, matches: util.EMAIL_RE },  normalize: 'downcase' , unique: true},
-    initials: {type: 'text', trim: true, required: true, maxLength: 3},
-    org_id: {type: 'belongs_to', required: function () {return this.role !== ROLE.superUser}},
-    role: {type: 'text', inclusion: {in: util.values(ROLE)}},
-  });
-
-  require('koru/env!./user')(model);
-
-  return model;
+  return User;
 });

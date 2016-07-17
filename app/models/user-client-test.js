@@ -1,21 +1,21 @@
 define(function (require, exports, module) {
   var test, v;
-  var TH = require('test-helper');
-  var session = require('koru/session');
-  var User = require('./user');
+  const session = require('koru/session');
+  const TH      = require('test-helper');
+  const User    = require('./user');
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.clearDB();
       v = null;
     },
 
-    "test forgotPassword": function () {
+    "test forgotPassword"() {
       test.stub(session, 'rpc');
 
       User.forgotPassword('email@address', v.stub = test.stub());

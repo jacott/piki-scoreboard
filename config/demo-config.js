@@ -37,6 +37,7 @@ exports.server = function (cfg) {
 
 exports.client = function (cfg) {
   cfg.set('requirejs.config.koru/main.urlRoot', urlRoot);
+  cfg.set('requirejs.config.models/user-client.pretendRole', process.env['PIKI_ROLE']);
 
   cfg.merge('requirejs.config.client.extraRequires', [
     'demo-client',
