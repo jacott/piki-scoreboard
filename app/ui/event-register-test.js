@@ -213,7 +213,18 @@ isClient && define(function (require, exports, module) {
         assert.dom('#Register td', {text: v.climbers[1].name, parent: function () {
           TH.click(this);
         }});
+      },
 
+      "test editClimber"() {
+        assert.dom('#Register form.edit', function () {
+          TH.click('[name=editClimber]');
+        });
+
+        assert.dom('#Climber', function () {
+          assert.dom('#EditClimber', function () {
+            assert.dom('[name=name]', {value: v.climbers[1].name});
+          });
+        });
       },
 
       "test change team"() {

@@ -270,7 +270,7 @@ define(function(require, exports, module) {
     'click [name=editClimber]': function (event) {
       Dom.stopEvent();
 
-      Route.gotoPage(Dom.Climber.Edit, {climberId: $.ctx.data.climber._id});
+      Route.gotoPage(Dom.Climber.Edit, {modelId: $.ctx.data.climber._id});
     },
   });
 
