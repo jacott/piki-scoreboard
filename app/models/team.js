@@ -18,7 +18,7 @@ define(function(require, exports, module) {
     module,
     fields: {
       name: {type:  'text', trim: true, required: true, maxLength: 200, unique: {scope: 'org_id'}},
-      shortName: {type:  'text', trim: true, required: true, maxLength: 5, unique: {scope: 'org_id'}},
+      shortName: {type:  'text', trim: true, required: true, maxLength: 5, unique: {scope: ['org_id', 'teamType_id']}},
       teamType_id: {type: 'belongs_to', required: true},
       org_id: 'belongs_to',
     },
