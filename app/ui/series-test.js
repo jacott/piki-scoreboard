@@ -24,13 +24,14 @@ isClient && define(function (require, exports, module) {
     },
 
     tearDown() {
+      TeamHelper.teamType_id = null;
       EventTpl.stop();
       TH.tearDown();
       v = null;
     },
 
     "test edit series"() {
-      Route.gotoPage(sut, {seriesId: v.series._id});
+      Route.gotoPage(sut.Events, {seriesId: v.series._id});
       assert.dom('#Series', function () {
         assert.dom('.tabbed.list', function () {
           assert.dom('.tabNames', function () {
@@ -52,7 +53,7 @@ isClient && define(function (require, exports, module) {
     "test add event"() {
       const tt1 = TH.Factory.createTeamType({_id: 'tt1'});
       v.series.$update({teamType_ids: ['tt1']});
-      Route.gotoPage(sut, {seriesId: v.series._id});
+      Route.gotoPage(sut.Events, {seriesId: v.series._id});
       assert.dom('#Series', function () {
         TH.click('[name=addEvent]');
       });
@@ -74,7 +75,7 @@ isClient && define(function (require, exports, module) {
     },
 
     "test events list"() {
-      Route.gotoPage(sut, {seriesId: v.series._id});
+      Route.gotoPage(sut.Events, {seriesId: v.series._id});
       assert.dom('#Series', function () {
         assert.dom('.tabbed.list', function () {
           assert.dom('.tabNames', function () {
@@ -99,7 +100,7 @@ isClient && define(function (require, exports, module) {
     },
 
     "test switching tabs"() {
-      Route.gotoPage(sut, {seriesId: v.series._id});
+      Route.gotoPage(sut.Events, {seriesId: v.series._id});
       assert.same(Route.currentHref, `/#SN1/series/${v.series._id}/events`);
       assert.dom('#Series', function () {
         assert.dom('.tabbed.list .tabNames', function () {
@@ -237,7 +238,7 @@ isClient && define(function (require, exports, module) {
 
       const rpc = test.stub(session, 'rpc').withArgs('Ranking.teamResults', v.series._id);
 
-      Route.gotoPage(sut.TeamResults, {seriesId: v.series._id});
+      Route.gotoPage(sut, {seriesId: v.series._id});
 
       assert.dom('#Series', function () {
         assert.dom('button.selected.tab[name=TeamResults]', 'Team Results');
@@ -283,6 +284,10 @@ isClient && define(function (require, exports, module) {
               assert.dom('td.event+td.event', '');
             });
           });
+
+          test.stub(Route, 'gotoPage');
+          TH.click('thead>tr>th.event', v.ev2.name);
+          assert.calledWith(Route.gotoPage, Dom.Event.Show, {eventId: v.ev2._id});
         });
       });
     },

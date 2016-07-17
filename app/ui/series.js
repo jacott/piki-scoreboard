@@ -31,10 +31,7 @@ define(function(require, exports, module) {
     return Series.findById(pageRoute.seriesId);
   }
 
-  base.addTemplate(module, Tpl.Events, Object.create(commonPageOptions, {
-    defaultPage: {value: true},
-  }));
-
+  base.addTemplate(module, Tpl.Events, Object.create(commonPageOptions));
   base.addTemplate(module, Tpl.Edit, Object.create(commonPageOptions));
 
   function tabOpened(elm, pageRoute) {
@@ -61,7 +58,9 @@ define(function(require, exports, module) {
     },
   });
 
-  base.addTemplate(module, Tpl.TeamResults, Object.create(commonPageOptions));
+  base.addTemplate(module, Tpl.TeamResults, Object.create(commonPageOptions, {
+    defaultPage: {value: true}
+  }));
 
   const sortByDate = util.compareByField('date', -1);
 
@@ -383,6 +382,13 @@ define(function(require, exports, module) {
     },
 
     $destroyed: tabClosed,
+  });
+
+  Tpl.TeamResults.Header.$events({
+    'click th.event'(event) {
+      Dom.stopEvent();
+      Route.gotoPage(Dom.Event.Show, {eventId: $.ctx.data._id});
+    },
   });
 
   Tpl.TeamResults.Row.$helpers({
