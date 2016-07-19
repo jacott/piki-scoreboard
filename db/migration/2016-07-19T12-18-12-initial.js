@@ -6,6 +6,10 @@ define(function(require, exports, module) {
   return function (mig) {
     mig.reversible({
       add: function (client) {
+        if (client.query('SELECT 1 from "Migration" limit 1').length) {
+          client.query('DELETE from "Migration"');
+          return;
+        }
         client.query(fs.readFileSync(module.id.replace(/\/[^/]*$/, '/initial.sql')));
       },
       revert: function (client) {

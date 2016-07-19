@@ -11,7 +11,7 @@ define(function(require, exports, module) {
   var koru = require('koru');
 
   return function () {
-    DBDriver.isPG && Migration.migrateTo(DBDriver.defaultDb, path.resolve(koru.appDir, '../db/migration'), 'zz');
+    DBDriver.isPG && new Migration(DBDriver.defaultDb).migrateTo(path.resolve(koru.appDir, '../db/migration'), 'zz');
     initNewInstall();
 
     Model.ensureIndexes();

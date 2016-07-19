@@ -1,24 +1,13 @@
---
--- PostgreSQL database dump
---
-
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
-
---
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
---
+SET row_security = off;
 
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
-
---
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
---
 
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
@@ -67,7 +56,8 @@ CREATE TABLE "Climber" (
     gender text,
     number integer,
     "uploadId" text,
-    disabled boolean
+    disabled boolean,
+    team_ids character varying(24)[]
 );
 
 CREATE TABLE "Club" (
@@ -83,7 +73,9 @@ CREATE TABLE "Competitor" (
     event_id character varying(24),
     climber_id character varying(24),
     category_ids character varying(24)[],
-    "createdAt" timestamp without time zone
+    "createdAt" timestamp without time zone,
+    team_ids character varying(24)[],
+    number integer
 );
 
 CREATE TABLE "Event" (
@@ -93,7 +85,13 @@ CREATE TABLE "Event" (
     heats jsonb,
     date text,
     errors jsonb,
-    closed boolean
+    closed boolean,
+    "teamType_ids" character varying(24)[],
+    series_id character varying(24)
+);
+
+CREATE TABLE "Migration" (
+    name text NOT NULL
 );
 
 CREATE TABLE "Org" (
@@ -110,8 +108,36 @@ CREATE TABLE "Result" (
     category_id character varying(24),
     "time" integer,
     scores jsonb,
-    problems jsonb
+    problems jsonb,
+    competitor_id character varying(24)
 );
+
+CREATE TABLE "Series" (
+    _id character varying(24) NOT NULL,
+    org_id character varying(24),
+    name text,
+    date text,
+    "teamType_ids" character varying(24)[],
+    closed boolean
+);
+
+
+CREATE TABLE "Team" (
+    _id character varying(24) NOT NULL,
+    org_id character varying(24),
+    "teamType_id" character varying(24),
+    name text,
+    "shortName" text
+);
+
+
+CREATE TABLE "TeamType" (
+    _id character varying(24) NOT NULL,
+    org_id character varying(24),
+    name text,
+    "default" boolean
+);
+
 
 CREATE TABLE "User" (
     _id character varying(24) NOT NULL,
@@ -150,11 +176,23 @@ ALTER TABLE ONLY "Competitor"
 ALTER TABLE ONLY "Event"
     ADD CONSTRAINT "Event_pkey" PRIMARY KEY (_id);
 
+ALTER TABLE ONLY "Migration"
+    ADD CONSTRAINT "Migration_pkey" PRIMARY KEY (name);
+
 ALTER TABLE ONLY "Org"
     ADD CONSTRAINT "Org_pkey" PRIMARY KEY (_id);
 
 ALTER TABLE ONLY "Result"
     ADD CONSTRAINT "Result_pkey" PRIMARY KEY (_id);
+
+ALTER TABLE ONLY "Series"
+    ADD CONSTRAINT "Series_pkey" PRIMARY KEY (_id);
+
+ALTER TABLE ONLY "TeamType"
+    ADD CONSTRAINT "TeamType_pkey" PRIMARY KEY (_id);
+
+ALTER TABLE ONLY "Team"
+    ADD CONSTRAINT "Team_pkey" PRIMARY KEY (_id);
 
 ALTER TABLE ONLY "UserLogin"
     ADD CONSTRAINT "UserLogin_pkey" PRIMARY KEY (_id);
