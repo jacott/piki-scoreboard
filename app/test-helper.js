@@ -55,7 +55,7 @@ define(function(require, exports, module) {
       if (isServer) {
         var ws = this.mockWs();
         var conn;
-        var id = 'koru/session/server-connection';
+        var id = 'koru/session/server-connection-factory';
         if (v && v.conn)
           conn = v.conn;
         else {

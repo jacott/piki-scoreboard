@@ -40,7 +40,7 @@ define(function(require, exports, module) {
       return ResourceString.en[text] || text;
     },
 
-    subscribe: require('koru/session/subscribe')(session),
+    subscribe: require('koru/session/subscribe'),
 
     stop() {
       orgSub && orgSub.stop();

@@ -1,9 +1,8 @@
 define(function(require, exports, module) {
+  const CssLoader = require('koru/css/loader');
   const session   = require('koru/session');
 
-  const cssLoader = require('koru/css/loader')(session);
-
-  cssLoader.loadAll('ui');
+  new CssLoader(session).loadAll('ui');
   // var Trace = require('koru/trace');
 
   // Trace.debug_page(true);

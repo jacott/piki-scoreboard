@@ -6,7 +6,7 @@ define(function(require, exports, module) {
   var Val = require('koru/model/validation');
   var session = require('koru/session');
   var message = require('koru/session/message');
-  var serverConnection = require('koru/session/server-connection');
+  var scFactory = require('koru/session/server-connection-factory');
 
   var geddon = TH.geddon;
 
@@ -43,7 +43,7 @@ define(function(require, exports, module) {
 
     mockConnection: function (sessId, session) {
       var test = geddon.test;
-      var conn = new (serverConnection(session || this.mockSession()))({send: test.stub(), on: test.stub()}, sessId || 's123', test.stub());
+      var conn = new (scFactory(session || this.mockSession()))({send: test.stub(), on: test.stub()}, sessId || 's123', test.stub());
       conn.userId = koru.userId();
       conn.sendBinary = test.stub();
       conn.added = test.stub();
