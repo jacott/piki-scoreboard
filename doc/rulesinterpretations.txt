@@ -1,0 +1,12 @@
+How Piki interprets IFSC rule 11.7.2
+
+Rule 11.7.2 on World Cup Ranking states that "the points gained by tied competitors in a competition will be the average of the points for the tied rank positions. The points will be rounded off to whole numbers."
+
+The rules do not specify whether "rounded off" means rounded up, rounded down, or either rounded up or down depending on the size of the fractional part of the number.
+
+Piki rounds down because of precedents found among the results on the IFSC website of rankings with a fractional part of .5 being rounded down, including:
+2015 World Cup Boulder - Toronto
+Jernej Kruder and Domen Skofic tied for 11th place; each awarded 29 points.
+
+2015 World Cup Boulder - Chongqing
+Four competitors tied for 27th place; each awarded 3 points.
