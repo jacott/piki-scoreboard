@@ -43,6 +43,15 @@ define(function(require, exports, module) {
       return this.safeRole === ROLE.superUser;
     }
 
+    isAdmin() {
+      switch (this.safeRole) {
+      case ROLE.admin: case ROLE.superUser:
+        return true;
+      default:
+        return false;
+      }
+    }
+
     canAdminister(doc) {
       switch(this.safeRole) {
       case ROLE.superUser:

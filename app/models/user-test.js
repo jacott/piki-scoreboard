@@ -38,6 +38,20 @@ define(function (require, exports, module) {
       assert.isFalse(user.isSuperUser());
     },
 
+    "test isAdmin"() {
+      var adminUser = TH.Factory.createUser({role: 'a'});
+      var user = TH.Factory.createUser({role: 'j'});
+      var su = TH.Factory.createUser('su');
+
+      assert.isFalse(user.isAdmin());
+      user.role = 'a';
+      assert.isFalse(user.isAdmin());
+
+      assert.isTrue(adminUser.isAdmin());
+      assert.isTrue(su.isAdmin());
+
+    },
+
     "test canAdminister"() {
       var doc = new User({org_id: '123'});
       doc.attributes.role = User.ROLE.superUser;

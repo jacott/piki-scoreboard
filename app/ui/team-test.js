@@ -75,6 +75,17 @@ isClient && define(function (require, exports, module) {
       assert.dom('#Team [name=addTeam]');
     },
 
+    "test non admin can't add teamType "() {
+      TH.user().attributes.role = 'j';
+      Route.gotoPage(sut.Index);
+
+      TH.selectMenu('#Team [name=teamType_id]', 'tt1', function () {
+        assert.dom(this.parentNode, function () {
+          assert.dom('li', {count: 1});
+        });
+      });
+    },
+
     "test adding new teamType"() {
       Route.gotoPage(sut.Index);
 

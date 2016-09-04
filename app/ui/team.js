@@ -8,6 +8,7 @@ define(function(require, exports, module) {
   const util       = require('koru/util');
   const Team       = require('models/team');
   const TeamType   = require('models/team-type');
+  const User       = require('models/user');
   const CrudPage   = require('ui/crud-page');
   const TeamHelper = require('ui/team-helper');
   const App        = require('./app-base');
@@ -83,7 +84,8 @@ define(function(require, exports, module) {
       Dom.stopEvent();
       let ctx = $.ctx;
       let list = TeamType.query.map(doc => [doc._id, doc.name]);
-      list.push({id: '$new', name: "Add new team type"});
+      if (User.me().isAdmin())
+        list.push({id: '$new', name: "Add new team type"});
       SelectMenu.popup(this, {
         list,
         onSelect(elm) {
