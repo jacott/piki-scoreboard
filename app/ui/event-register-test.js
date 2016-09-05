@@ -32,6 +32,7 @@ isClient && define(function (require, exports, module) {
       var names = ['Bob', 'brendon', 'bobby', 'robert'];
       v.climbers = TH.Factory.createList(4, 'createClimber', function (index, options) {
         options.name = names[index];
+        options.number = '12'+index;
         if (index === 1)
           options.team_ids = [v.teams1[0]._id];
       });
@@ -119,6 +120,7 @@ isClient && define(function (require, exports, module) {
         assert.dom('.Groups>fieldset.fields', function( ){
           assert.dom('label', function () {
             assert.dom('.name', 'Competitor number');
+            assert.dom('[name=number]', {value: '121'});
             TH.input('[name=number]', '567a');
           });
         });

@@ -423,6 +423,7 @@ define(function(require, exports, module) {
   function addClimber(competitor, climber) {
     competitor.climber_id = climber._id;
     competitor.team_ids = climber.team_ids;
+    competitor.number = climber.number;
   }
 
   return Tpl;
