@@ -127,7 +127,12 @@ define(function(require, exports, module) {
       });
 
       var competitor = Competitor.query.where({event_id: event._id, climber_id: climber._id}).fetchOne() ||
-            Competitor.build({event_id: event._id, climber_id: climber._id, team_ids: [club._id]});
+            Competitor.build({
+              event_id: event._id,
+              climber_id: climber._id,
+              number: climber.number,
+              team_ids: [club._id],
+            });
 
       competitor.category_ids = category_ids.sort();
       competitor.$$save();

@@ -22,7 +22,7 @@ define(function (require, exports, module) {
       v.fjl = TH.Factory.createCategory({shortName: 'FJL', gender: 'f', name: 'Female Junior Lead', group: 'Youth Lead'});
       v.mjl = TH.Factory.createCategory({shortName: 'MJL', gender: 'm', name: 'Male Junior Lead', group: 'Youth Lead'});
       v.fol = TH.Factory.createCategory({shortName: 'FOL', gender: 'f', name: 'Female Open Lead', group: 'Open Lead'});
-      v.sam = TH.Factory.createClimber({name: 'Sam Smith', dateOfBirth: '1996-04-16'});
+      v.sam = TH.Factory.createClimber({name: 'Sam Smith', dateOfBirth: '1996-04-16', number: 333});
       TH.loginAs(v.user);
 
       v.rpc = TH.mockRpc();
@@ -94,6 +94,12 @@ define(function (require, exports, module) {
       assert.equals(competitor.category_ids, [v.fjl._id, v.fol._id].sort());
 
       assert.equals(Object.keys(v.event.heats).sort(), [v.fjl._id, v.mjl._id, v.fol._id].sort());
+
+
+      var competitor = Competitor.findBy('climber_id', v.sam._id);
+      assert(competitor);
+
+      assert.equals(competitor.number, 333);
 
       assert.same(Competitor.query.count(), 2);
 
