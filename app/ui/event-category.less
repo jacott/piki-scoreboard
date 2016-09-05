@@ -148,6 +148,7 @@
       color: #fff;
     }
     &+.note {
+      margin-top: 1em;
       color: #888;
       display: block;
       text-align: center;
@@ -175,6 +176,9 @@
 @media print {
   #Event .Category {
     page-break-inside: avoid;
+    margin-bottom: 3em;
+    padding-bottom: 3em;
+    border-bottom: 1px dashed fade(#000, 20%);
     .results {
       thead {
         background-color: #fff;
