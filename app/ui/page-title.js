@@ -30,9 +30,11 @@ define(function(require, exports, module) {
   Dom.setTitle = function (title) {
     Route.title = title = title || 'Piki';
     var ctx = Dom.getCtx(titleElm);
-    if (! ctx) return;
-    ctx.data.title = title;
-    ctx.updateAllTags();
+    if (ctx) {
+      ctx.data.title = title;
+      ctx.updateAllTags();
+    }
+    return title;
   };
 
   Dom.setTitleLink = function (args) {
