@@ -1,5 +1,6 @@
 isClient && define(function (require, exports, module) {
   var test, v;
+  const session    = require('koru/session');
   const Route      = require('koru/ui/route');
   const Climber    = require('models/climber');
   const App        = require('ui/app');
@@ -88,6 +89,50 @@ isClient && define(function (require, exports, module) {
         Route.gotoPage(sut.Index);
 
         TH.click('td', v.climber.name);
+      },
+
+      "test merge other climbers"() {
+        test.stub(session, 'rpc');
+        v.climber3 = TH.Factory.createClimber({name: 'Angela Eiter'});
+        v.climber4 = TH.Factory.createClimber({name: 'Anne-Sophie Koller'});
+        TH.click('[name=merge]');
+        assert.dom('#MergeClimbers', function () {
+          assert.dom('h1', "Select climbers to merge into " + v.climber.name);
+          assert.dom('.list tbody', function () {
+            assert.dom('tr', {count: 3});
+            assert.dom('td.name', {text: v.climber2.name, parent() {
+              refute.className(this, 'selected');
+              assert.dom('td.select>[name=select]');
+              TH.click(this);
+              assert.className(this, 'selected');
+            }});
+            assert.dom('td.name', {text: v.climber3.name});
+          });
+          TH.input('[name=filter]', 'An');
+          assert.dom('tr', {count: 3});
+          TH.input('[name=filter]', 'Ang');
+          assert.dom('tr', {count: 2});
+          TH.click('.name', /Ang/);
+          refute.called(session.rpc);
+          TH.click('[type=submit]');
+        });
+        assert.dom('.Confirm', function () {
+          assert.dom('h1', 'Merge climbers?');
+          TH.click('button', 'Merge');
+        });
+        assert.dom('#MergeClimbers.merging');
+        refute.dom('.Confirm');
+        assert.calledWith(
+          session.rpc, "Climber.merge", v.climber._id,
+          TH.match(a => assert.equals(
+            a.slice(0).sort(),
+            [v.climber2._id, v.climber3._id].sort()
+          ) || true)
+        );
+        test.stub(Route.history, 'back');
+        session.rpc.yield();
+        assert.dom('#Flash', "Climbers merged");
+        assert.called(Route.history.back);
       },
 
       "test change name": function () {

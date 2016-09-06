@@ -10,7 +10,6 @@ define(function (require, exports, module) {
     setUp() {
       test = this;
       v = {};
-      v.rpc = TH.mockRpc();
       v.org = TH.Factory.createOrg();
       v.user = TH.Factory.createUser();
       test.stub(koru, 'info');

@@ -1,9 +1,11 @@
-define(function(require) {
-  const util = require('koru/util');
-  const Team = require('models/team');
+define(function(require, exports, module) {
+  const Model      = require('koru/model');
+  const session    = require('koru/session');
+  const util       = require('koru/util');
+  const Team       = require('models/team');
 
   return function (Climber) {
-    util.extend(Climber, {
+    util.merge(Climber, {
       search(text, limit, tester) {
         var regex = new RegExp(".*"+util.regexEscape(text)+".*", "i");
         var results = [];
@@ -19,6 +21,15 @@ define(function(require) {
 
         return results.sort(util.compareByName);
       },
+    });
+
+    session.registerBroadcast(module, 'mergeClimbers', function (climberId, ids) {
+      [Model.Competitor, Model.Result].forEach(model => {
+        model.where({climber_id: ids}).update('climber_id', climberId);
+      });
+      ids.forEach(id => {
+        Climber.serverQuery.onId(id).remove();
+      });
     });
   };
 });

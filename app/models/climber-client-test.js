@@ -1,8 +1,12 @@
 define(function (require, exports, module) {
   var test, v;
-  var TH = require('test-helper');
-  var Climber = require('./climber');
-  var util = require('koru/util');
+  const session    = require('koru/session');
+  const message    = require('koru/session/message');
+  const util       = require('koru/util');
+  const Competitor = require('models/competitor');
+  const Result     = require('models/result');
+  const TH         = require('test-helper');
+  const Climber    = require('./climber');
 
   TH.testCase(module, {
     setUp: function () {
@@ -13,6 +17,35 @@ define(function (require, exports, module) {
     tearDown: function () {
       TH.clearDB();
       v = null;
+    },
+
+    "test broadcasted mergeClimbers"() {
+      const dest = TH.Factory.createClimber();
+
+      const c2 = TH.Factory.createClimber();
+      const comp21 = TH.Factory.createCompetitor();
+      const comp22 = TH.Factory.createCompetitor();
+      const result21 = TH.Factory.createResult();
+
+      const c3 = TH.Factory.createClimber();
+      const comp31 = TH.Factory.createCompetitor();
+      const result31 = TH.Factory.createResult();
+
+      const c4 = TH.Factory.createClimber();
+      const comp41 = TH.Factory.createCompetitor();
+      const result41 = TH.Factory.createResult();
+
+      session._onMessage(v.conn, message.encodeMessage('B', ['mergeClimbers', dest._id, [c2._id, c3._id]], session.globalDict));
+
+      assert.same(Climber.query.count(), 2);
+      assert.same(comp41.$reload(true).climber_id, c4._id);
+      assert.same(comp22.$reload(true).climber_id, dest._id);
+      assert.same(comp31.$reload(true).climber_id, dest._id);
+      assert.same(comp21.$reload(true).climber_id, dest._id);
+
+      assert.same(result21.$reload(true).climber_id, dest._id);
+      assert.same(result31.$reload(true).climber_id, dest._id);
+      assert.same(result41.$reload(true).climber_id, c4._id);
     },
 
     "test team"() {

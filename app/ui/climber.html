@@ -51,6 +51,11 @@
     <form id="EditClimber">
       <h1>Edit {{name}}</h1>
       {{> /Climber.Form}}
+      <label class="mergeAction">
+        <button name="merge" class="link" type="button">
+          Merge other climbers into this climber
+        </button>
+      </label>
       <fieldset class="actions">
         <button type="submit" name="update">Save</button>
         <button type="button" name="delete">Delete</button>
@@ -66,6 +71,32 @@
     </div>
   </template>
 
+  <template name="Merge">
+    <div id="MergeClimbers">
+      <h1>Select climbers to merge into {{name}}</h1>
+      <div class="fields">
+        <label>
+          <input name="filter"><span></span>
+        </label>
+        <div class="actions">
+          <button name="merge" type="submit">Merge</button>
+          <button name="cancel" type="button">Cancel</button>
+        </div>
+      </div>
+      <div class="list">
+        <table><tbody>
+          {{each "climbers" template="Row"}}
+          <template name="Row">
+            <tr {{selected}}>
+              <td class="select"><button name="select" type="button"></button></td>
+              <td class="name">{{name}}</td>
+            </tr>
+          </template>
+        </tbody></table>
+      </div>
+    </div>
+  </template>
+
   <template name="Form">
     <fieldset class="fields">
       {{labelField "name"}}
@@ -73,5 +104,13 @@
       {{labelField "gender" selectList=genderList type="selectMenu" class="on"}}
       {{labelField "number"}}
     </fieldset>
+  </template>
+
+  <template name="ConfirmMerge">
+    <div>
+      <h1>Merge climbers?</h1>
+      <p>Warning: This action can not be undone!</p>
+      <p>Are you sure you want to merge the selected climbers?</p>
+    </div>
   </template>
 </template>
