@@ -6,6 +6,7 @@ isClient && define(function (require, exports, module) {
   const session      = require('koru/session');
   const publish      = require('koru/session/publish');
   const Route        = require('koru/ui/route');
+  const EventTpl     = require('ui/event');
   const Spinner      = require('ui/spinner');
   const TH           = require('ui/test-helper');
   const App          = require('./app');
@@ -99,7 +100,10 @@ isClient && define(function (require, exports, module) {
       v.org = TH.Factory.createOrg({shortName: 'FUZ'});
 
       assert.calledWith(v.subOrg, 'Org');
+      test.stub(EventTpl, 'startPage');
       v.subOrg.args(0, 1).callback();
+
+      assert.called(EventTpl.startPage);
 
       assert.same(App.orgId, v.org._id);
 
