@@ -57,7 +57,6 @@ define(function(require, exports, module) {
               callback();
             });
             Dom.Flash.loading();
-            Dom.setTitleLink([Tpl]);
           }
         }
       }

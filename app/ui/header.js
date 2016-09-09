@@ -3,8 +3,6 @@ define(function(require, exports, module) {
   var Dom    = require('koru/dom');
   var Dialog = require('koru/ui/dialog');
   var Help   = require('ui/help');
-  require('./page-title');
-  require('./sign-in');
 
   var Tpl = Dom.newTemplate(require('koru/html!./header'));
 
@@ -29,6 +27,9 @@ define(function(require, exports, module) {
       document.body.insertBefore(Tpl.$autoRender({}), document.body.firstChild);
     },
   });
+
+  Dom.setTitle = function (title) {
+  };
 
   return Tpl;
 });
