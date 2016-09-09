@@ -69,9 +69,25 @@ define(function(require, exports, module) {
 
       if (eventSub === currentSub)
         callback();
+
+      Tpl.stopNotify = Route.onChange((page, pageRoute, href) => {
+        const query = `#Event .tabNames button[name="${page.name}"]`;
+
+        const old = Dom('#Event .tabNames .selected');
+        Dom.removeClass(old, "selected");
+
+        const button = Dom(
+          pageRoute.search ? `${query}[data-search="${pageRoute.search}"]` : query
+        ) || Dom('#Event .tabNames [name="Register"]');
+
+        Dom.addClass(button, "selected");
+
+
+      }).stop;
     },
 
     onBaseExit(page, pageRoute) {
+      Tpl.stopNotify && Tpl.stopNotify();
       Dom.removeId('Event');
       Route.title = null;
     },
@@ -104,6 +120,16 @@ define(function(require, exports, module) {
       }
 
       Route.replacePage(Tpl.Show, {eventId: curr._id});
+    },
+  });
+
+  Tpl.$events({
+    'click .tabNames>button'(event) {
+      Dom.stopEvent();
+      const opts = {};
+      const search =  this.getAttribute('data-search');
+      if (search) opts.search = search;
+      Route.gotoPage(Tpl[this.getAttribute('name')], opts);
     },
   });
 

@@ -142,7 +142,7 @@ isClient && define(function (require, exports, module) {
       });
     },
 
-    "test switching tabs"() {
+    "//test switching series tabs"() {
       Route.gotoPage(sut.Index);
 
       test.spy(Route, 'replacePage');
@@ -270,12 +270,11 @@ isClient && define(function (require, exports, module) {
         result.setScore(2, '23+');
         result.setScore(3, '');
 
-        assert.dom('#Event:not(.noEvent) .menu', function () {
-          assert.dom('.link[name=register]');
-          assert.dom('.link[name=edit]');
+        assert.dom('#Event:not(.noEvent) nav.tabbed', function () {
+          assert.dom('[name=Register]');
+          assert.dom('[name=Edit]');
         });
         assert.dom('#Event #Show', function () {
-          assert.dom('h1', v.event.name + ' - Category results');
           assert.dom('.categories', function () {
             assert.dom('.link', {text: v.cats[0].name, parent: 2}, function () {
               assert.dom('.link', {count: 3});
@@ -331,7 +330,7 @@ isClient && define(function (require, exports, module) {
       },
 
       "test registration link"() {
-        TH.click('[name=register]');
+        TH.click('[name=Register]');
 
         assert.dom('body', function () {
           assert.dom('#Event #Register');
@@ -340,7 +339,7 @@ isClient && define(function (require, exports, module) {
 
       "Edit": {
         setUp() {
-          TH.click('[name=edit]');
+          TH.click('[name=Edit]');
         },
 
         "test changing format"() {
@@ -388,7 +387,6 @@ isClient && define(function (require, exports, module) {
 
         "test change name"() {
           assert.dom('#EditEvent', function () {
-            assert.dom('h1', 'Edit ' + v.event.name);
             TH.input('[name=name]', {value: v.event.name}, 'new name');
             TH.click('[type=submit]');
           });

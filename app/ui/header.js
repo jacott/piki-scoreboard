@@ -1,8 +1,9 @@
 define(function(require, exports, module) {
-  var App    = require('./app-base');
-  var Dom    = require('koru/dom');
-  var Dialog = require('koru/ui/dialog');
-  var Help   = require('ui/help');
+  const Dom    = require('koru/dom');
+  const Dialog = require('koru/ui/dialog');
+  const Route  = require('koru/ui/route');
+  const Help   = require('ui/help');
+  const App    = require('./app-base');
 
   var Tpl = Dom.newTemplate(require('koru/html!./header'));
 
@@ -29,6 +30,10 @@ define(function(require, exports, module) {
   });
 
   Dom.setTitle = function (title) {
+    const pageTitle = document.getElementById('PageTitle');
+    if (pageTitle)
+      pageTitle.textContent = title;
+    return `Piki ${Route.currentPageRoute && Route.currentPageRoute.orgSN}: ${title}`;
   };
 
   return Tpl;

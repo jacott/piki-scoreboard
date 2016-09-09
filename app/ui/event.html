@@ -1,14 +1,14 @@
 <template name="Event">
   <section id="Event" class="body">
     <div>
-      <nav class="menu">
-        {{pageLink name="show" value="Results" template="Event.Show" search="type=results"}}
-        {{pageLink name="teamResults" value="Team results" template="Event.TeamResults"}}
-        {{pageLink name="show" value="Start lists" template="Event.Show" search="type=startlists"}}
-        {{pageLink value="Series" template="Series"}}
-        {{pageLink class="adminAccess link" name="register" value="Registrations" template="Event.Register"}}
-        {{pageLink class="adminAccess link" name="edit" value="Edit event" template="Event.Edit"}}
-        {{pageLink class="adminAccess link" name="edit" value="Upload registrations" template="Event.RegUpload"}}
+      <nav class="tabbed list">
+        <div class="tabNames">
+          <button name="Show" data-search="?type=results" type="button" class="tab">Results</button>
+          <button name="Show" data-search="?type=startlists" type="button" class="tab">Start lists</button>
+          <button name="TeamResults" type="button" class="tab">Team results</button>
+          <button name="Register" type="button" class="adminAccess tab">Registrations</button>
+          <button name="Edit" type="button" class="adminAccess tab">Edit event</button>
+        </div>
      </nav>
       <section class="body">
       </section>
@@ -47,7 +47,6 @@
   <template name="Show">
     <section id="Show">
       <div>
-        <h1>{{displayName}} - Category {{listType}}</h1>
         {{eachCategory}}
 
         {{>Action ""}}
@@ -91,7 +90,6 @@
 
   <template name="Edit">
     <div id="EditEvent">
-      <h1>Edit {{name}}</h1>
       <form>
         {{> /Event.Form}}
         <fieldset class="actions">
