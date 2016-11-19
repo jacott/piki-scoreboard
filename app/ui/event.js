@@ -57,7 +57,6 @@ define(function(require, exports, module) {
               callback();
             });
             Dom.Flash.loading();
-            Dom.setTitleLink([Tpl]);
           }
         }
       }
@@ -70,9 +69,25 @@ define(function(require, exports, module) {
 
       if (eventSub === currentSub)
         callback();
+
+      Tpl.stopNotify = Route.onChange((page, pageRoute, href) => {
+        const query = `#Event .tabNames button[name="${page.name}"]`;
+
+        const old = Dom('#Event .tabNames .selected');
+        Dom.removeClass(old, "selected");
+
+        const button = Dom(
+          pageRoute.search ? `${query}[data-search="${pageRoute.search}"]` : query
+        ) || Dom('#Event .tabNames [name="Register"]');
+
+        Dom.addClass(button, "selected");
+
+
+      }).stop;
     },
 
     onBaseExit(page, pageRoute) {
+      Tpl.stopNotify && Tpl.stopNotify();
       Dom.removeId('Event');
       Route.title = null;
     },
@@ -80,7 +95,42 @@ define(function(require, exports, module) {
     stop() {
       eventSub && eventSub.stop();
       Tpl.event = null;
-    }
+    },
+
+    startPage() {
+      let prev, curr, currDate;
+      const now = util.dateNow();
+
+      Event.query.sort('date', -1).forEach(doc => {
+        prev = curr;
+        curr = doc;
+        currDate = new Date(curr.date).getTime();
+        return currDate < now;
+      });
+
+      if (! curr) {
+        Route.replacePage(Tpl);
+        return;
+      }
+
+      if (prev) {
+        const prevDate = new Date(prev.date).getTime();
+        if (Math.abs(now - prevDate) < Math.abs(now - currDate))
+          curr = prev;
+      }
+
+      Route.replacePage(Tpl.Show, {eventId: curr._id});
+    },
+  });
+
+  Tpl.$events({
+    'click .tabNames>button'(event) {
+      Dom.stopEvent();
+      const opts = {};
+      const search =  this.getAttribute('data-search');
+      if (search) opts.search = search;
+      Route.gotoPage(Tpl[this.getAttribute('name')], opts);
+    },
   });
 
   Index.$helpers({

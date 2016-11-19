@@ -125,6 +125,7 @@ define(function(require, exports, module) {
           pathname = null;
           Route.replacePath(pn[0], pn[1]);
         }
+        Dom.Event.startPage();
       });
 
       Flash.loading();

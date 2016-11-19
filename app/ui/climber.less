@@ -34,4 +34,49 @@
       width: 11ex;
     }
   }
+
+  .mergeAction {
+    display: block;
+    margin: 1em 0;
+    color: @cPrimaryText;
+  }
+}
+
+#MergeClimbers {
+  width: 100%;
+  height: calc(~"100vh - " @headerHeight);
+  padding: 0;
+  .flexFlow(column);
+  >h1, >.fields {
+    margin: 1em;
+    flex: 0 0;
+  }
+  .actions {
+    margin-top: 1em;
+  }
+  [name=filter] {
+    width: 20em;
+    &+span:after {
+      .md-inline-icon("search");
+    }
+  }
+  >.list {
+    padding: 1em;
+    overflow: auto;
+    flex: 1;
+    margin-top: 1em;
+
+    [name=select] {
+      .md-checkbox();
+    }
+
+    tr {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .selected [name=select]:before {
+      content: "check_box";
+    }
+  }
 }

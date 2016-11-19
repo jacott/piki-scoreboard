@@ -42,6 +42,9 @@ define(function (require, exports, module) {
       // Subscribe
       var sub = TH.mockSubscribe(v, 's123', 'Org', 'foo');
 
+      assert.equals(sub.conn.org_id, org1._id);
+
+
       assert.calledWith(Val.ensureString, 'foo');
 
       // Test initial data

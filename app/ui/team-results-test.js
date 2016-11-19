@@ -39,7 +39,7 @@ isClient && define(function (require, exports, module) {
       Route.gotoPage(EventTpl.Show, {eventId: v.event._id});
 
       assert.dom('#Event', function () {
-        TH.click('.link[name=teamResults]');
+        TH.click('[name=TeamResults]');
       });
 
       assert.dom('#TeamResults', function () {

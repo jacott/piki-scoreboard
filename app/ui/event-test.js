@@ -29,6 +29,46 @@ isClient && define(function (require, exports, module) {
       v = null;
     },
 
+    "test startPage"() {
+      const replacePage = test.stub(Route, 'replacePage');
+
+      // no events
+      sut.startPage();
+      assert.calledWith(replacePage, sut);
+
+
+      var events = TH.Factory.createList(3, 'createEvent', function (index, options) {
+        options.date = `2014/0${8-index}/01`;
+      });
+
+      // closer to 2014/07/01 than 2014/08/01
+      util.withDateNow(new Date(2014, 7-1, 10), () => {
+        sut.startPage();
+        assert.calledWith(replacePage, sut.Show, {eventId: events[1]._id});
+      });
+
+      replacePage.reset();
+      // after all events
+      util.withDateNow(new Date(2014, 10-1, 3), () => {
+        sut.startPage();
+        assert.calledWith(replacePage, sut.Show, {eventId: events[0]._id});
+      });
+
+      replacePage.reset();
+      // before all events - very rare
+      util.withDateNow(new Date(2014, 1, 3), () => {
+        sut.startPage();
+        assert.calledWith(replacePage, sut.Show, {eventId: events[2]._id});
+      });
+
+      replacePage.reset();
+      // closer to 2014/07/01 than 2014/06/01
+      util.withDateNow(new Date(2014, 6-1, 20), () => {
+        sut.startPage();
+        assert.calledWith(replacePage, sut.Show, {eventId: events[1]._id});
+      });
+    },
+
     "test event subscribing"() {
       var events = TH.Factory.createList(2, 'createEvent', function (index, options) {
         options.date = "2014/01/0"+(8-index);
@@ -102,7 +142,7 @@ isClient && define(function (require, exports, module) {
       });
     },
 
-    "test switching tabs"() {
+    "//test switching series tabs"() {
       Route.gotoPage(sut.Index);
 
       test.spy(Route, 'replacePage');
@@ -230,12 +270,11 @@ isClient && define(function (require, exports, module) {
         result.setScore(2, '23+');
         result.setScore(3, '');
 
-        assert.dom('#Event:not(.noEvent) .menu', function () {
-          assert.dom('.link[name=register]');
-          assert.dom('.link[name=edit]');
+        assert.dom('#Event:not(.noEvent) nav.tabbed', function () {
+          assert.dom('[name=Register]');
+          assert.dom('[name=Edit]');
         });
         assert.dom('#Event #Show', function () {
-          assert.dom('h1', v.event.name + ' - Category results');
           assert.dom('.categories', function () {
             assert.dom('.link', {text: v.cats[0].name, parent: 2}, function () {
               assert.dom('.link', {count: 3});
@@ -291,7 +330,7 @@ isClient && define(function (require, exports, module) {
       },
 
       "test registration link"() {
-        TH.click('[name=register]');
+        TH.click('[name=Register]');
 
         assert.dom('body', function () {
           assert.dom('#Event #Register');
@@ -300,7 +339,7 @@ isClient && define(function (require, exports, module) {
 
       "Edit": {
         setUp() {
-          TH.click('[name=edit]');
+          TH.click('[name=Edit]');
         },
 
         "test changing format"() {
@@ -348,7 +387,6 @@ isClient && define(function (require, exports, module) {
 
         "test change name"() {
           assert.dom('#EditEvent', function () {
-            assert.dom('h1', 'Edit ' + v.event.name);
             TH.input('[name=name]', {value: v.event.name}, 'new name');
             TH.click('[type=submit]');
           });

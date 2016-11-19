@@ -29,6 +29,8 @@ define(function(require, exports, module) {
 
     var handles = [];
 
+    sub.conn.org_id = org._id;
+
     sub.onStop(function () {
       handles.forEach(function (handle) {
         handle.stop();

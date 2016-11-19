@@ -63,7 +63,6 @@ isClient && define(function (require, exports, module) {
       gotoPage();
 
       assert.dom('#Event #Register:not(.closed)', function () {
-        assert.dom('h1', v.event.name);
         refute.dom('.Groups');
         assert.dom('fieldset', function () {
           assert.dom('label .name', {text: 'Name', parent: function () {

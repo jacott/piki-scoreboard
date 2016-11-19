@@ -1,16 +1,8 @@
 <template name="Header">
   <header id="Header">
     <div>
-      <nav class="left">
-        {{pageLink class="print link" id="OrgHomeLink" value=orgHomeLinkText template="Home"}}
-      </nav>
-      <nav class="title">
-        {{> /PageTitle}}
-      </nav>
-      <nav class="right">
-        <button class="link" name="help">Help</button>
-        {{> /SignIn}}
-      </nav>
+      <span id="PageTitle">Hello {{title}}</span>
+      <button name="menu" type="button"></button>
     </div>
   </header>
 </template>
