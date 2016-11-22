@@ -1,39 +1,29 @@
 <template name="SignIn">
-  <span id="SignIn">
-    <template name="SignInLink">
-      <button class="link" name="signIn">Sign in</button>
-    </template>
-    <template name="ProfileLink">
-      <span>
-        {{pageLink id="ProfileLink" value=name template="Profile"}}
-      </span>
-    </template>
-    {{item}}
-  </span>
-
-  <template name="Dialog">
-    <form id="SignInDialog">
-      <fieldset class="fields">
-        <label>
-          <span>Email</span>
-          <input type="text" name="email">
-        </label>
-        <label>
-          <span>Password</span>
-          <input type="password" name="password">
-        </label>
-      </fieldset>
-      <fieldset class="actions">
-        <button type="submit">Sign in</button>
-        <button type="button" name="cancel">Cancel</button>
-      </fieldset>
-      <button name="forgot" class="link">Forgot password?</button>
-      <template name="Progress">
-        <span id="SignInProgress" class="{{state}}">{{message}}</span>
-      </template>
-      {{> Progress}}
-    </form>
-  </template>
+  <section id="SignIn" class="body">
+    <div>
+      <form class="body">
+        <fieldset class="fields">
+          <label>
+            <span>Email</span>
+            <input type="text" name="email">
+          </label>
+          <label>
+            <span>Password</span>
+            <input type="password" name="password">
+          </label>
+        </fieldset>
+        <fieldset class="actions">
+          <button type="submit">Sign in</button>
+          <button type="button" name="cancel">Cancel</button>
+        </fieldset>
+        <button name="forgot" class="link">Forgot password?</button>
+        <template name="Progress">
+          <div id="SignInProgress" class="{{state}}">{{message}}</div>
+        </template>
+        {{> Progress}}
+      </form>
+    </div>
+  </section>
 
   <template name="ForgotPassword">
     <form id="ForgotPassword" action="/forgotpassword" method="post">

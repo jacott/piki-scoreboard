@@ -19,7 +19,7 @@
     "babel-polyfill": "^6.9.1",
     "babel-preset-es2015": "^6.9.0",
     "csv-parse": ">=0.1.3",
-    "koru": "^0.8.5",
+    "koru": "^0.8.6",
     "pg-libpq": ">=1.1.0"
   },
   "engines": {

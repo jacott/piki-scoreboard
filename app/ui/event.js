@@ -71,18 +71,25 @@ define(function(require, exports, module) {
         callback();
 
       Tpl.stopNotify = Route.onChange((page, pageRoute, href) => {
-        const query = `#Event .tabNames button[name="${page.name}"]`;
 
-        const old = Dom('#Event .tabNames .selected');
+        const tabList = Dom('#Event>div>nav.tabbed');
+        const old = tabList.getElementsByClassName('selected')[0];
+
         Dom.removeClass(old, "selected");
 
-        const button = Dom(
+
+        const query = `button[name="${page.name}"]`;
+        let button = page.parent === Tpl && tabList.querySelector(
           pageRoute.search ? `${query}[data-search="${pageRoute.search}"]` : query
-        ) || Dom('#Event .tabNames [name="Register"]');
+        );
 
+        if (! button) {
+          if (Dom.Event.Register.$contains(page))
+            button =  tabList.querySelector('[name="Register"]');
+        }
+
+        Dom.setClass('hide', ! button, tabList);
         Dom.addClass(button, "selected");
-
-
       }).stop;
     },
 
@@ -181,6 +188,7 @@ define(function(require, exports, module) {
   });
 
   Index.$extend({
+    title: "Calendar",
     $created(ctx, elm) {
       ctx.tab = (ctx.data.hash || '#event').slice(1);
       ctx.data = {};
@@ -481,6 +489,7 @@ define(function(require, exports, module) {
 
   Tpl.Show.$extend({
     $created(ctx) {
+      Tpl.Show.titleSuffix = Tpl.Show.results ? 'Results' : 'Start lists';
       Dom.autoUpdate(ctx);
     },
   });

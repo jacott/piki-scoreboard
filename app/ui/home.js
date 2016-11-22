@@ -24,9 +24,21 @@ define(function(require, exports, module) {
   Route.root.addTemplate(module, ChooseOrg);
   Route.root.defaultPage = Tpl;
 
+  ChooseOrg.$extend({
+    title: 'Choose organization',
+  });
+
   ChooseOrg.$helpers({
     orgs: function (callback) {
       callback.render({model: Org, sort: util.compareByName});
+    },
+  });
+
+  ChooseOrg.$events({
+    'click .link'(event) {
+      Dom.stopEvent();
+      const org = $.data(this);
+      Route.gotoPath(`/#${org.shortName}/event`);
     },
   });
 

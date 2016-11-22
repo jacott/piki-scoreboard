@@ -65,6 +65,7 @@ define(function(require, exports, module) {
   });
 
   Tpl.$extend({
+    title: "Profile",
     onBaseEntry () {
       var user = User.me();
 

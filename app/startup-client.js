@@ -14,6 +14,7 @@ define(function(require, exports, module) {
   require('ui/reg-upload');
   require('ui/reset-password');
   require('ui/series');
+  require('ui/sign-in');
   require('ui/team');
   require('ui/team-results');
 

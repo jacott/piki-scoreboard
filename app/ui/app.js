@@ -7,6 +7,7 @@ define(function(require, exports, module) {
   const sessState      = require('koru/session/state');
   const Route          = require('koru/ui/route');
   const util           = require('koru/util');
+  const uColor         = require('koru/util-color');
   const Org            = require('models/org');
   const User           = require('models/user');
   require('publish/publish-event');
@@ -29,6 +30,8 @@ define(function(require, exports, module) {
   koru.onunload(module, 'reload');
 
   util.extend(App, {
+    AVATAR_URL: 'https://secure.gravatar.com/avatar/',
+
     text(text) {
       var m = /^([^:]+):(.*)$/.exec(text);
       if (m) {
@@ -63,6 +66,19 @@ define(function(require, exports, module) {
         pathname && Route.replacePath(pathname[0] || document.location, pathname[1]);
       });
       header.show();
+    },
+
+    addColorClass(elm, color) {
+      var cc = uColor.colorClass(color);
+
+      if (Dom.hasClass(elm, cc)) return;
+
+      Dom.removeClass(elm, 'dark');
+      Dom.removeClass(elm, 'verydark');
+      Dom.removeClass(elm, 'light');
+      Dom.removeClass(elm, 'verylight');
+
+      Dom.addClass(elm, cc);
     },
 
     _setOrgShortName(value) {
@@ -125,8 +141,10 @@ define(function(require, exports, module) {
           pathname = null;
           Route.replacePath(pn[0], pn[1]);
         }
-        Dom.Event.startPage();
+        if (Route.currentPage === Route.root.defaultPage)
+          Dom.Event.startPage();
       });
+
 
       Flash.loading();
 

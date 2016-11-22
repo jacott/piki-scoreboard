@@ -24,27 +24,8 @@ isClient && define(function (require, exports, module) {
       v = null;
     },
 
-    "test profile link" () {
-      document.body.appendChild(SignIn.$autoRender({}));
-      TH.login();
-
-      login.ready(session);
-      refute.dom('[name=signIn]');
-      test.stub(Route, 'gotoPath');
-      TH.click('#ProfileLink');
-
-      assert.calledWith(Route.gotoPath, Dom.Profile);
-    },
-
-    "test cancel" () {
-      Dom.Dialog.open(SignIn.Dialog.$autoRender({}));
-      TH.click('[name=cancel]');
-
-      refute.dom('.Dialog');
-    },
-
     "test clicking forgot password" () {
-      Dom.Dialog.open(SignIn.Dialog.$autoRender({}));
+      Route.gotoPage(SignIn);
       TH.input('[name=email]', 'email@address');
       TH.click('[name=forgot]');
 
@@ -101,12 +82,10 @@ isClient && define(function (require, exports, module) {
 
     "test signing in" () {
       TH.loginAs(TH.Factory.createUser('guest'));
-      document.body.appendChild(SignIn.$autoRender({}));
-      assert.dom('#SignIn', function () {
-        TH.click('[name=signIn]');
-      });
+      Route.gotoPage(SignIn);
+      test.stub(Route.history, 'back');
 
-      assert.dom('.Dialog #SignInDialog', function () {
+      assert.dom('#SignIn', function () {
         assert.dom('form>fieldset:first-child', function () {
           assert.dom('label:first-child', function () {
             assert.dom('span', 'Email');
@@ -133,8 +112,15 @@ isClient && define(function (require, exports, module) {
 
         v.loginCallback();
       });
+      assert.called(Route.history.back);
+    },
 
-      refute.dom('.Dialog');
+    "test cancel" () {
+      Route.gotoPage(SignIn);
+      test.stub(Route.history, 'back');
+      TH.click('[name=cancel]');
+
+      assert.called(Route.history.back);
     },
   });
 });

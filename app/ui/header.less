@@ -7,4 +7,36 @@
   [name=menu] {
     .md-icon("menu"; @fontSize: 32px);
   }
+
+  [name=avatar] {
+    @width: 2em;
+    height: @width;
+    width: @width;
+    line-height: @width;
+    font-size: @width / 2 ;
+
+    margin-right: 10px;
+
+    position: relative;
+    border-radius: 50%;
+    text-align: center;
+    flex-shrink: 0;
+    vertical-align: middle;
+
+    .readOnlyAccess & {
+      display: none;
+    }
+
+    .img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 100%;
+    }
+  }
 }

@@ -1,8 +1,14 @@
 <template name="Header">
   <header id="Header">
     <div>
-      <span id="PageTitle">Hello {{title}}</span>
-      <button name="menu" type="button"></button>
+      <span id="PageTitle">{{title}}</span>
+      <span>
+        <button name="avatar" type="button"  title="{{title}}" {{color}}>
+          <span class="initials" {{nameClass}}>{{initials}}</span>
+          <div class="img" style="{{style}}"></div>
+        </button>
+        <button name="menu" type="button"></button>
+      </span>
     </div>
   </header>
 </template>

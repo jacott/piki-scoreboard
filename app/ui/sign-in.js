@@ -11,74 +11,34 @@ define(function(require, exports, module) {
   const User          = require('models/user');
   const App           = require('./app-base');
 
-  const Tpl = Dom.newTemplate(require('koru/html!./sign-in'));
+  const Tpl = Dom.newTemplate(module, require('koru/html!./sign-in'));
   const $ = Dom.current;
   const ForgotPassword = Tpl.ForgotPassword;
-  const Dialog = Tpl.Dialog;
 
-
-  Tpl.$helpers({
-    item () {
-      if (this && this.role !== 'g')
-        return Tpl.ProfileLink.$autoRender(this);
-      else
-        return Tpl.SignInLink.$autoRender({});
-    },
+  Route.root.addTemplate(module, Tpl, {
+    publicPage: true,
   });
 
-  Tpl.SignInLink.$events({
-    'click' (event) {
-      Dom.stopEvent();
-      Dom.Dialog.open(Dialog.$autoRender({}));
-    },
+  Tpl.$extend({
+    title: 'Sign in',
   });
 
-  util.extend(Tpl, {
-    $created (ctx, elm) {
-      var userOb;
-      ctx.onDestroy(login.onChange(session, state => {
-        if (state !== 'ready') return;
-        observeUserId();
-      }));
-
-      ctx.onDestroy(function () {
-        userOb && userOb.stop();
-        userOb = null;
-      });
-
-      observeUserId();
-
-      function observeUserId() {
-        userOb && userOb.stop();
-        if (koru.userId())
-          userOb = User.observeId(koru.userId(), userChange);
-
-        userChange(User.me());
-      }
-
-      function userChange(doc) {
-        App.setAccess();
-        ctx.updateAllTags(doc || {});
-      }
-    },
-  });
-
-
-  Dialog.$events({
+  Tpl.$events({
     'click [name=forgot]' (event) {
       Dom.stopEvent();
-      closeDialog();
 
       Dom.Dialog.open(ForgotPassword.$autoRender({
         email: event.currentTarget.querySelector('[name=email]').value}));
     },
 
-    'click [name=cancel]': closeDialog,
+    'click [name=cancel]'() {
+      Route.history.back();
+    },
 
     'click [type=submit]' (event) {
       Dom.stopEvent();
       var button = this;
-      var form = document.getElementById('SignInDialog');
+      var form = document.querySelector('#SignIn form');
       var email = form.querySelector('input[name=email]').value;
       var password = form.querySelector('input[name=password]').value;
 
@@ -88,7 +48,7 @@ define(function(require, exports, module) {
         if (error)
           setState(form, 'error');
         else
-          closeDialog();
+          Route.history.back();
       });
     },
   });
@@ -102,7 +62,7 @@ define(function(require, exports, module) {
     Dom.getCtx('#SignInProgress').updateAllTags({state: state});
   }
 
-  Dialog.Progress.$helpers({
+  Tpl.Progress.$helpers({
     message () {
       switch(this.state) {
       case 'submit':
@@ -144,5 +104,5 @@ define(function(require, exports, module) {
     },
   });
 
-  return Tpl;
+  module.exports = Tpl;
 });

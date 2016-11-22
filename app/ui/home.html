@@ -1,28 +1,26 @@
 <template name="Home">
   <section id="Home" class="body">
-    <div>
-      <nav class="menu">
-        {{pageLink value="Teams" template="Team"}}
-        {{pageLink value="Climbers" template="Climber"}}
-        {{pageLink value="Events" template="Event"}}
-        {{pageLink value="Series" var_hash="#series" template="Event"}}
-        {{pageLink class="adminAccess link" value="Competitor categories" template="Category"}}
-        {{pageLink value="Org" title="Choose another organization" template="Home.ChooseOrg"}}
-      </nav>
-      <section class="body">
-      </section>
-    </div>
+    <!-- <div> -->
+    <!--   <nav class="menu"> -->
+    <!--     {{pageLink value="Teams" template="Team"}} -->
+    <!--     {{pageLink value="Climbers" template="Climber"}} -->
+    <!--     {{pageLink value="Events" template="Event"}} -->
+    <!--     {{pageLink value="Series" var_hash="#series" template="Event"}} -->
+    <!--     {{pageLink class="adminAccess link" value="Competitor categories" template="Category"}} -->
+    <!--     {{pageLink value="Org" title="Choose another organization" template="Home.ChooseOrg"}} -->
+    <!--   </nav> -->
+    <!--   <section class="body"> -->
+    <!--   </section> -->
+    <!-- </div> -->
   </section>
   <template name="ChooseOrg">
     <section id="ChooseOrg" class="body">
       <div>
         <section class="body">
-          <h1>Choose Organization</h1>
-
           <ul class="ui-ul">
             {{each "orgs" template="Row"}}
             <template name="Row">
-              <li>{{pageLink value=name link=shortName}}</li>
+              <li><button type="button" class="link">{{name}}</button></li>
             </template>
           </ul>
         </section>

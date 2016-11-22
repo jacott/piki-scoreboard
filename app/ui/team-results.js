@@ -20,6 +20,10 @@ define(function(require, exports, module) {
     }
   });
 
+  Tpl.$extend({
+    titleSuffix: 'Team results',
+  });
+
   Tpl.$helpers({
     teams(callback) {
       const scores = Ranking.getTeamScores(EventTpl.event)[TeamHelper.teamType_id] || {};

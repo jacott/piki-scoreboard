@@ -1,29 +1,156 @@
 define(function(require, exports, module) {
-  const Dom    = require('koru/dom');
-  const Dialog = require('koru/ui/dialog');
-  const Route  = require('koru/ui/route');
-  const Help   = require('ui/help');
-  const App    = require('./app-base');
+  const koru        = require('koru');
+  const Dom         = require('koru/dom');
+  const md5sum      = require('koru/md5sum');
+  const Random      = require('koru/random');
+  const session     = require('koru/session');
+  const Dialog      = require('koru/ui/dialog');
+  const Route       = require('koru/ui/route');
+  const SelectMenu  = require('koru/ui/select-menu');
+  const UserAccount = require('koru/user-account');
+  const ClientLogin = require('koru/user-account/client-login');
+  const util        = require('koru/util');
+  const uColor      = require('koru/util-color');
+  const User        = require('models/user');
+  const Flash       = require('ui/flash');
+  const Help        = require('ui/help');
+  const App         = require('./app-base');
 
   var Tpl = Dom.newTemplate(require('koru/html!./header'));
+  const $ = Dom.current;
+
+  function getUser() {
+    const user = User.me();
+    _koru_.debug(`user`, user);
+
+    if (user && user._id !== 'guest')
+      return user;
+  }
 
   Tpl.$helpers({
-    orgHomeLinkText: function () {
-      var org = App.org();
-      if (org) return org.name;
-      return 'Choose Organization';
+    style() {
+      const user = getUser();
+      return user && user.email ? 'background-image:url(' + App.AVATAR_URL + md5sum(user.email)+'?d=blank)' : '';
     },
+
+    initials() {
+      const user = getUser();
+      return user && user.initials;
+    },
+
+    nameClass() {
+      const user = getUser();
+      if (user) {
+        const initials = user.initials;
+        Dom.setClass('long', initials.length > 2);
+      }
+    },
+
+    color() {
+      const user = getUser();
+      if (user) {
+        var rnd = Random.create(user.email);
+
+        var color = uColor.rgb2hex(uColor.hsl2rgb({h: rnd.alea(), s: 1 - rnd.alea()/2, l: 0.5}));
+        $.element.style.backgroundColor = color;
+        App.addColorClass($.element, color);
+      }
+    },
+
+    title() {
+      const user = getUser();
+      return user ? user.name : '';
+    },
+
   });
 
   Tpl.$events({
-    'click [name=help]': function (event) {
-      Dom.stopEvent();
-      Dialog.open(Help.$autoRender({}));
+    'click [name=avatar]'(event) {
+      const list = [
+        ['$signOut', 'Sign out'],
+        ['$signOutOther', 'Sign out of other sessions'],
+        ['profile/change-password', 'Change password'],
+      ];
+
+      SelectMenu.popup(this, {
+        list,
+        onSelect,
+      });
+    },
+
+    'click [name=menu]'(event) {
+      const list = [];
+      const ev = Dom.Event.event;
+      if (ev) {
+        list.push([`event/${ev._id}/show`, ev.displayName]);
+      }
+      list.push(['event', 'Calendar']);
+      list.push('disabled sep');
+      list.push(['choose-org', 'Go to another org']);
+      if (! koru.userId() || koru.userId() === 'guest')
+        list.push(['sign-in', 'Sign in']);
+      else
+        list.push(
+          ['org-settings',
+           `${Route.currentPageRoute && Route.currentPageRoute.orgSN} settings`]
+        );
+
+
+      list.push('disabled sep');
+      list.push(['help', 'Help']);
+
+      SelectMenu.popup(this, {
+        list,
+        onSelect,
+      });
     },
   });
 
+  const Actions = {
+    $signOut() {
+      UserAccount.logout();
+    },
+
+    $signOutOther() {
+      UserAccount.logoutOtherClients(function (error) {
+        if (error)
+          Flash.error('Unexpected error.');
+        else
+          Flash.notice('You have been signed out of any other sessions.');
+      });
+    },
+  };
+
+  function onSelect(elm) {
+    const id = $.data(elm).id;
+    const action = Actions[id];
+    if (action)
+      action(elm);
+    else
+      Route.gotoPath(id);
+    return true;
+  }
+
   Tpl.$extend({
-    show: function () {
+    $created(ctx) {
+      ctx.onDestroy(ClientLogin.onChange(session, state => {
+        if (state === 'ready') {
+          const uid = koru.userId();
+          if (! uid || uid === 'guest' || getUser())
+            ctx.updateAllTags();
+          else {
+            ctx.userObserve && ctx.userObserve.stop();
+            ctx.userObserve = User.observeId(uid, () => ctx.updateAllTags());
+          }
+        }
+      }));
+    },
+
+    $destroyed(ctx) {
+      ctx.userObserve && ctx.userObserve.stop();
+    },
+
+    show() {
       Dom.removeId('Header');
       document.body.insertBefore(Tpl.$autoRender({}), document.body.firstChild);
     },
@@ -31,9 +158,29 @@ define(function(require, exports, module) {
 
   Dom.setTitle = function (title) {
     const pageTitle = document.getElementById('PageTitle');
+
+    const pageRoute = Route.currentPageRoute;
+    const page = Route.currentPage;
+    let prev = page;
+    if (! title || title === 'Piki') {
+      title = null;
+      for (let tpl = page; tpl; prev = tpl, tpl = tpl.parent) {
+        if (tpl.title) {
+          title = tpl.title;
+          break;
+        }
+      }
+      if (! title)
+        title = prev ? util.capitalize(util.humanize(prev.name)) : "Piki";
+    }
+
     if (pageTitle)
       pageTitle.textContent = title;
-    return `Piki ${Route.currentPageRoute && Route.currentPageRoute.orgSN}: ${title}`;
+
+    if (page && page.titleSuffix)
+      title = `${title} - ${page.titleSuffix}`;
+
+    return `Piki ${(pageRoute && pageRoute.orgSN) || ''}: ${title}`;
   };
 
   return Tpl;
