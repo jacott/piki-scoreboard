@@ -1,24 +1,27 @@
 define(function(require, exports, module) {
   'use strict';
-  const koru    = require('koru');
-  const Model   = require('koru/model');
-  const Val     = require('koru/model/validation');
-  const session = require('koru/session');
-  const stubber = require('koru/test/stubber');
-  const util    = require('koru/util');
-  const User    = require('models/user');
+  const koru         = require('koru');
+  const localStorage = require('koru/local-storage');
+  const Model        = require('koru/model');
+  const dbBroker     = require('koru/model/db-broker');
+  const Val          = require('koru/model/validation');
+  const session      = require('koru/session');
+  const sessionTH    = require('koru/session/test-helper');
+  const Stubber      = require('koru/test/stubber');
+  const util         = require('koru/util');
 
-  var   TH      = require('koru/session/test-helper');
+  let TH             = Object.create(require('koru/test-helper'));
   const geddon = TH.geddon;
 
-  var user;
+  let user;
 
   TH.Factory = require('test/factory');
 
   koru.onunload(module, 'reload');
 
-  TH = util.reverseExtend({
-    showErrors: function (doc) {
+  util.mergeOwnDescriptors(TH, sessionTH);
+  util.merge(TH, {
+    showErrors (doc) {
       return function () {
         return Val.inspectErrors(doc);
       };
@@ -26,8 +29,8 @@ define(function(require, exports, module) {
 
     clearDB: isClient ? function () {
       TH.Factory.clear();
-      let dbv = Model._databases.default;
-      for(var name in dbv) {
+      const models = Model._databases.default;
+      for(var name in models) {
         var model = Model[name];
         model.docs = null;
       }
@@ -42,15 +45,15 @@ define(function(require, exports, module) {
       }
     },
 
-    user: function () {
+    user () {
       return null;
     },
 
-    userId: function () {
+    userId () {
       return user && user._id;
     },
 
-    mockRpc: function (v, sessId) {
+    mockRpc (v, sessId) {
       sessId = (sessId || "1").toString();
       if (isServer) {
         var ws = this.mockWs();
@@ -60,6 +63,7 @@ define(function(require, exports, module) {
           conn = v.conn;
         else {
           conn = new (require(id)({globalDict: session.globalDict}))(ws, sessId, function () {});
+          conn.dbId = 'sch00';
           if (v) v.conn = conn;
         }
         return geddon.test.intercept(session, 'rpc', function (method, ...args) {
@@ -122,7 +126,7 @@ define(function(require, exports, module) {
 
     matchModel: function (expect) {
       var func = this.match(function (actual) {
-        return actual && actual._id === expect._id;
+        return actual._id === expect._id;
       });
 
       Object.defineProperty(func, 'message', {get: function () {
@@ -144,21 +148,6 @@ define(function(require, exports, module) {
       return func;
     },
 
-    makeResponse: function (v) {
-      v.output = [];
-      return {
-        writeHead: geddon.test.stub(),
-        write: function (data) {
-          refute(v.ended);
-          v.output.push(data);
-        },
-        end: function (data) {
-          v.output.push(data);
-          v.ended = true;
-        }
-      };
-    },
-
     startTransaction: function () {
       if (isClient) return;
       util.forEach(arguments, db => {
@@ -167,7 +156,7 @@ define(function(require, exports, module) {
         transactionMap.set(db, tx);
         tx.transaction = 'ROLLBACK';
         db.query('BEGIN');
-        util.thread.db = db;
+        dbBroker.db = db;
       });
     },
 
@@ -176,15 +165,15 @@ define(function(require, exports, module) {
       util.forEach(arguments, db => {
         var tx = transactionMap.get(db);
         if (! tx) return;
-        util.thread.db = null;
+        dbBroker.db = null;
         tx.transaction = null;
         db.query('ROLLBACK');
         db._releaseConn();
       });
-      util.thread.db = null;
+      dbBroker.db = null;
     },
 
-  }, TH);
+  });
 
   if (isClient) {
     TH.MockFileReader = function (v) {
@@ -245,7 +234,7 @@ define(function(require, exports, module) {
         session.sendM = koru.nullFunc;
       }
     } else {
-      txClient = User.db;
+      txClient = dbBroker.db;
       txClient._getConn();
       txSave = txClient._weakMap.get(util.thread);
       txSave.transaction = 'ROLLBACK';
@@ -279,17 +268,20 @@ define(function(require, exports, module) {
 
   if (isServer) {
     geddon.onTestStart(function () {
-      util.thread.db = txClient;
+      dbBroker.db = txClient;
       txSave && txClient.query('BEGIN');
     });
 
     geddon.onTestEnd(function () {
       txSave && txClient.query('ROLLBACK');
     });
-
+  } else {
+    var orgsStr = JSON.stringify({sch00: {name: 'Org 1'}, sch02: {name: 'Org 2'}});
+    localStorage._resetValue = function () {return {orgs: orgsStr}};
   }
 
   function overrideSub(name, sub, callback) {
+    callback && callback();
     return true;
   }
 
@@ -301,7 +293,7 @@ define(function(require, exports, module) {
         func = newSpec;
         newSpec = null;
       }
-      var spy = stubber.spy(Val,'assertDocChanges');
+      var spy = Stubber.spy(Val,'assertDocChanges');
 
       try {
         func.call();
@@ -320,9 +312,8 @@ define(function(require, exports, module) {
     assertMessage: "Expected Val.assertDocChanges to be called with:\n{i1}, {i0}{$newSpec}\nbut was called with:\n{$args}",
     refuteMessage: "Did not expect Val.assertDocChanges to be called with:\n{i1}, {i0}{$newSpec}"
   });
-
   isServer && ga.add('modelUniqueIndex', {
-    assert: function (model, ...expected) {
+    assert (model, ...expected) {
       var enIdx = model.addUniqueIndex,
           count = enIdx.callCount,
           tvLength = enIdx.callCount,
@@ -350,5 +341,5 @@ define(function(require, exports, module) {
     message: "{$spy} to be calledWith {i$expected}{$calls}"
   });
 
-  return TH;
+  module.exports = TH;
 });

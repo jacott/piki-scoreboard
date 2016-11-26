@@ -21,8 +21,6 @@ define(function(require, exports, module) {
 
   function getUser() {
     const user = User.me();
-    _koru_.debug(`user`, user);
-
     if (user && user._id !== 'guest')
       return user;
   }
@@ -69,7 +67,7 @@ define(function(require, exports, module) {
       const list = [
         ['$signOut', 'Sign out'],
         ['$signOutOther', 'Sign out of other sessions'],
-        ['profile/change-password', 'Change password'],
+        ['profile', 'Profile'],
       ];
 
       SelectMenu.popup(this, {
@@ -87,17 +85,20 @@ define(function(require, exports, module) {
       list.push(['event', 'Calendar']);
       list.push('disabled sep');
       list.push(['choose-org', 'Go to another org']);
-      if (! koru.userId() || koru.userId() === 'guest')
-        list.push(['sign-in', 'Sign in']);
-      else
-        list.push(
-          ['org-settings',
-           `${Route.currentPageRoute && Route.currentPageRoute.orgSN} settings`]
-        );
-
+      list.push(
+        ! koru.userId() || koru.userId() === 'guest' ?
+          ['sign-in', 'Sign in'] :
+          ['sign-out', 'Sign out']
+      );
 
       list.push('disabled sep');
-      list.push(['help', 'Help']);
+      list.push(
+        ['category', 'Categories'],
+        ['climber', 'Climbers'],
+        ['team', 'Teams']
+      );
+      list.push('disabled sep');
+      list.push(['$help', 'Help']);
 
       SelectMenu.popup(this, {
         list,
@@ -118,6 +119,10 @@ define(function(require, exports, module) {
         else
           Flash.notice('You have been signed out of any other sessions.');
       });
+    },
+
+    $help() {
+      Dialog.open(Help.$autoRender({}));
     },
   };
 

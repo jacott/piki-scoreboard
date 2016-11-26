@@ -1,20 +1,22 @@
 isClient && define(function (require, exports, module) {
-  var test, v;
-  const koru     = require('koru');
-  const Dom      = require('koru/dom');
-  const Route    = require('koru/ui/route');
-  const Event    = require('models/event');
-  const Series   = require('models/series');
-  const EventTpl = require('ui/event');
+  const koru        = require('koru');
+  const Dom         = require('koru/dom');
+  const Route       = require('koru/ui/route');
+  const UserAccount = require('koru/user-account');
+  const Event       = require('models/event');
+  const Series      = require('models/series');
+  const Factory     = require('test/factory');
+  const EventTpl    = require('ui/event');
+  const TH          = require('./test-helper');
+
   const sut      = require('./header');
-  const TH       = require('./test-helper');
+  var v;
 
   TH.testCase(module, {
     setUp() {
-      test = this;
       v = {};
       sut.show();
-      test.stub(Route, 'gotoPath');
+      this.stub(Route, 'gotoPath');
     },
 
     tearDown() {
@@ -23,49 +25,49 @@ isClient && define(function (require, exports, module) {
     },
 
     "test event in menu"() {
-      const series = TH.Factory.createSeries();
-      const event = EventTpl.event = TH.Factory.createEvent({series_id: series._id});
+      const series = Factory.createSeries();
+      const event = EventTpl.event = Factory.createEvent({series_id: series._id});
 
-      TH.selectMenu('#Header [name=menu]', `/event/${event._id}/show`, function () {
+      TH.selectMenu('#Header [name=menu]', `event/${event._id}/show`, function () {
         assert.equals(this.textContent, event.displayName);
         TH.click(this);
       });
 
-      assert.calledWith(Route.gotoPath, `/event/${event._id}/show`);
+      assert.calledWith(Route.gotoPath, `event/${event._id}/show`);
 
     },
 
     "test Calendar"() {
-      TH.selectMenu('#Header [name=menu]', `/event`, function () {
+      TH.selectMenu('#Header [name=menu]', `event`, function () {
         assert.equals(this.textContent, 'Calendar');
         TH.click(this);
       });
 
-      assert.calledWith(Route.gotoPath, `/event`);
+      assert.calledWith(Route.gotoPath, `event`);
     },
 
     "test Change org"() {
-      TH.selectMenu('#Header [name=menu]', `/choose-org`, function () {
+      TH.selectMenu('#Header [name=menu]', `choose-org`, function () {
         assert.equals(this.textContent, 'Go to another org');
         TH.click(this);
       });
 
-      assert.calledWith(Route.gotoPath, `/choose-org`);
+      assert.calledWith(Route.gotoPath, `choose-org`);
     },
 
     "test Help"() {
-      TH.selectMenu('#Header [name=menu]', `/help`, function () {
+      TH.selectMenu('#Header [name=menu]', `$help`, function () {
         assert.equals(this.textContent, 'Help');
         TH.click(this);
       });
 
-      assert.calledWith(Route.gotoPath, `/help`);
+      assert.dom('.Dialog #Help');
     },
 
     "test sign in"() {
-      TH.loginAs(TH.Factory.createUser('guest'));
+      TH.loginAs(Factory.createUser('guest'));
 
-      TH.selectMenu('#Header [name=menu]', `/sign-in`, function () {
+      TH.selectMenu('#Header [name=menu]', `sign-in`, function () {
         assert.equals(this.textContent, 'Sign in');
         assert.dom(this.parentNode, function () {
           refute.dom('li', 'Sign out');
@@ -73,24 +75,50 @@ isClient && define(function (require, exports, module) {
         TH.click(this);
       });
 
-      assert.calledWith(Route.gotoPath, `/sign-in`);
+      assert.calledWith(Route.gotoPath, `sign-in`);
     },
 
-    "test sign out, profile, settings"() {
+    "test settings"() {
+      TH.selectMenu('#Header [name=menu]', 'climber', function () {
+        assert.dom(this.parentNode, elm => {
+          assert.dom('li', matchId('category'));
+          assert.dom('li', matchId('team'));
+        });
+      });
+    },
+
+    "test sign out"() {
       TH.login();
       TH.stubProperty(Route, 'currentPageRoute', {value: {orgSN: 'CNZ'}});
+      this.stub(UserAccount, 'logout');
 
-      TH.selectMenu('#Header [name=menu]', `/sign-out`, function () {
+      TH.selectMenu('#Header [name=menu]', '$help', function () {
+        assert.dom(this.parentNode, elm => refute.dom('li', 'Sign in'));
+      });
+
+      TH.selectMenu('#Header [name=avatar]', `$signOut`, function () {
         assert.equals(this.textContent, 'Sign out');
-        assert.dom(this.parentNode, function () {
-          refute.dom('li', 'Sign in');
-          assert.dom('li', 'Profile', {data: TH.match.field('id', '/profile')});
-          assert.dom('li', 'CNZ settings', {data: TH.match.field('id', '/org-settings')});
+        assert.dom(this.parentNode, elm => {
+          assert.dom('li', 'Profile', matchId('profile'));
         });
         TH.click(this);
       });
 
-      assert.calledWith(Route.gotoPath, `/sign-out`);
+      assert.called(UserAccount.logout);
+
+      this.stub(UserAccount, 'logoutOtherClients');
+      TH.selectMenu('[name=avatar]', '$signOutOther');
+
+      assert.calledWith(UserAccount.logoutOtherClients, TH.match.func);
+      UserAccount.logoutOtherClients.yield('my error');
+
+      assert.dom('#Flash.error', 'Unexpected error.');
+
+      UserAccount.logoutOtherClients.yield();
+
+      assert.dom('#Flash.notice', 'You have been signed out of any other sessions.');
     },
   });
+
+  function matchId(id) {return {data: TH.match.field('id', id)}}
 });

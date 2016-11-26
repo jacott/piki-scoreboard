@@ -21,7 +21,7 @@ define(function(require, exports, module) {
   const Disconnected   = require('./disconnected');
   require('./home');
 
-  var selfSub, orgSub, orgShortName, pathname, sessStateChange;
+  var selfSub, orgSub, orgShortName, sessStateChange;
 
   const isTouch = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i
         .test(navigator.userAgent.toLowerCase());
@@ -49,7 +49,7 @@ define(function(require, exports, module) {
       orgSub && orgSub.stop();
       selfSub && selfSub.stop();
       sessStateChange && sessStateChange.stop();
-      selfSub = orgSub = orgShortName = pathname = null;
+      selfSub = orgSub = orgShortName = null;
 
       window.removeEventListener('popstate', pageChanged);
     },
@@ -58,12 +58,11 @@ define(function(require, exports, module) {
       App.stop();
       sessStateChange = sessState.onChange(connectChange);
       Spinner.init();
-      pathname = [koru.getLocation()];
+      window.addEventListener('popstate', pageChanged);
       App.setAccess();
       selfSub = App.subscribe('Self', function (err) {
         Dom.removeClass(document.body, 'loading');
-        window.addEventListener('popstate', pageChanged);
-        pathname && Route.replacePath(pathname[0] || document.location, pathname[1]);
+        Route.replacePath(koru.getLocation());
       });
       header.show();
     },
@@ -87,13 +86,17 @@ define(function(require, exports, module) {
   });
 
   Route.root.routeVar = 'orgSN';
-  Route.root.onBaseEntry = function (page, pageRoute) {
+  Route.root.async = true;
+
+  Route.root.onBaseEntry = function (page, pageRoute, callback) {
     if (pageRoute.orgSN === undefined)
       pageRoute.orgSN = localStorage.getItem('orgSN') || null;
 
+
     if (pageRoute.orgSN !== orgShortName) {
-      subscribeOrg(pageRoute.orgSN);
-    }
+      subscribeOrg(pageRoute.orgSN, callback);
+    } else
+      callback();
   };
 
   Route.root.onBaseExit = function () {
@@ -111,8 +114,15 @@ define(function(require, exports, module) {
     Route.pageChanged();
   }
 
-  function subscribeOrg(shortName) {
+  function subscribeOrg(shortName, callback) {
     App.setAccess();
+    if (shortName && App.orgId) {
+      const doc = Org.findById(App.orgId);
+      if (doc && doc.shortName === shortName) {
+        callback && callback();
+        return;
+      }
+    }
     orgSub && orgSub.stop();
     if (shortName) {
       orgShortName = shortName;
@@ -125,7 +135,7 @@ define(function(require, exports, module) {
           subscribeOrg();
           return;
         }
-        var doc = Org.findBy('shortName', orgShortName);
+        const doc = Org.findBy('shortName', orgShortName);
         if (! doc) {
           subscribeOrg();
           return;
@@ -134,30 +144,15 @@ define(function(require, exports, module) {
         App.orgId = doc._id;
         App.setAccess();
         Dom.addClass(document.body, 'inOrg');
-        var orgLink = document.getElementById('OrgHomeLink');
-        if (orgLink) orgLink.textContent = doc.name;
-        if (pathname) {
-          var pn = pathname;
-          pathname = null;
-          Route.replacePath(pn[0], pn[1]);
-        }
-        if (Route.currentPage === Route.root.defaultPage)
-          Dom.Event.startPage();
+        callback();
       });
-
 
       Flash.loading();
 
-      if (Route.loadingArgs) {
-        pathname = Route.loadingArgs;
-        Route.abortPage();
-      }
-
     } else {
-      orgSub = orgShortName = App.orgId = pathname = null;
+      orgSub = orgShortName = App.orgId = null;
       Dom.removeClass(document.body, 'inOrg');
-      var orgLink = document.getElementById('OrgHomeLink');
-      if (orgLink) orgLink.textContent = "Choose Organization";
+      callback && callback();
     }
   }
 

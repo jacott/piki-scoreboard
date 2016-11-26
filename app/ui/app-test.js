@@ -6,6 +6,7 @@ isClient && define(function (require, exports, module) {
   const session      = require('koru/session');
   const publish      = require('koru/session/publish');
   const Route        = require('koru/ui/route');
+  const Factory      = require('test/factory');
   const EventTpl     = require('ui/event');
   const Spinner      = require('ui/spinner');
   const TH           = require('ui/test-helper');
@@ -54,16 +55,13 @@ isClient && define(function (require, exports, module) {
       assert.same(App.me(), user);
     },
 
-    "//test rendering"() {
+    "test rendering"() {
       TH.loginAs(TH.Factory.createUser('guest'));
       App.start();
 
       assert.dom('body.readOnlyAccess', function () {
         assert.dom('body>header', function () {
-          assert.dom('button#OrgHomeLink', "Choose Organization", function () {
-             assert.same(Dom.getCtx(this).data.link, Dom.Home);
-          });
-          assert.dom('button[name=signIn]');
+          assert.dom('button[name=menu]');
         });
       });
     },
@@ -72,8 +70,6 @@ isClient && define(function (require, exports, module) {
       test.stub(Route, 'pageChanged');
 
       App.start();
-
-      refute.called(window.addEventListener);
 
       var sub = v.subSelf.args(0, 1);
 
@@ -90,23 +86,44 @@ isClient && define(function (require, exports, module) {
       test.stub(publish._pubs, 'Org');
       Route.replacePath.restore();
       test.stub(koru, 'getLocation').returns({pathname: '/'});
+      test.stub (App, 'subscribe');
 
-      v.subOrg = session.interceptSubscribe.withArgs('Org');
+      const selfSub = App.subscribe.withArgs('Self').returns({waiting: true, stop: this.stub()});
+      const orgSub = App.subscribe.withArgs('Org');
 
       App.start();
 
-      v.subSelf.args(0, 1).callback();
+      selfSub.yield();
 
       v.org = TH.Factory.createOrg({shortName: 'FUZ'});
 
-      assert.calledWith(v.subOrg, 'Org');
-      test.stub(EventTpl, 'startPage');
-      v.subOrg.args(0, 1).callback();
-
-      assert.called(EventTpl.startPage);
+      assert.calledWith(orgSub, 'Org');
+      orgSub.yield();
 
       assert.same(App.orgId, v.org._id);
 
+      assert.same(Route.currentPage, Dom.Home);
+    },
+
+    "test Route.root.onBaseEntry"() {
+      assert.same(Route.root.routeVar, 'orgSN');
+      assert.same(Route.root.async, true);
+      test.stub (App, 'subscribe');
+
+      const selfSub = App.subscribe.withArgs('Self').returns({stop: this.stub()});
+      const orgSub = App.subscribe.withArgs('Org');
+
+      App.start();
+      selfSub.yield();
+
+      /** test diff orgSN */
+      Route.root.onBaseEntry('x', {orgSN: 'org2'}, v.callback = test.stub());
+      refute.called(v.callback);
+      assert.calledWith(App.subscribe, 'Org', 'org2');
+
+      Factory.createOrg({shortName: 'org2'});
+      orgSub.yield();
+      assert.called(v.callback);
     },
 
     "test subscribing to Org"() {
@@ -114,43 +131,42 @@ isClient && define(function (require, exports, module) {
       Route.replacePath.restore();
       test.stub(koru, 'getLocation').returns({pathname: '/FOO'});
 
-      v.subOrg = session.interceptSubscribe.withArgs('Org');
+      this.stub(App, 'subscribe');
+      v.subSelf = App.subscribe.withArgs('Self').returns({stop() {}});
+      v.subOrg = App.subscribe.withArgs('Org').returns({stop: v.orgStop = this.stub()});
 
       assert.same(Route.root.routeVar, 'orgSN');
 
       App.start();
 
       assert.called(v.subSelf);
-      refute.called(v.subOrg);
-      v.subSelf.args(0, 1).callback();
+      v.subSelf.yield();
 
       assert.called(v.subOrg);
 
       // simulate org added by subscribe
       v.org = TH.Factory.createOrg({shortName: 'FOO'});
       Dom.getCtxById('Header').updateAllTags();
-      v.subOrg.args(0, 1).callback();
+      v.subOrg.yield();
 
       assert.same(App.orgId, v.org._id);
       assert.equals(App.org().attributes, v.org.attributes);
 
-      // FIXME
-//      assert.dom('#OrgHomeLink', v.org.name);
+      assert.dom('#Home');
       assert.className(document.body, 'inOrg');
 
-      v.stopStub = test.stub(v.subOrg.args(0, 1), 'stop');
+//      v.stopStub = test.stub(v.subOrg.args(0, 1), 'stop');
 
       assert.same(localStorage.getItem('orgSN'), 'FOO');
 
       localStorage.setItem('orgSN', '');
 
-      Route.root.onBaseEntry(null, {});
+      Route.root.onBaseEntry(null, {}, v.callback = this.stub());
 
-      assert.called(v.stopStub);
+      assert.called(v.orgStop);
 
       assert.same(App.orgId, null);
-      // FIXME
-      //      assert.dom('#OrgHomeLink', "Choose Organization");
+      assert.called(v.callback);
       refute.className(document.body, 'inOrg');
     },
   });

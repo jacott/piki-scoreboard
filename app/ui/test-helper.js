@@ -1,37 +1,103 @@
 define(function(require, exports, module) {
-  const koruTH =    require('koru/ui/test-helper');
-  const util =      require('koru/util');
-  const Dom =       require('koru/dom');
-  const Route =     require('koru/ui/route');
-  const koru =       require('koru');
-  const App =       require('./app');
-  const Home =      require('ui/home');
-  const TH =        require('test-helper');
+  const TH       = Object.create(require('test-helper'));
+  const koru         = require('koru');
+  const Dom          = require('koru/dom');
+  const localStorage = require('koru/local-storage');
   require('koru/ui/helpers');
+  const Route        = require('koru/ui/route');
+  const KoruUITH     = require('koru/ui/test-helper');
+  const util         = require('koru/util');
+  const Factory      = require('test/factory');
+  const App          = require('ui/app');
 
   koru.onunload(module, 'reload');
 
-  exports = module.exports = util.reverseExtend({
-    setOrg: function (org) {
-      org = org || exports.Factory.createOrg();
+  util.mergeOwnDescriptors(TH, KoruUITH);
+  util.merge(TH, {
+    setOrg(org) {
+      org = org || Factory.createOrg();
       App.orgId = org._id;
+      localStorage.setItem('orgSN', org.shortName);
       Dom.addClass(document.body, 'inOrg');
-      App._setOrgShortName(org.shortName);
-
-      Route.replacePage(Home, {orgSN: org.shortName});
     },
 
-    selectMenu: koruTH.selectMenu,
-
-    tearDown: function () {
-      Route.replacePage();
-      exports.domTearDown();
-      exports.clearDB();
+    tearDown(v) {
+      TH.domTearDown();
+      TH.clearDB();
       util.thread.userId = null;
     },
-  }, TH);
 
-  exports.setAccess = App.setAccess; // used by TH.loginAs
+    addStyles(styles) {
+      var style = Dom.h({style: '', class: "testStyle"});
+
+      style.innerHTML = styles;
+      document.head.appendChild(style);
+    },
+
+    findDomEvent(template, type) {
+      return template._events.filter(function (event) {
+        return event[0] === type;
+      });
+    },
+
+    mouse(node, eventName, args) {
+      if (typeof node === 'string') {
+        assert.elideFromStack.dom(node, function () {
+          TH.mouse(this, eventName, args);
+        });
+      } else {
+        assert.elideFromStack(node,'node not found');
+        if (typeof eventName === 'object') {
+          args = eventName;
+          eventName = 'mousemove';
+        } else {
+          eventName = eventName || 'mousemove';
+          args = args || {};
+        }
+        var bbox = node.getBoundingClientRect();
+
+        args.clientX = bbox.left + bbox.width/2;
+        args.clientY = bbox.top + bbox.height/2;
+
+        var event =  TH.buildEvent(eventName, args);
+
+        if (document.createEvent) {
+          TH.dispatchEvent(node, event);
+        } else {
+          node.fireEvent("on" + event.__name, event);
+        }
+        return event;
+      }
+    },
+
+    stubRAF(v) {
+      var func;
+      TH.geddon.test.intercept(window, 'requestAnimationFrame', function (arg) {
+        func = arg;
+        return 123;
+      });
+      v.nextRaf = function () {
+        if (func) {
+          func();
+          func = null;
+        }
+      };
+    },
+
+    confirmRemove(func) {
+      var dialog = document.body.querySelector('.Dialog');
+      assert.elideFromStack.msg('should display Confirm Dialog')(dialog);
+      assert.elideFromStack.dom(dialog, function () {
+        assert.elideFromStack.dom('#ConfirmRemove', function () {
+          func && func();
+        });
+        TH.click('[name=okay]');
+        assert.elideFromStack.msg('should close confirm dialog')
+          .same(this.parentNode, null);
+
+      });
+    },
+  });
 
   var onAnimationEnd;
 
@@ -46,5 +112,5 @@ define(function(require, exports, module) {
     Dom.Ctx.prototype.onAnimationEnd = onAnimationEnd;
   });
 
-  util.reverseExtend(exports, koruTH);
+  module.exports = TH;
 });

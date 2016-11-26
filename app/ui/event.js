@@ -103,31 +103,6 @@ define(function(require, exports, module) {
       eventSub && eventSub.stop();
       Tpl.event = null;
     },
-
-    startPage() {
-      let prev, curr, currDate;
-      const now = util.dateNow();
-
-      Event.query.sort('date', -1).forEach(doc => {
-        prev = curr;
-        curr = doc;
-        currDate = new Date(curr.date).getTime();
-        return currDate < now;
-      });
-
-      if (! curr) {
-        Route.replacePage(Tpl);
-        return;
-      }
-
-      if (prev) {
-        const prevDate = new Date(prev.date).getTime();
-        if (Math.abs(now - prevDate) < Math.abs(now - currDate))
-          curr = prev;
-      }
-
-      Route.replacePage(Tpl.Show, {eventId: curr._id});
-    },
   });
 
   Tpl.$events({

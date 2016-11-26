@@ -28,7 +28,7 @@ isClient && define(function (require, exports, module) {
         TH.click('.link', v.org.name);
       });
 
-      assert.calledWith(Route.gotoPath, v.org.shortName);
+      assert.calledWith(Route.gotoPath, `/#${v.org.shortName}/event`);
     },
 
     "with org": {
@@ -49,14 +49,8 @@ isClient && define(function (require, exports, module) {
           TH.click('button.link', 'Climbers');
           assert.calledWith(Route.gotoPath, Dom.Climber);
 
-          TH.click('button.link', 'Events');
-          assert.calledWith(Route.gotoPath, Dom.Event);
-
           TH.click('button.link', 'Competitor categories');
           assert.calledWith(Route.gotoPath, Dom.Category);
-
-          TH.click('button.link', 'Org');
-          assert.calledWith(Route.gotoPath, Dom.Home.ChooseOrg);
         });
       },
 
@@ -65,13 +59,6 @@ isClient && define(function (require, exports, module) {
         TH.click('button.link', 'Climbers');
 
         assert.dom('#Climber');
-      },
-
-      "test events link"() {
-        Route.gotoPage(Dom.Home);
-        TH.click('button.link', 'Events');
-
-        assert.dom('#Event');
       },
     },
   });

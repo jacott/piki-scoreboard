@@ -41,7 +41,8 @@ isClient && define(function (require, exports, module) {
       v.open = TH.Factory.createCategory({group: '2 Open Lead'});
 
       TH.setOrg(v.org);
-      v.eventSub = test.stub(App, 'subscribe').withArgs('Event').returns({stop: v.stop = test.stub()});
+      this.stub(App, 'subscribe').yields();
+      v.eventSub = App.subscribe.withArgs('Event').returns({stop: v.stop = test.stub()});
       TH.login();
     },
 

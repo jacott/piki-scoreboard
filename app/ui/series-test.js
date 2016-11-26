@@ -101,7 +101,7 @@ isClient && define(function (require, exports, module) {
 
     "test switching tabs"() {
       Route.gotoPage(sut.Events, {seriesId: v.series._id});
-      assert.same(Route.currentHref, `/#SN1/series/${v.series._id}/events`);
+      assert.same(Route.currentHref, `/#series/${v.series._id}/events`);
       assert.dom('#Series', function () {
         assert.dom('.tabbed.list .tabNames', function () {
 
@@ -146,7 +146,7 @@ isClient && define(function (require, exports, module) {
               assert.calledWith(session.rpc, 'Ranking.seriesResult', v.series._id, TH.match.func);
               session.rpc.yield(null, v.results);
               refute.className(this, 'loading');
-              assert.same(Route.currentHref, `/#SN1/series/${v.series._id}/results`);
+              assert.same(Route.currentHref, `/#series/${v.series._id}/results`);
               assert.dom('table.categories', function () {
                 assert.dom('tr:first-child.heading.fmt.B>td[colspan="2"]');
                 assert.dom('tr', {count: 6});

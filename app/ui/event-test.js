@@ -29,46 +29,6 @@ isClient && define(function (require, exports, module) {
       v = null;
     },
 
-    "test startPage"() {
-      const replacePage = test.stub(Route, 'replacePage');
-
-      // no events
-      sut.startPage();
-      assert.calledWith(replacePage, sut);
-
-
-      var events = TH.Factory.createList(3, 'createEvent', function (index, options) {
-        options.date = `2014/0${8-index}/01`;
-      });
-
-      // closer to 2014/07/01 than 2014/08/01
-      util.withDateNow(new Date(2014, 7-1, 10), () => {
-        sut.startPage();
-        assert.calledWith(replacePage, sut.Show, {eventId: events[1]._id});
-      });
-
-      replacePage.reset();
-      // after all events
-      util.withDateNow(new Date(2014, 10-1, 3), () => {
-        sut.startPage();
-        assert.calledWith(replacePage, sut.Show, {eventId: events[0]._id});
-      });
-
-      replacePage.reset();
-      // before all events - very rare
-      util.withDateNow(new Date(2014, 1, 3), () => {
-        sut.startPage();
-        assert.calledWith(replacePage, sut.Show, {eventId: events[2]._id});
-      });
-
-      replacePage.reset();
-      // closer to 2014/07/01 than 2014/06/01
-      util.withDateNow(new Date(2014, 6-1, 20), () => {
-        sut.startPage();
-        assert.calledWith(replacePage, sut.Show, {eventId: events[1]._id});
-      });
-    },
-
     "test event subscribing"() {
       var events = TH.Factory.createList(2, 'createEvent', function (index, options) {
         options.date = "2014/01/0"+(8-index);
@@ -142,7 +102,7 @@ isClient && define(function (require, exports, module) {
       });
     },
 
-    "//test switching series tabs"() {
+    "test switching series tabs"() {
       Route.gotoPage(sut.Index);
 
       test.spy(Route, 'replacePage');

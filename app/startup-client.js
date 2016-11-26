@@ -17,6 +17,7 @@ define(function(require, exports, module) {
   require('ui/sign-in');
   require('ui/team');
   require('ui/team-results');
+  require('ui/help');
 
   koru.onunload(module, restart);
 

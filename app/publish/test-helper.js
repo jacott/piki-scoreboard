@@ -1,20 +1,20 @@
 define(function(require, exports, module) {
-  var koru = require('koru');
-  var TH = require('test-helper');
-  var util = require('koru/util');
-  var Model = require('model');
-  var Val = require('koru/model/validation');
-  var session = require('koru/session');
-  var message = require('koru/session/message');
-  var scFactory = require('koru/session/server-connection-factory');
+  const TH               = Object.create(require('test-helper'));
+  const koru        = require('koru');
+  const Val         = require('koru/model/validation');
+  const session     = require('koru/session');
+  const message     = require('koru/session/message');
+  const UserAccount = require('koru/user-account');
+  const util        = require('koru/util');
+  const Model       = require('model');
 
-  var geddon = TH.geddon;
+  const geddon = TH.geddon;
 
-  return util.extend({
-    mockClientSub: function () {
+  util.merge(TH, {
+    mockClientSub () {
       var sub = {
         match: geddon.test.stub(),
-        onStop: function (func) {
+        onStop (func) {
           geddon.test.onEnd(func);
         },
       };
@@ -23,7 +23,7 @@ define(function(require, exports, module) {
       return sub;
     },
 
-    stubMatchers: function (sub, names) {
+    stubMatchers (sub, names) {
       var matchers = {};
       names.split(' ').forEach(function (name) {
         matchers[name] = sub.match.withArgs(name, TH.match.func);
@@ -31,7 +31,7 @@ define(function(require, exports, module) {
       return matchers;
     },
 
-    assertMatchersCalled: function (matchers) {
+    assertMatchersCalled (matchers) {
       var funcs = {};
       for (var key in matchers) {
         var match = matchers[key];
@@ -41,37 +41,33 @@ define(function(require, exports, module) {
       return funcs;
     },
 
-    mockConnection: function (sessId, session) {
-      var test = geddon.test;
-      var conn = new (scFactory(session || this.mockSession()))({send: test.stub(), on: test.stub()}, sessId || 's123', test.stub());
-      conn.userId = koru.userId();
-      conn.sendBinary = test.stub();
-      conn.added = test.stub();
-      conn.changed = test.stub();
-      conn.removed = test.stub();
-      return conn;
-    },
-
-    mockSession: function () {
+    mockSession () {
       return {globalDict: message.newGlobalDict()};
     },
 
-    mockSubscribe: function (v, id, name) {
+    stubVerifyToken (token) {
+      token = (token || 'ulid|ultoken').split('|');
+      geddon.test.stub(UserAccount, 'verifyToken').withArgs(...token).returns({userId: TH.userId()});
+    },
+
+    mockSubscribe (v, id, name, ...args) {
       if (! v.conn) {
         v.conn = this.mockConnection(null, v.session);
         v.send = v.conn.ws.send;
       }
       var pub = session._commands.P;
-      var args =  new Array(arguments.length - 3);
-      for(var i = args.length - 1; i >= 0; --i) args[i] = arguments[i+3];
       pub.call(v.conn, [id, name, args]);
 
       return v.conn._subs[id];
     },
 
-    cleanUpTest: function (v) {
+    cleanUpTest (v) {
       TH.clearDB();
       v.conn && v.conn.close();
     },
-  }, TH);
+  });
+
+  require('koru/env!./test-helper')(TH);
+
+  module.exports = TH;
 });
