@@ -34,7 +34,7 @@ define(function(require, exports, module) {
   Factory.defines({
     Org: function (options) {
       return new Factory.Builder('Org', options).genName()
-        .addField('email', 'email' in options || Factory.generateName('email').replace(/\s+/g, '') + '@obeya.co')
+        .addField('email', 'email' in options || Factory.generateName('email').replace(/\s+/g, '') + '@vimaly.com')
         .addField('shortName', 'shortName' in options || Factory.generateName('SN').replace(/\s+/g, ''));
     },
 

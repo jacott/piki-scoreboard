@@ -40,7 +40,7 @@
 }
 
 .oi-content(@content) {
-  font-family: 'Obeya icons';
+  font-family: 'app icons';
   content: @content;
 }
 

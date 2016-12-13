@@ -1,6 +1,6 @@
-var KORU_PORT = process.env['KORU_PORT'];
+const KORU_PORT = process.env['KORU_PORT'];
 
-var urlRoot = 'http://localhost:'+KORU_PORT+'/';
+const urlRoot = 'http://localhost:'+KORU_PORT;
 
 exports.server = function (cfg) {
   cfg.merge('requirejs', {
@@ -18,11 +18,11 @@ exports.server = function (cfg) {
       },
 
       "koru/main": {
-        "urlRoot": urlRoot,
+        urlRoot,
         indexjs: __dirname+"/../build/index.js",
         "userAccount" : {
           emailConfig: {
-            from: 'piki-demo@obeya.co',
+            from: 'piki-demo@vimaly.lxd',
             siteName: 'Piki demo',
           },
         },

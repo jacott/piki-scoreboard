@@ -1,7 +1,7 @@
-var KORU_HOSTNAME = process.env['KORU_HOSTNAME'];
-var KORU_PORT = process.env['KORU_PORT'];
+const KORU_HOSTNAME = process.env['KORU_HOSTNAME'];
+const KORU_PORT = process.env['KORU_PORT'];
 
-var urlRoot = 'https://'+KORU_HOSTNAME+'/';
+const urlRoot = 'https://'+KORU_HOSTNAME;
 
 exports.server = function (cfg) {
   cfg.merge('requirejs', {
@@ -17,7 +17,7 @@ exports.server = function (cfg) {
       },
 
       "koru/main": {
-        "urlRoot": urlRoot,
+        urlRoot,
         "mailUrl": "smtp://mail",
         "userAccount" : {
           emailConfig: {
