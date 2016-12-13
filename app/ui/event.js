@@ -70,27 +70,8 @@ define(function(require, exports, module) {
       if (eventSub === currentSub)
         callback();
 
-      Tpl.stopNotify = Route.onChange((page, pageRoute, href) => {
-
-        const tabList = Dom('#Event>div>nav.tabbed');
-        const old = tabList.getElementsByClassName('selected')[0];
-
-        Dom.removeClass(old, "selected");
-
-
-        const query = `button[name="${page.name}"]`;
-        let button = page.parent === Tpl && tabList.querySelector(
-          pageRoute.search ? `${query}[data-search="${pageRoute.search}"]` : query
-        );
-
-        if (! button) {
-          if (Dom.Event.Register.$contains(page))
-            button =  tabList.querySelector('[name="Register"]');
-        }
-
-        Dom.setClass('hide', ! button, tabList);
-        Dom.addClass(button, "selected");
-      }).stop;
+      Tpl.stopNotify = Route.onChange(pageChange).stop;
+      pageChange(page, pageRoute);
     },
 
     onBaseExit(page, pageRoute) {
@@ -104,6 +85,27 @@ define(function(require, exports, module) {
       Tpl.event = null;
     },
   });
+
+  function pageChange(page, pageRoute) {
+    const tabList = Dom('#Event>div>nav.tabbed');
+    const old = tabList.getElementsByClassName('selected')[0];
+
+    Dom.removeClass(old, "selected");
+
+
+    const query = `button[name="${page.name}"]`;
+    let button = page.parent === Tpl && tabList.querySelector(
+      pageRoute.search ? `${query}[data-search="${pageRoute.search}"]` : query
+    );
+
+    if (! button) {
+      if (Dom.Event.Register.$contains(page))
+        button =  tabList.querySelector('[name="Register"]');
+    }
+
+    Dom.setClass('hide', ! button, tabList);
+    Dom.addClass(button, "selected");
+  }
 
   Tpl.$events({
     'click .tabNames>button'(event) {

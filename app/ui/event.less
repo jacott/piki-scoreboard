@@ -3,11 +3,6 @@
 #Event {
   user-select: none;
 
-  >div>.body {
-    margin: 2em 1em 1em;
-  }
-
-
   form {
     margin: 10px;
 
@@ -52,6 +47,17 @@
 
 
 #Event #Show {
+  >div {
+    margin: 0 1em;
+  }
+
+  tr {
+    line-height: 1.5em;
+    vertical-align: baseline;
+    .select:before {
+      line-height: inherit;
+    }
+  }
   form {
     display: inline-block;
 

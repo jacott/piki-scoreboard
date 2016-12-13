@@ -85,11 +85,8 @@ define(function(require, exports, module) {
       list.push(['event', 'Calendar']);
       list.push('disabled sep');
       list.push(['choose-org', 'Go to another org']);
-      list.push(
-        ! koru.userId() || koru.userId() === 'guest' ?
-          ['sign-in', 'Sign in'] :
-          ['sign-out', 'Sign out']
-      );
+      (koru.userId() && koru.userId() !== 'guest') ||
+        list.push(['sign-in', 'Sign in']);
 
       list.push('disabled sep');
       list.push(
@@ -141,12 +138,12 @@ define(function(require, exports, module) {
       ctx.onDestroy(ClientLogin.onChange(session, state => {
         if (state === 'ready') {
           const uid = koru.userId();
-          if (! uid || uid === 'guest' || getUser())
+          ctx.userObserve && ctx.userObserve.stop();
+          ctx.userObserve = User.observeId(uid, () => {
+            App.setAccess();
             ctx.updateAllTags();
-          else {
-            ctx.userObserve && ctx.userObserve.stop();
-            ctx.userObserve = User.observeId(uid, () => ctx.updateAllTags());
-          }
+          });
+          ctx.updateAllTags();
         }
       }));
     },

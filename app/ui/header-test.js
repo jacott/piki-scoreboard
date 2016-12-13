@@ -69,9 +69,6 @@ isClient && define(function (require, exports, module) {
 
       TH.selectMenu('#Header [name=menu]', `sign-in`, function () {
         assert.equals(this.textContent, 'Sign in');
-        assert.dom(this.parentNode, function () {
-          refute.dom('li', 'Sign out');
-        });
         TH.click(this);
       });
 

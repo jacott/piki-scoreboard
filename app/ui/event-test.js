@@ -60,6 +60,7 @@ isClient && define(function (require, exports, module) {
       Route.gotoPage(sut.Index);
 
       assert.dom('#Event', function () {
+        assert.dom('.tabbed.list.hide');
         assert.dom('button.selected.event.tab', 'Events');
         assert.dom('button:not(.selected).series.tab', 'Series');
         assert.dom('.list', function () {

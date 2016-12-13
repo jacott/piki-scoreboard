@@ -63,6 +63,7 @@ isClient && define(function (require, exports, module) {
     "test registering": function () {
       gotoPage();
 
+      assert.dom('#Event [name=Register].selected');
       assert.dom('#Event #Register:not(.closed)', function () {
         refute.dom('.Groups');
         assert.dom('fieldset', function () {
