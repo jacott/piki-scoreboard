@@ -1,0 +1,14 @@
+<template name="ChooseOrg">
+  <section id="ChooseOrg" class="body">
+    <div>
+      <section class="body">
+        <ul class="ui-ul">
+          {{each "orgs" template="Row"}}
+          <template name="Row">
+            <li><button type="button" class="link">{{name}}</button></li>
+          </template>
+        </ul>
+      </section>
+    </div>
+  </section>
+</template>

@@ -19,7 +19,6 @@ define(function(require, exports, module) {
   const Spinner        = require('ui/spinner');
   const App            = require('./app-base');
   const Disconnected   = require('./disconnected');
-  require('./home');
 
   var selfSub, orgSub, orgShortName, sessStateChange;
 

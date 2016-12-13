@@ -51,7 +51,7 @@ define(function(require, exports, module) {
             Form.renderError(form, 'newPassword', Val.Error.msgFor(error.reason));
           koru.error(error.message);
         } else {
-          Route.replacePath(Dom.Home);
+          Route.replacePath(Route.root.defaultPage);
         }
       }
     },

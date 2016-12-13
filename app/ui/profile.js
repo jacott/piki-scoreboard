@@ -8,7 +8,6 @@ define(function(require, exports, module) {
   const UserAccount = require('koru/user-account');
   const login       = require('koru/user-account/client-login');
   const User        = require('models/user');
-  const Home        = require('ui/home');
   const SystemSetup = require('./system-setup');
 
   const Tpl = Dom.newTemplate(require('koru/html!./profile'));
@@ -70,7 +69,7 @@ define(function(require, exports, module) {
       var user = User.me();
 
       if (! user || user._id === 'guest')
-        Route.abortPage(Home);
+        Route.abortPage(Route.root.defaultPage);
 
       document.body.appendChild(Tpl.$autoRender(User.me()));
     },
@@ -81,7 +80,7 @@ define(function(require, exports, module) {
 
     $created (ctx) {
       ctx.onDestroy(login.onChange(session, state => {
-        state === 'ready' && Route.replacePage(Home);
+        state === 'ready' && Route.replacePage(Route.root.defaultPage);
       }));
     },
   });

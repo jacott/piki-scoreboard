@@ -7,6 +7,7 @@ isClient && define(function (require, exports, module) {
   const publish      = require('koru/session/publish');
   const Route        = require('koru/ui/route');
   const Factory      = require('test/factory');
+  const Event        = require('ui/event');
   const EventTpl     = require('ui/event');
   const Spinner      = require('ui/spinner');
   const TH           = require('ui/test-helper');
@@ -102,7 +103,7 @@ isClient && define(function (require, exports, module) {
 
       assert.same(App.orgId, v.org._id);
 
-      assert.same(Route.currentPage, Dom.Home);
+      assert.same(Route.currentPage, Route.root.defaultPage);
     },
 
     "test Route.root.onBaseEntry"() {
@@ -152,10 +153,8 @@ isClient && define(function (require, exports, module) {
       assert.same(App.orgId, v.org._id);
       assert.equals(App.org().attributes, v.org.attributes);
 
-      assert.dom('#Home');
+      assert.dom('#Event');
       assert.className(document.body, 'inOrg');
-
-//      v.stopStub = test.stub(v.subOrg.args(0, 1), 'stop');
 
       assert.same(localStorage.getItem('orgSN'), 'FOO');
 

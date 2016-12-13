@@ -7,7 +7,6 @@ isClient && define(function (require, exports, module) {
   var App = require('ui/app');
   var UserAccount = require('koru/user-account');
   var Random = require('koru/random');
-  var Home = require('./home');
   var koru = require('koru');
 
   TH.testCase(module, {
@@ -72,7 +71,7 @@ isClient && define(function (require, exports, module) {
 
       v.callback(null);
 
-      assert.calledWith(Route.replacePath, Home);
+      assert.calledWith(Route.replacePath, Route.root.defaultPage);
     },
 
   });

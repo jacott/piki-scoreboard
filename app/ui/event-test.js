@@ -1,5 +1,4 @@
 isClient && define(function (require, exports, module) {
-  var test, v;
   const Route      = require('koru/ui/route');
   const util       = require('koru/util');
   const Climber    = require('models/climber');
@@ -8,10 +7,12 @@ isClient && define(function (require, exports, module) {
   const Series     = require('models/series');
   const App        = require('ui/app');
   const TeamHelper = require('ui/team-helper');
-  const sut        = require('./event');
   require('./event-category');
   require('./event-register');
   const TH         = require('./test-helper');
+
+  const sut        = require('./event');
+  var test, v;
 
   TH.testCase(module, {
     setUp() {
@@ -53,6 +54,8 @@ isClient && define(function (require, exports, module) {
     },
 
     "test rendering"() {
+      assert.same(Route.root.defaultPage, sut.Index);
+
       var events = TH.Factory.createList(2, 'createEvent', function (index, options) {
         options.date = "2014/01/0"+(6+index);
       });

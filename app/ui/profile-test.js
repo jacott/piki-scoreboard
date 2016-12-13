@@ -5,7 +5,7 @@ isClient && define(function (require, exports, module) {
   const Route       = require('koru/ui/route');
   const UserAccount = require('koru/user-account');
   const ClientLogin = require('koru/user-account/client-login');
-  const Home        = require('ui/home');
+  const Event       = require('ui/event');
   const Profile     = require('./profile');
   const TH          = require('./test-helper');
 
@@ -40,7 +40,7 @@ isClient && define(function (require, exports, module) {
         ClientLogin.wait(session, 'wait');
         refute.called(Route.replacePage);
         ClientLogin.ready(session, 'ready');
-        assert.calledWith(Route.replacePage, Home);
+        assert.calledWith(Route.replacePage, Event.Index);
       },
 
       "test signOut other clients": function () {

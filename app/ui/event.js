@@ -18,7 +18,12 @@ define(function(require, exports, module) {
 
   const Tpl   = Dom.newTemplate(require('koru/html!./event'));
   const $ = Dom.current;
-  const Index = Tpl.Index;
+  const Index = Route.root.defaultPage = Tpl.Index;
+
+
+  koru.onunload(module, function () {
+    Route.root.defaultPage = null;
+  });
 
   Dom.registerHelpers({
     lazySeriesList() {
