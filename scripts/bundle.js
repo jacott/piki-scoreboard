@@ -8,7 +8,7 @@ const {parse} = require('babylon');
 const generate = require('babel-generator').default;
 
 process.chdir(__dirname+'/..');
-var rootDir = process.cwd();
+const rootDir = process.cwd();
 
 bundleAll.bundle({
 }, function ({ast, code: codeMap, css}) {

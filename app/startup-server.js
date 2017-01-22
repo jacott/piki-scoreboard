@@ -11,14 +11,14 @@ define(function(require, exports, module) {
 
   koru.onunload(module, restart);
 
-  var emailConfig = koru.config.userAccount.emailConfig;
+  const emailConfig = koru.config.userAccount.emailConfig;
   emailConfig.sendResetPasswordEmailText = function(user, resetToken) {
     return require('server/email-text').sendResetPasswordEmailText(user, resetToken);
   };
 
   function restart(mod, error) {
     if (error) return;
-    var modId = mod.id;
+    const modId = mod.id;
     setTimeout(function () {
       require(modId, function (sc) {
         sc.start && sc.start();

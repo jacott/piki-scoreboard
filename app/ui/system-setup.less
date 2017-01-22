@@ -5,7 +5,11 @@ body:not(.inOrg) #SystemSetup .menu>[name=addUser] {
   display: none;
 }
 
-#SystemSetup {
+#SystemSetup>div {
+  padding: 4px;
+  h1 {
+    margin-top: 20px;
+  }
   table.orgs {
     body:not(sAccess) & {
       cursor: inherit;

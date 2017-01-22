@@ -12,7 +12,7 @@ define(function(require, exports, module) {
   Route.root.addTemplate(module, Tpl);
 
   Tpl.$helpers({
-    orgs: function (callback) {
+    orgs(callback) {
       callback.render({model: Org, sort: util.compareByName});
     },
   });

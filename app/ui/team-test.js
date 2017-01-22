@@ -30,6 +30,8 @@ isClient && define(function (require, exports, module) {
       TH.Factory.createTeamType();
       var other = TH.Factory.createTeam();
 
+      TeamHelper.teamType_id = 'foo'; // should self correct
+
       Route.gotoPage(sut.Index);
 
       assert.dom('#Team', function () {

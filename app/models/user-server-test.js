@@ -1,18 +1,18 @@
 define(function (require, exports, module) {
-  var test, v;
   const koru        = require('koru');
   const Val         = require('koru/model/validation');
   const session     = require('koru/session');
   const UserAccount = require('koru/user-account');
   const ChangeLog   = require('models/change-log');
   const TH          = require('test-helper');
+
   const User        = require('./user');
+  var v;
 
   TH.testCase(module, {
     setUp() {
-      test = this;
       v = {};
-      test.stub(koru, 'info');
+      this.stub(koru, 'info');
     },
 
     tearDown() {
@@ -21,7 +21,7 @@ define(function (require, exports, module) {
     },
 
     "test guestUser"() {
-      var guest = User.guestUser();
+      const guest = User.guestUser();
       assert.equals(guest._id, 'guest');
       assert.equals(guest.role, 'g');
 
@@ -29,8 +29,8 @@ define(function (require, exports, module) {
     },
 
     "test authorize"() {
-      var subject = TH.Factory.createUser();
-      var user = TH.Factory.createUser('su');
+      const subject = TH.Factory.createUser();
+      let user = TH.Factory.createUser('su');
 
       refute.accessDenied(function () {
         subject.authorize(user._id);
@@ -44,9 +44,9 @@ define(function (require, exports, module) {
     },
 
     "test admin deleting superuser"() {
-      var org = TH.Factory.createOrg();
-      var subject = TH.Factory.createUser({org_id: org._id, role: User.ROLE.admin});
-      var user = TH.Factory.createUser('su', {org_id: org._id});
+      const org = TH.Factory.createOrg();
+      const subject = TH.Factory.createUser({org_id: org._id, role: User.ROLE.admin});
+      const user = TH.Factory.createUser('su', {org_id: org._id});
 
       assert.accessDenied(function () {
         user.authorize(subject._id);
@@ -54,15 +54,15 @@ define(function (require, exports, module) {
     },
 
     "test createUser"() {
-      test.stub(UserAccount, 'sendResetPasswordEmail', function (user, token) {
+      this.stub(UserAccount, 'sendResetPasswordEmail', function (user, token) {
         assert(User.exists({_id: user._id}));
       });
       TH.loginAs(TH.Factory.createUser('su'));
-      var user = TH.Factory.buildUser();
+      const user = TH.Factory.buildUser();
       ChangeLog.docs.remove({});
       user.$$save();
 
-      var mUser = UserAccount.model.findBy('userId', user._id);
+      const mUser = UserAccount.model.findBy('userId', user._id);
 
       assert(mUser);
 
@@ -77,38 +77,40 @@ define(function (require, exports, module) {
       TH.Factory.createUser('su');
       TH.login();
 
-      var rpc = TH.mockRpc(v);
+      const rpc = TH.mockRpc(v);
       rpc('save', 'User', TH.userId(), {email: "foo@bar.com"});
 
-      var user = User.findById(TH.userId());
+      const user = User.findById(TH.userId());
 
       assert.same(user.email, "foo@bar.com");
+
+
     },
 
     "forgotPassword": {
       setUp() {
-        test.stub(Val, 'ensureString');
-        test.stub(UserAccount, 'sendResetPasswordEmail');
+        this.stub(Val, 'ensureString');
+        this.stub(UserAccount, 'sendResetPasswordEmail');
         v.rpc = TH.mockRpc();
       },
 
       "test missing email"() {
-        var res = v.rpc('User.forgotPassword', '  ');
+        const res = v.rpc('User.forgotPassword', '  ');
 
         assert.equals(res, {email: 'is_required'});
         refute.called(UserAccount.sendResetPasswordEmail);
       },
 
       "test invalid email"() {
-        var res = v.rpc('User.forgotPassword', ' xyz ');
+        const res = v.rpc('User.forgotPassword', ' xyz ');
 
         assert.equals(res, {email: 'is_invalid'});
         refute.called(UserAccount.sendResetPasswordEmail);
       },
 
       "test user without userAccount"() {
-        var user = TH.Factory.createUser({email: 'foo@bar.com'});
-        var res = v.rpc('User.forgotPassword', 'foo@bar.com  ');
+        const user = TH.Factory.createUser({email: 'foo@bar.com'});
+        const res = v.rpc('User.forgotPassword', 'foo@bar.com  ');
 
         assert.equals(res, {success: true});
 
@@ -116,9 +118,9 @@ define(function (require, exports, module) {
       },
 
       "test success"() {
-        var user = TH.Factory.buildUser({email: 'foo@bar.com'});
+        const user = TH.Factory.buildUser({email: 'foo@bar.com'});
         user.$save('force');
-        var res = v.rpc('User.forgotPassword', 'foo@bar.com  ');
+        const res = v.rpc('User.forgotPassword', 'foo@bar.com  ');
 
         assert.equals(res, {success: true});
 

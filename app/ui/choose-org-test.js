@@ -1,5 +1,4 @@
 isClient && define(function (require, exports, module) {
-  var test, v;
   const Dom     = require('koru/dom');
   const Route   = require('koru/ui/route');
   const Event   = require('ui/event');
@@ -7,10 +6,10 @@ isClient && define(function (require, exports, module) {
   const TH      = require('./test-helper');
 
   const sut = require('./choose-org');
+  var v;
 
   TH.testCase(module, {
     setUp() {
-      test = this;
       v = {};
       TH.loginAs(TH.Factory.createUser('guest'));
     },
@@ -24,7 +23,7 @@ isClient && define(function (require, exports, module) {
       v.org = TH.Factory.createOrg();
       Route.gotoPage(sut);
 
-      test.stub(Route, 'gotoPath');
+      this.stub(Route, 'gotoPath');
       assert.dom('#ChooseOrg', function () {
         TH.click('.link', v.org.name);
       });

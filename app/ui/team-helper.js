@@ -10,7 +10,7 @@ define(function(require, exports, module) {
 
   let teamType_id = undefined;
 
-  util.extend(exports, {
+  util.merge(exports, {
     get teamType_id() {
       if (teamType_id === undefined) {
         const teamType = TeamType.findBy('default', true);
@@ -58,7 +58,7 @@ define(function(require, exports, module) {
     },
 
     teamTD() {
-      const team = teamType_id && this.teamMap[teamType_id];
+      const team = exports.teamType_id && this.teamMap[teamType_id];
       return team && Dom.h({span: team.shortName, $title: team.name});
     },
 
@@ -67,7 +67,13 @@ define(function(require, exports, module) {
     },
 
     teamTypeField(field) {
-      return exports.teamType_id && TeamType.findById(teamType_id)[field];
+      let tt = teamType_id && TeamType.findById(teamType_id);
+      if (! tt) {
+        tt = TeamType.findBy('default', true);
+        if (! tt) return;
+        exports.teamType_id = tt._id;
+      }
+      return tt[field];
     }
   });
 
@@ -107,9 +113,6 @@ define(function(require, exports, module) {
       }
     },
   });
-
-
-
 
   Dom.registerHelpers({
     selectedTeamType() {
