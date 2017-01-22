@@ -23,6 +23,8 @@ define(function(require, exports, module) {
       if (was === null) {
         UserAccount.createUserLogin({email: doc.email, userId: doc._id});
         UserAccount.sendResetPasswordEmail(doc);
+      } else if (was && was.email) {
+        UserAccount.updateOrCreateUserLogin({userId: doc._id, email: doc.email});
       }
     });
 

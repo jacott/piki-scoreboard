@@ -12,7 +12,6 @@ define(function (require, exports, module) {
   TH.testCase(module, {
     setUp() {
       v = {};
-      this.stub(koru, 'info');
     },
 
     tearDown() {
@@ -29,6 +28,7 @@ define(function (require, exports, module) {
     },
 
     "test authorize"() {
+      TH.noInfo();
       const subject = TH.Factory.createUser();
       let user = TH.Factory.createUser('su');
 
@@ -44,6 +44,7 @@ define(function (require, exports, module) {
     },
 
     "test admin deleting superuser"() {
+      TH.noInfo();
       const org = TH.Factory.createOrg();
       const subject = TH.Factory.createUser({org_id: org._id, role: User.ROLE.admin});
       const user = TH.Factory.createUser('su', {org_id: org._id});
@@ -84,7 +85,9 @@ define(function (require, exports, module) {
 
       assert.same(user.email, "foo@bar.com");
 
+      const ul = UserAccount.model.findBy('userId', user._id);
 
+      assert.same(ul.email, user.email);
     },
 
     "forgotPassword": {
