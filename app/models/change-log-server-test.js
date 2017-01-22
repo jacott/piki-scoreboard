@@ -75,7 +75,8 @@ define(function (require, exports, module) {
     'test save on create': function () {
       TH.login();
       var climber = TH.Factory.buildClimber({name: 'new climber'});
-      session.rpc('save', 'Climber', '123', climber.changes);
+      climber.changes._id = '123';
+      session.rpc('save', 'Climber', null, climber.changes);
 
       climber = Climber.findById('123');
 
