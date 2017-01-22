@@ -18,6 +18,7 @@ define(function(require, exports, module) {
   require('ui/team');
   require('ui/team-results');
   require('ui/help');
+  require('ui/choose-org');
 
   koru.onunload(module, restart);
 
