@@ -280,7 +280,7 @@ isClient && define(function (require, exports, module) {
               assert.dom('li', {count: 2});
               assert.dom('li+li', tt2.name);
             });
-            TH.click(this);
+            TH.mouseDownUp(this);
           });
 
           assert.dom('th.name>span', tt1.name);

@@ -80,7 +80,7 @@ define(function(require, exports, module) {
       Route.gotoPage(Tpl.Edit, {modelId: data._id});
     },
 
-    'click [name=teamType_id]'(event) {
+    'mousedown [name=teamType_id]'(event) {
       Dom.stopEvent();
       let ctx = $.ctx;
       let list = TeamType.query.map(doc => [doc._id, doc.name]);

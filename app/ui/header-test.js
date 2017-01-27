@@ -30,7 +30,7 @@ isClient && define(function (require, exports, module) {
 
       TH.selectMenu('#Header [name=menu]', `event/${event._id}/show`, function () {
         assert.equals(this.textContent, event.displayName);
-        TH.click(this);
+        TH.mouseDownUp(this);
       });
 
       assert.calledWith(Route.gotoPath, `event/${event._id}/show`);
@@ -40,7 +40,7 @@ isClient && define(function (require, exports, module) {
     "test Calendar"() {
       TH.selectMenu('#Header [name=menu]', `event`, function () {
         assert.equals(this.textContent, 'Calendar');
-        TH.click(this);
+        TH.mouseDownUp(this);
       });
 
       assert.calledWith(Route.gotoPath, `event`);
@@ -49,7 +49,7 @@ isClient && define(function (require, exports, module) {
     "test Change org"() {
       TH.selectMenu('#Header [name=menu]', `choose-org`, function () {
         assert.equals(this.textContent, 'Go to another org');
-        TH.click(this);
+        TH.mouseDownUp(this);
       });
 
       assert.calledWith(Route.gotoPath, `choose-org`);
@@ -58,7 +58,7 @@ isClient && define(function (require, exports, module) {
     "test Help"() {
       TH.selectMenu('#Header [name=menu]', `$help`, function () {
         assert.equals(this.textContent, 'Help');
-        TH.click(this);
+        TH.mouseDownUp(this);
       });
 
       assert.dom('.Dialog #Help');
@@ -69,7 +69,7 @@ isClient && define(function (require, exports, module) {
 
       TH.selectMenu('#Header [name=menu]', `sign-in`, function () {
         assert.equals(this.textContent, 'Sign in');
-        TH.click(this);
+        TH.mouseDownUp(this);
       });
 
       assert.calledWith(Route.gotoPath, `sign-in`);
@@ -98,7 +98,7 @@ isClient && define(function (require, exports, module) {
         assert.dom(this.parentNode, elm => {
           assert.dom('li', 'Profile', matchId('profile'));
         });
-        TH.click(this);
+        TH.mouseDownUp(this);
       });
 
       assert.called(UserAccount.logout);

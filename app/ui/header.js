@@ -63,7 +63,7 @@ define(function(require, exports, module) {
   });
 
   Tpl.$events({
-    'click [name=avatar]'(event) {
+    'mousedown [name=avatar]'(event) {
       const list = [
         ['$signOut', 'Sign out'],
         ['$signOutOther', 'Sign out of other sessions'],
@@ -76,7 +76,7 @@ define(function(require, exports, module) {
       });
     },
 
-    'click [name=menu]'(event) {
+    'mousedown [name=menu]'(event) {
       const list = [];
       const ev = Dom.Event.event;
       if (ev) {

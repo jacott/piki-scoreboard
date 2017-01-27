@@ -1,9 +1,10 @@
 isClient && define(function (require, exports, module) {
   var test, v;
-  const Route = require('koru/ui/route');
-  const App   = require('ui/app');
-  const sut   = require('./event-category');
-  const TH    = require('./test-helper');
+  const Route         = require('koru/ui/route');
+  const App           = require('ui/app');
+  const EventRegister = require('ui/event-register');
+  const sut           = require('./event-category');
+  const TH            = require('./test-helper');
 
   TH.testCase(module, {
     setUp() {
@@ -294,7 +295,7 @@ isClient && define(function (require, exports, module) {
             assert.dom('li.selected', {text: 'General', data: TH.match.field('id', -1)});
             assert.dom('li:not(.selected)', {text: 'Qual 1', data: TH.match.field('id', 1)});
           });
-          TH.click(this);
+          TH.mouseDownUp(this);
         });
 
         assert.dom('h1', 'Qual 2 - Results');

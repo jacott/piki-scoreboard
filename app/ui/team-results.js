@@ -38,7 +38,7 @@ define(function(require, exports, module) {
   });
 
   Tpl.$events({
-    'click [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent(teamTypeList),
+    'mousedown [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent(teamTypeList),
   });
 
   function teamTypeList(ctx) {

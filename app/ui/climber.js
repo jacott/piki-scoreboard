@@ -5,7 +5,6 @@ define(function(require, exports, module) {
   const Dialog     = require('koru/ui/dialog');
   const Form       = require('koru/ui/form');
   const Route      = require('koru/ui/route');
-  const SelectMenu = require('koru/ui/select-menu');
   const util       = require('koru/util');
   const Climber    = require('models/climber');
   const TeamType   = require('models/team-type');
@@ -48,7 +47,7 @@ define(function(require, exports, module) {
   });
 
   Index.$events({
-    'click [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent(ctx => TeamType.query.fetch()),
+    'mousedown [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent(ctx => TeamType.query.fetch()),
 
     'click .climbers tr'(event) {
       if (! Dom.hasClass(document.body, 'aAccess')) return;
