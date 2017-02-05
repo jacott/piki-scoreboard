@@ -1,64 +1,79 @@
 #!/bin/bash
 set -e
+cd `dirname "$0"`/..
 
-. `dirname $0`/environ.sh
+branch="$1"
 
-top_dir=$PWD
+lockKey=$branch
 
-init ${1-$(basename $top_dir)}
+. scripts/script-helper
+. config/environ.sh
 
-version=`git describe --tag --always`
+cd /u/build-piki
+
+mkdir -p build
+rm -f build/*
+
+[[ -d tmp ]] || mkdir tmp
+
+git clean -f -d
+git fetch
+git checkout -B ${2-master} origin/${2-master}
+git reset --hard
+
+version=`git describe --tags --always --long --match 'v*'`
+
+echo "$version" >build/version
 
 echo $branch $version $PWD
 
-app_dir="/u/app/${branch}"
-dest="${app_dir}/build"
-
-rm -rf $dest
-mkdir -p $dest
-
-git archive --format=tar HEAD | (cd $dest && tar xf -)
-
-cd $dest
-
-if [ -e ../built -a "$(grep "NODE_PATH=" config/${branch}.cfg)" = "$(grep "NODE_PATH=" ../built/config/${branch}.cfg)" ];then
-    rsync -a ../built/node_modules ./
-    diff -q ../built/npm-shrinkwrap.json ./npm-shrinkwrap.json >/dev/null ||
-        $NPM install
+if test -e tmp/yarn.lock && ${NODE} -v | cat - yarn.lock | diff -q - tmp/yarn.lock >/dev/null;then
+    :
 else
-    $NPM install
+    echo 'yarn install...'
+    rm -rf node_modules
+    yarn
+    ${NODE} -v | cat - yarn.lock >tmp/yarn.lock
 fi
 
-$NODE --es_staging scripts/bundle.js $branch
+echo -e "bundle client: css, js..."
 
-MD5SUM=$(cat build/index.js build/index.css app/index.html|md5sum -b);MD5SUM=${MD5SUM/ */}
+$NODE --es_staging scripts/bundle.js $branch >/dev/null
 
-echo -e "window.KORU_APP_VERSION='${MD5SUM},${version}';\c"|cat - build/index.js >app/index.js
-cat <<EOF >>config/$branch.cfg
-export KORU_APP_VERSION="${MD5SUM},${version}"
-EOF
 mv build/index.css app
 
 cd app
 
-echo -e "\nCompressing...\c"
+echo "Compressing..."
 
-zopfli index.js index.css index.html
+gzip -k index.css index.html
 
-cd ../..
 
-echo -e "\n\nTransferring..."
+echo "archiving..."
 
-rsync -a --info=progress2 --delete --exclude='node_modules/**' --compare-dest=../built build/ ${KORU_DEST_SERVER}:${app_dir}/staging
+cd ..
 
-echo -e "\n\nInstalling..."
+tarfile=$PWD/tmp/piki-$branch-$version.tar.gz
+if [ ! -e $tarfile -a -e tmp/piki-current.tar.gz ];then
+    rm -f tmp/piki-previous.tar.gz
+    mv -f tmp/piki-current.tar.gz tmp/piki-previous.tar.gz
+fi
+tar -c -z \
+    --exclude="*app/**/*-test.js" \
+    --file  $tarfile\
+    app config db build node_modules \
+    LICENSE README.md .koru yarn.lock package.json scripts
 
-ssh ${KORU_DEST_SERVER} ${app_dir}/staging/scripts/install_pkg.sh $branch
+cd tmp
+ln -sf $(basename $tarfile) piki-current.tar.gz
 
-echo "SUCCESS"
-
-cd $app_dir
-
-rm -rf built
-
-mv build built
+scp piki-current.tar.gz ${KORU_DEST_SERVER}:/u/tmp
+staging=/u/app/piki/staging
+ssh ${KORU_DEST_SERVER} "
+set -e
+rm -rf $staging
+mkdir -p $staging
+cd $staging
+tar xf /u/tmp/piki-current.tar.gz
+exec ./scripts/install-piki $branch
+"

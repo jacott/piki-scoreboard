@@ -1,9 +1,0 @@
-#!/bin/bash
-set -e
-
-. `dirname "$0"`/environ.sh
-init test
-
-dropdb --if-exists pikitest
-createdb pikitest
-psql -q pikitest <db/schema.sql

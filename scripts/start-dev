@@ -1,11 +1,8 @@
 #!/bin/bash
 set -e
 
-. `dirname "$0"`/environ.sh
-init ${1-demo}
+. `dirname "$0"`/../config/environ.sh
 
-# export NODE_OPTIONS='--prof'
-# send SIGUSR1 to debug
 if [[ -e tmp/yarn.lock && -e node_modules ]] && ${NODE} -v | cat - yarn.lock | diff -q - tmp/yarn.lock >/dev/null;then
     echo 'node_modules okay'
 else
@@ -18,4 +15,4 @@ fi
 
 cd app
 echo -e "starting ${branch}...\c"
-exec ${NODE} $NODE_DEBUG --es_staging ../node_modules/koru/lib/koru.js "$@"
+exec ${NODE} $NODE_DEBUG --es_staging $KORU_MODULE/lib/koru.js "$@"

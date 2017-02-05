@@ -1,0 +1,25 @@
+#!/bin/bash
+set -e
+
+extraCleanup() {
+    :
+}
+
+cleanup() {
+    extraCleanup
+    rm -f $lock
+}
+
+tmpdir=/u/build-piki/tmp
+mkdir -p $tmpdir
+
+lock="${tmpdir}/lock-${lockKey}"
+
+if [ -e $lock ];then
+    echo >&2 "deploy in progress: pid $(cat $lock)"
+    exit 1
+fi
+
+echo >${lock} $$
+
+trap cleanup 0

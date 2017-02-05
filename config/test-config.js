@@ -5,15 +5,7 @@ const urlRoot = 'http://test.piki';
 exports.server = function (cfg) {
   cfg.merge('requirejs', {
     config: {
-      "koru/config": {
-        DBDriver: "koru/pg/driver",
-      },
-      "koru/pg/driver": {
-        url: "host=/var/run/postgresql dbname=pikitest",
-      },
-
       "koru/web-server": {
-        port: KORU_PORT,
         defaultPage: 'test/index.html',
       },
 

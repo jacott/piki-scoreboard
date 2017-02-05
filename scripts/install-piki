@@ -1,0 +1,91 @@
+#!/bin/bash
+set -e
+
+network=$1
+
+init() {
+    . config/environ.sh $network
+
+    appName=piki
+    staging=$PWD
+    appDir=$(realpath ..)
+
+    # setup systemctl
+    export XDG_RUNTIME_DIR="/run/user/$UID"
+    export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
+
+    mkdir -p tmp $BACKUP_DIR /u/incoming
+
+    if [ ! -e $appDir/current ];then
+        createdb $APP_DB || :
+    fi
+
+    nginxConf=/etc/nginx/conf.d/$appName.conf
+    serviceConf=$HOME/.config/systemd/user/$appName.service
+
+    rm -f ${nginxConf}~ ${serviceConf}~
+}
+
+completeConfig() {
+    echo "configure for $appName..."
+    version=$(cat build/version)
+    echo -e "window.KORU_APP_VERSION='${version}';\c" |
+        cat - build/index.js >app/index.js
+    echo "export KORU_APP_VERSION='${version}'" |
+        cat - config/$branch.sh >config/piki.sh
+    [[ -e config/$branch-config.js ]] &&
+        mv config/$branch-config.js config/piki-config.js
+    gzip -k app/index.js
+}
+
+configNginx() {
+    template=config/common-nginx.conf
+    srcConf=tmp/nginx.conf
+    destConf=$nginxConf
+
+    sed <$template >$srcConf \
+        -e "s/{{KORU_PORT}}/$KORU_PORT/g" -e "s/{{APP_DOMAIN}}/$APP_DOMAIN/g" \
+        -e "s/{{APP_NAME}}/$appName/g"
+    if test ! -e $destConf || ! diff -q $srcConf $destConf;then
+        mv -b $srcConf $destConf
+        sudo /bin/systemctl reload nginx
+    fi
+}
+
+installService() {
+    srcConf=config/piki.service
+    destConf=$serviceConf
+
+    if test ! -e $destConf || ! diff -q $srcConf $destConf;then
+        mv -b $srcConf $destConf
+        systemctl --user reenable $appName
+    fi
+}
+
+deploy() {
+    echo "starting..."
+    rm -rf $appDir/previous
+    test -e $appDir/current && mv -f $appDir/current $appDir/previous
+    mv $appDir/staging $appDir/current
+
+    systemctl --user start $appName
+}
+
+init
+
+completeConfig
+
+echo "stoping..."
+systemctl --user stop $appName || :
+
+if [ -x ./current/backup-${network} ];then
+    ./current/backup-${network} $appName
+fi
+
+# FIXME build a restore-from-back script here
+
+configNginx
+installService
+
+deploy
+echo "done"

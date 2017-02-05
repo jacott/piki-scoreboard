@@ -90,10 +90,6 @@ CREATE TABLE "Event" (
     series_id character varying(24)
 );
 
-CREATE TABLE "Migration" (
-    name text NOT NULL
-);
-
 CREATE TABLE "Org" (
     _id character varying(24) NOT NULL,
     name text,
@@ -175,9 +171,6 @@ ALTER TABLE ONLY "Competitor"
 
 ALTER TABLE ONLY "Event"
     ADD CONSTRAINT "Event_pkey" PRIMARY KEY (_id);
-
-ALTER TABLE ONLY "Migration"
-    ADD CONSTRAINT "Migration_pkey" PRIMARY KEY (name);
 
 ALTER TABLE ONLY "Org"
     ADD CONSTRAINT "Org_pkey" PRIMARY KEY (_id);

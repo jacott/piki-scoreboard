@@ -1,9 +1,5 @@
 @import "forms.lessimport";
 
-div.ui-buttonMenu {
-  .buttonMenu();
-}
-
 .ui-selectList.boardSelect>div>div {
   min-width: 200px;
 }
@@ -167,27 +163,6 @@ body>.complete {
     li.disabled {
       opacity: 0.7;
       cursor: not-allowed;
-    }
-  }
-}
-
-.buttonMenu {
-  position: relative;
-  >[name=dropMenu] {
-    .md-icon("arrow_drop_down");
-  }
-  >.dropMenu {
-    position: absolute;
-    top: 100%;
-    min-width: 100%;
-    background-color: #fff;
-    font-size:  1em;
-    box-shadow: @colorShadowLight 4px 4px 2px;
-    white-space: nowrap;
-    >* {
-      width: 100%;
-      text-align: left;
-      display: block;
     }
   }
 }

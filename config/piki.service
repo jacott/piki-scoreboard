@@ -1,0 +1,10 @@
+[Unit]
+AssertPathExists=/u/app/piki/current/scripts/piki
+
+[Service]
+WorkingDirectory=/u/app/piki/current
+ExecStart=/u/app/piki/current/scripts/piki
+Restart=always
+
+[Install]
+WantedBy=default.target

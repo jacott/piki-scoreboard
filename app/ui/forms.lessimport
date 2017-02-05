@@ -1,45 +1,5 @@
 @import "global.lessimport";
 
-.buttonMenu() {
-  display: inline-block;
-  position: relative;
-  &>div {
-    border-radius: 4px;
-    &:hover {
-      background-color: lighten(@colorToolbarBtnBGSel, 10%);
-      &>button {
-        color: @colorToolbarBtnSel;
-      }
-    }
-    &>button[name=dropMenu] {
-      .md-icon("arrow_drop_down");
-    }
-  }
-  &>ul {
-    display: none;
-    margin-top: 2px;
-    clear: both;
-    background-color: white;
-    border-radius: 4px;
-    box-shadow: @colorShadowLight 4px 4px 2px;
-    &>li {
-      display: block;
-      padding: 0 4px 0 0;
-      >button {
-        width: 100%;
-        text-align: left;
-      }
-    }
-  }
-  &.open {
-    &>ul {
-      display: block;
-    }
-    z-index: 1;
-  }
-}
-
-
 .actions() {
   margin-top: 1em;
   font-size: 1.2em;

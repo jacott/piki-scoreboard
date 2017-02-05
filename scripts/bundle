@@ -1,14 +1,7 @@
 #!/bin/bash
 set -e
 
-. `dirname $0`/environ.sh
+. `dirname $0`/../config/environ.sh
 
-top_dir=$PWD
-
-init ${1-$(basename $top_dir)}
-
-version=`git describe --tag --always`
-
-echo $branch $version $PWD
-
-$NODE scripts/bundle.js $branch
+#$NODE --es_staging --inspect --debug-brk scripts/bundle.js $branch
+$NODE --es_staging scripts/bundle.js $branch

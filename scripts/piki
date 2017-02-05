@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+
+cd `dirname "$0"`/..
+
+. config/environ.sh piki
+
+cd app
+
+exec $NODE --es_staging ../node_modules/koru/lib/koru.js piki
