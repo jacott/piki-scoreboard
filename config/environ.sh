@@ -20,7 +20,7 @@ export KORU_MODULE=$(readlink -f node_modules/koru)
 
 export BACKUP_DIR=/u/backup
 
-export APP_MAILDOMAIN=piki.vimaly.com
+export APP_MAILDOMAIN=vimaly.com
 export APP_DISPLAY_NAME=Piki
 
 tmpdir=$KORU_HOME/tmp
@@ -45,10 +45,6 @@ export KORU_LOG_DIR=$LOG_DIR
 if [[ ! -d $LOG_DIR ]];then
     echo "no log dir: $LOG_DIR"
     exit 1
-fi
-
-if [[ $APP_MAILURL = setup ]]; then
-    APP_MAILURL="smtp://app:$(cat /u/private/intra-authtoken.txt)@mail.${APP_MAILDOMAIN}:465"
 fi
 
 if [ "$2" = "--config" ];then
