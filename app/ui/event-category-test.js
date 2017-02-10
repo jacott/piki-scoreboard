@@ -206,7 +206,7 @@ isClient && define(function (require, exports, module) {
       "test entering finals"() {
         assert.dom('#Event .Category', function () {
           assert.dom('tr#Result_'+ v.result._id, function () {
-            TH.trigger('td:nth-child(3)', 'mousedown');
+            TH.trigger('td:nth-child(3)', 'pointerdown');
           });
           assert.dom('h1', 'Final - Start order');
           assert.dom('tr#Result_'+ v.result._id, function () {
@@ -248,7 +248,7 @@ isClient && define(function (require, exports, module) {
 
         TH.selectMenu('button[name=selectHeat]', 3);
         assert.dom('tr#Result_'+ v.result._id, function () {
-          TH.trigger('td.heat99', 'mousedown');
+          TH.trigger('td.heat99', 'pointerdown');
         });
 
         assert.dom('.start table.results', function () {
@@ -270,13 +270,13 @@ isClient && define(function (require, exports, module) {
 
         assert.dom('#Event .Category', function () {
           assert.dom('tr#Result_'+ v.result._id, function () {
-            TH.trigger('td:nth-child(3)', 'mousedown');
+            TH.trigger('td:nth-child(3)', 'pointerdown');
           });
           assert.dom('h1', 'Final - Start order');
           assert.dom('tr#Result_'+ v.result._id, function () {
             assert.dom('td:nth-child(3)>input[placeholder="n+"]');
             assert.dom('td:nth-child(2)', function () {
-              TH.trigger(this, 'mousedown');
+              TH.trigger(this, 'pointerdown');
             });
           });
           assert.dom('tr#Result_'+ v.result._id + '>td:nth-child(2)>input[placeholder="m:ss"]', function () {
@@ -295,7 +295,7 @@ isClient && define(function (require, exports, module) {
             assert.dom('li.selected', {text: 'General', data: TH.match.field('id', -1)});
             assert.dom('li:not(.selected)', {text: 'Qual 1', data: TH.match.field('id', 1)});
           });
-          TH.mouseDownUp(this);
+          TH.pointerDownUp(this);
         });
 
         assert.dom('h1', 'Qual 2 - Results');
@@ -308,7 +308,7 @@ isClient && define(function (require, exports, module) {
         TH.login();
         assert.dom('#Event .Category', function () {
           assert.dom('tr#Result_'+ v.result._id,  function() {
-            TH.trigger('td:last-child', 'mousedown');
+            TH.trigger('td:last-child', 'pointerdown');
           });
         });
 

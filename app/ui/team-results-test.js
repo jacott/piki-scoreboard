@@ -65,7 +65,7 @@ isClient && define(function (require, exports, module) {
             assert.dom('li', {count: 2});
             assert.dom('li', v.tt1.name);
           });
-          TH.mouseDownUp(this);
+          TH.pointerDownUp(this);
         });
 
         assert.dom('th.name>span', v.tt2.name);

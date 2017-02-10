@@ -189,7 +189,7 @@ define(function(require, exports, module) {
     },
 
 
-    'mousedown td.score': function (event) {
+    'pointerdown td.score': function (event) {
       if (event.target === document.activeElement ||
           ! Dom.hasClass(document.body, 'jAccess'))
         return;

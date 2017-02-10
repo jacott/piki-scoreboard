@@ -76,9 +76,9 @@ isClient && define(function (require, exports, module) {
             TH.input('[name=name]', '');
             refute(Dom('body>.complete'));
             TH.input('[name=name]', 'b');
-            TH.trigger(Dom('body>ul>li'), 'mousedown');
+            TH.trigger(Dom('body>ul>li'), 'pointerdown');
             TH.input('[name=name]', 'bre');
-            TH.trigger(Dom('body>ul>li'), 'mousedown');
+            TH.trigger(Dom('body>ul>li'), 'pointerdown');
           }});
         });
 
@@ -177,7 +177,7 @@ isClient && define(function (require, exports, module) {
         }});
       });
       assert.dom('body>ul>li', 'Add "John Smith"', function () {
-        TH.trigger(this, 'mousedown');
+        TH.trigger(this, 'pointerdown');
       });
 
       assert.dom('.Dialog #AddClimber', function () {
@@ -253,7 +253,7 @@ isClient && define(function (require, exports, module) {
                   assert.dom('li:nth-last-child(2)', 'Team 5');
                   assert.dom('li:last-child', 'add new team');
                 });
-                TH.mouseDownUp(this);
+                TH.pointerDownUp(this);
               });
               assert.dom('button.select.none', 'Select');
 

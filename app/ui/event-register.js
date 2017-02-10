@@ -90,7 +90,7 @@ define(function(require, exports, module) {
       Route.replacePath(Tpl);
     },
 
-    'mousedown [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent(teamTypeList),
+    'pointerdown [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent(teamTypeList),
 
     'click th': function (event) {
       Dom.stopEvent();
@@ -302,7 +302,7 @@ define(function(require, exports, module) {
   });
 
   Teams.TeamType.$events({
-    'mousedown .select': function (event) {
+    'pointerdown .select': function (event) {
       Dom.stopEvent();
 
       let ctx = $.ctx;
@@ -352,7 +352,7 @@ define(function(require, exports, module) {
   });
 
   catTpl.$events({
-    'mousedown .select'(event) {
+    'pointerdown .select'(event) {
       Dom.stopEvent();
       const ctx = $.ctx;
       const data = ctx.data;

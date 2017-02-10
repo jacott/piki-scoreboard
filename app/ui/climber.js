@@ -47,7 +47,7 @@ define(function(require, exports, module) {
   });
 
   Index.$events({
-    'mousedown [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent(ctx => TeamType.query.fetch()),
+    'pointerdown [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent(ctx => TeamType.query.fetch()),
 
     'click .climbers tr'(event) {
       if (! Dom.hasClass(document.body, 'aAccess')) return;

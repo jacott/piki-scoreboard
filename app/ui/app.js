@@ -155,7 +155,7 @@ define(function(require, exports, module) {
     }
   }
 
-  document.addEventListener(isTouch ? 'touchstart' : 'mousedown', ripple, true);
+  document.addEventListener('pointerdown', ripple, true);
   var rippleElm = Dom.h({div: {}, class: 'ripple'});
 
   function ripple(event) {
@@ -186,14 +186,14 @@ define(function(require, exports, module) {
       st[Dom.vendorTransform] = translate;
     });
 
-    document.addEventListener('mouseup', removeRipple, true);
+    document.addEventListener('pointerup', removeRipple, true);
 
     function removeRipple(event) {
-      document.removeEventListener('mouseup', removeRipple, true);
+      document.removeEventListener('pointerup', removeRipple, true);
 
       // Allow a repaint to occur before removing this class, so the animation
-      // shows for tap events, which seem to trigger a mouseup too soon after
-      // mousedown.
+      // shows for tap events, which seem to trigger a pointerup too soon after
+      // pointerdown.
       Dom.nextFrame(function() {
         Dom.addClass(rippleElm, 'ripple-finished');
       });

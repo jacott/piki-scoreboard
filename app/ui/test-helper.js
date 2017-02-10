@@ -40,18 +40,18 @@ define(function(require, exports, module) {
       });
     },
 
-    mouse(node, eventName, args) {
+    pointer(node, eventName, args) {
       if (typeof node === 'string') {
         assert.elideFromStack.dom(node, function () {
-          TH.mouse(this, eventName, args);
+          TH.pointer(this, eventName, args);
         });
       } else {
         assert.elideFromStack(node,'node not found');
         if (typeof eventName === 'object') {
           args = eventName;
-          eventName = 'mousemove';
+          eventName = 'pointermove';
         } else {
-          eventName = eventName || 'mousemove';
+          eventName = eventName || 'pointermove';
           args = args || {};
         }
         var bbox = node.getBoundingClientRect();
