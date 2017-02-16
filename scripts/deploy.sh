@@ -6,8 +6,8 @@ branch="$1"
 
 lockKey=$branch
 
-. scripts/script-helper
 . config/environ.sh
+. scripts/script-helper
 
 cd /u/build-piki
 
@@ -51,20 +51,23 @@ gzip -k index.css index.html
 
 echo "archiving..."
 
-cd ..
 
-tarfile=$PWD/tmp/piki-$branch-$version.tar.gz
-if [ ! -e $tarfile -a -e tmp/piki-current.tar.gz ];then
-    rm -f tmp/piki-previous.tar.gz
-    mv -f tmp/piki-current.tar.gz tmp/piki-previous.tar.gz
+cd $tmpdir
+
+tarfile=$tmpdir/piki-$branch-$version.tar.gz
+if [ ! -e $tarfile -a -e piki-current.tar.gz ];then
+    rm -f piki-previous.tar.gz
+    mv -f piki-current.tar.gz piki-previous.tar.gz
+    rm -f $(find -L . ! -newer piki-previous.tar.gz \
+                 ! -samefile piki-previous.tar.gz \
+                 -name 'piki*-v*.tar.gz')
 fi
-tar -c -z \
+tar -c -z -C /u/build-piki \
     --exclude="*app/**/*-test.js" \
     --file  $tarfile\
     app config db build node_modules \
     LICENSE README.md .koru yarn.lock package.json scripts
 
-cd tmp
 ln -sf $(basename $tarfile) piki-current.tar.gz
 
 scp piki-current.tar.gz ${KORU_DEST_SERVER}:/u/tmp
