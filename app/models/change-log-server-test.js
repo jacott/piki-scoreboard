@@ -32,7 +32,7 @@ define(function (require, exports, module) {
       TH.login();
       var climber = TH.Factory.createClimber();
 
-      assert.difference(0, ChangeLog, function () {
+      assert.difference({by: 0, model: ChangeLog}, () => {
         session.rpc('save', 'Climber', climber._id, {});
       });
     },
