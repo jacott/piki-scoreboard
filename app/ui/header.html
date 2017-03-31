@@ -1,14 +1,15 @@
 <template name="Header">
   <header id="Header">
     <div>
-      <span id="PageTitle">{{title}}</span>
-      <span>
+      <div id="HeaderOrgName"></div>
+      <div id="PageTitle">{{title}}</div>
+      <div class="menus">
         <button name="avatar" type="button"  title="{{title}}" {{color}}>
           <span class="initials" {{nameClass}}>{{initials}}</span>
           <div class="img" style="{{style}}"></div>
         </button>
         <button name="menu" type="button"></button>
-      </span>
+      </div>
     </div>
   </header>
 </template>

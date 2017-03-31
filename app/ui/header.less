@@ -1,42 +1,63 @@
 @import "global.lessimport";
 
 #Header>div {
-  padding-left: 1em;
-  .flexFlow(row, nowrap);
-  justify-content: space-between;
-  [name=menu] {
-    .md-icon("menu"; @fontSize: 32px);
+  padding-left: 5px;
+
+  >#HeaderOrgName {
+    margin: 0;
+    line-height: 1.2em;
   }
 
-  [name=avatar] {
-    @width: 2em;
-    height: @width;
-    width: @width;
-    line-height: @width;
-    font-size: @width / 2 ;
+  >#PageTitle {
+    position: absolute;
+    left: 50%; bottom: 0;
+    height: 2.5em;
+    line-height: 1.2em;
+    background-color: @colorHeaderBackground;
+    padding: 5px;
+    transform: translate(-50%, 0%);
+    overflow: hidden;
+    white-space: nowrap;
+  }
 
-    margin-right: 10px;
-
-    position: relative;
-    border-radius: 50%;
-    text-align: center;
-    flex-shrink: 0;
-    vertical-align: middle;
-
-    .readOnlyAccess & {
-      display: none;
+  >.menus {
+    position: absolute;
+    right: 0; top: 0;
+    margin-right: 5px;
+    >[name=menu]:before {
+      .md-inline-icon("menu"; @fontSize: 32px);
     }
 
-    .img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+    >[name=avatar] {
+      @width: 2em;
+      height: @width;
+      width: @width;
+      line-height: @width;
+      font-size: @width / 2 ;
+
+      margin-right: 10px;
+
+      position: relative;
       border-radius: 50%;
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: 100%;
+      text-align: center;
+      flex-shrink: 0;
+      vertical-align: middle;
+
+      .readOnlyAccess & {
+        display: none;
+      }
+
+      .img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 100%;
+      }
     }
   }
 }

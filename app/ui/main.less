@@ -50,46 +50,23 @@ body {
     height: @headerHeight;
     line-height: @headerHeight;
     font-size: 1.2em;
-
-    .link {
-      color: @colorHeaderText;
-    }
-
-    nav.left {
-      float: left;
-    }
-    nav.title {
-      position: absolute;
-      text-align: center;
-      left: 50%;
-      width: 35%;
-      #PageTitle {
-        position: relative;
-        left: -50%;
-      }
-    }
-    nav.right {
-      float: right;
-      >:not(:first-child) {
-        margin-left: 1em;
-      }
-    }
   }
-  &~section {
-    position: absolute;
-    top: @headerHeight;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    > div {
-      background-color: #fff;
-      height: 100%;
-      overflow: auto;
-      margin: auto;
-      width: @bodyWidth;
-      max-width: 100%;
-      min-width: @bodyWidth / 2;
-    }
+}
+
+body>section {
+  position: absolute;
+  top: @headerHeight;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  > div {
+    background-color: #fff;
+    height: 100%;
+    overflow: auto;
+    margin: auto;
+    width: @bodyWidth;
+    max-width: 100%;
+    min-width: @bodyWidth / 2;
   }
 }
 

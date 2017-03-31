@@ -11,6 +11,7 @@ define(function(require, exports, module) {
   const ClientLogin = require('koru/user-account/client-login');
   const util        = require('koru/util');
   const uColor      = require('koru/util-color');
+  const Org         = require('models/org');
   const User        = require('models/user');
   const Flash       = require('ui/flash');
   const Help        = require('ui/help');
@@ -59,7 +60,6 @@ define(function(require, exports, module) {
       const user = getUser();
       return user ? user.name : '';
     },
-
   });
 
   Tpl.$events({
@@ -144,6 +144,15 @@ define(function(require, exports, module) {
             ctx.updateAllTags();
           });
           ctx.updateAllTags();
+        }
+      }));
+      ctx.orgSN = null;
+      ctx.onDestroy(Route.onChange(() => {
+        const {orgSN} = Route.currentPageRoute;
+        if (ctx.orgSN !== orgSN) {
+          ctx.orgSN = orgSN;
+          document.getElementById('HeaderOrgName').textContent =
+            (Org.findBy('shortName', orgSN)||{}).name || '';
         }
       }));
     },
