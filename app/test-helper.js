@@ -30,14 +30,14 @@ define(function(require, exports, module) {
     clearDB: isClient ? function () {
       TH.Factory.clear();
       const models = Model._databases.default;
-      for(var name in models) {
-        var model = Model[name];
+      for(let name in models) {
+        const model = Model[name];
         model.docs = null;
       }
     } : function () {
       TH.Factory.clear();
-      for(var name in Model) {
-        var model = Model[name];
+      for(let name in Model) {
+        const model = Model[name];
         if ('docs' in model) {
           txSave || model.docs.truncate();
           model._$docCacheClear();
@@ -56,13 +56,13 @@ define(function(require, exports, module) {
     mockRpc (v, sessId) {
       sessId = (sessId || "1").toString();
       if (isServer) {
-        var ws = this.mockWs();
-        var conn;
-        var id = 'koru/session/server-connection-factory';
+        const ws = this.mockWs();
+        let conn;
+        const id = 'koru/session/server-connection-factory';
         if (v && v.conn)
           conn = v.conn;
         else {
-          conn = new (require(id)({globalDict: session.globalDict}))(ws, sessId, function () {});
+          conn = new (require(id)({globalDict: session.globalDict}))(ws, sessId, () => {});
           conn.dbId = 'sch00';
           if (v) v.conn = conn;
         }
@@ -213,7 +213,7 @@ define(function(require, exports, module) {
   var koruAfTimeout, koruSetTimeout, koruClearTimeout;
   var kst = 0;
 
-  var sendP, sendM;
+  let sendP, sendM;
 
 
   geddon.onStart(function () {
@@ -229,9 +229,9 @@ define(function(require, exports, module) {
         session.sendP = koru.nullFunc;
         session.interceptSubscribe = overrideSub; // don't queue subscribes
       }
-      if (session.hasOwnProperty('sendM')) {
-        sendM = session.sendM;
-        session.sendM = koru.nullFunc;
+      if (session.hasOwnProperty('_sendM')) {
+        sendM = session._sendM;
+        session._sendM = koru.nullFunc;
       }
     } else {
       txClient = dbBroker.db;
@@ -241,7 +241,7 @@ define(function(require, exports, module) {
     }
   });
 
-  geddon.onEnd(function () {
+  geddon.onEnd(() => {
     if (isServer && txSave) {
       txSave.transaction = null;
       txSave = null;
@@ -258,7 +258,7 @@ define(function(require, exports, module) {
         sendP = null;
       }
       if (sendM) {
-        session.sendM = sendM;
+        session._sendM = sendM;
         sendM = null;
       }
     }

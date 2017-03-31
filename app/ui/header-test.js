@@ -92,6 +92,7 @@ isClient && define(function (require, exports, module) {
       TH.selectMenu('#Header [name=menu]', '$help', function () {
         assert.dom(this.parentNode, elm => refute.dom('li', 'Sign in'));
       });
+      Dom.remove(Dom('.glassPane'));
 
       TH.selectMenu('#Header [name=avatar]', `$signOut`, function () {
         assert.equals(this.textContent, 'Sign out');

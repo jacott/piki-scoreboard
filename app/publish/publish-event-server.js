@@ -1,41 +1,31 @@
 define(function(require, exports, module) {
-  var publish = require('koru/session/publish');
-  var Event = require('models/event');
-  var koru = require('koru');
-  var Model = require('model');
-  var Val = require('koru/model/validation');
-
+  const koru    = require('koru');
+  const Val     = require('koru/model/validation');
+  const publish = require('koru/session/publish');
+  const Model   = require('model');
   require('models/competitor');
+  const Event   = require('models/event');
   require('models/result');
 
-  var orgChildren = ['Competitor', 'Result'];
+  const orgChildren = ['Competitor', 'Result'];
 
-  koru.onunload(module, function () {
-    publish._destroy('Event');
-  });
+  koru.onunload(module, () => {publish._destroy('Event')});
 
-  publish('Event', function (eventId) {
+  publish({name: 'Event', init(eventId) {
     Val.ensureString(eventId);
-    var sub = this;
+    const event = Event.findById(eventId);
+    if (! event) return this.error(new koru.Error(404, 'Event not found'));
 
-    var event = Event.findById(eventId);
-    if (! event) return sub.error(new koru.Error(404, 'Event not found'));
-    event = null;
+    const handles = [];
 
-    var handles = [];
+    this.onStop(() => {handles.forEach(handle => {handle.stop()})});
 
-    sub.onStop(function () {
-      handles.forEach(function (handle) {
-        handle.stop();
-      });
-    });
+    const sendUpdate = this.sendUpdate.bind(this);
 
-    var sendUpdate = sub.sendUpdate.bind(sub);
-
-    orgChildren.forEach(function (name) {
-      var model = Model[name];
+    orgChildren.forEach(name => {
+      const model = Model[name];
       handles.push(model.observeEvent_id(eventId, sendUpdate));
       model.query.where('event_id', eventId).forEach(sendUpdate);
     });
-  });
+  }});
 });

@@ -6,7 +6,7 @@ define(function(require, exports, module) {
     publish._destroy('Self');
   });
 
-  publish('Self', function () {
+  publish({name: 'Self', init() {
     var sub = this;
 
     sub.match('User', function (doc) {
@@ -16,5 +16,5 @@ define(function(require, exports, module) {
     sub.match('Org', function (doc) {
       return true;
     });
-  });
+  }});
 });

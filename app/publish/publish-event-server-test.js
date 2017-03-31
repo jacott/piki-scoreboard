@@ -1,16 +1,18 @@
 define(function (require, exports, module) {
-  var test, v;
-  var TH = require('./test-helper');
-  var sut = require('./publish-event');
-  var publish = require('koru/session/publish');
-  var Model = require('koru/model');
-  var koru = require('koru');
-  var Val = require('koru/model/validation');
+  const koru    = require('koru');
+  const Model   = require('koru/model');
+  const Val     = require('koru/model/validation');
+  const publish = require('koru/session/publish');
+  const TH      = require('./test-helper');
 
-  var children = ['Competitor', 'Result'];
+  const sut     = require('./publish-event');
+  var test, v;
+
+  const children = ['Competitor', 'Result'];
+
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
       v.event = TH.Factory.createEvent();
@@ -27,12 +29,12 @@ define(function (require, exports, module) {
       test.stub(Val, 'ensureString');
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.cleanUpTest(v);
       v = null;
     },
 
-    "test observes org": function () {
+    "test observes org"() {
       var obSpys = children.map(function (modelName) {
         return test.spy(Model[modelName], 'observeEvent_id');
       });

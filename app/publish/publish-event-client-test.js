@@ -1,8 +1,8 @@
 define(function (require, exports, module) {
-  var test, v;
-  var TH = require('./test-helper');
+  const publish = require('koru/session/publish');
   require('./publish-event');
-  var publish = require('koru/session/publish');
+  const TH      = require('./test-helper');
+  var test, v;
 
   TH.testCase(module, {
     setUp: function () {

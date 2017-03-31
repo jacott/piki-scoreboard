@@ -1,56 +1,48 @@
 define(function(require, exports, module) {
-  var publish = require('koru/session/publish');
-  var Org = require('models/org');
-  var koru = require('koru');
-  var Model = require('model');
-  var Val = require('koru/model/validation');
-  var User = require('models/user');
-
-  require('models/team');
-  require('models/team-type');
+  const koru    = require('koru');
+  const Val     = require('koru/model/validation');
+  const publish = require('koru/session/publish');
+  const Model   = require('model');
+  require('models/category');
   require('models/climber');
   require('models/event');
-  require('models/category');
+  const Org     = require('models/org');
   require('models/series');
+  require('models/team');
+  require('models/team-type');
+  const User    = require('models/user');
 
 
-  var orgChildren = ['Climber', 'Event', 'Series', 'Category', 'Team', 'TeamType'];
+  const orgChildren = ['Climber', 'Event', 'Series', 'Category', 'Team', 'TeamType'];
 
-  koru.onunload(module, function () {
-    publish._destroy('Org');
-  });
+  koru.onunload(module, () => {publish._destroy('Org')});
 
-  publish('Org', function (shortName) {
+  publish({name: 'Org', init(shortName) {
+    const {userId} = this;
     Val.ensureString(shortName);
-    var sub = this;
+    const org = Org.findBy('shortName', shortName);
+    if (! org) return this.error(new koru.Error(404, 'Org not found'));
 
-    var org = Org.findBy('shortName', shortName);
-    if (! org) return sub.error(new koru.Error(404, 'Org not found'));
+    const handles = [];
 
-    var handles = [];
+    this.conn.org_id = org._id;
 
-    sub.conn.org_id = org._id;
+    this.onStop(() => {handles.forEach(handle => {handle.stop()})});
 
-    sub.onStop(function () {
-      handles.forEach(function (handle) {
-        handle.stop();
-      });
-    });
-
-    var sendUpdate = sub.sendUpdate.bind(sub);
+    const sendUpdate = this.sendUpdate.bind(this);
 
     handles.push(User.observeOrg_id(org._id, sendUser));
     User.query.where('org_id', org._id).forEach(sendUser);
 
-    orgChildren.forEach(function (name) {
-      var model = Model[name];
+    orgChildren.forEach(name => {
+      const model = Model[name];
       handles.push(model.observeOrg_id(org._id, sendUpdate));
       model.query.where('org_id', org._id).forEach(sendUpdate);
     });
 
     function sendUser(doc, was) {
-      if (doc && doc._id === sub.userId) return;
+      if (doc && doc._id === userId) return;
       sendUpdate(doc, was);
     }
-  });
+  }});
 });

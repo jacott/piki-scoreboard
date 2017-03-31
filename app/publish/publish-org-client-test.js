@@ -1,22 +1,23 @@
 define(function (require, exports, module) {
-  var test, v;
-  var TH = require('./test-helper');
+  const publish = require('koru/session/publish');
+  const TH      = require('./test-helper');
+
   require('./publish-org');
-  var publish = require('koru/session/publish');
+  var test, v;
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
       v.sub = TH.mockClientSub();
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.cleanUpTest(v);
       v = null;
     },
 
-    "test publish": function () {
+    "test publish"() {
       var sut = publish._pubs.Org;
       var matchUser = v.sub.match.withArgs('User', TH.match.func);
 

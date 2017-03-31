@@ -1,36 +1,29 @@
 define(function(require, exports, module) {
-  var publish = require('koru/session/publish');
-  var Query = require('koru/model/query');
-  var Org = require('models/org');
-  var User = require('models/user');
-  var koru = require('koru');
+  const koru    = require('koru');
+  const Query   = require('koru/model/query');
+  const publish = require('koru/session/publish');
+  const Org     = require('models/org');
+  const User    = require('models/user');
 
-  koru.onunload(module, function () {
-    publish._destroy('Self');
-  });
+  koru.onunload(module, () => {publish._destroy('Self')});
 
-  publish('Self', function () {
-    var sub = this;
-    if (! sub.userId) {
-      sub.setUserId(User.guestUser()._id);
+  publish({name: 'Self', init() {
+    if (! this.userId) {
+      this.setUserId(User.guestUser()._id);
       return;
     }
-    var user = User.findById(sub.userId);
+    const user = User.findById(this.userId);
 
     if (! user) {
-      sub.error(new koru.Error(404, 'User not found'));
+      this.error(new koru.Error(404, 'User not found'));
       return;
     }
 
-    var handles = [];
+    const handles = [];
 
-    sub.onStop(function () {
-      handles.forEach(function (handle) {
-        handle.stop();
-      });
-    });
+    this.onStop(() => {handles.forEach(handle => {handle.stop()})});
 
-    var sendUpdate = sub.sendUpdate.bind(sub);
+    const sendUpdate = this.sendUpdate.bind(this);
 
     // Publish self
     handles.push(User.observeId(user._id, sendUpdate));
@@ -39,5 +32,5 @@ define(function(require, exports, module) {
     // Publish all orgs
     handles.push(Org.onChange(sendUpdate));
     Org.query.forEach(sendUpdate);
-  });
+  }});
 });

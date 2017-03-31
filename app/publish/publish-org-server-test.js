@@ -1,14 +1,14 @@
 define(function (require, exports, module) {
   var test, v;
-  var TH = require('./test-helper');
-  var sut = require('./publish-org');
-  var publish = require('koru/session/publish');
-  var Model = require('koru/model');
-  var koru = require('koru');
-  var Val = require('koru/model/validation');
+  const koru    = require('koru');
+  const Model   = require('koru/model');
+  const Val     = require('koru/model/validation');
+  const publish = require('koru/session/publish');
+  const sut     = require('./publish-org');
+  const TH      = require('./test-helper');
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
       v.user = TH.Factory.createUser();
@@ -16,12 +16,12 @@ define(function (require, exports, module) {
       test.stub(Val, 'ensureString');
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.cleanUpTest(v);
       v = null;
     },
 
-    "test publish": function () {
+    "test publish"() {
       var org1 = TH.Factory.createOrg({shortName: 'foo'});
 
       var user1 = TH.Factory.createUser();
@@ -85,7 +85,7 @@ define(function (require, exports, module) {
      * session user should not be sent to client as it is already
      * present.
      */
-    "test session user not sent": function () {
+    "test session user not sent"() {
       var org = v.user.org;
 
       var sub = TH.mockSubscribe(v, 's123', 'Org', org.shortName);
@@ -98,7 +98,7 @@ define(function (require, exports, module) {
       refute.calledWith(v.conn.changed, 'User');
     },
 
-    "test org not found": function () {
+    "test org not found"() {
       var sub = TH.mockSubscribe(v, 's123', 'Org', 'bad');
 
       refute(sub);

@@ -7,11 +7,11 @@ define(function(require, exports, module) {
   return function (Climber) {
     util.merge(Climber, {
       search(text, limit, tester) {
-        var regex = new RegExp(".*"+util.regexEscape(text)+".*", "i");
-        var results = [];
-        var docs = Climber.docs;
-        for(var id in docs) {
-          var doc = docs[id];
+        const regex = new RegExp(".*"+util.regexEscape(text)+".*", "i");
+        const results = [];
+        const docs = Climber.docs;
+        for(let id in docs) {
+          const doc = docs[id];
           if (regex.test(doc.name) && (! tester || tester(doc))) {
             results.push(doc);
             if (results.length === limit)
@@ -23,13 +23,11 @@ define(function(require, exports, module) {
       },
     });
 
-    session.registerBroadcast(module, 'mergeClimbers', function (climberId, ids) {
+    session.registerBroadcast(module, 'mergeClimbers', (climberId, ids) => {
       [Model.Competitor, Model.Result].forEach(model => {
         model.where({climber_id: ids}).update('climber_id', climberId);
       });
-      ids.forEach(id => {
-        Climber.serverQuery.onId(id).remove();
-      });
+      ids.forEach(id => {Climber.serverQuery.onId(id).remove()});
     });
   };
 });

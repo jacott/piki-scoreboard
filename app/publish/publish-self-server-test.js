@@ -1,25 +1,26 @@
 define(function (require, exports, module) {
+  const koru    = require('koru');
+  const Model   = require('koru/model');
+  const publish = require('koru/session/publish');
+  const Org     = require('models/org');
+  const User    = require('models/user');
+  const TH      = require('./test-helper');
+
+  const sut     = require('./publish-self');
   var test, v;
-  var TH = require('./test-helper');
-  var sut = require('./publish-self');
-  var publish = require('koru/session/publish');
-  var Model = require('koru/model');
-  var koru = require('koru');
-  var User = require('models/user');
-  var Org = require('models/org');
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.cleanUpTest(v);
       v = null;
     },
 
-    "test publish guest": function () {
+    "test publish guest"() {
       var sub = TH.mockSubscribe(v, 's123', 'Self');
 
       assert.same(v.conn.userId, 'guest');
@@ -27,7 +28,7 @@ define(function (require, exports, module) {
       assert(sub._stop);
     },
 
-    "test publish user": function () {
+    "test publish user"() {
       var user = TH.Factory.createUser();
       var org1 = TH.Factory.createOrg();
       var org2 = TH.Factory.createOrg();
@@ -73,7 +74,7 @@ define(function (require, exports, module) {
       assert.called(oStop);
     },
 
-    "test user not found": function () {
+    "test user not found"() {
       test.stub(koru, 'userId').returns('bad');
 
       var sub = TH.mockSubscribe(v, 's123', 'Self');

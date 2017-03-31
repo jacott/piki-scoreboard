@@ -9,12 +9,12 @@ define(function (require, exports, module) {
   const Climber    = require('./climber');
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.clearDB();
       v = null;
     },
@@ -66,7 +66,7 @@ define(function (require, exports, module) {
 
     },
 
-    "test search": function () {
+    "test search"() {
       var names = ['Bob', 'brendon', 'bobby', 'robert'];
       v.climbers = TH.Factory.createList(4, 'createClimber', function (index, options) {
         options.name = names[index];

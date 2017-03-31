@@ -1,28 +1,20 @@
 define(function(require, exports, module) {
-  var publish = require('koru/session/publish');
-  var koru = require('koru');
-  var Event = require('models/event');
+  const koru    = require('koru');
+  const publish = require('koru/session/publish');
   require('models/competitor');
+  const Event   = require('models/event');
   require('models/result');
 
-  var orgChildren = ['Competitor', 'Result'];
+  const orgChildren = ['Competitor', 'Result'];
 
-  koru.onunload(module, function () {
-    publish._destroy('Event');
-  });
+  koru.onunload(module, () => {publish._destroy('Event')});
 
-  publish('Event', function (eventId) {
-    var sub = this;
+  publish({name: 'Event', init(eventId) {
+    const event = Event.findById(eventId);
+    if (! event) return this.error(new koru.Error(404, 'event not found'));
 
-    var event = Event.findById(eventId);
-    if (! event) return sub.error(new koru.Error(404, 'event not found'));
+    orgChildren.forEach(name => {this.match(name, matchOrg)});
 
-    orgChildren.forEach(function (name) {
-      sub.match(name, matchOrg);
-    });
-
-    function matchOrg(doc) {
-      return event._id === doc.event_id;
-    }
-  });
+    function matchOrg(doc) {return event._id === doc.event_id}
+  }});
 });

@@ -15,18 +15,12 @@ define(function(require, exports, module) {
     publish._destroy('Org');
   });
 
-  publish('Org', function (shortName) {
-    var sub = this;
+  publish({name: 'Org', init(shortName) {
+    const org = Org.findBy('shortName', shortName);
+    if (! org) return this.error(new koru.Error(404, 'org not found'));
 
-    var org = Org.findBy('shortName', shortName);
-    if (! org) return sub.error(new koru.Error(404, 'org not found'));
+    orgChildren.forEach(name => {this.match(name, matchOrg)});
 
-    orgChildren.forEach(function (name) {
-      sub.match(name, matchOrg);
-    });
-
-    function matchOrg(doc) {
-      return org._id === doc.org_id;
-    }
-  });
+    function matchOrg(doc) {return org._id === doc.org_id}
+  }});
 });
