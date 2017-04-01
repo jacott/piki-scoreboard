@@ -51,6 +51,10 @@ define(function(require, exports, module) {
       document.body.appendChild(elm);
       const currentSub = eventSub;
 
+      const pageTitle = document.getElementById('PageTitle');
+      if (pageTitle)
+        pageTitle.href = `#${pageRoute.orgSN}/event/${pageRoute.eventId}/show`;
+
       if (pageRoute.eventId) {
         if (! Tpl.event || Tpl.event._id !== pageRoute.eventId) {
           if (Tpl.event =  Event.findById(pageRoute.eventId)) {

@@ -55,11 +55,6 @@ define(function(require, exports, module) {
         App.addColorClass($.element, color);
       }
     },
-
-    title() {
-      const user = getUser();
-      return user ? user.name : '';
-    },
   });
 
   Tpl.$events({
@@ -185,8 +180,9 @@ define(function(require, exports, module) {
         title = prev ? util.capitalize(util.humanize(prev.name)) : "Piki";
     }
 
-    if (pageTitle)
+    if (pageTitle && pageTitle.textContent !== title) {
       pageTitle.textContent = title;
+    }
 
     if (page && page.titleSuffix)
       title = `${title} - ${page.titleSuffix}`;

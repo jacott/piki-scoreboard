@@ -396,6 +396,11 @@ define(function(require, exports, module) {
     if (data.selectHeat === -1)
       data.showingResults = true;
     updateResults(ctx);
+
+    const pageRoute = util.shallowCopy(Route.currentPageRoute);
+    pageRoute.search =
+      `?type=${data.showingResults ? 'results' : 'startlists'}&heat=${data.heat.number}`;
+    Route.replaceHistory(pageRoute);
   }
 
   function updateResults(ctx) {
