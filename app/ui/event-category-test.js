@@ -24,7 +24,8 @@ isClient && define(function (require, exports, module) {
       TH.Factory.createCompetitor({team_ids: [v.t1._id, v.t2._id], number: 123});
       v.result2 = TH.Factory.createResult({scores: [0.3]});
       TH.setOrg(v.org);
-      v.eventSub = test.stub(App, 'subscribe').withArgs('Event').returns({stop: v.stop = test.stub()});
+      v.eventSub = test.stub(App, 'subscribe').withArgs('Event')
+        .returns({stop: v.stop = test.stub()});
       Route.gotoPage(sut, {eventId: v.event._id, append: v.category._id, search: '&type=results'});
       v.eventSub.yield();
     },
@@ -47,7 +48,7 @@ isClient && define(function (require, exports, module) {
             assert.dom('th:nth-child(6)', 'Qual 1');
           });
           assert.dom('tbody', function () {
-            assert.dom('tr:first-child>td.climber>.name', {text: v.result2.climber.name, parent: function () {
+            assert.dom('tr:first-child>td.climber>.name', {text: v.result2.climber.name, parent() {
               assert.dom('.teams', function () {
                 assert.dom('span', v.t1.shortName);
                 assert.dom('span', v.t2.shortName);
@@ -61,7 +62,7 @@ isClient && define(function (require, exports, module) {
         v.result.setScore(1, "23");
 
         assert.dom('.results>tbody', function () {
-          assert.dom('tr:first-child>td.climber>.name', {text: v.result.climber.name, parent: function () {
+          assert.dom('tr:first-child>td.climber>.name', {text: v.result.climber.name, parent() {
             assert.dom('.teams', function () {
               assert.dom('span:first-child', "");
               assert.dom('span', v.t2.shortName);
@@ -73,7 +74,7 @@ isClient && define(function (require, exports, module) {
               }});
             });
           }});
-          assert.dom('tr:last-child>td.climber>.name', {text: v.result2.climber.name, parent: function () {
+          assert.dom('tr:last-child>td.climber>.name', {text: v.result2.climber.name, parent() {
             assert.dom(this.parentNode, function () {
               assert.dom('.score:nth-child(2)>span', '2');
               refute.dom('i');
@@ -83,7 +84,7 @@ isClient && define(function (require, exports, module) {
         v.result.setScore(2, "13+");
         assert.dom('.results>tbody', function () {
           assert.dom('tr:first-child',  function () {
-            assert.dom('.score>span', {text: "13+", parent: function () {
+            assert.dom('.score>span', {text: "13+", parent() {
               assert.dom('i', "1");
               assert.dom(this.previousSibling, function () {
                 assert.dom('span', "1");
@@ -97,7 +98,7 @@ isClient && define(function (require, exports, module) {
         v.result2.setScore(2, "43.5");
         assert.dom('.results>tbody', function () {
           assert.dom('tr:last-child', function () {
-            assert.dom('.score>span', {text: "43.5", parent: function () {
+            assert.dom('.score>span', {text: "43.5", parent() {
               assert.dom('i', "1");
               assert.dom(this.previousSibling, function () {
                 assert.dom('span', "1.41");
@@ -279,10 +280,13 @@ isClient && define(function (require, exports, module) {
               TH.trigger(this, 'pointerdown');
             });
           });
-          assert.dom('tr#Result_'+ v.result._id + '>td:nth-child(2)>input[placeholder="m:ss"]', function () {
-            assert.same(document.activeElement, this);
-            TH.change(this, "3.44");
-          });
+          assert.dom(
+            'tr#Result_'+ v.result._id +
+              '>td:nth-child(2)>input[placeholder="m:ss"]', function () {
+                assert.same(document.activeElement, this);
+                TH.change(this, "3.44");
+              }
+          );
           assert.equals(v.result.$reload().time, 3*60+44);
         });
       },

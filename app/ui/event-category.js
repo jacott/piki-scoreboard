@@ -15,43 +15,44 @@ define(function(require, exports, module) {
   const Score = Tpl.Score;
   const BoulderScore = Tpl.BoulderScore;
   const InvalidInput = Tpl.InvalidInput.$render();
-  var focusField;
 
-  koru.onunload(module, function () {
-    eventTpl.route.removeTemplate(Tpl);
-  });
+  let focusField;
+
+  koru.onunload(module, () => {eventTpl.route.removeTemplate(Tpl)});
 
   eventTpl.route.addTemplate(module, Tpl, {
     focus: '.Category [name=selectHeat]',
-    data: function (page,pageRoute) {
+    data(page,pageRoute) {
       if (! eventTpl.event) Route.abortPage();
       var params = Route.searchParams(pageRoute);
-      return {showingResults: params.type === 'results', category_id: pageRoute.append, heatNumber: +(params.heat || -1)};
+      return {showingResults: params.type === 'results',
+              category_id: pageRoute.append, heatNumber: +(params.heat || -1)};
     }
   });
 
   Tpl.$helpers({
-    classes: function () {
-      return (this.showingResults ? "Category rank " : "Category start ") + this.heat.className() + ' ' + this.heat.type;
+    classes() {
+      return (this.showingResults ? "Category rank " : "Category start ") +
+        this.heat.className() + ' ' + this.heat.type;
     },
-    modeSwitchLabel: function () {
+    modeSwitchLabel() {
       return this.showingResults ? "Show start order" : "Show results";
     },
-    mode: function () {
+    mode() {
       return this.showingResults ? "Results" : "Start order";
     },
-    heats: function () {
+    heats() {
       return this.heat.list();
     },
-    headers: function () {
+    headers() {
       var frag = document.createDocumentFragment();
-      this.heat.headers(function (number, name) {
+      this.heat.headers((number, name) => {
         frag.appendChild(HeatHeader.$render({heat: number, name: name}));
       });
       return frag;
     },
 
-    results: function () {
+    results() {
       var frag = document.createDocumentFragment();
 
       var results = Result.eventCatIndex.fetch({
@@ -80,7 +81,7 @@ define(function(require, exports, module) {
   });
 
   Tpl.$extend({
-    $created: function (ctx, elm) {
+    $created(ctx, elm) {
       var data = ctx.data;
       var showingResults = data.showingResults;
       util.extend(data, {
@@ -93,7 +94,8 @@ define(function(require, exports, module) {
           showingResults = value;
           if (showingResults)
             focusField = null;
-          this.canInput = ! (value || eventTpl.event.closed)  && Dom.hasClass(document.body, 'jAccess');
+          this.canInput = ! (value || eventTpl.event.closed) &&
+            Dom.hasClass(document.body, 'jAccess');
           return value;
         },
       });
@@ -101,9 +103,9 @@ define(function(require, exports, module) {
 
       Dom.autoUpdate(ctx, {
         subject: data.category,
-        removed: function () {Route.replacePath(eventTpl)},
+        removed() {Route.replacePath(eventTpl)},
       });
-      ctx.onDestroy(Result.onChange(function (doc, was) {
+      ctx.onDestroy(Result.onChange((doc, was) => {
         var result = doc || was;
         if (result.event_id !== eventTpl.event._id ||
             result.category_id !== ctx.data.category._id)
@@ -113,26 +115,26 @@ define(function(require, exports, module) {
       }));
     },
 
-    $destroyed: function (ctx, elm) {
+    $destroyed(ctx, elm) {
       focusField = null;
     },
   });
 
   Tpl.$events({
-    'click [name=toggleStartOrder]': function (event) {
+    'click [name=toggleStartOrder]'(event) {
       Dom.stopEvent();
       var data = $.data();
       data.showingResults = ! data.showingResults;
       updateResults($.ctx);
     },
 
-    'change [name=selectHeat]': function (event) {
+    'change [name=selectHeat]'(event) {
       Dom.stopEvent();
 
       setHeatNumber($.ctx, this.value);
     },
 
-    'change td.score input': function (event) {
+    'change td.score input'(event) {
       if (! saveScore(this)) {
         Dom.stopEvent();
         getFocusElm().focus();
@@ -140,11 +142,11 @@ define(function(require, exports, module) {
       }
     },
 
-    'focus td.score input': function (event) {
+    'focus td.score input'(event) {
       setFocusField(this);
     },
 
-    'keydown td.score input': function (event) {
+    'keydown td.score input'(event) {
       switch(event.which) {
       case 27:
         focusField = null;
@@ -189,7 +191,7 @@ define(function(require, exports, module) {
     },
 
 
-    'pointerdown td.score': function (event) {
+    'pointerdown td.score'(event) {
       if (event.target === document.activeElement ||
           ! Dom.hasClass(document.body, 'jAccess'))
         return;
@@ -229,13 +231,13 @@ define(function(require, exports, module) {
   });
 
   HeatHeader.$helpers({
-    heatClass: function () {
+    heatClass() {
       Dom.addClass($.element, this.heat > 0 ? (this.name === 'Result' ? 'problem' : 'score') : 'other');
     },
   });
 
   Tpl.Result.$extend({
-    $created: function (ctx) {
+    $created(ctx) {
       Dom.autoUpdate(ctx, {subject: ctx.data.climber});
     },
   });
@@ -255,7 +257,7 @@ define(function(require, exports, module) {
       });
       return frag;
     },
-    scores: function () {
+    scores() {
       var frag = document.createDocumentFragment();
       var parentCtx = Dom.getCtx($.element.parentNode);
       var result = parentCtx.data;
@@ -298,8 +300,10 @@ define(function(require, exports, module) {
 
       function renderScore(i, canInput, qr) {
         if (qr)
-          var data = {result: result, heat: -2,
-                      score: scores[i] == null ? '' : heat.numberToScore(Math.pow(result.rankMult, 1/i), -2)};
+          var data = {
+            result: result, heat: -2,
+            score: scores[i] == null && heat.total !== heat.rankIndex ? ''
+              : heat.numberToScore(Math.pow(result.rankMult, 1/i), -2)};
         else
           var data = {result: result, canInput: canInput, heat: i,
                       score: heat.numberToScore(scores[i], i),
@@ -315,14 +319,14 @@ define(function(require, exports, module) {
   });
 
   Score.$helpers({
-    rank: function () {
+    rank() {
       if (! this.rank) return;
       var elm =  document.createElement('i');
       elm.textContent = this.rank;
       return elm;
     },
 
-    score: function () {
+    score() {
       if (this.canInput) {
         var elm = document.createElement('input');
         elm.setAttribute('placeholder', this.heat === 99 ? "m:ss" : "n+");
@@ -338,13 +342,13 @@ define(function(require, exports, module) {
       return elm;
     },
 
-    heatClass: function () {
+    heatClass() {
       Dom.addClass($.element, 'heat' + this.heat);
     },
   });
 
   BoulderScore.$helpers({
-    problems: function () {
+    problems() {
       var len = this.heat.problems;
       var problems = this.result.problems ? this.result.problems[this.heat.number - 1] || [] : [];
       var canInput = this.canInput;
@@ -425,7 +429,8 @@ define(function(require, exports, module) {
   }
 
   function getFocusElm() {
-    return document.querySelector('#' + focusField.id + ' td.score input[tabIndex="'+focusField.tabIndex+'"].'+focusField.name);
+    return document.querySelector(
+      '#' + focusField.id + ' td.score input[tabIndex="'+focusField.tabIndex+'"].'+focusField.name);
   }
 
   function saveScore(elm) {

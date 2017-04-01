@@ -1,14 +1,14 @@
 define(function(require, exports, module) {
-  var Val = require('koru/model/validation');
-  var util = require('koru/util');
-  var koru = require('koru');
-  var Org = require('./org');
+  const koru = require('koru');
+  const Val  = require('koru/model/validation');
+  const util = require('koru/util');
+  const Org  = require('./org');
 
-  var model = require('model').define(module, {
+  const model = require('model').define(module, {
 
   });
 
-  model.HEAT_FORMAT_REGEX = /^Q{0,3}(:\d+)?(F\d+(:\d+)?){1,3}$/;
+  model.HEAT_FORMAT_REGEX = /^Q{0,10}(:\d+)?(F\d+(:\d+)?){0,3}$/;
 
   model.defineFields({
     org_id: 'belongs_to',

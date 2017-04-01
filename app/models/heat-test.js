@@ -420,14 +420,61 @@ define(function (require, exports, module) {
       },
     },
 
+    "qual only": {
+      setUp() {
+        v.call = number => {
+          v.heat = new Heat(number, v.format || 'LQQQ');
+
+          v.results = [];
+
+          v.heat.headers((number, name) => {
+            v.results.push({number: number, name: name});
+          });
+
+          return v.results;
+        };
+      },
+
+      "test last qual result"() {
+        assert.equals(v.call(3), [
+          {number: 3, name: 'Result'},
+        ]);
+      },
+
+      "test genral results"() {
+        assert.equals(v.call(-1), [
+          {number: -2, name: 'Rank'},
+          {number: -2, name: 'Qual points'},
+          {number: 3, name: 'Qual 3'},
+          {number: 2, name: 'Qual 2'},
+          {number: 1, name: 'Qual 1'},
+        ]);
+
+        const results = [v.r1 = {scores: [0.2, 200, 300, 400, 300]},
+                         v.r2 = {scores: [0.3, 100, 300, 400, 400]},
+                         v.r3 = {scores: [0.4, 100, 300, 600, 400]}];
+
+        v.heat.sort(results);
+
+        assert.equals(results, [
+          {scores: [0.2, 200, 300, 400, 300], rankMult: 5,
+           rank3: 2.5, rank2: 2, rank1: 1, sPoints: 90},
+          {scores: [0.4, 100, 300, 600, 400], rankMult: 5,
+           rank3: 1, rank2: 2, rank1: 2.5, sPoints: 90},
+          {scores: [0.3, 100, 300, 400, 400], rankMult: 12.5,
+           rank3: 2.5, rank2: 2, rank1: 2.5, sPoints: 65}]);
+      },
+
+    },
+
     "headers": {
       setUp() {
-        v.call = function (number) {
+        v.call = number => {
           v.heat = new Heat(number, v.format || 'LQQF26F8');
 
           v.results = [];
 
-          v.heat.headers(function (number, name) {
+          v.heat.headers((number, name) => {
             v.results.push({number: number, name: name});
           });
 

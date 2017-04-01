@@ -14,6 +14,8 @@ define(function(require) {
       format = format.slice(1);
       this.total = format.length;
       this.rankIndex = format.indexOf('F');
+      if (this.rankIndex === -1)
+        this.rankIndex = this.total;
 
       var pnum = 5;
       for(var i = 1; i <= this.total; ++i) {
@@ -277,7 +279,7 @@ define(function(require) {
 
       return function (a, b) {
         var aScores = a.scores, bScores = b.scores;
-        var mLen = max < 0 ? Math.max(aScores.length, bScores.length) - 1 : max;
+        var mLen = max < 0 ? last === rankIndex ? last : Math.max(aScores.length, bScores.length) - 1 : max;
         var as, bs;
 
         for(; mLen >= min; --mLen) {
@@ -290,6 +292,7 @@ define(function(require) {
             } else {
               as = a.rankMult;
               bs = b.rankMult;
+
               if (as == null) as = -5;
               if (bs == null) bs = -5;
               return as - bs; // lower rank is better
@@ -325,7 +328,7 @@ define(function(require) {
         callback(0, 'Start order');
       }
       else {
-        if (this.type === 'L' && num === this.total)
+        if (this.type === 'L' && num === this.total && this.rankIndex !== this.total)
           callback(99, 'Time taken');
         callback(num, "Result");
         if (this.type === 'B') callback(num, "Sum");

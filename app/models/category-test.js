@@ -1,20 +1,21 @@
 define(function (require, exports, module) {
+  const TH       = require('test-helper');
+
+  const Category = require('./category');
   var test, v;
-  var TH = require('test-helper');
-  var Category = require('./category');
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.clearDB();
       v = null;
     },
 
-    'test creation': function () {
+    'test creation'() {
       var category=TH.Factory.createCategory();
 
       assert(Category.exists(category._id));
@@ -22,7 +23,7 @@ define(function (require, exports, module) {
       assert(category.org);
     },
 
-    'test standard validators': function () {
+    'test standard validators'() {
       var validators = Category._fieldValidators;
 
       assert.validators(validators.name, {maxLength: [200], required: [true], trim: [true]});
@@ -34,7 +35,7 @@ define(function (require, exports, module) {
       assert.validators(validators.minAge, {number: [{integer: true, $gt: 0, $lt: 100}]});
       assert.validators(validators.maxAge, {number: [{integer: true, $gt: 0, $lt: 100}]});
       assert.validators(validators.heatFormat, {inclusion: [{
-        matches: /^Q{0,3}(:\d+)?(F\d+(:\d+)?){1,3}$/,
+        matches: TH.match(x => x.toString() === /^Q{0,10}(:\d+)?(F\d+(:\d+)?){0,3}$/.toString()),
       }]});
     },
 
