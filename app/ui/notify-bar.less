@@ -1,0 +1,12 @@
+@import "global.lessimport";
+
+#NotifyBar {
+  color: #fff;
+  padding: 3px;
+  border-radius: @fixedBorderRadius;
+  .flexFlow(row, nowrap);
+  align-items: center;
+  &:not(.on) {
+    display: none;
+  }
+}

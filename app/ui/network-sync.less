@@ -1,0 +1,23 @@
+@import "global.lessimport";
+
+#NetworkSync {
+  &:not(.show) {
+    display: none;
+  }
+  &:before {
+    .md-inline-icon("sync");
+  }
+
+  &[name="offline"] {
+    position: relative;
+    &:before {content: "sync_disabled"}
+  }
+
+  &[name="failure"] {
+    position: relative;
+    &:before {
+      color: #f94;
+      content: "sync_problem";
+    }
+  }
+}

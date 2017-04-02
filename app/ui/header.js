@@ -15,6 +15,7 @@ define(function(require, exports, module) {
   const User        = require('models/user');
   const Flash       = require('ui/flash');
   const Help        = require('ui/help');
+  const NotifyBar   = require('ui/notify-bar');
   const App         = require('./app-base');
 
   var Tpl = Dom.newTemplate(require('koru/html!./header'));
@@ -129,7 +130,7 @@ define(function(require, exports, module) {
   }
 
   Tpl.$extend({
-    $created(ctx) {
+    $created(ctx, elm) {
       ctx.onDestroy(ClientLogin.onChange(session, state => {
         if (state === 'ready') {
           const uid = koru.userId();
@@ -150,6 +151,8 @@ define(function(require, exports, module) {
             (Org.findBy('shortName', orgSN)||{}).name || '';
         }
       }));
+
+      elm.getElementsByClassName('notifyBarContainer')[0].appendChild(NotifyBar.$autoRender());
     },
 
     $destroyed(ctx) {

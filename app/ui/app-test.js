@@ -9,7 +9,6 @@ isClient && define(function (require, exports, module) {
   const Factory      = require('test/factory');
   const Event        = require('ui/event');
   const EventTpl     = require('ui/event');
-  const Spinner      = require('ui/spinner');
   const TH           = require('ui/test-helper');
   const App          = require('./app');
 
@@ -19,7 +18,6 @@ isClient && define(function (require, exports, module) {
       v = {};
       test.stub(Route, 'replacePath');
       test.stub(window, 'addEventListener');
-      test.stub(Spinner, 'init');
       test.stub(session, 'sendP');
       v.subSelf = test.spy(session, 'interceptSubscribe').withArgs('Self');
       TH.loginAs(TH.Factory.createUser('guest'));
@@ -29,11 +27,6 @@ isClient && define(function (require, exports, module) {
       App.stop();
       TH.tearDown();
       v = null;
-    },
-
-    "test inits spinner"() {
-      App.start();
-      assert.called(Spinner.init);
     },
 
     "test Org"() {

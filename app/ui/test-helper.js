@@ -22,8 +22,8 @@ define(function(require, exports, module) {
     },
 
     tearDown(v) {
-      TH.domTearDown();
       TH.clearDB();
+      TH.domTearDown();
       util.thread.userId = null;
     },
 

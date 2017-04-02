@@ -110,11 +110,11 @@ isClient && define(function (require, exports, module) {
       assert.calledWith(UserAccount.logoutOtherClients, TH.match.func);
       UserAccount.logoutOtherClients.yield('my error');
 
-      assert.dom('#Flash.error', 'Unexpected error.');
+      assert.dom('#Flash .error', 'Unexpected error.');
 
       UserAccount.logoutOtherClients.yield();
 
-      assert.dom('#Flash.notice', 'You have been signed out of any other sessions.');
+      assert.dom('#Flash .notice', 'You have been signed out of any other sessions.');
     },
   });
 

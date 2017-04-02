@@ -1,42 +1,85 @@
 define(function(require, exports, module) {
-  const koru = require('koru');
-  const Dom  = require('koru/dom');
-  const util = require('koru/util');
+  const koru           = require('koru');
+  const Dom            = require('koru/dom');
+  const Val            = require('koru/model/validation');
+  const util           = require('koru/util');
+  const ResourceString = require('resource-string');
 
-  var Tpl = Dom.newTemplate(require('koru/html!./flash'));
+  const Tpl = module.exports = Dom.newTemplate(module, require('koru/html!./flash'));
+  const {Message} = Tpl;
 
   Tpl.$events({
     'click .m'(event) {
       Dom.stopEvent();
-      Dom.hideAndRemove(event.currentTarget);
+      close(this);
     },
   });
 
-  util.extend(Tpl, {
-    $created(ctx, elm) {
-      ctx.onDestroy(koru.afTimeout(function () {
-        Dom.hideAndRemove(elm);
-      }, 7000));
-    },
+  util.merge(Tpl, {
+    close,
     error(message) {
-      return this.notice(message, 'error');
+      return display({message, type: 'error', transient: true});
     },
 
-    notice(message, classes) {
-      Dom.removeId('Flash');
-      document.body.appendChild(Tpl.$autoRender({message: message, classes: classes || 'notice'}));
+    notice(message) {
+      return display({message, transient: true});
     },
 
-    loading() {
-      this.notice('Loading...', 'loading');
-    }
+    confirm(message) {
+      return display({message, transient: false});
+    },
   });
 
-  koru.globalErrorCatch = function (e) {
-    koru.error(e.error < 500 ? e : util.extractError(e));
-    Tpl.error(e.reason || "Unexpected error");
-    return true;
+  function display({message, transient, type='notice'}) {
+    message = ResourceString.text(message);
+    let flash = document.getElementById('Flash');
+    if (flash) {
+
+      Dom.removeClass(flash, 'remElm');
+
+      Dom.forEach(flash, '#Flash>.m.transient:not(.remElm)',
+                  elm => {Dom.hideAndRemove(elm)});
+    } else {
+      flash = Tpl.$autoRender();
+      document.body.appendChild(flash);
+    }
+
+    const classes = `m ${type}${transient ? ' transient' : ''}`;
+    const elm = Message.$autoRender({classes, message});
+    const ctx = Dom.myCtx(elm);
+    flash.appendChild(elm);
+    transient && ctx.onDestroy(koru.afTimeout(() => {close(elm)}, 7000));
+  }
+
+  function close(elm) {
+    const flash = elm.parentNode;
+    Dom.hideAndRemove(elm);
+    if (! flash.querySelector('.m:not(.remElm)'))
+      Dom.hideAndRemove(flash);
+  }
+
+  koru.unexpectedError = function (userMsg, logMsg) {
+    Tpl.error('unexpected_error:'+(userMsg||logMsg));
+    koru.error('Unexpected error', (logMsg||userMsg));
   };
 
-  return Tpl;
+
+  koru.globalErrorCatch = koru.globalCallback = function (e) {
+    if (! e) return;
+    let reason = e.reason || e.toString();
+    if (typeof reason === 'object') {
+      try {
+        reason = Val.Error.toString(reason);
+      } catch(ex) {
+        reason = util.inspect(reason);
+      }
+      reason = `Update failed: ${reason}`;
+    }
+    if (typeof e.error !== "number" || e.error >= 500) {
+      e.stack && koru.error(util.extractError(e));
+      Tpl.error(reason);
+    } else
+      Tpl.notice(reason);
+    return true;
+  };
 });

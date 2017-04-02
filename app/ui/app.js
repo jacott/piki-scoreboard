@@ -1,7 +1,6 @@
 define(function(require, exports, module) {
   const koru           = require('koru');
   const Dom            = require('koru/dom');
-  const format         = require('koru/format');
   const localStorage   = require('koru/local-storage');
   const session        = require('koru/session');
   const sessState      = require('koru/session/state');
@@ -14,11 +13,9 @@ define(function(require, exports, module) {
   require('publish/publish-org');
   require('publish/publish-self');
   const ResourceString = require('resource-string');
-  const Flash          = require('ui/flash');
   const header         = require('ui/header');
-  const Spinner        = require('ui/spinner');
+  const Loading        = require('ui/loading');
   const App            = require('./app-base');
-  const Disconnected   = require('./disconnected');
 
   var selfSub, orgSub, orgShortName, sessStateChange;
 
@@ -31,16 +28,7 @@ define(function(require, exports, module) {
   util.extend(App, {
     AVATAR_URL: 'https://secure.gravatar.com/avatar/',
 
-    text(text) {
-      var m = /^([^:]+):(.*)$/.exec(text);
-      if (m) {
-        var fmt = ResourceString.en[m[1]];
-        if (fmt) {
-          return format(fmt, m[2].split(':'));
-        }
-      }
-      return ResourceString.en[text] || text;
-    },
+    text: ResourceString.text,
 
     subscribe: require('koru/session/subscribe'),
 
@@ -55,8 +43,6 @@ define(function(require, exports, module) {
 
     start() {
       App.stop();
-      sessStateChange = sessState.onChange(connectChange);
-      Spinner.init();
       window.addEventListener('popstate', pageChanged);
       App.setAccess();
       selfSub = App.subscribe('Self', function (err) {
@@ -102,13 +88,6 @@ define(function(require, exports, module) {
     subscribeOrg(null);
   };
 
-  function connectChange(state) {
-    if (state)
-      Dom.removeId('Disconnected');
-    else
-      document.body.appendChild(Disconnected.$autoRender({}));
-  }
-
   function pageChanged(event) {
     Route.pageChanged();
   }
@@ -128,7 +107,7 @@ define(function(require, exports, module) {
       App.orgId = null;
 
       orgSub = App.subscribe('Org', orgShortName, function (err) {
-        Dom.removeId('Flash');
+        Loading.done();
         if (err) {
           koru.globalErrorCatch(err);
           subscribeOrg();
@@ -145,8 +124,6 @@ define(function(require, exports, module) {
         Dom.addClass(document.body, 'inOrg');
         callback();
       });
-
-      Flash.loading();
 
     } else {
       orgSub = orgShortName = App.orgId = null;

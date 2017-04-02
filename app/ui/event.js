@@ -62,10 +62,8 @@ define(function(require, exports, module) {
 
             eventSub && eventSub.stop();
             eventSub = App.subscribe('Event', pageRoute.eventId, function () {
-              Dom.removeId('Flash');
               callback();
             });
-            Dom.Flash.loading();
           }
         }
       }

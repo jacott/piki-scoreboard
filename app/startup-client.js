@@ -7,9 +7,12 @@ define(function(require, exports, module) {
   const userAccount = require('koru/user-account');
   const App         = require('ui/app');
   require('ui/category');
+  require('ui/choose-org');
   require('ui/climber');
   require('ui/event-category');
   require('ui/event-register');
+  require('ui/help');
+  const Loading     = require('ui/loading');
   require('ui/profile');
   require('ui/reg-upload');
   require('ui/reset-password');
@@ -17,8 +20,6 @@ define(function(require, exports, module) {
   require('ui/sign-in');
   require('ui/team');
   require('ui/team-results');
-  require('ui/help');
-  require('ui/choose-org');
 
   koru.onunload(module, restart);
 
@@ -34,6 +35,7 @@ define(function(require, exports, module) {
     userAccount.init();
     session.connect();
     App.start();
+    Loading.start();
   }
 
   function stop() {
