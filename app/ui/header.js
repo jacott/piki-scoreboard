@@ -30,7 +30,8 @@ define(function(require, exports, module) {
   Tpl.$helpers({
     style() {
       const user = getUser();
-      return user && user.email ? 'background-image:url(' + App.AVATAR_URL + md5sum(user.email)+'?d=blank)' : '';
+      return user && user.email ?
+        `background-image:url(${App.AVATAR_URL}${md5sum(user.email)}?d=blank` : '';
     },
 
     initials() {
