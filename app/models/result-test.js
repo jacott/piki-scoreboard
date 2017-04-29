@@ -2,8 +2,10 @@ define(function (require, exports, module) {
   var test, v;
   const koru     = require('koru');
   const Val      = require('koru/model/validation');
+  const Random   = require('koru/random').global;
   const util     = require('koru/util');
   const TH       = require('test-helper');
+  const Factory  = require('test/factory');
   const Category = require('./category');
   const Result   = require('./result');
 
@@ -32,10 +34,13 @@ define(function (require, exports, module) {
     },
 
     "test result has competitor"() {
-      let res = Result.where({competitor_id: v.competitor._id}).fetchOne();
+      this.stub(Random, 'fraction').returns(0.54321);
+      const comp2 = Factory.buildCompetitor({category_ids: v.catIds});
+      comp2.$$save();
+      let res = Result.where({competitor_id: comp2._id}).fetchOne();
       assert(res);
       assert.equals(res.event_id, v.competitor.event_id);
-
+      assert.equals(res.scores, [0.54321]);
     },
 
     "competitor registration": {
@@ -53,6 +58,7 @@ define(function (require, exports, module) {
         var result = TH.Factory.buildResult({category_id: v.cat2._id});
         result.$$save();
         assert.equals(v.event.$reload().heats, {cat1: 'LQQF8', cat2: 'BQQF26F8'});
+
       },
 
       "test no more in category"() {
@@ -277,12 +283,8 @@ define(function (require, exports, module) {
 
       assert.same(v.result.event_id, v.competitor.event_id);
       assert.same(v.result.climber_id, v.competitor.climber_id);
-      if (isClient)
-        assert.same(v.result.scores[0], 0);
-      else {
-        assert.between(v.result.scores[0], 0, 1);
-        refute.same(v.r2.scores[0], v.result.scores[0]);
-      }
+      assert.between(v.result.scores[0], 0, 1);
+      refute.same(v.r2.scores[0], v.result.scores[0]);
     },
 
     "test deleted when competitor cat removed"() {

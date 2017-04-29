@@ -2,6 +2,7 @@ define(function(require, exports, module) {
   const koru        = require('koru');
   const {BaseModel} = require('koru/model');
   const Val         = require('koru/model/validation');
+  const Random      = require('koru/random').global;
   const util        = require('koru/util');
   const Category    = require('./category');
   const Competitor  = require('./competitor');
@@ -162,7 +163,7 @@ define(function(require, exports, module) {
         category_id: catId, event_id: doc.event_id,
         climber_id: doc.climber_id,
         competitor_id: doc._id,
-        scores: [isClient ? 0 : Math.random()],
+        scores: [Random.fraction()],
       });
     });
   }
