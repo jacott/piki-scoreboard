@@ -17,7 +17,7 @@ define(function(require, exports, module) {
   const Loading        = require('ui/loading');
   const App            = require('./app-base');
 
-  var selfSub, orgSub, orgShortName, sessStateChange;
+  let selfSub, orgSub, orgShortName = null, sessStateChange;
 
   const isTouch = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i
         .test(navigator.userAgent.toLowerCase());
@@ -77,6 +77,8 @@ define(function(require, exports, module) {
     if (pageRoute.orgSN === undefined)
       pageRoute.orgSN = localStorage.getItem('orgSN') || null;
 
+    if (pageRoute.orgSN == null && page !== Dom.ChooseOrg)
+      Route.abortPage('choose-org');
 
     if (pageRoute.orgSN !== orgShortName) {
       subscribeOrg(pageRoute.orgSN, callback);

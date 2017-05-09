@@ -266,7 +266,7 @@ define(function(require, exports, module) {
     geddon.onTestEnd(() => {txSave && txClient.query('ROLLBACK')});
   } else {
     var orgsStr = JSON.stringify({sch00: {name: 'Org 1'}, sch02: {name: 'Org 2'}});
-    localStorage._resetValue = () => ({orgs: orgsStr});
+    localStorage._resetValue = () => ({orgs: orgsStr, orgSN: 'SN1'});
   }
 
   function overrideSub(name, sub, callback) {

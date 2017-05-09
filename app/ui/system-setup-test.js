@@ -1,19 +1,21 @@
 isClient && define(function (require, exports, module) {
   var test, v;
-  var TH = require('./test-helper');
-  var SystemSetup = require('./system-setup');
-  var Route = require('koru/ui/route');
-  var Dom = require('koru/dom');
-  var UserAccount = require('koru/user-account');
-  var Org = require('models/org');
-  var User = require('models/user');
-  var App = require('./app-base');
+  const Dom         = require('koru/dom');
+  const Route       = require('koru/ui/route');
+  const UserAccount = require('koru/user-account');
+  const Org         = require('models/org');
+  const User        = require('models/user');
+  const Factory     = require('test/factory');
+  const App         = require('./app-base');
+  const SystemSetup = require('./system-setup');
+  const TH          = require('./test-helper');
 
   TH.testCase(module, {
     setUp: function () {
       test = this;
       v = {};
-      v.su = TH.Factory.createUser('su');
+      App.orgId = Factory.createOrg()._id;
+      v.su = Factory.createUser('su');
       TH.loginAs(v.su);
       App.setAccess();
     },
@@ -39,7 +41,7 @@ isClient && define(function (require, exports, module) {
     },
 
     "test renders orgs list": function () {
-      var orgs = TH.Factory.createList(2, 'createOrg');
+      var orgs = Factory.createList(2, 'createOrg');
 
       Route.gotoPage(Dom.SystemSetup);
 
@@ -49,11 +51,11 @@ isClient && define(function (require, exports, module) {
     },
 
     "test renders users list": function () {
-      v.org = TH.Factory.createOrg({name: 'org1'});
+      v.org = Factory.createOrg({name: 'org1'});
 
       setOrg();
 
-      var users = TH.Factory.createList(2, 'createUser');
+      var users = Factory.createList(2, 'createUser');
 
       assert.dom('h1', 'org1 Users');
       assert.dom('table.users', function () {
@@ -87,8 +89,8 @@ isClient && define(function (require, exports, module) {
     },
     "edit org": {
       setUp: function () {
-        v.org = TH.Factory.createOrg();
-        v.org2 = TH.Factory.createOrg();
+        v.org = Factory.createOrg();
+        v.org2 = Factory.createOrg();
 
         Route.gotoPage(Dom.SystemSetup.Index);
 
@@ -133,7 +135,7 @@ isClient && define(function (require, exports, module) {
     },
 
     "test addUser": function () {
-      v.org = TH.Factory.createOrg();
+      v.org = Factory.createOrg();
       setOrg();
 
       assert.dom('#SystemSetup', function () {
@@ -164,9 +166,9 @@ isClient && define(function (require, exports, module) {
 
     "edit user": {
       setUp: function () {
-        v.org = TH.Factory.createOrg();
-        v.user = TH.Factory.createUser();
-        v.user2 = TH.Factory.createUser();
+        v.org = Factory.createOrg();
+        v.user = Factory.createUser();
+        v.user2 = Factory.createUser();
 
         setOrg();
 

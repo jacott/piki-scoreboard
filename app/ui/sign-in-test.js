@@ -1,22 +1,26 @@
 isClient && define(function (require, exports, module) {
-  var test, v;
-
-  const koru        = require('koru');
-  const Dom         = require('koru/dom');
-  const session     = require('koru/session');
+  const koru         = require('koru');
+  const Dom          = require('koru/dom');
+  const localStorage = require('koru/local-storage');
+  const session      = require('koru/session');
   require('koru/ui/page-link');
-  const Route       = require('koru/ui/route');
-  const UserAccount = require('koru/user-account');
-  const login       = require('koru/user-account/client-login');
-  const User        = require('models/user');
-  const SignIn      = require('./sign-in');
-  const TH          = require('./test-helper');
+  const Route        = require('koru/ui/route');
+  const UserAccount  = require('koru/user-account');
+  const login        = require('koru/user-account/client-login');
+  const User         = require('models/user');
+  const Factory      = require('test/factory');
+  const App          = require('ui/app');
+  const TH           = require('./test-helper');
+
+  const SignIn       = require('./sign-in');
+  var test, v;
 
   TH.testCase(module, {
     setUp: function () {
       test = this;
       v = {};
       test.stub(UserAccount,'loginWithPassword');
+      App.orgId = Factory.createOrg()._id;
     },
 
     tearDown: function () {
@@ -81,7 +85,7 @@ isClient && define(function (require, exports, module) {
     },
 
     "test signing in" () {
-      TH.loginAs(TH.Factory.createUser('guest'));
+      TH.loginAs(Factory.createUser('guest'));
       Route.gotoPage(SignIn);
       test.stub(Route.history, 'back');
 

@@ -1,9 +1,10 @@
 isClient && define(function (require, exports, module) {
-  const Dom     = require('koru/dom');
-  const Route   = require('koru/ui/route');
-  const Event   = require('ui/event');
-  const Climber = require('./climber');
-  const TH      = require('./test-helper');
+  const Dom          = require('koru/dom');
+  const localStorage = require('koru/local-storage');
+  const Route        = require('koru/ui/route');
+  const Event        = require('ui/event');
+  const Climber      = require('./climber');
+  const TH           = require('./test-helper');
 
   const sut = require('./choose-org');
   var v;
@@ -20,7 +21,9 @@ isClient && define(function (require, exports, module) {
     },
 
     "test Choose org"() {
+      localStorage.removeItem('orgSN');
       v.org = TH.Factory.createOrg();
+
       Route.gotoPage(sut);
 
       this.stub(Route, 'gotoPath');
