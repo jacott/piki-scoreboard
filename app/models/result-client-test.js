@@ -91,7 +91,7 @@ define(function (require, exports, module) {
     "test index"() {
       var result = TH.Factory.createResult();
 
-      assert.equals(Result.eventCatIndex({
+      assert.equals(Result.eventCatIndex.lookup({
         event_id: result.event_id,
         category_id: result.category_id,
         climber_id: result.climber_id,

@@ -61,7 +61,7 @@ define(function (require, exports, module) {
     "test index": function () {
       var competitor = TH.Factory.createCompetitor();
 
-      assert.equals(Competitor.eventIndex({
+      assert.equals(Competitor.eventIndex.lookup({
         event_id: competitor.event_id,
         climber_id: competitor.climber_id}), competitor._id);
     },

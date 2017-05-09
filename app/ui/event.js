@@ -274,7 +274,7 @@ define(function(require, exports, module) {
             .forEach(function (doc) {doc && callback(doc)});
 
       function catList() {
-        return Object.keys(Result.eventCatIndex({event_id: Tpl.event._id})||{})
+        return Object.keys(Result.eventCatIndex.lookup({event_id: Tpl.event._id})||{})
           .map(function (cat_id) {
               return cats[cat_id];
             }).sort(compareCategories);
@@ -380,7 +380,7 @@ define(function(require, exports, module) {
     var cats = Category.docs;
     var lastType, lastStyle;
     Dom.removeChildren(table);
-    Object.keys(Result.eventCatIndex({event_id: Tpl.event._id})||{})
+    Object.keys(Result.eventCatIndex.lookup({event_id: Tpl.event._id})||{})
       .map(function (cat_id) {
         return cats[cat_id];
       }).sort(compareCategories)

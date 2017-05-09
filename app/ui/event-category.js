@@ -55,9 +55,9 @@ define(function(require, exports, module) {
     results() {
       var frag = document.createDocumentFragment();
 
-      var results = Result.eventCatIndex.fetch({
+      var results = Result.query.withIndex(Result.eventCatIndex, {
         event_id: eventTpl.event._id, category_id: $.data().category._id,
-      });
+      }).fetch();
 
       var heat = this.heat;
 

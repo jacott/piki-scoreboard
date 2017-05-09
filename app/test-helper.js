@@ -10,10 +10,11 @@ define(function(require, exports, module) {
   const Stubber      = require('koru/test/stubber');
   const util         = require('koru/util');
 
-  let TH             = Object.create(require('koru/test-helper'));
-  const geddon = TH.geddon;
+  let TH = Object.create(require('koru/test-helper'));
+  const {geddon} = TH;
 
-  let user;
+  let user = null;
+  let txSave = null, txClient = null;
 
   TH.Factory = require('test/factory');
 
@@ -21,22 +22,18 @@ define(function(require, exports, module) {
 
   util.mergeOwnDescriptors(TH, sessionTH);
   util.merge(TH, {
-    showErrors (doc) {
-      return function () {
-        return Val.inspectErrors(doc);
-      };
-    },
+    showErrors (doc) {return () => Val.inspectErrors(doc)},
 
-    clearDB: isClient ? function () {
+    clearDB: isClient ? () => {
       TH.Factory.clear();
       const models = Model._databases.default;
-      for(let name in models) {
+      for(const name in models) {
         const model = Model[name];
-        model.docs = null;
+        model.docs = undefined;
       }
-    } : function () {
+    } : () => {
       TH.Factory.clear();
-      for(let name in Model) {
+      for(const name in Model) {
         const model = Model[name];
         if ('docs' in model) {
           txSave || model.docs.truncate();
@@ -45,13 +42,9 @@ define(function(require, exports, module) {
       }
     },
 
-    user () {
-      return null;
-    },
+    user () {return null;},
 
-    userId () {
-      return user && user._id;
-    },
+    userId () {return user && user._id;},
 
     mockRpc (v, sessId) {
       sessId = (sessId || "1").toString();
@@ -88,11 +81,11 @@ define(function(require, exports, module) {
       }
     },
 
-    login: function (func) {
+    login(func) {
       return this.loginAs(user || this.Factory.last.user || this.Factory.createUser('admin'), func);
     },
 
-    loginAs: function (newUser, func) {
+    loginAs(newUser, func) {
       var test = geddon.test;
       var self = this;
 
@@ -124,31 +117,31 @@ define(function(require, exports, module) {
       }
     },
 
-    matchModel: function (expect) {
+    matchModel(expect) {
       var func = this.match(function (actual) {
         return actual._id === expect._id;
       });
 
-      Object.defineProperty(func, 'message', {get: function () {
+      Object.defineProperty(func, 'message', {get() {
         return util.inspect(expect);
       }});
 
       return func;
     },
 
-    matchItems: function (items) {
+    matchItems(items) {
       var func = this.match(function (actual) {
         return util.deepEqual(actual && actual.sort(), items && items.sort());
       });
 
-      Object.defineProperty(func, 'message', {get: function () {
+      Object.defineProperty(func, 'message', {get() {
         return JSON.stringify(items);
       }});
 
       return func;
     },
 
-    startTransaction: function () {
+    startTransaction() {
       if (isClient) return;
       util.forEach(arguments, db => {
         db._getConn();
@@ -160,7 +153,7 @@ define(function(require, exports, module) {
       });
     },
 
-    rollbackTransaction: function () {
+    rollbackTransaction() {
       if (isClient) return;
       util.forEach(arguments, db => {
         var tx = transactionMap.get(db);
@@ -185,7 +178,7 @@ define(function(require, exports, module) {
       MockFileReader.prototype = {
         constructor: MockFileReader,
 
-        readAsArrayBuffer: function (file) {
+        readAsArrayBuffer(file) {
           this.result = this._str2ab(file.slice(0));
         },
 
@@ -264,20 +257,16 @@ define(function(require, exports, module) {
     }
   });
 
-  var txSave, txClient;
-
   if (isServer) {
-    geddon.onTestStart(function () {
+    geddon.onTestStart(() => {
       dbBroker.db = txClient;
       txSave && txClient.query('BEGIN');
     });
 
-    geddon.onTestEnd(function () {
-      txSave && txClient.query('ROLLBACK');
-    });
+    geddon.onTestEnd(() => {txSave && txClient.query('ROLLBACK')});
   } else {
     var orgsStr = JSON.stringify({sch00: {name: 'Org 1'}, sch02: {name: 'Org 2'}});
-    localStorage._resetValue = function () {return {orgs: orgsStr}};
+    localStorage._resetValue = () => ({orgs: orgsStr});
   }
 
   function overrideSub(name, sub, callback) {
@@ -288,7 +277,7 @@ define(function(require, exports, module) {
   var ga = geddon.assertions;
 
   ga.add('docChanges', {
-    assert: function (doc, spec, newSpec, func) {
+    assert(doc, spec, newSpec, func) {
       if (! func) {
         func = newSpec;
         newSpec = null;
@@ -309,36 +298,9 @@ define(function(require, exports, module) {
       }
     },
 
-    assertMessage: "Expected Val.assertDocChanges to be called with:\n{i1}, {i0}{$newSpec}\nbut was called with:\n{$args}",
+    assertMessage: "Expected Val.assertDocChanges to be called with:\n{i1}, {i0}{$newSpec}\n"+
+      "but was called with:\n{$args}",
     refuteMessage: "Did not expect Val.assertDocChanges to be called with:\n{i1}, {i0}{$newSpec}"
-  });
-  isServer && ga.add('modelUniqueIndex', {
-    assert (model, ...expected) {
-      var enIdx = model.addUniqueIndex,
-          count = enIdx.callCount,
-          tvLength = enIdx.callCount,
-          result = false;
-
-      for(var i=0;i < tvLength;++i) {
-        var call = enIdx.getCall(i);
-        if (call.thisValue === model) {
-          if (call.calledWith.apply(call,expected)) {
-            result = true;
-            break;
-          }
-        }
-      }
-
-      if (this._asserting !== result) {
-        this.expected = expected;
-        this.spy = enIdx.printf("%n");
-        this.calls = enIdx.printf("%C");
-      }
-
-      return result;
-    },
-
-    message: "{$spy} to be calledWith {i$expected}{$calls}"
   });
 
   module.exports = TH;

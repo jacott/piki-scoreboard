@@ -198,7 +198,7 @@ define(function(require, exports, module) {
         var competitor = $.data();
         competitor.$clearCache();
 
-        var competitors = Competitor.eventIndex({event_id: competitor.event_id}) || {};
+        var competitors = Competitor.eventIndex.lookup({event_id: competitor.event_id}) || {};
 
         var found = false;
         var completeList = Climber.search(value, 20, function (doc) {

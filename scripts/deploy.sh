@@ -18,12 +18,10 @@ rm -f build/*
 
 git clean -f -d
 git fetch
-git checkout -B ${2-master} origin/${2-master}
 git reset --hard
+git checkout -B ${2-master} origin/${2-master}
 
 version=`git describe --tags --always --long --match 'v*'`
-
-echo "$version" >build/version
 
 echo $branch $version $PWD
 
@@ -39,6 +37,15 @@ fi
 echo -e "bundle client: css, js..."
 
 $NODE --es_staging scripts/bundle.js $branch >/dev/null
+
+MD5SUM=$(cat node_modules/yaajs/yaa.js config/$branch-config.js build/index.js \
+                 build/index.css app/index.html|md5sum -b)
+MD5SUM=${MD5SUM/ */}
+
+cp app/index.html build/
+sed <build/index.html >app/index.html "s/CACHE_BUST_HASH/$MD5SUM/g"
+
+echo "$version,$MD5SUM" >build/version
 
 mv build/index.css app
 
