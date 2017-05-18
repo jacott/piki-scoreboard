@@ -1,13 +1,15 @@
 isClient && define(function (require, exports, module) {
-  const koru        = require('koru');
-  const Dom         = require('koru/dom');
-  const Route       = require('koru/ui/route');
-  const UserAccount = require('koru/user-account');
-  const Event       = require('models/event');
-  const Series      = require('models/series');
-  const Factory     = require('test/factory');
-  const EventTpl    = require('ui/event');
-  const TH          = require('./test-helper');
+  const koru           = require('koru');
+  const Dom            = require('koru/dom');
+  const Route          = require('koru/ui/route');
+  const UserAccount    = require('koru/user-account');
+  const Event          = require('models/event');
+  const Series         = require('models/series');
+  const Factory        = require('test/factory');
+  const EventTpl       = require('ui/event');
+  const SystemSetupTpl = require('ui/system-setup');
+  const TeamTpl        = require('ui/team');
+  const TH             = require('./test-helper');
 
   const sut      = require('./header');
   var v;
@@ -34,7 +36,32 @@ isClient && define(function (require, exports, module) {
       });
 
       assert.calledWith(Route.gotoPath, `event/${event._id}/show`);
+    },
 
+    "test system-setup in menu"() {
+      TH.click('#Header [name=menu]');
+      assert.dom('#SelectMenu', elm => {refute.dom('li', 'Org settings')});
+      Dom.remove(Dom('.glassPane'));
+
+      /** logging in is not good enough **/
+      const admin = Factory.createUser('admin');
+      TH.loginAs(admin);
+      TH.click('#Header [name=menu]');
+
+      assert.dom('#SelectMenu', elm => {refute.dom('li', 'Org settings')});
+      Dom.remove(Dom('.glassPane'));
+
+      /** need to be on org's own site as well **/
+      const series = Factory.createSeries();
+      const event = EventTpl.event = Factory.createEvent({series_id: series._id});
+      Route.gotoPage(TeamTpl, {orgSN: admin.org.shortName});
+
+      TH.click('#Header [name=menu]');
+      assert.dom('#SelectMenu', elm => {
+        TH.pointerDownUp('li', 'Org settings');
+      });
+
+      assert.calledWith(Route.gotoPath, 'system-setup');
     },
 
     "test Calendar"() {

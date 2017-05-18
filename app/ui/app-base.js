@@ -17,6 +17,7 @@ define(function(require, exports, module) {
       const _id = koru.userId();
       const user = _id && User.findById(_id);
       Dom.setClassBySuffix(user ? user.accessClasses(App.orgId) : 'readOnly', 'Access', document.body);
+      Dom.setClass('isGuest', User.isGuest(), document.body);
     },
   };
 
