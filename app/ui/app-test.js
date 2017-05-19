@@ -29,6 +29,21 @@ isClient && define(function (require, exports, module) {
       v = null;
     },
 
+    "test guest"() {
+      App.setAccess();
+      assert.dom('body.isGuest');
+
+      TH.user.restore();
+      App.setAccess();
+      assert.dom('body:not(.isGuest)');
+
+      const judge = TH.Factory.createUser({role: 'j'});
+
+      TH.loginAs(judge);
+      App.setAccess();
+      assert.dom('body:not(.isGuest)');
+    },
+
     "test Org"() {
       refute(App.org());
 

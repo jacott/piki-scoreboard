@@ -81,6 +81,13 @@ define(function(require, exports, module) {
       }
       list.push(['event', 'Calendar']);
       list.push('disabled sep');
+      const me = User.me();
+      if (me && koru.userId() !== 'guest' && (
+        me.isSuperUser() ||
+          (me.org.shortName === Route.currentPageRoute.orgSN && me.isAdmin())
+      )) {
+        list.push(['system-setup', 'Org settings']);
+      }
       list.push(['choose-org', 'Go to another org']);
       (koru.userId() && koru.userId() !== 'guest') ||
         list.push(['sign-in', 'Sign in']);

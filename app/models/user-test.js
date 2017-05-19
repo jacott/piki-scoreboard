@@ -26,6 +26,28 @@ define(function (require, exports, module) {
       refute(user.$isValid());
     },
 
+    "test isGuest"() {
+      /**
+       * Current user is guest only if logged in with koru.userId() 'guest'
+       **/
+      var adminUser = TH.Factory.createUser({role: 'a'});
+      var user = TH.Factory.createUser({role: 'j'});
+      var su = TH.Factory.createUser('su');
+      var guest = isServer ? User.guestUser() : TH.Factory.createUser({_id: 'guest'});
+
+      // not logged in
+      assert.isFalse(User.isGuest());
+
+      TH.loginAs(adminUser);
+      assert.isFalse(User.isGuest());
+      TH.loginAs(user);
+      assert.isFalse(User.isGuest());
+      TH.loginAs(su);
+      assert.isFalse(User.isGuest());
+      TH.loginAs(guest);
+      assert.isTrue(User.isGuest());
+    },
+
     "test isSuperUser"() {
       var user = TH.Factory.buildUser('su');
 

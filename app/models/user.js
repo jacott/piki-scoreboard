@@ -31,6 +31,10 @@ define(function(require, exports, module) {
       return classes + " p";
     }
 
+    static isGuest() {
+      return koru.userId() === 'guest';
+    }
+
     emailWithName() {
       return this.name.replace('/<>/','')+" <"+this.email+">";
     }
@@ -52,12 +56,12 @@ define(function(require, exports, module) {
       }
     }
 
-    canAdminister(doc) {
+    canAdminister(user) {
       switch(this.safeRole) {
       case ROLE.superUser:
         return true;
       case ROLE.admin:
-        return ! doc || (doc.attributes.org_id || doc.org_id) === this.org_id;
+        return ! user || (user.attributes.org_id || user.org_id) === this.org_id;
       }
       return false;
     }
@@ -69,8 +73,10 @@ define(function(require, exports, module) {
         Val.addError(this, '_id', 'not_allowed');
         return;
       }
+      // user was not a su at last saved state so cannot change someone to a superuser
       if (this.isSuperUser() || this.role === 's')
         Val.addError(this, 'role', 'is_invalid');
+      // cannot change org_id for existing user and cannot set org_id diff to own org_id
       if (('org_id' in this.changes) &&
           (! this.$isNewRecord() || this.org_id !== me.org_id))
         Val.addError(this, 'org_id', 'is_invalid');
