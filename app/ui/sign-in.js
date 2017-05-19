@@ -59,7 +59,7 @@ define(function(require, exports, module) {
 
   function setState(form, state) {
     Dom.setClassBySuffix(state, "-state", form);
-    Dom.getCtx('#SignInProgress').updateAllTags({state: state});
+    Dom.ctx('#SignInProgress').updateAllTags({state: state});
   }
 
   Tpl.Progress.$helpers({

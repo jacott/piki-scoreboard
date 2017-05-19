@@ -425,7 +425,7 @@ define(function(require, exports, module) {
 
       $.ctx.onDestroy(Tpl.scoreCounts.onChange(function (cat_id) {
         var elm = document.getElementById('cat_'+cat_id);
-        elm && Dom.getMyCtx(elm).updateAllTags();
+        elm && Dom.myCtx(elm).updateAllTags();
       }));
 
       return table;
@@ -446,7 +446,7 @@ define(function(require, exports, module) {
             ++i;
         }
       }
-      Dom.getCtx(action).updateAllTags({fmt: firstFormat});
+      Dom.ctx(action).updateAllTags({fmt: firstFormat});
     }),
 
     'click .printResults'(event) {

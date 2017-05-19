@@ -161,7 +161,7 @@ isClient && define(function (require, exports, module) {
             assert.same(document.activeElement, this);
           });
 
-          assert.attributesEqual(Dom.getCtx(this).data.changes, {event_id: v.event._id});
+          assert.attributesEqual(Dom.ctx(this).data.changes, {event_id: v.event._id});
         });
 
       });

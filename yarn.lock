@@ -939,9 +939,9 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.3.6"
 
-koru@^0.12.13:
-  version "0.12.13"
-  resolved "https://registry.yarnpkg.com/koru/-/koru-0.12.13.tgz#7a8631a141fdba65f21b4c10ef252696e48463c5"
+koru@^0.12.14:
+  version "0.12.14"
+  resolved "https://registry.yarnpkg.com/koru/-/koru-0.12.14.tgz#de706e7314a907dbafe9474114af36aa62b80fbc"
   dependencies:
     autoprefixer "^6.3.6"
     babel-generator "^6.23.0"
@@ -960,7 +960,7 @@ koru@^0.12.13:
     nodemailer-smtp-pool "^2.6.0"
     nodemailer-stub-transport "^1.0.0"
     parseurl "^1.3.1"
-    pepjs "^0.4.2"
+    pepjs "^0.4.3"
     postcss "^5.0.21"
     send "^0.15.1"
     ws "^2.2.3"
@@ -1153,9 +1153,9 @@ path-is-absolute@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/path-is-absolute/-/path-is-absolute-1.0.1.tgz#174b9268735534ffbc7ace6bf53a5a9e1b5c5f5f"
 
-pepjs@^0.4.2:
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/pepjs/-/pepjs-0.4.2.tgz#13264eea894984ff423c83e40d2fa4e1dec1c9fa"
+pepjs@^0.4.3:
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/pepjs/-/pepjs-0.4.3.tgz#16080e970aae779913756c2daef88eaa7486df41"
 
 pg-libpq@>=1.1.0:
   version "1.1.0"

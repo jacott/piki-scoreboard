@@ -154,7 +154,7 @@ define(function(require, exports, module) {
           event.target.value = $.data(this).score || '';
           Dom.remove(this.parentNode.querySelector('.errorMsg'));
         } else {
-          Dom.getCtx(this).updateAllTags();
+          Dom.ctx(this).updateAllTags();
         }
         document.activeElement.blur();
         break;
@@ -259,7 +259,7 @@ define(function(require, exports, module) {
     },
     scores() {
       var frag = document.createDocumentFragment();
-      var parentCtx = Dom.getCtx($.element.parentNode);
+      var parentCtx = Dom.ctx($.element.parentNode);
       var result = parentCtx.data;
       var scores = result.scores;
 
@@ -439,7 +439,7 @@ define(function(require, exports, module) {
   }
 
   function saveScore(elm) {
-    var ctx = Dom.getCtx(elm);
+    var ctx = Dom.ctx(elm);
     var data = ctx.data;
     if (! data.result || data.score === elm.value) return true;
 

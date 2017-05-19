@@ -155,7 +155,7 @@ isClient && define(function (require, exports, module) {
 
       // simulate org added by subscribe
       v.org = TH.Factory.createOrg({shortName: 'FOO'});
-      Dom.getCtxById('Header').updateAllTags();
+      Dom.ctxById('Header').updateAllTags();
       v.subOrg.yield();
 
       assert.same(App.orgId, v.org._id);

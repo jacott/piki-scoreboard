@@ -317,7 +317,7 @@ define(function(require, exports, module) {
           if (id === '$new') {
             let elm = Tpl.AddTeam.$autoRender(new Team({org_id: App.orgId, teamType_id: ctx.data._id}));
             Dialog.open(elm);
-            Dom.getCtx(elm).teamData = {competitor, ctx};
+            Dom.ctx(elm).teamData = {competitor, ctx};
           } else {
             competitor.setTeam(ctx.data._id, id);
             ctx.updateAllTags();
@@ -335,7 +335,7 @@ define(function(require, exports, module) {
     },
     'click [type=submit]': Form.submitFunc('AddTeam', {
       success(team) {
-        let {competitor, ctx} = Dom.getCtxById('AddTeam').teamData;
+        let {competitor, ctx} = Dom.ctxById('AddTeam').teamData;
         competitor.setTeam(ctx.data._id, team._id);
         ctx.updateAllTags();
         Dialog.close();
