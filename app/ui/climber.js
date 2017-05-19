@@ -18,6 +18,7 @@ define(function(require, exports, module) {
   const Index = Tpl.Index;
   const Merge = Tpl.Merge;
 
+  Tpl.title = "Climbers";
 
   Tpl.route.addTemplate(module, Merge, {
     focus: true,

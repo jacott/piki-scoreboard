@@ -18,6 +18,8 @@ define(function(require, exports, module) {
   const Index = Tpl.Index;
 
   Tpl.$extend({
+    title: "Teams",
+
     onBaseEntry() {
       document.body.appendChild(Tpl.$autoRender({}));
     },

@@ -31,7 +31,7 @@ define(function(require, exports, module) {
     systemSetup () {
       var user = $.data();
       if (user && user.isSuperUser()) {
-        return Form.pageLink({value: "System setup", template: "SystemSetup"});
+        return Form.pageLink({value: "Org settings", template: "SystemSetup"});
       }
     },
   });
@@ -64,7 +64,7 @@ define(function(require, exports, module) {
   });
 
   Tpl.$extend({
-    title: "Profile",
+    title: "Profile",
     onBaseEntry () {
       var user = User.me();
 

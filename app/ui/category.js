@@ -14,6 +14,8 @@ define(function(require, exports, module) {
 
   const typeNameComparitor = util.compareBy(['type', 'heatFormat', 'name']);
 
+  Tpl.title = "Categories";
+
   Index.$events({
     'click .categories tr'(event) {
       Dom.stopEvent();

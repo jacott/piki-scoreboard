@@ -107,17 +107,5 @@ isClient && define(function (require, exports, module) {
         assert.called(Route.history.back);
       },
     },
-
-    "test super user has system-setup link": function () {
-      TH.loginAs(v.su);
-
-      Route.gotoPage(Profile);
-
-      assert.dom('#Profile>div>nav', function () {
-        TH.click('button.link', "System setup");
-      });
-
-      assert.dom('#SystemSetup');
-    },
   });
 });

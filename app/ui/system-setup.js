@@ -32,6 +32,7 @@ define(function(require, exports, module) {
 
 
   Tpl.$extend({
+    title: "Org settings",
     onBaseEntry: function () {
       document.body.appendChild(Tpl.$autoRender({}));
     },
