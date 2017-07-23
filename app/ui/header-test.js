@@ -32,7 +32,7 @@ isClient && define(function (require, exports, module) {
 
       TH.selectMenu('#Header [name=menu]', `event/${event._id}/show`, function () {
         assert.equals(this.textContent, event.displayName);
-        TH.pointerDownUp(this);
+        TH.click(this);
       });
 
       assert.calledWith(Route.gotoPath, `event/${event._id}/show`);
@@ -58,7 +58,7 @@ isClient && define(function (require, exports, module) {
 
       TH.click('#Header [name=menu]');
       assert.dom('#SelectMenu', elm => {
-        TH.pointerDownUp('li', 'Org settings');
+        TH.click('li', 'Org settings');
       });
 
       assert.calledWith(Route.gotoPath, 'system-setup');
@@ -67,7 +67,7 @@ isClient && define(function (require, exports, module) {
     "test Calendar"() {
       TH.selectMenu('#Header [name=menu]', `event`, function () {
         assert.equals(this.textContent, 'Calendar');
-        TH.pointerDownUp(this);
+        TH.click(this);
       });
 
       assert.calledWith(Route.gotoPath, `event`);
@@ -76,7 +76,7 @@ isClient && define(function (require, exports, module) {
     "test Change org"() {
       TH.selectMenu('#Header [name=menu]', `choose-org`, function () {
         assert.equals(this.textContent, 'Go to another org');
-        TH.pointerDownUp(this);
+        TH.click(this);
       });
 
       assert.calledWith(Route.gotoPath, `choose-org`);
@@ -85,7 +85,7 @@ isClient && define(function (require, exports, module) {
     "test Help"() {
       TH.selectMenu('#Header [name=menu]', `$help`, function () {
         assert.equals(this.textContent, 'Help');
-        TH.pointerDownUp(this);
+        TH.click(this);
       });
 
       assert.dom('.Dialog #Help');
@@ -96,7 +96,7 @@ isClient && define(function (require, exports, module) {
 
       TH.selectMenu('#Header [name=menu]', `sign-in`, function () {
         assert.equals(this.textContent, 'Sign in');
-        TH.pointerDownUp(this);
+        TH.click(this);
       });
 
       assert.calledWith(Route.gotoPath, `sign-in`);
@@ -126,7 +126,7 @@ isClient && define(function (require, exports, module) {
         assert.dom(this.parentNode, elm => {
           assert.dom('li', 'Profile', matchId('profile'));
         });
-        TH.pointerDownUp(this);
+        TH.click(this);
       });
 
       assert.called(UserAccount.logout);

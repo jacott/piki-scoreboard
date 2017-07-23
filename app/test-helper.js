@@ -55,11 +55,11 @@ define(function(require, exports, module) {
         if (v && v.conn)
           conn = v.conn;
         else {
-          conn = new (require(id)({globalDict: session.globalDict}))(ws, sessId, () => {});
+          conn = new (require(id)({globalDict: session.globalDict}))(ws, ws._upgradeReq, sessId, () => {});
           conn.dbId = 'sch00';
           if (v) v.conn = conn;
         }
-        return geddon.test.intercept(session, 'rpc', function (method, ...args) {
+        return geddon.test.intercept(session, 'rpc', (method, ...args) => {
           conn.userId = koru.userId();
           try {
             var prevUserId = util.thread.userId;
@@ -75,7 +75,7 @@ define(function(require, exports, module) {
           }
         });
       } else {
-        return geddon.test.intercept(session, 'rpc', function (method, ...args) {
+        return geddon.test.intercept(session, 'rpc', (method, ...args) => {
           return session._rpcs[method].apply(util.thread, args);
         });
       }
@@ -94,8 +94,8 @@ define(function(require, exports, module) {
         koru.userId.restore && koru.userId.restore();
 
         if (newUser) {
-          test.intercept(koru, 'userId', function () {return user._id});
-          test.intercept(self, 'user', function () {return user}, function () {
+          test.intercept(koru, 'userId', () => user._id);
+          test.intercept(self, 'user', () => user, () => {
             user = null;
             util.thread.userId = null;
             koru.userId.restore && koru.userId.restore();
@@ -118,21 +118,14 @@ define(function(require, exports, module) {
     },
 
     matchModel(expect) {
-      var func = this.match(function (actual) {
-        return actual._id === expect._id;
-      });
-
-      Object.defineProperty(func, 'message', {get() {
-        return util.inspect(expect);
-      }});
+      const func = this.match(actual => actual != null && actual._id === expect._id);
+      Object.defineProperty(func, 'message', {get() {return util.inspect(expect)}});
 
       return func;
     },
 
     matchItems(items) {
-      var func = this.match(function (actual) {
-        return util.deepEqual(actual && actual.sort(), items && items.sort());
-      });
+      const func = this.match(actual => util.deepEqual(actual && actual.sort(), items && items.sort()));
 
       Object.defineProperty(func, 'message', {get() {
         return JSON.stringify(items);
@@ -169,7 +162,7 @@ define(function(require, exports, module) {
   });
 
   if (isClient) {
-    TH.MockFileReader = function (v) {
+    TH.MockFileReader = v => {
       function MockFileReader(...args) {
         v.fileReaderargs = args.slice();
         v.fileReader = this;
@@ -182,12 +175,12 @@ define(function(require, exports, module) {
           this.result = this._str2ab(file.slice(0));
         },
 
-        _result2Str: function(buf) {
+        _result2Str(buf) {
           buf = buf || this.result;
           return String.fromCharCode.apply(null, new Uint8Array(buf));
         },
 
-        _str2ab: function(str) {
+        _str2ab(str) {
           var buf = new ArrayBuffer(str.length);
           var bufView = new Uint8Array(buf);
           for (var i=0, strLen=str.length; i<strLen; i++) {
@@ -206,16 +199,16 @@ define(function(require, exports, module) {
   var koruAfTimeout, koruSetTimeout, koruClearTimeout;
   var kst = 0;
 
-  let sendP, sendM;
+  var sendP, _sendM;
 
 
-  geddon.onStart(function () {
+  geddon.onStart(() => {
     koruAfTimeout = koru.afTimeout;
     koruSetTimeout = koru.setTimeout;
     koruClearTimeout = koru.clearTimeout;
-    koru.setTimeout = function() { return ++kst};
-    koru.afTimeout = function() { return function () {}};
-    koru.clearTimeout = function() {};
+    koru.setTimeout = () => { return ++kst};
+    koru.afTimeout = () => () => {};
+    koru.clearTimeout = () => {};
     if (isClient) {
       if (session.hasOwnProperty('sendP')) {
         sendP = session.sendP;
@@ -223,7 +216,7 @@ define(function(require, exports, module) {
         session.interceptSubscribe = overrideSub; // don't queue subscribes
       }
       if (session.hasOwnProperty('_sendM')) {
-        sendM = session._sendM;
+        _sendM = session._sendM;
         session._sendM = koru.nullFunc;
       }
     } else {
@@ -250,9 +243,9 @@ define(function(require, exports, module) {
         session.sendP = sendP;
         sendP = null;
       }
-      if (sendM) {
-        session._sendM = sendM;
-        sendM = null;
+      if (_sendM) {
+        session._sendM = _sendM;
+        _sendM = null;
       }
     }
   });

@@ -18,14 +18,14 @@ define(function(require, exports, module) {
   const NotifyBar   = require('ui/notify-bar');
   const App         = require('./app-base');
 
-  var Tpl = Dom.newTemplate(require('koru/html!./header'));
+  const Tpl = Dom.newTemplate(require('koru/html!./header'));
   const $ = Dom.current;
 
-  function getUser() {
+  const getUser = ()=>{
     const user = User.me();
     if (user && user._id !== 'guest')
       return user;
-  }
+  };
 
   Tpl.$helpers({
     style() {
@@ -50,9 +50,10 @@ define(function(require, exports, module) {
     color() {
       const user = getUser();
       if (user) {
-        var rnd = Random.create(user.email);
+        const rnd = Random.create(user.email);
 
-        var color = uColor.rgb2hex(uColor.hsl2rgb({h: rnd.alea(), s: 1 - rnd.alea()/2, l: 0.5}));
+        const color = uColor.rgb2hex(uColor.hsl2rgb({
+          h: rnd.fraction(), s: 1 - rnd.fraction()/2, l: 0.5}));
         $.element.style.backgroundColor = color;
         App.addColorClass($.element, color);
       }
@@ -173,7 +174,7 @@ define(function(require, exports, module) {
     },
   });
 
-  Dom.setTitle = function (title) {
+  Dom.setTitle = title => {
     const pageTitle = document.getElementById('PageTitle');
 
     const pageRoute = Route.currentPageRoute;

@@ -5,6 +5,7 @@ define(function (require, exports, module) {
   const UserAccount = require('koru/user-account');
   const ChangeLog   = require('models/change-log');
   const TH          = require('test-helper');
+  const Factory     = require('test/factory');
 
   const User        = require('./user');
   var v;

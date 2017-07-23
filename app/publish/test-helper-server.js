@@ -8,8 +8,9 @@ define(function(require, exports, module) {
 
     util.merge(TH, {
       mockConnection (sessId, session) {
-        var test = geddon.test;
-        var conn = new (serverConnection(session || this.mockSession()))({send: test.stub(), on: test.stub()}, sessId || 's123', function () {});
+        const {test} = geddon;
+        const conn = new (serverConnection(session || this.mockSession()))({
+          send: test.stub(), on: test.stub()}, {}, sessId || 's123', () => {});
         conn.userId = koru.userId();
         conn.sendBinary = test.stub();
         conn.added = test.stub();
@@ -17,7 +18,6 @@ define(function(require, exports, module) {
         conn.removed = test.stub();
         return conn;
       },
-
     });
   };
 

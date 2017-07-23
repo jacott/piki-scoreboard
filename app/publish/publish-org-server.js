@@ -30,19 +30,19 @@ define(function(require, exports, module) {
     this.onStop(() => {handles.forEach(handle => {handle.stop()})});
 
     const sendUpdate = this.sendUpdate.bind(this);
+    const sendUser = (doc, was) => {
+      if (doc && doc._id === userId) return;
+      this.sendUpdate(doc, was);
+    };
 
-    handles.push(User.observeOrg_id(org._id, sendUser));
+    handles.push(User.observeOrg_id([org._id], sendUser));
     User.query.where('org_id', org._id).forEach(sendUser);
 
     orgChildren.forEach(name => {
       const model = Model[name];
-      handles.push(model.observeOrg_id(org._id, sendUpdate));
+      handles.push(model.observeOrg_id([org._id], sendUpdate));
       model.query.where('org_id', org._id).forEach(sendUpdate);
     });
 
-    function sendUser(doc, was) {
-      if (doc && doc._id === userId) return;
-      sendUpdate(doc, was);
-    }
   }});
 });

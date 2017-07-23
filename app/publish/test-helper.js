@@ -1,5 +1,4 @@
 define(function(require, exports, module) {
-  const TH               = Object.create(require('test-helper'));
   const koru        = require('koru');
   const Val         = require('koru/model/validation');
   const session     = require('koru/session');
@@ -8,6 +7,7 @@ define(function(require, exports, module) {
   const util        = require('koru/util');
   const Model       = require('model');
 
+  const TH = Object.create(require('test-helper'));
   const geddon = TH.geddon;
 
   util.merge(TH, {

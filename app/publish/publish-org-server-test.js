@@ -4,6 +4,7 @@ define(function (require, exports, module) {
   const Model   = require('koru/model');
   const Val     = require('koru/model/validation');
   const publish = require('koru/session/publish');
+  const User    = require('models/user');
   const sut     = require('./publish-org');
   const TH      = require('./test-helper');
 
@@ -22,15 +23,15 @@ define(function (require, exports, module) {
     },
 
     "test publish"() {
-      var org1 = TH.Factory.createOrg({shortName: 'foo'});
+      const org1 = TH.Factory.createOrg({shortName: 'foo'});
 
-      var user1 = TH.Factory.createUser();
-      var user2 = TH.Factory.createUser();
+      const user1 = TH.Factory.createUser();
+      const user2 = TH.Factory.createUser();
 
-      var tt1 = TH.Factory.createTeamType();
-      var team1 = TH.Factory.createTeam();
+      const tt1 = TH.Factory.createTeamType();
+      const team1 = TH.Factory.createTeam();
 
-      var obSpys = 'User Climber Event Series Category Team TeamType'.split(' ').map(function (name) {
+      const obSpys = 'User Climber Event Series Category Team TeamType'.split(' ').map(name=>{
         try {
           return test.spy(Model[name], 'observeOrg_id');
         } catch(ex) {
@@ -40,7 +41,7 @@ define(function (require, exports, module) {
       });
 
       // Subscribe
-      var sub = TH.mockSubscribe(v, 's123', 'Org', 'foo');
+      const sub = TH.mockSubscribe(v, 's123', 'Org', 'foo');
 
       assert.equals(sub.conn.org_id, org1._id);
 
@@ -55,7 +56,6 @@ define(function (require, exports, module) {
       assert.calledWith(v.conn.added, 'Team', team1._id, team1.attributes);
       assert.calledWith(v.conn.added, 'TeamType', tt1._id, tt1.attributes);
 
-
       // Test changes
       user1.name = 'new name';
       user1.$$save();
@@ -69,16 +69,14 @@ define(function (require, exports, module) {
       assert.calledWith(v.conn.changed, 'Team', team1._id, {name: 'new team name'});
 
       // *** test stopping ***
-      var stopSpys = obSpys.map(function (spy) {
-        assert.calledWith(spy, org1._id);
+      var stopSpys = obSpys.map(spy=>{
+        assert.calledWith(spy, [org1._id]);
         return test.spy(spy.firstCall.returnValue, 'stop');
       });
 
       sub.stop();
 
-      stopSpys.forEach(function (spy) {
-        assert.called(spy);
-      });
+      stopSpys.forEach(spy=>{assert.called(spy)});
     },
 
     /**
@@ -86,9 +84,9 @@ define(function (require, exports, module) {
      * present.
      */
     "test session user not sent"() {
-      var org = v.user.org;
+      const {org} = v.user;
 
-      var sub = TH.mockSubscribe(v, 's123', 'Org', org.shortName);
+      const sub = TH.mockSubscribe(v, 's123', 'Org', org.shortName);
 
       refute.calledWith(v.conn.added, 'User');
 

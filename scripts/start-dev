@@ -15,4 +15,4 @@ fi
 
 cd app
 echo -e "starting ${branch}...\c"
-exec ${NODE} $NODE_DEBUG --es_staging $KORU_MODULE/lib/koru.js "$@"
+exec ${NODE} --inspect --es_staging $KORU_MODULE/lib/koru.js "$@"

@@ -299,7 +299,7 @@ isClient && define(function (require, exports, module) {
             assert.dom('li.selected', {text: 'General', data: TH.match.field('id', -1)});
             assert.dom('li:not(.selected)', {text: 'Qual 1', data: TH.match.field('id', 1)});
           });
-          TH.pointerDownUp(this);
+          TH.click(this);
         });
 
         assert.dom('h1', 'Qual 2 - Results');

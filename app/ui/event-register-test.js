@@ -253,7 +253,7 @@ isClient && define(function (require, exports, module) {
                   assert.dom('li:nth-last-child(2)', 'Team 5');
                   assert.dom('li:last-child', 'add new team');
                 });
-                TH.pointerDownUp(this);
+                TH.click(this);
               });
               assert.dom('button.select.none', 'Select');
 
