@@ -1,11 +1,11 @@
 define(function(require, exports, module) {
-  var util = require('koru/util');
-  var ChangeLog = require('./change-log');
-  var User = require('./user');
-  var Val = require('koru/model/validation');
-  var Event = require('./event');
+  const Val       = require('koru/model/validation');
+  const util      = require('koru/util');
+  const ChangeLog = require('./change-log');
+  const Event     = require('./event');
+  const User      = require('./user');
 
-  return function (model) {
+  return model =>{
     ChangeLog.logChanges(model);
 
     var FIELD_SPEC = {
@@ -21,7 +21,7 @@ define(function(require, exports, module) {
     };
 
     util.extend(model.prototype, {
-      authorize: function (userId) {
+      authorize(userId) {
         Val.ensureString(this.event_id);
 
         Val.assertDocChanges(this, FIELD_SPEC, NEW_FIELD_SPEC);

@@ -140,8 +140,10 @@ isClient && define(function (require, exports, module) {
 
         assert.dom('table>thead', function () {
           assert.dom('th[data-sort=team]', 'Club');
-          TH.selectMenu('th[data-sort=team]>[name=selectTeamType]', TH.match.field('name', 'School'), function () {
-            assert.dom(this.parentNode, function () {
+          TH.selectMenu(
+            'th[data-sort=team]>[name=selectTeamType]',
+            TH.match.field('name', 'School'), function () {
+              assert.dom(this.parentNode, function () {
               assert.dom('li', {count: 2});
               assert.dom('li:first-child', 'Club');
             });

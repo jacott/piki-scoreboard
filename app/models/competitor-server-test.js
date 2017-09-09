@@ -1,30 +1,32 @@
 define(function (require, exports, module) {
-  var test, v;
-  var TH = require('test-helper');
-  var Competitor = require('./competitor');
-  var koru = require('koru');
-  var Event = require('./event');
-  var User = require('./user');
-  var Val = require('koru/model/validation');
+  const koru       = require('koru');
+  const Val        = require('koru/model/validation');
+  const TH         = require('test-helper');
+  const Competitor = require('./competitor');
+  const Event      = require('./event');
+  const User       = require('./user');
+
+  const {stub, spy} = TH;
+
+  let v = null;
 
   TH.testCase(module, {
-    setUp: function () {
-      test = this;
+    setUp() {
       v = {};
       v.event = TH.Factory.createEvent();
       v.user = TH.Factory.createUser();
-      test.stub(koru, 'info');
+      stub(koru, 'info');
 
-      test.stub(Val, 'ensureString');
+      stub(Val, 'ensureString');
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.clearDB();
       v = null;
     },
 
     "authorize": {
-      "test denied": function () {
+      "test denied"() {
         var oOrg = TH.Factory.createOrg();
         var oEvent = TH.Factory.createEvent();
         var oUser = TH.Factory.createUser();
@@ -36,8 +38,8 @@ define(function (require, exports, module) {
         });
       },
 
-      "test allowed": function () {
-        test.spy(Val, 'assertDocChanges');
+      "test allowed"() {
+        spy(Val, 'assertDocChanges');
 
         var competitor = TH.Factory.buildCompetitor({number: 123});
 
@@ -56,7 +58,7 @@ define(function (require, exports, module) {
                           });
       },
 
-      "test event closed": function () {
+      "test event closed"() {
         var event = TH.Factory.createEvent({closed: true});
         var competitor = TH.Factory.buildCompetitor();
 

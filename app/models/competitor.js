@@ -21,7 +21,10 @@ define(function(require, exports, module) {
       this.team_ids = list;
     }
 
-    get climberName() {return this.climber.name}
+    get name() {return this.climber && this.climber.name}
+    get dateOfBirth() {return this.climber.dateOfBirth}
+    get gender() {return this.climber.gender}
+    get number() {return this.climber.number}
   }
 
   module.exports = Competitor.define({
@@ -29,7 +32,7 @@ define(function(require, exports, module) {
     fields: {
       event_id: 'belongs_to',
       climber_id: 'belongs_to',
-      team_ids: {type: 'has_many', accessor: {get: function () {
+      team_ids: {type: 'has_many', accessor: {get() {
         return Competitor.getField(this, 'team_ids') || [];
       }}},
       category_ids: 'has_many',

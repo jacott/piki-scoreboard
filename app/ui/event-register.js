@@ -24,7 +24,7 @@ define(function(require, exports, module) {
     Index, Add, Edit, Category: catTpl,
     Groups, Teams, AddClimber} = Tpl;
   let competitor;
-  let sortField = 'climberName';
+  let sortField = 'name';
   let asc = 1;
   let sortFunc;
 
@@ -52,7 +52,8 @@ define(function(require, exports, module) {
     competitors(each) {
       return {
         query: Competitor.query,
-        compare: sortFunc,
+        compare: asc == 1 ? sortFunc : (a,b)=>sortFunc(b,a),
+        compareKeys: sortFunc.compareKeys,
       };
     },
 
@@ -221,7 +222,7 @@ define(function(require, exports, module) {
   Tpl.Row.$helpers({
     categories() {
       var frag = document.createDocumentFragment();
-      this.category_ids.forEach(function (id) {
+      this.category_ids.forEach(id =>{
         var abbr = document.createElement('abbr');
         var cat = Category.findById(id);
         if (! cat) return;

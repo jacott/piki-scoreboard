@@ -1,38 +1,47 @@
 define(function(require, exports, module) {
   'use strict';
-  const koru         = require('koru');
-  const localStorage = require('koru/local-storage');
-  const Model        = require('koru/model');
-  const dbBroker     = require('koru/model/db-broker');
-  const Val          = require('koru/model/validation');
-  const session      = require('koru/session');
-  const sessionTH    = require('koru/session/test-helper');
-  const Stubber      = require('koru/test/stubber');
-  const util         = require('koru/util');
+  const koru            = require('koru');
+  const localStorage    = require('koru/local-storage');
+  const Model           = require('koru/model');
+  const dbBroker        = require('koru/model/db-broker');
+  const Val             = require('koru/model/validation');
+  const session         = require('koru/session');
+  const sessionTH       = require('koru/session/test-helper');
+  const Stubber         = require('koru/test/stubber');
+  const util            = require('koru/util');
+  const Factory         = require('test/factory');
+
+  const {private$} = require('koru/symbols');
+  const tx$ = Symbol();
+
+  const {hasOwn} = util;
 
   let TH = Object.create(require('koru/test-helper'));
-  const {geddon} = TH;
+  const geddon = TH.geddon;
 
   let user = null;
   let txSave = null, txClient = null;
 
-  TH.Factory = require('test/factory');
+  let koruAfTimeout, koruSetTimeout, koruClearTimeout;
+  let kst = 0;
 
-  koru.onunload(module, 'reload');
+  let sendP, _sendM;
+
+  TH.Factory = Factory;
 
   util.mergeOwnDescriptors(TH, sessionTH);
   util.merge(TH, {
     showErrors (doc) {return () => Val.inspectErrors(doc)},
 
     clearDB: isClient ? () => {
-      TH.Factory.clear();
+      Factory.clear();
       const models = Model._databases.default;
       for(const name in models) {
         const model = Model[name];
         model.docs = undefined;
       }
     } : () => {
-      TH.Factory.clear();
+      Factory.clear();
       for(const name in Model) {
         const model = Model[name];
         if ('docs' in model) {
@@ -51,19 +60,20 @@ define(function(require, exports, module) {
       if (isServer) {
         const ws = this.mockWs();
         let conn;
-        const id = 'koru/session/server-connection-factory';
         if (v && v.conn)
           conn = v.conn;
         else {
-          conn = new (require(id)({globalDict: session.globalDict}))(ws, ws._upgradeReq, sessId, () => {});
+          const id = 'koru/session/server-connection-factory';
+          conn = new (require(id)({
+            globalDict: session.globalDict}))(ws, ws._upgradeReq, sessId, () => {});
           conn.dbId = 'sch00';
           if (v) v.conn = conn;
         }
         return geddon.test.intercept(session, 'rpc', (method, ...args) => {
           conn.userId = koru.userId();
+          const prevUserId = util.thread.userId;
+          const prevConnection = util.thread.connection;
           try {
-            var prevUserId = util.thread.userId;
-            var prevConnection = util.thread.connection;
             util.thread.userId = conn.userId;
             util.thread.connection = conn;
 
@@ -86,16 +96,15 @@ define(function(require, exports, module) {
     },
 
     loginAs(newUser, func) {
-      var test = geddon.test;
-      var self = this;
+      const {test} = geddon;
 
       if (newUser !== user) {
-        user && self.user.restore();
+        user && this.user.restore();
         koru.userId.restore && koru.userId.restore();
 
         if (newUser) {
           test.intercept(koru, 'userId', () => user._id);
-          test.intercept(self, 'user', () => user, () => {
+          test.intercept(this, 'user', () => user, () => {
             user = null;
             util.thread.userId = null;
             koru.userId.restore && koru.userId.restore();
@@ -106,14 +115,14 @@ define(function(require, exports, module) {
         }
       }
 
-      self.setAccess && self.setAccess();
+      this.setAccess && this.setAccess();
 
-      if (! func) return user;
+      if (func === undefined) return user;
 
       try {
         return func();
       } finally {
-        self.user && self.user.restore && self.user.restore();
+        this.user && this.user.restore && this.user.restore();
       }
     },
 
@@ -138,8 +147,8 @@ define(function(require, exports, module) {
       if (isClient) return;
       util.forEach(arguments, db => {
         db._getConn();
-        var tx = db._weakMap.get(util.thread);
-        transactionMap.set(db, tx);
+        const tx = util.thread[db[db[private$].tx$]];
+        db[tx$] = tx;
         tx.transaction = 'ROLLBACK';
         db.query('BEGIN');
         dbBroker.db = db;
@@ -149,7 +158,7 @@ define(function(require, exports, module) {
     rollbackTransaction() {
       if (isClient) return;
       util.forEach(arguments, db => {
-        var tx = transactionMap.get(db);
+        const tx = db[tx$];
         if (! tx) return;
         dbBroker.db = null;
         tx.transaction = null;
@@ -181,9 +190,9 @@ define(function(require, exports, module) {
         },
 
         _str2ab(str) {
-          var buf = new ArrayBuffer(str.length);
-          var bufView = new Uint8Array(buf);
-          for (var i=0, strLen=str.length; i<strLen; i++) {
+          const buf = new ArrayBuffer(str.length);
+          const bufView = new Uint8Array(buf);
+          for (let i=0, strLen=str.length; i<strLen; i++) {
             bufView[i] = str.charCodeAt(i);
           }
           return buf;
@@ -192,14 +201,8 @@ define(function(require, exports, module) {
 
       return MockFileReader;
     };
-  } else {
-    var transactionMap = new WeakMap;
   }
 
-  var koruAfTimeout, koruSetTimeout, koruClearTimeout;
-  var kst = 0;
-
-  var sendP, _sendM;
 
 
   geddon.onStart(() => {
@@ -210,19 +213,19 @@ define(function(require, exports, module) {
     koru.afTimeout = () => () => {};
     koru.clearTimeout = () => {};
     if (isClient) {
-      if (session.hasOwnProperty('sendP')) {
+      if (hasOwn(session, 'sendP')) {
         sendP = session.sendP;
         session.sendP = koru.nullFunc;
         session.interceptSubscribe = overrideSub; // don't queue subscribes
       }
-      if (session.hasOwnProperty('_sendM')) {
+      if (hasOwn(session, '_sendM')) {
         _sendM = session._sendM;
         session._sendM = koru.nullFunc;
       }
     } else {
       txClient = dbBroker.db;
       txClient._getConn();
-      txSave = txClient._weakMap.get(util.thread);
+      txSave = util.thread[txClient[txClient[private$].tx$]];
       txSave.transaction = 'ROLLBACK';
     }
   });
@@ -256,18 +259,15 @@ define(function(require, exports, module) {
       txSave && txClient.query('BEGIN');
     });
 
-    geddon.onTestEnd(() => {txSave && txClient.query('ROLLBACK')});
+    geddon.onTestEnd(() => {
+      txSave && txClient.query('ROLLBACK');
+    });
   } else {
-    var orgsStr = JSON.stringify({sch00: {name: 'Org 1'}, sch02: {name: 'Org 2'}});
+    const orgsStr = JSON.stringify({sch00: {name: 'Org 1'}, sch02: {name: 'Org 2'}});
     localStorage._resetValue = () => ({orgs: orgsStr, orgSN: 'SN1'});
   }
 
-  function overrideSub(name, sub, callback) {
-    callback && callback();
-    return true;
-  }
-
-  var ga = geddon.assertions;
+  const ga = geddon.assertions;
 
   ga.add('docChanges', {
     assert(doc, spec, newSpec, func) {
@@ -296,5 +296,9 @@ define(function(require, exports, module) {
     refuteMessage: "Did not expect Val.assertDocChanges to be called with:\n{i1}, {i0}{$newSpec}"
   });
 
-  module.exports = TH;
+  const overrideSub = (name, sub, callback) => true;
+
+  koru.onunload(module, 'reload');
+
+  return TH;
 });
