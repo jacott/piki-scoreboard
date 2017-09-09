@@ -129,7 +129,7 @@ define(function(require, exports, module) {
   };
 
   function onSelect(elm) {
-    const id = $.data(elm).id;
+    const id = $.data(elm)._id;
     const action = Actions[id];
     if (action)
       action(elm);

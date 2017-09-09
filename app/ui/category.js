@@ -12,7 +12,7 @@ define(function(require, exports, module) {
   const $ = Dom.current;
   const Index = Tpl.Index;
 
-  const typeNameComparitor = util.compareBy(['type', 'heatFormat', 'name']);
+  const typeNameComparitor = util.compareByFields('type', 'heatFormat', 'name');
 
   Tpl.title = "Categories";
 

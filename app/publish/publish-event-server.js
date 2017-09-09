@@ -24,7 +24,7 @@ define(function(require, exports, module) {
 
     orgChildren.forEach(name => {
       const model = Model[name];
-      handles.push(model.observeEvent_id(eventId, sendUpdate));
+      handles.push(model.observeEvent_id([eventId], sendUpdate));
       model.query.where('event_id', eventId).forEach(sendUpdate);
     });
   }});

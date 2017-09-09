@@ -296,8 +296,8 @@ isClient && define(function (require, exports, module) {
 
         TH.selectMenu('button[name=selectHeat]', 2, function () {
           assert.dom(this.parentNode, function () {
-            assert.dom('li.selected', {text: 'General', data: TH.match.field('id', -1)});
-            assert.dom('li:not(.selected)', {text: 'Qual 1', data: TH.match.field('id', 1)});
+            assert.dom('li.selected', {text: 'General', data: TH.match.field('_id', -1)});
+            assert.dom('li:not(.selected)', {text: 'Qual 1', data: TH.match.field('_id', 1)});
           });
           TH.click(this);
         });

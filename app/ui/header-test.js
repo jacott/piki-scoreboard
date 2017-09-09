@@ -145,5 +145,5 @@ isClient && define(function (require, exports, module) {
     },
   });
 
-  function matchId(id) {return {data: TH.match.field('id', id)}}
+  function matchId(id) {return {data: TH.match.field('_id', id)}}
 });

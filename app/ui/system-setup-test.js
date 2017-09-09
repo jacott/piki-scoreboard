@@ -11,7 +11,7 @@ isClient && define(function (require, exports, module) {
   const TH          = require('./test-helper');
 
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
       App.orgId = Factory.createOrg()._id;
@@ -20,12 +20,12 @@ isClient && define(function (require, exports, module) {
       App.setAccess();
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.tearDown();
       v = null;
     },
 
-    "test onEntry onExit": function () {
+    "test onEntry onExit"() {
       Route.gotoPage(SystemSetup);
 
       assert.dom('#SystemSetup', function () {
@@ -40,7 +40,7 @@ isClient && define(function (require, exports, module) {
       refute.dom('#SystemSetup');
     },
 
-    "test renders orgs list": function () {
+    "test renders orgs list"() {
       var orgs = Factory.createList(2, 'createOrg');
 
       Route.gotoPage(Dom.SystemSetup);
@@ -50,7 +50,7 @@ isClient && define(function (require, exports, module) {
       });
     },
 
-    "test renders users list": function () {
+    "test renders users list"() {
       v.org = Factory.createOrg({name: 'org1'});
 
       setOrg();
@@ -63,7 +63,7 @@ isClient && define(function (require, exports, module) {
       });
     },
 
-    "test addOrg": function () {
+    "test addOrg"() {
       Route.gotoPage(Dom.SystemSetup);
 
       assert.dom('#SystemSetup', function () {
@@ -88,7 +88,7 @@ isClient && define(function (require, exports, module) {
       assert.attributesEqual(org, {name: 'Foo Bar', shortName: 'FB', email: 'fb@foo.com'}, ['_id']);
     },
     "edit org": {
-      setUp: function () {
+      setUp() {
         v.org = Factory.createOrg();
         v.org2 = Factory.createOrg();
 
@@ -97,7 +97,7 @@ isClient && define(function (require, exports, module) {
         TH.click('td', v.org.name);
       },
 
-      "test change name": function () {
+      "test change name"() {
         assert.dom('#OrgForm', function () {
           TH.input('[name=name]', {value: v.org.name}, 'new name');
           TH.click('[type=submit]');
@@ -108,7 +108,7 @@ isClient && define(function (require, exports, module) {
         });
       },
 
-      "test delete": function () {
+      "test delete"() {
         assert.dom('#OrgForm', function () {
           TH.click('[name=delete]');
         });
@@ -134,7 +134,7 @@ isClient && define(function (require, exports, module) {
       },
     },
 
-    "test addUser": function () {
+    "test addUser"() {
       v.org = Factory.createOrg();
       setOrg();
 
@@ -165,7 +165,7 @@ isClient && define(function (require, exports, module) {
     },
 
     "edit user": {
-      setUp: function () {
+      setUp() {
         v.org = Factory.createOrg();
         v.user = Factory.createUser();
         v.user2 = Factory.createUser();
@@ -175,7 +175,7 @@ isClient && define(function (require, exports, module) {
         TH.click('td', v.user.name);
       },
 
-      "test change name": function () {
+      "test change name"() {
         assert.dom('#UserForm', function () {
           TH.input('[name=name]', {value: v.user.name}, 'new name');
           TH.click('[type=submit]');
@@ -186,7 +186,7 @@ isClient && define(function (require, exports, module) {
         });
       },
 
-      "test delete": function () {
+      "test delete"() {
         assert.dom('#UserForm', function () {
           TH.click('[name=delete]');
         });

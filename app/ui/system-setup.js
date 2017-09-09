@@ -1,31 +1,29 @@
 define(function(require, exports, module) {
-  var Dom    = require('koru/dom');
-  var Route = require('koru/ui/route');
-  var Form = require('koru/ui/form');
-  var User = require('models/user');
-  var Org = require('models/org');
-  var App = require('./app-base');
-  var util = require('koru/util');
-  var koru = require('koru');
+  const koru  = require('koru');
+  const Dom   = require('koru/dom');
+  const Form  = require('koru/ui/form');
+  const Route = require('koru/ui/route');
+  const util  = require('koru/util');
+  const Org   = require('models/org');
+  const User  = require('models/user');
+  const App   = require('./app-base');
 
-  var Tpl = Dom.newTemplate(require('koru/html!./system-setup'));
+  const Tpl = Dom.newTemplate(require('koru/html!./system-setup'));
 
-  var $ = Dom.current;
+  const $ = Dom.current;
 
-  var base = Route.root.addBase(module, Tpl);
+  const base = Route.root.addBase(module, Tpl);
 
-  koru.onunload(module, function () {
-    Route.root.removeBase(Tpl);
-  });
+  koru.onunload(module, ()=>{Route.root.removeBase(Tpl)});
 
   base.addTemplate(module, Tpl.Index, {defaultPage: true});
   base.addTemplate(module, Tpl.OrgForm, {
-    data: function (page, pageRoute) {
+    data(page, pageRoute) {
       return Org.findById(pageRoute.append) || new Org();
     }
   });
   base.addTemplate(module, Tpl.UserForm, {
-    data: function (page, pageRoute) {
+    data(page, pageRoute) {
       return User.findById(pageRoute.append) || new User({org_id: App.orgId});
     }
   });
@@ -33,36 +31,42 @@ define(function(require, exports, module) {
 
   Tpl.$extend({
     title: "Org settings",
-    onBaseEntry: function () {
+    onBaseEntry() {
       document.body.appendChild(Tpl.$autoRender({}));
     },
 
-    onBaseExit: function () {
+    onBaseExit() {
       Dom.removeId('SystemSetup');
     },
   });
 
   Tpl.$helpers({
-    org: function () {
+    org() {
       return App.org();
     },
 
-    orgList: function (callback) {
-      callback.render({model: Org, sort: util.compareByName});
+    orgList(each) {
+      return {
+        query: Org.query,
+        compare: util.compareByName,
+      };
     },
 
-    userList: function (callback) {
-      callback.render({model: User, sort: util.compareByName});
+    userList(each) {
+      return {
+        query: User.query,
+        compare: util.compareByName,
+      };
     },
   });
 
   Tpl.$events({
-    'click [name=cancel]': function (event) {
+    'click [name=cancel]'(event) {
       Dom.stopEvent();
       Route.history.back();
     },
 
-    'click [name=delete]': function (event) {
+    'click [name=delete]'(event) {
       var doc = $.data(event.currentTarget.querySelector('form'));
 
       Dom.stopEvent();
@@ -81,7 +85,7 @@ define(function(require, exports, module) {
 
     },
 
-    'click .orgs tr': function (event) {
+    'click .orgs tr'(event) {
       if (! Dom.hasClass(document.body, 'sAccess')) return;
       Dom.stopEvent();
 
@@ -89,7 +93,7 @@ define(function(require, exports, module) {
       Route.gotoPage(Tpl.OrgForm, {append: data._id});
     },
 
-    'click .users tr': function (event) {
+    'click .users tr'(event) {
       Dom.stopEvent();
 
       var data = $.data(this);
@@ -104,11 +108,11 @@ define(function(require, exports, module) {
   });
 
   Tpl.UserForm.$helpers({
-    orgList: function () {
+    orgList() {
       return Org.query.fetch().sort(util.compareByName);
     },
 
-    roleList: function () {
+    roleList() {
       var su = User.me().isSuperUser();
       var role =  User.ROLE;
       var results = [];

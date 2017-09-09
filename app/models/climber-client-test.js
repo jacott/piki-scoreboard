@@ -61,8 +61,8 @@ define(function (require, exports, module) {
       let climber = TH.Factory.createClimber({team_ids: [v.teams1[0]._id]});
       let climber2 = TH.Factory.createClimber();
 
-      assert.equals(climber.team(v.tt[0]), TH.matchModel(v.teams1[0]));
-      assert.equals(climber2.team(v.tt[0]), undefined);
+      assert.equals(climber.getTeam(v.tt[0]), TH.matchModel(v.teams1[0]));
+      assert.equals(climber2.getTeam(v.tt[0]), undefined);
 
     },
 

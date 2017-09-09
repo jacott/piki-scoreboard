@@ -14,6 +14,32 @@ define(function(require, exports, module) {
     }
   }
 
+  class HasTeam extends BaseModel {
+    get teamMap() {
+
+      let map = this.$cache.teamMap;
+      if (! map) {
+        map = this.$cache.teamMap = Team.teamMap(this.team_ids);
+      }
+      return map;
+    }
+
+    getTeam(id) {
+      return this.teamMap[BaseModel.toId(id)];
+    }
+
+    get team() {return this.teamMap[Team.teamType_id]}
+
+    get teamName() {
+      const {team} = this;
+      return team == null ? null : team.name;
+    }
+  }
+
+  Team.HasTeam = HasTeam;
+
+  Team.teamType_id = undefined;
+
   module.exports = Team.define({
     module,
     fields: {

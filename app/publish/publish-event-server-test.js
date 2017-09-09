@@ -49,7 +49,7 @@ define(function (require, exports, module) {
 
       // *** test stopping ***
       var stopSpys = obSpys.map(function (spy) {
-        assert.calledWith(spy, v.event._id);
+        assert.calledWith(spy, [v.event._id]);
         return test.spy(spy.firstCall.returnValue, 'stop');
       });
 

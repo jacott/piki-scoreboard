@@ -18,54 +18,45 @@ define(function(require, exports, module) {
   require('./climber');
   const eventTpl     = require('./event');
 
-  var Tpl   = Dom.newTemplate(require('koru/html!./event-register'));
-  var $ = Dom.current;
-  var Index = Tpl.Index;
-
-  var Add = Tpl.Add;
-  var Edit = Tpl.Edit;
-  var catTpl = Tpl.Category;
-  var Groups = Tpl.Groups;
-  var Teams = Tpl.Teams;
-  var AddClimber = Tpl.AddClimber;
-  var competitor;
-  var sortField = 'name';
-  var asc = 1;
-  var sortClimber = true;
-  var sortFunc;
+  const Tpl   = Dom.newTemplate(require('koru/html!./event-register'));
+  const $ = Dom.current;
+  const {
+    Index, Add, Edit, Category: catTpl,
+    Groups, Teams, AddClimber} = Tpl;
+  let competitor;
+  let sortField = 'climberName';
+  let asc = 1;
+  let sortFunc;
 
   setSortFunc();
 
-  koru.onunload(module, function () {
-    eventTpl.route.removeBase(Tpl);
-  });
+  koru.onunload(module, ()=>{eventTpl.route.removeBase(Tpl)});
 
-  var base = eventTpl.route.addBase(module, Tpl);
+  const base = eventTpl.route.addBase(module, Tpl);
   base.addTemplate(module, Add, {
     focus: true,
     defaultPage: true,
   });
   base.addTemplate(module, Edit, {
     focus: true,
-    data: function (page, pageRoute) {
+    data(page, pageRoute) {
       return Competitor.findById(pageRoute.append) || Route.abortPage();
     }
   });
 
   Tpl.$helpers({
-    closedClass: function () {
+    closedClass() {
       Dom.setClass('closed', eventTpl.event.closed);
     },
-    competitors: function (callback) {
-      callback.render({
-        model: Competitor,
-        sort: function (a, b) {
-          return (sortClimber ? sortFunc(a.climber, b.climber) : sortFunc(a, b)) * asc;
-        }
-      });
+
+    competitors(each) {
+      return {
+        query: Competitor.query,
+        compare: sortFunc,
+      };
     },
 
-    sortOrder: function () {
+    sortOrder() {
       var parent = $.element.parentNode;
       var ths = parent.getElementsByTagName('th');
       for(var i = 0; i < ths.length; ++i) {
@@ -80,19 +71,19 @@ define(function(require, exports, module) {
   });
 
   Tpl.$events({
-    'click tbody>tr': function (event) {
+    'click tbody>tr'(event) {
       Dom.stopEvent();
       Route.replacePath(Edit, {append: $.data(this)._id});
     },
 
-    'click [name=cancel]': function (event) {
+    'click [name=cancel]'(event) {
       Dom.stopEvent();
       Route.replacePath(Tpl);
     },
 
     'menustart [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent(teamTypeList),
 
-    'click th': function (event) {
+    'click th'(event) {
       Dom.stopEvent();
       var sort = this.getAttribute('data-sort');
       if (sortField === sort)
@@ -112,13 +103,10 @@ define(function(require, exports, module) {
 
 
   function setSortFunc() {
-    sortClimber = true;
     switch (sortField) {
     case 'cat':
-      sortClimber = false;
       return sortFunc = util.compareByField('category_ids');
     case 'createdAt':
-      sortClimber = false;
       return sortFunc = util.compareByField('createdAt');
     case 'team':
       return sortFunc = TeamHelper.sortBy;
@@ -129,22 +117,22 @@ define(function(require, exports, module) {
 
 
   Tpl.$extend({
-    onBaseEntry: function (page, pageRoute) {
+    onBaseEntry(page, pageRoute) {
       if (! eventTpl.event) Route.abortPage();
       document.querySelector('#Event>div>.body').appendChild(Tpl.$autoRender(eventTpl.event));
     },
 
-    onBaseExit: function (page, pageRoute) {
+    onBaseExit(page, pageRoute) {
       Dom.removeId('Register');
     },
 
-    $destroyed: function (ctx, elm) {
+    $destroyed(ctx, elm) {
       competitor = null;
     },
   });
 
   Edit.$extend({
-    $created: function (ctx, elm) {
+    $created(ctx, elm) {
       addGroups(elm, ctx.data);
       addTeams(elm, ctx.data);
     },
@@ -153,7 +141,7 @@ define(function(require, exports, module) {
   Edit.$events({
     'submit': submit,
 
-    'click [name=delete]': function (event) {
+    'click [name=delete]'(event) {
       Dom.stopEvent();
       var doc = $.data();
 
@@ -175,7 +163,7 @@ define(function(require, exports, module) {
   });
 
   Add.$extend({
-    $created: function (ctx) {
+    $created(ctx) {
       if (eventTpl.event) {
         ctx.data = new Competitor({event_id: eventTpl.event._id});
       }
@@ -183,13 +171,13 @@ define(function(require, exports, module) {
   });
 
   Add.$events({
-    'click [name=cancel]': function (event) {
+    'click [name=cancel]'(event) {
       Dom.stopEvent();
       Route.replacePath(Tpl);
     },
     'submit': submit,
 
-    'input [name=name]': function (event) {
+    'input [name=name]'(event) {
       var input = this;
       var value = input.value;
       if (value) value = value.trim();
@@ -216,7 +204,7 @@ define(function(require, exports, module) {
       Form.completeList({
         input: this,
         completeList: completeList,
-        callback: function (ret) {
+        callback(ret) {
           if (ret._id) {
             input.value = ret.name;
             addClimber(competitor, ret);
@@ -231,7 +219,7 @@ define(function(require, exports, module) {
   });
 
   Tpl.Row.$helpers({
-    categories: function () {
+    categories() {
       var frag = document.createDocumentFragment();
       this.category_ids.forEach(function (id) {
         var abbr = document.createElement('abbr');
@@ -248,7 +236,7 @@ define(function(require, exports, module) {
   });
 
   Tpl.Row.$extend({
-    $created: function (ctx) {
+    $created(ctx) {
       Dom.autoUpdate(ctx, {subject: ctx.data.climber});
     },
   });
@@ -264,7 +252,7 @@ define(function(require, exports, module) {
       addTeams(form, competitor);
     }),
 
-    'click [name=cancel]': function (event) {
+    'click [name=cancel]'(event) {
       Dom.stopEvent();
       Dom.Dialog.close();
       document.querySelector('#Register [name=name].autoComplete').focus();
@@ -272,7 +260,7 @@ define(function(require, exports, module) {
   });
 
   Groups.$events({
-    'click [name=editClimber]': function (event) {
+    'click [name=editClimber]'(event) {
       Dom.stopEvent();
 
       Route.gotoPage(Dom.Climber.Edit, {modelId: $.ctx.data.climber._id});
@@ -280,19 +268,18 @@ define(function(require, exports, module) {
   });
 
   Teams.$helpers({
-    teamTypes(callback) {
-      callback.render({
-        model: TeamType,
-        params: {_id: this.event.teamType_ids},
-        sort: util.compareByName,
-      });
+    teamTypes(each) {
+      return {
+        query: TeamType.where({_id: this.event.teamType_ids}),
+        compare: util.compareByName,
+      };
     },
   });
 
   Teams.TeamType.$helpers({
     teamName() {
       let competitor = Teams.$data();
-      let team = competitor.team(this._id);
+      let team = competitor.getTeam(this._id);
 
       Dom.setClass('none', ! team, $.element.parentNode);
       if (team)
@@ -302,20 +289,22 @@ define(function(require, exports, module) {
   });
 
   Teams.TeamType.$events({
-    'menustart .select': function (event) {
+    'menustart .select'(event) {
       Dom.stopEvent();
 
       let ctx = $.ctx;
       let competitor = Teams.$data();
-      let list = Team.where('teamType_id', $.ctx.data._id).sort('name').map(team => [team._id, team.name]);
+      let list = Team.where('teamType_id', $.ctx.data._id).sort('name');
 
-      list = [{id: null, name: Dom.h({i:'none'})}, ...list, {id: '$new', name: Dom.h({i: 'add new team'})}];
+      list = [{_id: null, name: Dom.h({i:'none'})}, ...list,
+              {_id: '$new', name: Dom.h({i: 'add new team'})}];
       SelectMenu.popup(this, {
         list,
         onSelect(elm) {
-          let id = $.data(elm).id;
+          let id = $.data(elm)._id;
           if (id === '$new') {
-            let elm = Tpl.AddTeam.$autoRender(new Team({org_id: App.orgId, teamType_id: ctx.data._id}));
+            let elm = Tpl.AddTeam.$autoRender(
+              new Team({org_id: App.orgId, teamType_id: ctx.data._id}));
             Dialog.open(elm);
             Dom.ctx(elm).teamData = {competitor, ctx};
           } else {

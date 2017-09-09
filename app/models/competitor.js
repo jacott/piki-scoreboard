@@ -1,22 +1,14 @@
 define(function(require, exports, module) {
-  const koru        = require('koru');
-  const {BaseModel} = require('koru/model');
-  const Val         = require('koru/model/validation');
-  const util        = require('koru/util');
-  const Team        = require('models/team');
-  const Category    = require('./category');
-  const Climber     = require('./climber');
-  const Event       = require('./event');
+  const koru      = require('koru');
+  const BaseModel = require('koru/model/base-model');
+  const Val       = require('koru/model/validation');
+  const util      = require('koru/util');
+  const Team      = require('models/team');
+  const Category  = require('./category');
+  const Climber   = require('./climber');
+  const Event     = require('./event');
 
-  class Competitor extends BaseModel {
-    get teamMap() {
-      let map = this.$cache.teamMap;
-      if (! map) {
-        map = this.$cache.teamMap = Team.teamMap(this.team_ids);
-      }
-      return map;
-    }
-
+  class Competitor extends Team.HasTeam {
     setTeam(teamType_id, team_id) {
       const map = this.teamMap;
       let team = Team.findById(team_id);
@@ -29,9 +21,7 @@ define(function(require, exports, module) {
       this.team_ids = list;
     }
 
-    team(teamType_id) {
-      return this.teamMap[Competitor.toId(teamType_id)];
-    }
+    get climberName() {return this.climber.name}
   }
 
   module.exports = Competitor.define({

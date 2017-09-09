@@ -62,8 +62,8 @@ define(function (require, exports, module) {
       },
 
       "test no more in category"() {
-        var results = [1,2].map(function () {
-          var result = TH.Factory.buildResult({category_id: v.cat1._id});
+        const results = [1,2].map(()=>{
+          const result = TH.Factory.buildResult({category_id: v.cat1._id});
           result.$$save();
           return result;
         });
@@ -137,7 +137,7 @@ define(function (require, exports, module) {
 
         v.rpc("Result.setScore", v.result._id, 1, '');
 
-        assert.equals(v.result.$reload().scores, [1, null, 440000]);
+        assert.equals(v.result.$reload().scores, [1, NaN, 440000]);
       },
 
       "test delete last score"() {
@@ -145,7 +145,7 @@ define(function (require, exports, module) {
 
         v.rpc("Result.setScore", v.result._id, 2, '');
 
-        assert.equals(v.result.$reload().scores, [1, 220000, null]);
+        assert.equals(v.result.$reload().scores, [1, 220000, NaN]);
       },
     },
 
@@ -212,12 +212,12 @@ define(function (require, exports, module) {
         assert.calledWith(Val.ensureNumber, 1, 2);
         assert.calledWith(Val.ensureString, v.result._id);
 
-        assert.equals(v.result.$reload().scores, [1, null]);
+        assert.equals(v.result.$reload().scores, [1, NaN]);
         assert.equals(v.result.problems[0][1], null);
 
         v.rpc("Result.setBoulderScore", v.result._id, 1, 1);
 
-        assert.equals(v.result.$reload().scores, [1, null]);
+        assert.equals(v.result.$reload().scores, [1, NaN]);
         assert.equals(v.result.problems[0], [null, null]);
       },
 

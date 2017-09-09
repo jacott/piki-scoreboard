@@ -91,13 +91,11 @@ define(function(require, exports, module) {
   });
 
   Tpl.Events.$helpers({
-    list(callback) {
-      callback.render({
-        model: Event,
-        sort: sortByDate,
-        params: {
-          series_id: this._id,
-        }});
+    list(each) {
+      return {
+        query: Event.where({series_id: this._id}),
+        compare: sortByDate,
+      };
     },
   });
 
@@ -231,13 +229,11 @@ define(function(require, exports, module) {
     category() {
       return Category.findById(this.category_id);
     },
-    events(callback) {
-      for (let row of this.events)
-        callback(row);
+    events(each) {
+      return this.events;
     },
-    climbers(callback) {
-      for (let row of this.climbers)
-        callback(row);
+    climbers(each) {
+      return this.climbers;
     },
   });
 
@@ -283,11 +279,12 @@ define(function(require, exports, module) {
   });
 
   Tpl.CatResult.Row.$helpers({
-    events(callback) {
+    events(each) {
       const eventMap = this.events;
 
+      each.clear();
       for (let row of $.ctx.parentCtx.data.events)
-        callback({_id: row._id, points: eventMap[row._id]});
+        each.append({_id: row._id, points: eventMap[row._id]});
     },
   });
 
@@ -317,18 +314,15 @@ define(function(require, exports, module) {
 
 
   Tpl.TeamResults.$helpers({
-    events(callback) {
-      callback.clear();
-      if (this.events) for (let row of this.events) {
-        callback(row);
-      }
+    events(each) {
+      return this.events || [];
     },
 
-    teams(callback) {
-      callback.clear();
+    teams(each) {
+      each.clear();
       if (this.teams) for (let row of this.teams) {
         if (row.team.teamType_id === TeamHelper.teamType_id)
-          callback(row);
+          each.append(row);
       }
     },
   });
@@ -398,11 +392,12 @@ define(function(require, exports, module) {
   });
 
   Tpl.TeamResults.Row.$helpers({
-    events(callback) {
+    events(each) {
       const eventMap = this.events;
       const {events} = $.ctx.parentCtx.data;
+      each.clear();
       for (let event of events) {
-        callback({_id: event._id, event, points: eventMap[event._id]});
+        each.append({_id: event._id, event, points: eventMap[event._id]});
       }
     },
   });

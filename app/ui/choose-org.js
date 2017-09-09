@@ -12,8 +12,11 @@ define(function(require, exports, module) {
   Route.root.addTemplate(module, Tpl);
 
   Tpl.$helpers({
-    orgs(callback) {
-      callback.render({model: Org, sort: util.compareByName});
+    orgs(each) {
+      return {
+        query: Org.query,
+        compare: util.compareByName
+      };
     },
   });
 

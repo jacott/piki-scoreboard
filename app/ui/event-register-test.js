@@ -1,5 +1,4 @@
 isClient && define(function (require, exports, module) {
-  var test, v;
   const Dom        = require('koru/dom');
   const Route      = require('koru/ui/route');
   const Climber    = require('models/climber');
@@ -7,11 +6,13 @@ isClient && define(function (require, exports, module) {
   const Team       = require('models/team');
   const App        = require('ui/app');
   const TeamHelper = require('ui/team-helper');
-  const sut        = require('./event-register');
   const TH         = require('./test-helper');
 
+  const sut = require('./event-register');
+  var test, v;
+
   TH.testCase(module, {
-    setUp: function () {
+    setUp() {
       test = this;
       v = {};
       v.org =  TH.Factory.createOrg();
@@ -46,13 +47,13 @@ isClient && define(function (require, exports, module) {
       TH.login();
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.tearDown();
       TeamHelper.teamType_id = null;
       v = null;
     },
 
-    "test closed": function () {
+    "test closed"() {
       v.event.$update({closed: true});
 
       gotoPage();
@@ -60,14 +61,14 @@ isClient && define(function (require, exports, module) {
       assert.dom('#Register.closed');
     },
 
-    "test registering": function () {
+    "test registering"() {
       gotoPage();
 
       assert.dom('#Event [name=Register].selected');
       assert.dom('#Event #Register:not(.closed)', function () {
         refute.dom('.Groups');
         assert.dom('fieldset', function () {
-          assert.dom('label .name', {text: 'Name', parent: function () {
+          assert.dom('label .name', {text: 'Name', parent() {
             TH.input('[name=name]', {value: ''}, 'bo');
             assert.dom(Dom('body>.complete'), function () {
               assert.dom('li', 'Bob');
@@ -102,7 +103,7 @@ isClient && define(function (require, exports, module) {
 
         assert.dom('.Groups', function () {
           assert.dom('h1', {count: 1});
-          assert.dom('label .name', {text: '1 Youth Lead', parent: function () {
+          assert.dom('label .name', {text: '1 Youth Lead', parent() {
             assert.dom('button.select.category.none', '---');
             TH.selectMenu('button.select', v.u16._id);
             TH.selectMenu('button.select', TH.match.field('_id', null));
@@ -111,7 +112,7 @@ isClient && define(function (require, exports, module) {
             assert.dom('button.select.category:not(.none)', v.u18.name);
           }});
 
-          assert.dom('label .name', {text: '2 Open Lead', parent: function () {
+          assert.dom('label .name', {text: '2 Open Lead', parent() {
             TH.selectMenu('button.select', v.open._id);
             assert.dom('button.select.category:not(.none)', v.open.name);
           }});
@@ -147,7 +148,7 @@ isClient && define(function (require, exports, module) {
           });
         });
 
-        assert.dom('table td', {text: 'brendon', parent: function () {
+        assert.dom('table td', {text: 'brendon', parent() {
           assert.dom('td.team', v.teams1[0].shortName);
           assert.dom('td.cat', function () {
             assert.dom('abbr', v.u18.shortName);
@@ -168,11 +169,11 @@ isClient && define(function (require, exports, module) {
 
     },
 
-    "test adding new climber": function () {
+    "test adding new climber"() {
       gotoPage();
 
       assert.dom('#Register', function () {
-        assert.dom('label .name', {parent: function () {
+        assert.dom('label .name', {parent() {
           TH.input('[name=name]', 'John Smith');
         }});
       });
@@ -190,7 +191,7 @@ isClient && define(function (require, exports, module) {
       assert.dom('.Groups');
     },
 
-    "test can't add twice": function () {
+    "test can't add twice"() {
       var oComp = TH.Factory.createCompetitor({climber_id: v.climbers[1]._id});
 
       gotoPage();
@@ -201,7 +202,7 @@ isClient && define(function (require, exports, module) {
       assert.dom('body>ul>li', {count: 1, text: 'Already registered'});
     },
 
-    "test cancel add": function () {
+    "test cancel add"() {
       gotoPage();
 
       assert.dom('#Event #Register', function () {
@@ -217,12 +218,12 @@ isClient && define(function (require, exports, module) {
     },
 
     "edit": {
-      setUp: function () {
+      setUp() {
         v.oComp = TH.Factory.createCompetitor({climber_id: v.climbers[1]._id, team_ids: [v.teams1[0]._id]});
 
         gotoPage();
 
-        assert.dom('#Register td', {text: v.climbers[1].name, parent: function () {
+        assert.dom('#Register td', {text: v.climbers[1].name, parent() {
           TH.click(this);
         }});
       },
@@ -246,7 +247,7 @@ isClient && define(function (require, exports, module) {
               assert.dom('.name', v.tt[0].name);
 
               assert.dom('button.select:not(.none)', v.teams1[0].name);
-              TH.selectMenu('button.select', TH.match.field('id', null), function () {
+              TH.selectMenu('button.select', TH.match.field('_id', null), function () {
                 assert.dom(this.parentNode, function () {
                   assert.dom('li:first-child>i', 'none');
                   assert.dom('li:nth-child(2)', 'Team 4');
@@ -276,7 +277,7 @@ isClient && define(function (require, exports, module) {
         assert.same(Team.findBy('name', 'Dynomites Wellington').teamType_id, v.tt[0]._id);
       },
 
-      "test change category": function () {
+      "test change category"() {
         assert.dom('#Register form.edit', function () {
           assert.dom('.Groups', function () {
             assert.dom('button.select.category:not(.none)', 'Category 4', function () {
@@ -290,7 +291,7 @@ isClient && define(function (require, exports, module) {
         assert.equals(v.oComp.$reload().category_ids,[]);
       },
 
-      "test cancel": function () {
+      "test cancel"() {
         test.stub(Route, 'replacePath');
 
         TH.click('#Register form [name=cancel]');
@@ -298,7 +299,7 @@ isClient && define(function (require, exports, module) {
         assert.calledWithExactly(Route.replacePath, Dom.Event.Register);
       },
 
-      "test delete competitor": function () {
+      "test delete competitor"() {
         assert.dom('#Register form.edit', function () {
           TH.click('[name=delete]');
         });

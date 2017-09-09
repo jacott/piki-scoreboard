@@ -37,7 +37,7 @@ isClient && define(function (require, exports, module) {
       assert.dom('#Team', function () {
         assert.dom('#TeamIndex.noTeamType');
 
-        TH.selectMenu('[name=teamType_id]', TH.match.field('id', 'tt1'));
+        TH.selectMenu('[name=teamType_id]', 'tt1');
         assert.dom('#TeamIndex:not(.noTeamType)');
         assert.dom('[name=teamType_id]', 'type 1');
 
@@ -59,7 +59,7 @@ isClient && define(function (require, exports, module) {
     "test adding new team"() {
       Route.gotoPage(sut.Index);
 
-      TH.selectMenu('#Team [name=teamType_id]', TH.match.field('id', 'tt1'));
+      TH.selectMenu('#Team [name=teamType_id]', 'tt1');
       assert.dom('#Team', function () {
         TH.click('[name=addTeam]');
       });
@@ -91,7 +91,7 @@ isClient && define(function (require, exports, module) {
     "test adding new teamType"() {
       Route.gotoPage(sut.Index);
 
-      TH.selectMenu('#Team [name=teamType_id]', TH.match.field('id', '$new'));
+      TH.selectMenu('#Team [name=teamType_id]', '$new');
 
       assert.dom('#AddTeamType', function () {
         TH.input('[name=name]', 'Club');
@@ -103,7 +103,7 @@ isClient && define(function (require, exports, module) {
 
       assert(TeamType.exists({org_id: v.org._id, name: 'Club', default: true}));
 
-      TH.selectMenu('#Team [name=teamType_id]', TH.match.field('id', '$new'));
+      TH.selectMenu('#Team [name=teamType_id]', '$new');
 
       assert.dom('#AddTeamType', function () {
         TH.input('[name=name]', 'School');
@@ -113,7 +113,7 @@ isClient && define(function (require, exports, module) {
 
       assert(TeamType.exists({org_id: v.org._id, name: 'School', default: false}));
 
-      TH.selectMenu('#Team [name=teamType_id]', TH.match.field('id', '$new'));
+      TH.selectMenu('#Team [name=teamType_id]', '$new');
       assert.dom('#AddTeamType', function () {
         TH.click('[name=cancel]');
       });
@@ -123,7 +123,7 @@ isClient && define(function (require, exports, module) {
     "test edit teamType"() {
       let tt = TH.Factory.createTeamType({default: true});
       Route.gotoPage(sut.Index);
-      TH.selectMenu('#Team [name=teamType_id]', TH.match.field('id', tt._id));
+      TH.selectMenu('#Team [name=teamType_id]', tt._id);
 
       TH.click('[name=EditTeamType]');
 
@@ -152,7 +152,7 @@ isClient && define(function (require, exports, module) {
         v.team2 = TH.Factory.createTeam();
 
         Route.gotoPage(sut.Index);
-        TH.selectMenu('#Team [name=teamType_id]', TH.match.field('id', 'tt1'));
+        TH.selectMenu('#Team [name=teamType_id]', 'tt1');
 
         TH.click('td', v.team.name);
       },

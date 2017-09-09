@@ -22,7 +22,7 @@ define(function(require, exports, module) {
 
   Tpl.route.addTemplate(module, Merge, {
     focus: true,
-    data: function (page, pageRoute) {
+    data(page, pageRoute) {
 
       const doc = Climber.findById(pageRoute.modelId);
       if (doc) return doc;
@@ -81,7 +81,7 @@ define(function(require, exports, module) {
         classes: 'warn',
         okay: 'Delete',
         content: Tpl.ConfirmDelete,
-        callback: function(confirmed) {
+        callback(confirmed) {
           if (confirmed) {
             doc.$remove();
             Route.gotoPage(Tpl);
@@ -112,7 +112,7 @@ define(function(require, exports, module) {
   });
 
   Merge.$helpers({
-    climbers(callback) {
+    climbers(each) {
       const climber = this;
       const ctx = $.ctx;
       const filterRe = new RegExp(
@@ -120,14 +120,12 @@ define(function(require, exports, module) {
           .map(p => `\\b${p}`).join('.*'),
         "i"
       );
-      callback.render({
-        model: Climber,
-        filter(doc) {
-          return doc._id !== climber._id &&
+      return {
+        query: Climber.where(doc  => doc._id !== climber._id &&
             (ctx.selected[doc._id] ||
-             filterRe.test(doc.name));
-        },
-      });
+             filterRe.test(doc.name))),
+        compare: util.compareByName,
+      };
     },
   });
 

@@ -5,20 +5,9 @@ define(function(require, exports, module) {
   const Org         = require('./org');
   const Team        = require('./team');
 
-  class Climber extends BaseModel {
+  class Climber extends Team.HasTeam {
     get yearOfBirth() {
       return this.dateOfBirth && this.dateOfBirth.slice(0, 4);
-    }
-    get teamMap() {
-      let map = this.$cache.teamMap;
-      if (! map) {
-        map = this.$cache.teamMap = Team.teamMap(this.team_ids);
-      }
-      return map;
-    }
-
-    team(teamType_id) {
-      return this.teamMap[Climber.toId(teamType_id)];
     }
   }
 

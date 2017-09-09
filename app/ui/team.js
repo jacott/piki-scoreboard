@@ -30,15 +30,13 @@ define(function(require, exports, module) {
   });
 
   Index.$helpers({
-    rows: function (callback) {
+    rows: function (each) {
       const {sortFunc, asc} = $.template.sorting;
-      callback.render({
-        model: $.template.parent.model,
-        sort: function (a, b) {
-          return sortFunc(a, b) * asc;
-        },
-        params: {teamType_id: TeamHelper.teamType_id},
-      });
+      return {
+        query: $.template.parent.model.where({teamType_id: TeamHelper.teamType_id}),
+        compare: (a, b)=> sortFunc(a, b) * asc,
+        compareKeys: sortFunc.compareKeys
+      };
     },
 
     teamTypePrompt() {
@@ -87,11 +85,11 @@ define(function(require, exports, module) {
       let ctx = $.ctx;
       let list = TeamType.query.map(doc => [doc._id, doc.name]);
       if (User.me().isAdmin())
-        list.push({id: '$new', name: "Add new team type"});
+        list.push({_id: '$new', name: "Add new team type"});
       SelectMenu.popup(this, {
         list,
         onSelect(elm) {
-          let id = $.data(elm).id;
+          let id = $.data(elm)._id;
           if (id === '$new') {
             openAddTeamType();
           } else {

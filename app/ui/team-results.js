@@ -27,13 +27,11 @@ define(function(require, exports, module) {
   Tpl.$helpers({
     teams(callback) {
       const scores = Ranking.getTeamScores(EventTpl.event)[TeamHelper.teamType_id] || {};
-      callback.clear();
 
-      Object.keys(scores).map(id => {
+      return Object.keys(scores).map(id => {
         const team = Team.findById(id);
         return {id, team, points: scores[id]};
-      }).sort(util.compareByField('points', -1))
-        .forEach(row => callback(row));
+      }).sort(util.compareByField('points', -1));
     },
   });
 

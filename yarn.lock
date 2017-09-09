@@ -605,9 +605,9 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.3.6"
 
-koru@^0.13.0:
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/koru/-/koru-0.13.0.tgz#914639e0f410257eb2882e24272112cb498947f4"
+koru@^0.15.0:
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/koru/-/koru-0.15.0.tgz#f87099230dedf25bfdf770d21fa6648b94f6e63c"
   dependencies:
     autoprefixer "^7.1.2"
     babel-generator "^6.23.0"

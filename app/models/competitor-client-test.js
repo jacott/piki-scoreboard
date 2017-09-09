@@ -40,8 +40,8 @@ define(function (require, exports, module) {
       let t1 = TH.Factory.createTeam();
       let competitor = TH.Factory.createCompetitor({team_ids: [t1._id]});
 
-      assert.same(competitor.team('foo'), undefined);
-      assert.same(competitor.team(tt1), t1);
+      assert.same(competitor.getTeam('foo'), undefined);
+      assert.same(competitor.getTeam(tt1), t1);
     },
 
     "test categoryIdForGroup": function () {

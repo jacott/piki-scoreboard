@@ -4,7 +4,7 @@ define(function(require, exports, module) {
   const util  = require('koru/util');
   const App   = require('ui/app');
 
-  const Tpl = module.exports = Dom.newTemplate(module, require('koru/html!./crud-page'));
+  const Tpl = Dom.newTemplate(module, require('koru/html!./crud-page'));
   const $ = Dom.current;
 
   Tpl.$helpers({
@@ -48,7 +48,7 @@ define(function(require, exports, module) {
       Tpl.Index.setSortFunc.call(subTpl.Index);
 
       subTpl.Index.$events({
-        'click th': function (event) {
+        'click th'(event) {
           Dom.stopEvent();
           const {sorting} = subTpl.Index;
           const sort = this.getAttribute('data-sort');
@@ -66,27 +66,27 @@ define(function(require, exports, module) {
       return subTpl;
     },
 
-    onBaseEntry: function () {
+    onBaseEntry() {
       document.body.appendChild(this.$autoRender({}));
     },
 
-    onBaseExit: function () {
+    onBaseExit() {
       Dom.removeId(this.name);
     },
   });
 
   Tpl.Index.$helpers({
-    rows: function (callback) {
+    rows(each) {
       const {sortFunc, asc} = $.template.sorting;
-      callback.render({
-        model: $.template.parent.model,
-        sort: function (a, b) {
-          return sortFunc(a, b) * asc;
-        },
-      });
+      return {
+        query: $.template.parent.model.query,
+        compare: (a, b) => sortFunc(a, b) * asc,
+        compareKeys: sortFunc.compareKeys,
+        updateAllTags: true,
+      };
     },
 
-    sortOrder: function () {
+    sortOrder() {
       const parent = $.element.parentNode;
       const ths = parent.getElementsByTagName('th');
       const {sortField, asc} = $.template.sorting;
@@ -95,7 +95,7 @@ define(function(require, exports, module) {
         Dom.removeClass(ths[i], 'desc');
       }
 
-      var elm = parent.querySelector('[data-sort="'+sortField+'"]');
+      const elm = parent.querySelector('[data-sort="'+sortField+'"]');
       Dom.addClass(elm, 'sort');
       asc === -1 &&  Dom.addClass(elm, 'desc');
     },
@@ -107,4 +107,6 @@ define(function(require, exports, module) {
       return sorting.sortFunc = util.compareByField(sorting.sortField);
     },
   });
+
+  return Tpl;
 });

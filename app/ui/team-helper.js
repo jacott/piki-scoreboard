@@ -3,24 +3,26 @@ define(function(require, exports, module) {
   const SelectMenu = require('koru/ui/select-menu');
   const util       = require('koru/util');
   const Series     = require('models/series');
+  const Team       = require('models/team');
   const TeamType   = require('models/team-type');
 
   const Tpl = Dom.newTemplate(module, require('koru/html!./team-helper'));
   const $ = Dom.current;
 
-  let teamType_id = undefined;
+  const sortBy = util.compareByField('teamName');
 
   util.merge(exports, {
     get teamType_id() {
-      if (teamType_id === undefined) {
+      if (Team.teamType_id === undefined) {
         const teamType = TeamType.findBy('default', true);
-        teamType_id = teamType ? teamType._id : null;
+
+        Team.teamType_id = teamType === undefined ? null : teamType._id;
       }
-      return teamType_id;
+      return Team.teamType_id;
     },
 
     set teamType_id(value) {
-      teamType_id = value;
+      Team.teamType_id = value;
     },
 
     setSeriesTeamType(series, value) {
@@ -30,14 +32,14 @@ define(function(require, exports, module) {
       const {teamType_ids} = series;
 
       if (value && teamType_ids && teamType_ids.indexOf(value) !== -1)
-        return teamType_id = value;
+        return Team.teamType_id = value;
 
-      if (teamType_ids.indexOf(teamType_id) !== -1)
-        return teamType_id;
+      if (teamType_ids.indexOf(Team.teamType_id) !== -1)
+        return Team.teamType_id;
 
       const tt = TeamType.where({_id: teamType_ids}).sort('default', -1).fetchOne();
       if (tt)
-        return teamType_id = tt._id;
+        return Team.teamType_id = tt._id;
     },
 
     chooseTeamTypeEvent(listBuilder) {
@@ -58,16 +60,14 @@ define(function(require, exports, module) {
     },
 
     teamTD() {
-      const team = exports.teamType_id && this.teamMap[teamType_id];
+      const team = exports.teamType_id && this.teamMap[Team.teamType_id];
       return team && Dom.h({span: team.shortName, $title: team.name});
     },
 
-    sortBy(a, b) {
-      return util.compareByName(a.team(teamType_id), b.team(teamType_id));
-    },
+    sortBy,
 
     teamTypeField(field) {
-      let tt = teamType_id && TeamType.findById(teamType_id);
+      let tt = Team.teamType_id && TeamType.findById(Team.teamType_id);
       if (! tt) {
         tt = TeamType.findBy('default', true);
         if (! tt) return;
@@ -81,11 +81,11 @@ define(function(require, exports, module) {
     teamTypes,
   });
 
-  function teamTypes(callback) {
-    callback.render({
-      model: TeamType,
-      sort: util.compareByName,
-    });
+  function teamTypes(each) {
+    return {
+      query: TeamType.query,
+      compare: util.compareByName,
+    };
   }
 
 

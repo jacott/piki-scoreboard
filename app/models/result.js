@@ -64,10 +64,7 @@ define(function(require, exports, module) {
 
       Val.allowAccessIf(heat.type === 'L' && index >=0 && index <= heat.total);
 
-      var changes = {};
-      score = heat.scoreToNumber(score) || null;
-      changes['scores.' + index] = score;
-      Result.query.onId(id).update(changes);
+      Result.query.onId(id).updatePartial('scores', [index, heat.scoreToNumber(score) || NaN]);
     },
 
     setBoulderScore(id, index, problem, bonus, top) {
@@ -134,10 +131,10 @@ define(function(require, exports, module) {
         }
       }
 
-      changes['problems.' + (index-1)] = round;
-      changes['scores.' + index] = dnc === "dnc" ? -1 : score = heat.boulderScoreToNumber(b, ba, t, ta);
-
-      Result.query.onId(id).update(changes);
+      Result.query.onId(id).updatePartial(
+        'problems', [index - 1, round || NaN],
+        'scores', [index, dnc === "dnc" ? -1 : score = heat.boulderScoreToNumber(b, ba, t, ta) || NaN]
+      );
     },
   });
 
@@ -177,31 +174,19 @@ define(function(require, exports, module) {
   Result.beforeCreate(Result, function (doc) {
     var event = Event.findById(doc.event_id);
     if (event.heats && doc.category_id in event.heats) return;
-    Event.query.onId(doc.event_id).update(buildHeat(doc, ! event.heats));
+    Event.query.onId(doc.event_id).updatePartial('heats', buildHeat(doc, ! event.heats));
     });
 
   Result.beforeRemove(Result, function (doc) {
     if (Result.query.where({event_id: doc.event_id, category_id: doc.category_id}).whereNot('_id', doc._id).count(1))
       return;
 
-    var heat = {};
-    heat["heats."+ doc.category_id] = undefined;
-    Event.query.onId(doc.event_id).update(heat);
+    Event.query.onId(doc.event_id).updatePartial('heats', [doc.category_id]);
   });
 
   function buildHeat(doc, newHeats) {
-    var category  = Category.findById(doc.category_id);
-    var value = category.type + category.heatFormat;
-
-    if (newHeats) {
-      var heats = {};
-        heats[doc.category_id] = value;
-      return {heats: heats};
-    } else {
-      var heat = {};
-      heat["heats."+doc.category_id] = value;
-      return heat;
-    }
+    const category  = Category.findById(doc.category_id);
+    return [doc.category_id, category.type + category.heatFormat];
   }
 
   require('koru/env!./result')(Result);

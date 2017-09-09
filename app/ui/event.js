@@ -20,22 +20,30 @@ define(function(require, exports, module) {
   const $ = Dom.current;
   const Index = Route.root.defaultPage = Tpl.Index;
 
+  const sortByDate = util.compareByField('date', -1);
 
-  koru.onunload(module, function () {
-    Route.root.defaultPage = null;
-  });
+
+  const compareCategories = (a, b)=>{
+    const ai = a._id, bi = b._id;
+    if (ai === bi) return 0;
+    var ac, bc;
+    if (((ac = Tpl.event.heatTypes(ai)) === (bc = Tpl.event.heatTypes(bi))) &&
+        ((ac = a.group) === (bc = b.group)) &&
+        ((ac = a.name) === (bc = b.name))) {
+      return ai < bi ? -1 : 1;
+    }
+    return ac < bc ? -1 : 1;
+  };
+  compareCategories.compareKeys = ['group', 'name', '_id'];
 
   Dom.registerHelpers({
-    lazySeriesList() {
-      return function () {
-        return Series.query.fetch().sort(util.compareByName);
-      };
-    },
+    lazySeriesList: () => () => Series.query.fetch().sort(util.compareByName)
   });
 
   const base = Route.root.addBase(module, Tpl, 'eventId');
   base.async = true;
-  koru.onunload(module, function () {
+  koru.onunload(module, ()=>{
+    Route.root.defaultPage = null;
     Route.root.removeBase(Tpl);
   });
 
@@ -46,7 +54,8 @@ define(function(require, exports, module) {
     onBaseEntry(page, pageRoute, callback) {
       var elm = Tpl.$autoRender({});
       pageRoute.eventId &&
-        Dom.myCtx(elm).onDestroy(Event.observeId(pageRoute.eventId, doc => Dom.setTitle(doc && doc.displayName)));
+        Dom.myCtx(elm).onDestroy(Event.observeId(
+          pageRoute.eventId, doc => Dom.setTitle(doc && doc.displayName)));
 
       document.body.appendChild(elm);
       const currentSub = eventSub;
@@ -125,8 +134,12 @@ define(function(require, exports, module) {
   });
 
   Index.$helpers({
-    list(callback) {
-      callback.render({model: $.ctx.tab === 'series' ? Series : Event, sort: sortByDate});
+    list(each) {
+      return {
+        query: ($.ctx.tab === 'series' ? Series : Event).query,
+        compare: sortByDate,
+        updateAllTags: true,
+      };
     },
 
     addLink() {
@@ -147,10 +160,6 @@ define(function(require, exports, module) {
       return this === Tpl.event ? "selected" : "";
     },
   });
-
-  function sortByDate(a, b) {
-    return a.date === b.date ? 0 : a.date < b.date ? 1 : -1;
-  }
 
   Index.$events({
     'click .list tr'(event) {
@@ -268,31 +277,32 @@ define(function(require, exports, module) {
   });
 
   Tpl.Edit.$helpers({
-    categories(callback) {
-      var cats = Category.docs;
-      var eventCats = catList()
-            .forEach(function (doc) {doc && callback(doc)});
+    categories(each) {
+      const cats = Category.docs;
 
-      function catList() {
-        return Object.keys(Result.eventCatIndex.lookup({event_id: Tpl.event._id})||{})
-          .map(function (cat_id) {
-              return cats[cat_id];
-            }).sort(compareCategories);
-      }
+      const {ctx} = $;
 
-      $.ctx.onDestroy(Event.onChange(function (doc, was) {
-        doc = doc || was;
-        if (doc._id !== Tpl.event._id) return;
-        catList().forEach(function (doc) {
-          callback(doc, doc, compareCategories);
-        });
-      }));
+      ctx.onEventChange == null || ctx.onEventChange.stop();
+      ctx.onEventChange = Event.observeId(this._id, (doc, undo)=>{
+        each.list.changeOptions({updateAllTags: true});
+      });
 
-
-      $.ctx.onDestroy(Result.onChange(function (doc, was) {
-        if (doc && was) return;
-        (doc || was) && callback(doc && cats[doc.category_id], was && cats[was.category_id], compareCategories);
-      }));
+      return {
+        query: {
+          forEach: body =>{
+            for (const cat_id in Result.eventCatIndex.lookup({event_id: this._id})) {
+              body(cats[cat_id]);
+            }
+          },
+          onChange: body => {
+            return Result.onChange((doc, was)=>{
+              if (doc && was) return;
+              body(doc && cats[doc.category_id], was && cats[was.category_id]);
+            });
+          },
+          compare: compareCategories,
+        }
+      };
     },
   });
 
@@ -305,6 +315,8 @@ define(function(require, exports, module) {
 
   Tpl.Edit.$extend({
     $destroyed(ctx, elm) {
+      ctx.onEventChange && ctx.onEventChange.stop();
+      ctx.onEventChange = null;
       ctx.data.$clearChanges();
     }
   });
@@ -548,17 +560,6 @@ define(function(require, exports, module) {
         counts.notify(res.category_id);
       }
     }
-  }
-
-  function compareCategories(a, b) {
-    if (a._id === b._id) return 0;
-    var ac, bc;
-    if (((ac = Tpl.event.heatTypes(a._id)) === (bc = Tpl.event.heatTypes(b._id))) &&
-        ((ac = a.group) === (bc = b.group)) &&
-        ((ac = a.name) === (bc = b.name)))
-      return 0;
-
-    return ac < bc ? -1 : 1;
   }
 
   return Tpl;

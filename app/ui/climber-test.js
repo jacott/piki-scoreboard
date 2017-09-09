@@ -1,5 +1,4 @@
 isClient && define(function (require, exports, module) {
-  var test, v;
   const session    = require('koru/session');
   const Route      = require('koru/ui/route');
   const Climber    = require('models/climber');
@@ -8,9 +7,12 @@ isClient && define(function (require, exports, module) {
   const sut        = require('./climber');
   const TH         = require('./test-helper');
 
+  const {stub, spy, onEnd, util} = TH;
+
+  let v = null;
+
   TH.testCase(module, {
-    setUp: function () {
-      test = this;
+    setUp() {
       v = {};
       v.org =  TH.Factory.createOrg();
       TH.login();
@@ -18,13 +20,13 @@ isClient && define(function (require, exports, module) {
       App.setAccess();
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.tearDown();
       TeamHelper.teamType_id = null;
       v = null;
     },
 
-    "test rendering": function () {
+    "test rendering"() {
       const tt1 = TH.Factory.createTeamType();
       const team = TH.Factory.createTeam();
       var climber1 = TH.Factory.createClimber({team_ids: [team._id]});
@@ -54,11 +56,11 @@ isClient && define(function (require, exports, module) {
       });
     },
 
-    "test adding new climber": function () {
+    "test adding new climber"() {
       var team = TH.Factory.createTeam();
 
       Route.gotoPage(sut.Index);
-      test.stub(Route.history, 'back');
+      stub(Route.history, 'back');
 
       assert.dom('#Climber', function () {
         TH.click('[name=addClimber]');
@@ -82,7 +84,7 @@ isClient && define(function (require, exports, module) {
     },
 
     "edit": {
-      setUp: function () {
+      setUp() {
         v.climber = TH.Factory.createClimber();
         v.climber2 = TH.Factory.createClimber();
 
@@ -92,7 +94,7 @@ isClient && define(function (require, exports, module) {
       },
 
       "test merge other climbers"() {
-        test.stub(session, 'rpc');
+        stub(session, 'rpc');
         v.climber3 = TH.Factory.createClimber({name: 'Angela Eiter'});
         v.climber4 = TH.Factory.createClimber({name: 'Anne-Sophie Koller'});
         TH.click('[name=merge]');
@@ -129,14 +131,14 @@ isClient && define(function (require, exports, module) {
             [v.climber2._id, v.climber3._id].sort()
           ) || true)
         );
-        test.stub(Route.history, 'back');
+        stub(Route.history, 'back');
         session.rpc.yield();
         assert.dom('#Flash', "Climbers merged");
         assert.called(Route.history.back);
       },
 
-      "test change name": function () {
-        test.stub(Route.history, 'back');
+      "test change name"() {
+        stub(Route.history, 'back');
 
         assert.dom(document.body, function () {
         assert.dom('#EditClimber', function () {
@@ -149,7 +151,7 @@ isClient && define(function (require, exports, module) {
         assert.called(Route.history.back);
       },
 
-      "test delete": function () {
+      "test delete"() {
         assert.dom('#EditClimber', function () {
           TH.click('[name=delete]');
         });
