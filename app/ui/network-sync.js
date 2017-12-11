@@ -22,6 +22,7 @@ define(function(require, exports, module) {
 
   Tpl.$extend({
     $created(_ctx, _elm) {
+      Dom.removeId('NetworkSync');
       ctx = _ctx; elm = _elm;
       ctx.data = data;
     },
