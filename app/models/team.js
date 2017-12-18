@@ -1,7 +1,7 @@
 define(function(require, exports, module) {
-  const {BaseModel} = require('model');
-  const Org         = require('models/org');
-  const TeamType    = require('./team-type');
+  const {BaseModel}     = require('model');
+  const Org             = require('models/org');
+  const TeamType        = require('./team-type');
 
   class Team extends BaseModel {
     static teamMap(list) {
@@ -27,18 +27,9 @@ define(function(require, exports, module) {
     getTeam(id) {
       return this.teamMap[BaseModel.toId(id)];
     }
-
-    get team() {return this.teamMap[Team.teamType_id]}
-
-    get teamName() {
-      const {team} = this;
-      return team == null ? null : team.name;
-    }
   }
 
   Team.HasTeam = HasTeam;
-
-  Team.teamType_id = undefined;
 
   module.exports = Team.define({
     module,

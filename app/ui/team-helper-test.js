@@ -1,4 +1,4 @@
-isClient && define(function (require, exports, module) {
+define(function (require, exports, module) {
   var test, v;
   const TH     = require('test-helper');
   const sut    = require('./team-helper');
@@ -11,7 +11,7 @@ isClient && define(function (require, exports, module) {
 
     tearDown() {
       TH.clearDB();
-      sut.teamType_id = null;
+      sut.teamType_id = undefined;
       v = null;
     },
 

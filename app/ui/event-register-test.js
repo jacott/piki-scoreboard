@@ -15,7 +15,7 @@ isClient && define(function (require, exports, module) {
     setUp() {
       test = this;
       v = {};
-      v.org =  TH.Factory.createOrg();
+      v.org =  TH.Factory.createOrg({_id: App.orgId = "org123"});
       v.tt = TH.Factory.createList(3, 'createTeamType', (index, options) => {
         options.name = ['Club', 'School', 'Country'][index];
       });
