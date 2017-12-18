@@ -5,16 +5,28 @@
     <meta name="viewport" content="width=device-width, user-scalable=yes, maximum-scale=2">
     <meta charset="utf-8">
     <meta name="theme-color" content="#000000">
-    <link rel="manifest" href="/manifest.json">
-    <link rel="icon" type="image/png" href="/images/icon.png" sizes="42x42">
-    <link rel="stylesheet" async href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <style type="text/css">
       body.loading>*{display: none;}
       body.loading:before {content: "Loading..."; font-size: 2rem; margin: auto;}
     </style>
 
-    <link rel="stylesheet" async href="/index.css?CACHE_BUST_HASH" charset="utf-8">
+
+    <link rel="preload" href="https://fonts.googleapis.com/icon?family=Material+Icons" charset="utf-8" as="style">
+    <link rel="preload" href="/index.css?CACHE_BUST_HASH" charset="utf-8" as="style">
+
     <script data-main="/client" async src="/index.js?CACHE_BUST_HASH" charset="utf-8"></script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="/index.css?CACHE_BUST_HASH" charset="utf-8">
+
+    <link rel="manifest" href="/manifest.json">
+    <link href="/images/icon.png" rel="icon" type="image/png" sizes="42x42">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#000000">
+    <link rel="apple-touch-icon" href="/images/icon.png" >
+    <script>
+      console.log('x', Array.from(document.fonts.keys()).map(f => f.family))
+    </script>
   </head>
   <body class="loading">
     <div id="Spinner"><i></i></div>

@@ -1,21 +1,21 @@
 define(function(require, exports, module) {
-  const koru           = require('koru');
-  const Dom            = require('koru/dom');
-  const localStorage   = require('koru/local-storage');
-  const session        = require('koru/session');
-  const sessState      = require('koru/session/state');
-  const Route          = require('koru/ui/route');
-  const util           = require('koru/util');
-  const uColor         = require('koru/util-color');
-  const Org            = require('models/org');
-  const User           = require('models/user');
+  const koru            = require('koru');
+  const Dom             = require('koru/dom');
+  const localStorage    = require('koru/local-storage');
+  const session         = require('koru/session');
+  const sessState       = require('koru/session/state');
+  const Route           = require('koru/ui/route');
+  const util            = require('koru/util');
+  const uColor          = require('koru/util-color');
+  const Org             = require('models/org');
+  const User            = require('models/user');
   require('publish/publish-event');
   require('publish/publish-org');
   require('publish/publish-self');
-  const ResourceString = require('resource-string');
-  const header         = require('ui/header');
-  const Loading        = require('ui/loading');
-  const App            = require('./app-base');
+  const ResourceString  = require('resource-string');
+  const header          = require('ui/header');
+  const Loading         = require('ui/loading');
+  const App             = require('./app-base');
 
   let selfSub, orgSub, orgShortName = null, sessStateChange;
 
@@ -45,7 +45,7 @@ define(function(require, exports, module) {
       App.stop();
       window.addEventListener('popstate', pageChanged);
       App.setAccess();
-      selfSub = App.subscribe('Self', function (err) {
+      selfSub = App.subscribe('Self', err =>{
         Dom.removeClass(document.body, 'loading');
         Route.replacePath(koru.getLocation());
       });

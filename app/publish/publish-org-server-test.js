@@ -69,7 +69,8 @@ define(function (require, exports, module) {
       assert.calledWith(v.conn.changed, 'Team', team1._id, {name: 'new team name'});
 
       // *** test stopping ***
-      var stopSpys = obSpys.map(spy=>{
+
+      const stopSpys = obSpys.map(spy=>{
         assert.calledWith(spy, [org1._id]);
         return test.spy(spy.firstCall.returnValue, 'stop');
       });
