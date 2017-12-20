@@ -1,15 +1,17 @@
 define(function(require, exports, module) {
-  var util = require('koru/util');
-  var Model = require('model');
-  var Random = require('koru/random');
-  var koru = require('koru');
-  var User = require('./user');
+  const koru            = require('koru');
+  const Random          = require('koru/random');
+  const util            = require('koru/util');
+  const Model           = require('model');
+  const User            = require('./user');
 
-  return function (model) {
-    Model.BaseModel.prototype.$parentId = parentId;
+  return model =>{
+    Model.BaseModel.prototype.$parentId = function () {
+      return this.constructor._parentIdField && this[this.constructor._parentIdField];
+    };
 
     util.extend(model, {
-      logChanges: function (subject, options) {
+      logChanges(subject, options) {
         options = options || {};
         subject._parent = options.parent;
         subject._parentIdField = options.parent && (options.parentIdField || util.uncapitalize(options.parent.modelName)+'_id');
@@ -17,7 +19,7 @@ define(function(require, exports, module) {
         observeChanges(subject, options.aux, options.callback);
       },
 
-      create: function (attributes) {
+      create(attributes) {
         var now = util.newDate();
         Model._support._updateTimestamps(attributes, model.updateTimestamps, now);
         attributes._id = Random.id();
@@ -27,39 +29,37 @@ define(function(require, exports, module) {
       },
     });
 
-    koru.Fiber(function () {
-      model.addIndex('createdAt', -1, 'parent_id');
-    }).run();
+    koru.runFiber(()=>{model.addIndex('createdAt', -1, 'parent_id')});
 
     function observeChanges(subject, aux, callback) {
-      subject.onChange(function (doc, was) {
-        var userId = koru.userId();
-        if (! userId) return;
-        var user = User.findById(userId);
-        if (! user) return;
+      subject.onChange((doc, undo)=>{
+        const userId = koru.userId();
+        if (userId == null) return;
+        const user = User.findById(userId);
+        if (user === undefined) return;
 
-        var sub = doc || was;
-        var params = {
+        const sub = doc || undo;
+        const params = {
           model: subject.modelName,
           model_id: sub.attributes._id,
           parent: subject._parent ? subject._parent.modelName : subject.modelName,
           parent_id: subject._parent ? sub.$parentId() : sub.attributes._id,
           user_id: userId,
-          org_id: user.org_id,
+          org_id: sub.org_id,
         };
         if (! doc) {
           params.type= 'remove';
-          params.before = JSON.stringify(was.attributes);
+          params.before = JSON.stringify(undo.attributes);
           var cl = model.create(params);
         } else {
-          var cl = createChangeLog(params, subject, aux, doc, was);
+          var cl = createChangeLog(params, subject, aux, doc, undo);
         }
-        callback && callback(cl, doc, was);
+        callback && callback(cl, doc, undo);
       });
     }
 
     function createChangeLog(params, subject, aux, doc, was) {
-      var attributes = doc.attributes;
+      const {attributes} = doc;
 
       params.type = was ? 'update' : 'create';
 
@@ -93,8 +93,4 @@ define(function(require, exports, module) {
     }
 
   };
-
-  function parentId() {
-    return this.constructor._parentIdField && this[this.constructor._parentIdField];
-  }
 });

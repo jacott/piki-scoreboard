@@ -1,24 +1,21 @@
 define(function(require, exports, module) {
-  const koru        = require('koru');
-  const Dom         = require('koru/dom');
-  const session     = require('koru/session');
-  const Dialog      = require('koru/ui/dialog');
-  const Form        = require('koru/ui/form');
-  const Route       = require('koru/ui/route');
-  const UserAccount = require('koru/user-account');
-  const login       = require('koru/user-account/client-login');
-  const User        = require('models/user');
-  const SystemSetup = require('./system-setup');
+  const koru            = require('koru');
+  const Dom             = require('koru/dom');
+  const session         = require('koru/session');
+  const Dialog          = require('koru/ui/dialog');
+  const Form            = require('koru/ui/form');
+  const Route           = require('koru/ui/route');
+  const UserAccount     = require('koru/user-account');
+  const login           = require('koru/user-account/client-login');
+  const User            = require('models/user');
+  const Flash           = require('ui/flash');
+  const SystemSetup     = require('./system-setup');
 
   const Tpl = Dom.newTemplate(require('koru/html!./profile'));
 
   const base = Route.root.addBase(module, Tpl);
-  koru.onunload(module, function () {
-    Route.root.removeBase(Tpl);
-  });
-
-  var $ = Dom.current;
-  var ChangePassword = Tpl.ChangePassword;
+  const $ = Dom.current;
+  const {ChangePassword} = Tpl;
 
   base.addTemplate(module, Tpl.Index, {
     focus: true,
@@ -29,7 +26,7 @@ define(function(require, exports, module) {
 
   Tpl.$helpers({
     systemSetup () {
-      var user = $.data();
+      const user = $.data();
       if (user && user.isSuperUser()) {
         return Form.pageLink({value: "Org settings", template: "SystemSetup"});
       }
@@ -45,11 +42,11 @@ define(function(require, exports, module) {
     'click [name=signOutOthers]' (event) {
       Dom.stopEvent();
 
-      var elm = Tpl.SignOutOthers.$autoRender({});
+      const elm = Tpl.SignOutOthers.$autoRender({});
 
       Dialog.open(elm);
 
-      UserAccount.logoutOtherClients(function (error) {
+      UserAccount.logoutOtherClients(error =>{
         elm.firstChild.textContent = error ? 'Unexpected error.' :
           'You have been signed out of any other sessions.';
       });
@@ -66,7 +63,7 @@ define(function(require, exports, module) {
   Tpl.$extend({
     title: "Profile",
     onBaseEntry () {
-      var user = User.me();
+      const user = User.me();
 
       if (! user || user._id === 'guest')
         Route.abortPage(Route.root.defaultPage);
@@ -85,16 +82,44 @@ define(function(require, exports, module) {
     },
   });
 
+  Tpl.Index.$extend({
+    $created(ctx, elm) {
+      ctx.data = User.me();
+    },
+  });
+
+  Tpl.Index.$events({
+    'click [type=submit]': Form.submitFunc('UserForm', {
+      success() {
+        Flash.notice('Profile updated');
+        document.activeElement.blur();
+        Dom.ctxById('Profile').updateAllTags();
+      },
+      save(doc) {
+        doc.changes.org_id = doc.org_id;
+
+        return doc.$save();
+      }
+    }),
+
+    'click [name=cancel]'(event) {
+      Dom.stopEvent();
+      document.activeElement.blur();
+      $.ctx.updateAllTags();
+    },
+  });
+
+
   ChangePassword.$events({
     'submit' (event) {
       Dom.stopEvent();
-      var form = event.currentTarget;
-      var oldPassword = form.querySelector('[name=oldPassword]').value;
-      var newPassword = form.querySelector('[name=newPassword]');
+      const form = event.currentTarget;
+      const oldPassword = form.querySelector('[name=oldPassword]').value;
+      const newPassword = form.querySelector('[name=newPassword]');
 
       Dom.addClass(form, 'submitting');
 
-      UserAccount.changePassword(User.me().email, oldPassword, newPassword.value, function (error) {
+      UserAccount.changePassword(User.me().email, oldPassword, newPassword.value, error =>{
         if (error) {
           Dom.removeClass(form, 'submitting');
           Form.renderError(form, 'oldPassword', 'invalid password.');
@@ -102,16 +127,15 @@ define(function(require, exports, module) {
           Route.history.back();
         }
       });
-
     },
 
     'input [name=newPassword],[name=confirm]' (event) {
       Dom.stopEvent();
 
-      var form = event.currentTarget;
-      var newPassword = form.querySelector('[name=newPassword]').value;
-      var confirm = form.querySelector('[name=confirm]').value;
-      var submit = form.querySelector('[type=submit]');
+      const form = event.currentTarget;
+      const newPassword = form.querySelector('[name=newPassword]').value;
+      const confirm = form.querySelector('[name=confirm]').value;
+      const submit = form.querySelector('[type=submit]');
 
       if (newPassword.length >= 5 && newPassword === confirm)
         submit.removeAttribute('disabled');
@@ -119,6 +143,8 @@ define(function(require, exports, module) {
         submit.setAttribute('disabled', 'disabled');
     },
   });
+
+  koru.onunload(module, ()=>{Route.root.removeBase(Tpl)});
 
   return Tpl;
 });

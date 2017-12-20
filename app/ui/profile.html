@@ -8,11 +8,20 @@
   </section>
 
   <template name="Index">
-    <nav>
-      <button name="signOut" class="link">Sign out</button>
-      <button name="signOutOthers" class="link">Sign out my other sessions</button>
-      {{pageLink value="Change password" template="Profile.ChangePassword"}}
-    </nav>
+    <section class="Index">
+      <form id="UserForm">
+        <fieldset class="fields">
+          {{labelField "name"}}
+          {{labelField "initials"}}
+          {{labelField "email"}}
+        </fieldset>
+        <fieldset class="actions">
+          <button type="submit">Update</button>
+          <button type="button" name="cancel">Reset</button>
+          {{pageLink value="Change password" template="Profile.ChangePassword"}}
+        </fieldset>
+      </form>
+    </section>
   </template>
 
   <template name="SignOutOthers">
@@ -33,7 +42,7 @@
       </fieldset>
       <fieldset class="actions">
         <button type="submit" disabled="disabled">Apply</button>
-        {{cancelButton}}
+        {{pageLink value="Cancel" template="Profile"}}
       </fieldset>
     </form>
   </template>

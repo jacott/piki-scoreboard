@@ -1,13 +1,13 @@
 define(function (require, exports, module) {
-  const publish = require('koru/session/publish');
-  const TH      = require('./test-helper');
+  const publish         = require('koru/session/publish');
+  const TH              = require('./test-helper');
 
   require('./publish-org');
-  var test, v;
+
+  let v = null;
 
   TH.testCase(module, {
     setUp() {
-      test = this;
       v = {};
       v.sub = TH.mockClientSub();
     },
@@ -18,23 +18,35 @@ define(function (require, exports, module) {
     },
 
     "test publish"() {
-      var sut = publish._pubs.Org;
-      var matchUser = v.sub.match.withArgs('User', TH.match.func);
+      const sut = publish._pubs.Org;
+      const matchUser = v.sub.match.withArgs('User', TH.match.func);
+      const matchEvent = v.sub.match.withArgs('Event', TH.match.func);
 
-      var org = TH.Factory.createOrg({shortName: 'o1'});
+      const org = TH.Factory.createOrg({shortName: 'o1'});
 
       sut.call(v.sub, 'o1');
 
-      assert.calledOnce(matchUser);
+      {
+        assert.calledOnce(matchUser);
 
-      var m = matchUser.args(0, 1);
+        const m = matchUser.args(0, 1);
 
-      assert.isTrue(m({org_id: org._id}));
-      assert.isFalse(m({org_id: 'x'+org._id}));
+        assert.isTrue(m({org_id: org._id, role: 'a'}));
+        assert.isFalse(m({org_id: org._id, role: undefined}));
+        assert.isFalse(m({org_id: 'x'+org._id, role: 'a'}));
+      }
 
-      'User Climber Event Series Category Team TeamType'.split(' ').forEach(function (name) {
-        assert.calledWith(v.sub.match, name, m);
-      });
+      {
+        assert.calledOnce(matchEvent);
+
+        const m = matchEvent.args(0, 1);
+
+        assert.isTrue(m({org_id: org._id}));
+        assert.isFalse(m({org_id: 'x'+org._id}));
+
+        'Climber Event Series Category Team TeamType'.split(' ')
+          .forEach(name =>{assert.calledWith(v.sub.match, name, m)});
+      }
     },
   });
 });

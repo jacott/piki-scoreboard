@@ -1,7 +1,7 @@
 define(function(require, exports, module) {
-  var Model = require('koru/model');
-  var Val = require('koru/model/validation');
-  var koru = require('koru');
+  const koru            = require('koru');
+  const Model           = require('koru/model');
+  const Val             = require('koru/model/validation');
 
   Val.register(module, {
     associated: require('koru/model/validators/associated-validator'),

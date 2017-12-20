@@ -1,8 +1,7 @@
 #!/bin/bash
 set -e
 
-. `dirname "$0"`/environ.sh
-init demo
+. `dirname "$0"`/../config/environ.sh demo
 
 pg_dump -O -s -x piki${branch} >db/schema.sql
 

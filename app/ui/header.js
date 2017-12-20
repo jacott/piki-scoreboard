@@ -84,7 +84,7 @@ define(function(require, exports, module) {
       list.push('disabled sep');
       const me = User.me();
       if (me && koru.userId() !== 'guest' && (
-        me.isSuperUser() ||
+        me.isSuperUser() || me.org === undefined ||
           (me.org.shortName === Route.currentPageRoute.orgSN && me.isAdmin())
       )) {
         list.push(['system-setup', 'Org settings']);
@@ -144,11 +144,13 @@ define(function(require, exports, module) {
         if (state === 'ready') {
           const uid = koru.userId();
           ctx.userObserve && ctx.userObserve.stop();
-          ctx.userObserve = User.observeId(uid, () => {
+          const updateAll = () => {
             App.setAccess();
             ctx.updateAllTags();
-          });
-          ctx.updateAllTags();
+          };
+
+          ctx.userObserve = User.observeId(uid, updateAll);
+          updateAll();
         }
       }));
       ctx.orgSN = null;

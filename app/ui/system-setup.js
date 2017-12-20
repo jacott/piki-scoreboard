@@ -75,9 +75,14 @@ define(function(require, exports, module) {
         classes: 'warn',
         okay: 'Delete',
         content: Tpl.ConfirmDelete,
-        callback: function(confirmed) {
+        callback(confirmed) {
           if (confirmed) {
-            doc.$remove();
+            if (doc.constructor === User) {
+              doc.changes = {org_id: doc.org_id, role: null};
+              doc.$$save();
+            } else {
+              doc.$remove();
+            }
             Route.replacePath(Tpl);
           }
         },
@@ -125,7 +130,14 @@ define(function(require, exports, module) {
   });
 
   Tpl.UserForm.$events({
-    'click [type=submit]': Form.submitFunc('UserForm', Tpl),
+    'click [type=submit]': Form.submitFunc('UserForm', {
+      success: Tpl,
+      save(doc) {
+        doc.changes.org_id = doc.org_id;
+
+        return doc.$save();
+      }
+    }),
   });
 
   return Tpl;

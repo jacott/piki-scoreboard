@@ -1,7 +1,8 @@
 define(function(require, exports, module) {
-  var util = require('koru/util');
-  var Val = require('koru/model/validation');
-  var Model = require('koru/model');
+  const Model           = require('koru/model');
+  const Val             = require('koru/model/validation');
+  const util            = require('koru/util');
+  const Role            = require('models/role');
 
   const FIELD_SPEC = {
     name: 'string',
@@ -9,13 +10,14 @@ define(function(require, exports, module) {
     shortName: 'string',
   };
 
-  return function(model){
+  return model =>{
     // FIXME ChangeLog.logChanges(model);
 
     util.extend(model.prototype, {
-      authorize: function (userId) {
+      authorize(userId) {
         Val.assertDocChanges(this, FIELD_SPEC);
-        Val.allowAccessIf(Model.User.query.where({_id: userId, role: Model.User.ROLE.superUser}).count(1));
+        Val.allowAccessIf(Role.where({
+          user_id: userId, role: Model.User.ROLE.superUser}).count(1));
       },
     });
   };

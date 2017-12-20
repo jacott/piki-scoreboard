@@ -17,21 +17,15 @@ define(function(require, exports, module) {
   session.defineRpc('Reg.upload', function (eventId, data) {
     Val.ensureString(eventId);
 
-    var ROLE = User.ROLE;
+    const ROLE = User.ROLE;
 
-    var user = User.query.where({
-      _id: this.userId,
-      role: {$in: [ROLE.superUser, ROLE.admin]}}).fetchOne();
-
+    const user = User.findById(this.userId);
     Val.allowAccessIf(user);
 
     var event = Event.findById(eventId);
+    Val.allowAccessIf(event && user.canAdminister(event));
 
-    Val.allowAccessIf(event);
-
-    user.isSuperUser() || Val.allowAccessIf(event.org_id === user.org_id);
-
-    const clubTeamType = TeamType.where({org_id:  user.org_id, name: 'Club'}).fetchOne();
+    const clubTeamType = TeamType.where({org_id:  event.org_id, name: 'Club'}).fetchOne();
     Val.allowAccessIf(clubTeamType, 'No Team type named Club found for this organization');
 
     var future = new Future();

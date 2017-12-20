@@ -2,11 +2,12 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.5.3
--- Dumped by pg_dump version 9.5.3
+-- Dumped from database version 9.6.6
+-- Dumped by pg_dump version 9.6.6
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
@@ -172,6 +173,18 @@ CREATE TABLE "Result" (
 
 
 --
+-- Name: Role; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE "Role" (
+    _id text COLLATE pg_catalog."C" NOT NULL,
+    org_id text COLLATE pg_catalog."C",
+    user_id text COLLATE pg_catalog."C",
+    role text
+);
+
+
+--
 -- Name: Series; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -218,9 +231,7 @@ CREATE TABLE "User" (
     _id character varying(24) NOT NULL,
     name text,
     email text,
-    initials text,
-    org_id character varying(24),
-    role text
+    initials text
 );
 
 
@@ -240,7 +251,7 @@ CREATE TABLE "UserLogin" (
 
 
 --
--- Name: Category_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: Category Category_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "Category"
@@ -248,7 +259,7 @@ ALTER TABLE ONLY "Category"
 
 
 --
--- Name: ChangeLog_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: ChangeLog ChangeLog_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "ChangeLog"
@@ -256,7 +267,7 @@ ALTER TABLE ONLY "ChangeLog"
 
 
 --
--- Name: Climber_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: Climber Climber_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "Climber"
@@ -264,7 +275,7 @@ ALTER TABLE ONLY "Climber"
 
 
 --
--- Name: Club_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: Club Club_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "Club"
@@ -272,7 +283,7 @@ ALTER TABLE ONLY "Club"
 
 
 --
--- Name: Competitor_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: Competitor Competitor_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "Competitor"
@@ -280,7 +291,7 @@ ALTER TABLE ONLY "Competitor"
 
 
 --
--- Name: Event_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: Event Event_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "Event"
@@ -288,7 +299,7 @@ ALTER TABLE ONLY "Event"
 
 
 --
--- Name: Migration_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: Migration Migration_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "Migration"
@@ -296,7 +307,7 @@ ALTER TABLE ONLY "Migration"
 
 
 --
--- Name: Org_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: Org Org_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "Org"
@@ -304,7 +315,7 @@ ALTER TABLE ONLY "Org"
 
 
 --
--- Name: Result_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: Result Result_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "Result"
@@ -312,7 +323,15 @@ ALTER TABLE ONLY "Result"
 
 
 --
--- Name: Series_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: Role Role_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY "Role"
+    ADD CONSTRAINT "Role_pkey" PRIMARY KEY (_id);
+
+
+--
+-- Name: Series Series_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "Series"
@@ -320,7 +339,7 @@ ALTER TABLE ONLY "Series"
 
 
 --
--- Name: TeamType_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: TeamType TeamType_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "TeamType"
@@ -328,7 +347,7 @@ ALTER TABLE ONLY "TeamType"
 
 
 --
--- Name: Team_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: Team Team_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "Team"
@@ -336,7 +355,7 @@ ALTER TABLE ONLY "Team"
 
 
 --
--- Name: UserLogin_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: UserLogin UserLogin_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "UserLogin"
@@ -344,7 +363,7 @@ ALTER TABLE ONLY "UserLogin"
 
 
 --
--- Name: User_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: User User_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY "User"
@@ -356,6 +375,13 @@ ALTER TABLE ONLY "User"
 --
 
 CREATE INDEX "ChangeLog_createdAt_parent_id" ON "ChangeLog" USING btree ("createdAt" DESC, parent_id);
+
+
+--
+-- Name: Role_user_id_org_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX "Role_user_id_org_id" ON "Role" USING btree (user_id, org_id);
 
 
 --

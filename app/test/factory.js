@@ -1,38 +1,38 @@
 define(function(require, exports, module) {
-  var Factory = require('koru/model/test-factory');
-  var util = require('koru/util');
-  var Random = require('koru/random');
-  var uDate = require('koru/util-date');
-  var Org = require('models/org');
-  var Model = require('model');
+  const Factory         = require('koru/model/test-factory');
+  const Random          = require('koru/random');
+  const util            = require('koru/util');
+  const uDate           = require('koru/util-date');
+  const Model           = require('model');
+  const Org             = require('models/org');
 
   Factory.traits({
     User: {
-      guest: function (options) {
+      guest(options) {
         util.reverseExtend(options, {
           _id: 'guest',
           name: undefined, initials: undefined,
           email: undefined, role: 'g', org_id: null
         });
       },
-      su: function (options) {
+      su(options) {
         util.reverseExtend(options, {
           name: "Super User", initials: "SU",
           email: "su@example.com", role: 's', org_id: null
         });
       },
 
-      admin: function (options) {
+      admin(options) {
         util.reverseExtend(options, {role: Model.User.ROLE.admin});
       }
     },
   });
 
 
-  var defaultAfter = JSON.stringify({name: 'new name'});
+  const defaultAfter = JSON.stringify({name: 'new name'});
 
   Factory.defines({
-    Org: function (options) {
+    Org(options) {
       return new Factory.Builder('Org', options).genName()
         .addField('email', 'email' in options || Factory.generateName('email').replace(/\s+/g, '') + '@vimaly.com')
         .addField('shortName', 'shortName' in options || Factory.generateName('SN').replace(/\s+/g, ''));
@@ -51,7 +51,7 @@ define(function(require, exports, module) {
         .addRef('org');
     },
 
-    Category: function (options) {
+    Category(options) {
       return new Factory.Builder('Category', options).genName()
         .addRef('org')
         .addField('heatFormat', 'QQF8')
@@ -61,7 +61,7 @@ define(function(require, exports, module) {
         .addField('shortName', 'shortName' in options || Factory.generateName('SN').replace(/\s+/g, ''));
     },
 
-    Climber: function (options) {
+    Climber(options) {
       return new Factory.Builder('Climber', options).genName()
         .addRef('org')
         .addField('gender', 'm')
@@ -69,14 +69,14 @@ define(function(require, exports, module) {
         .addField('number', 'number' in options || +Factory.generateName('cn').slice(2));
     },
 
-    Competitor: function (options) {
+    Competitor(options) {
       if (options.category_ids === undefined) {
-        var category = Factory.last.category || Factory.createCategory();
+        const category = Factory.last.category || Factory.createCategory();
         options.category_ids = [category._id];
       }
 
       if (options.team_ids === undefined) {
-        var team = Factory.last.team || Factory.createTeam();
+        const team = Factory.last.team || Factory.createTeam();
         options.team_ids = [team._id];
       }
 
@@ -86,7 +86,7 @@ define(function(require, exports, module) {
 
     },
 
-    Result: function (options) {
+    Result(options) {
       Factory.last.competitor || Factory.createCompetitor();
       return new Factory.Builder('Result', options)
         .addRef('event')
@@ -96,20 +96,20 @@ define(function(require, exports, module) {
         .addField('scores', [options.scores || Model.Result.query.count()]);
     },
 
-    Event: function (options) {
+    Event(options) {
       if (options.teamType_ids === undefined) {
-        var teamType = Factory.last.teamType || Factory.createTeamType();
+        const teamType = Factory.last.teamType || Factory.createTeamType();
         options.teamType_ids = [teamType._id];
       }
 
-      var category = Factory.last.category || Factory.createCategory();
+      const category = Factory.last.category || Factory.createCategory();
       if (! ('heats' in options)) {
         options.heats = [category._id];
       }
 
       if (options.heats && 'forEach' in options.heats) {
         var heats = {};
-        options.heats.forEach(function (heat) {
+        options.heats.forEach(heat =>{
           var category = Model.Category.findById(heat);
           heats[heat] = category.type + category.heatFormat;
         });
@@ -122,7 +122,7 @@ define(function(require, exports, module) {
         .addField('date', '2014-04-01');
     },
 
-    Series: function (options) {
+    Series(options) {
       if (options.teamType_ids === undefined) {
         var teamType = Factory.last.teamType || Factory.createTeamType();
         options.teamType_ids = [teamType._id];
@@ -133,20 +133,44 @@ define(function(require, exports, module) {
         .addField('date', '2014-04-01');
     },
 
-    User: function (options) {
-      var username = 'username' in options ? options.username : Factory.generateName('user');
+    User(options) {
+      const username = 'username' in options ? options.username : Factory.generateName('user');
+      const user = new Factory.Builder('User', options)
+            .addField('name', 'name' in options || 'fn '+username)
+            .addField('email', 'email' in options || ('email-'+username.replace(/\s+/g,'.')+'@test.co').toLowerCase())
+            .addField('initials', 'initials' in options || 'u'+username.substring(4))
+      ;
 
-      return new Factory.Builder('User', options)
-        .addRef('org')
-        .addField('role', 'a')
-        .addField('name', 'name' in options || 'fn '+username)
-        .addField('email', 'email' in options || ('email-'+username.replace(/\s+/g,'.')+'@test.co').toLowerCase())
-        .addField('initials', 'initials' in options || 'u'+username.substring(4));
-        // .afterCreate(function (doc) {
-        //   isServer && Model.UserLogin && Model.UserLogin.insert({_id: doc._id, emails: [{address: doc.email, verified: true}], password: options.password});
-        // });
+      if (isClient) {
+        user.addRef('org').addField('role', 'a');
+      } else {
+        const _id = user.options._id || Random.id();
+        user.options._id = _id;
+        let org_id;
+        if ('org_id' in options) {
+          org_id = options.org_id;
+          delete options.org_id;
+        } else {
+          const org = Factory.last.org || Factory.createOrg();
+          org_id = org._id;
+        }
+        const role = ('role' in options) ? options.role : 'a';
+        delete options.role;
+
+        Factory.createRole({user_id: _id, org_id, role});
+      }
+
+      return user;
     },
 
+    Role(options) {
+      return new Factory.Builder('Role', options)
+        .addField('org_id', ()=> (Factory.last.org  || Factory.createOrg())._id)
+        .addField('user_id', ()=> (Factory.last.user || Factory.createUser())._id)
+        .addField('role', 'a')
+      ;
+    },
+    //$$newModel$$ - DO NOT REMOVE THIS LINE!
   });
 
   return Factory;

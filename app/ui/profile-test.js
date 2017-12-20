@@ -1,111 +1,85 @@
 isClient && define(function (require, exports, module) {
-  var test, v;
-  const Dom         = require('koru/dom');
-  const session     = require('koru/session');
-  const Route       = require('koru/ui/route');
-  const UserAccount = require('koru/user-account');
-  const ClientLogin = require('koru/user-account/client-login');
-  const Event       = require('ui/event');
-  const Profile     = require('./profile');
-  const TH          = require('./test-helper');
+  const Dom             = require('koru/dom');
+  const session         = require('koru/session');
+  const Route           = require('koru/ui/route');
+  const UserAccount     = require('koru/user-account');
+  const ClientLogin     = require('koru/user-account/client-login');
+  const User            = require('models/user');
+  const Event           = require('ui/event');
+  const TH              = require('./test-helper');
+
+  const {stub, spy, onEnd} = TH;
+
+  const Profile = require('./profile');
+  let v = null;
 
   TH.testCase(module, {
-    setUp: function () {
-      test = this;
+    setUp() {
       v = {};
       v.su = TH.Factory.createUser('su');
       TH.setOrg();
+      TH.loginAs(v.user = TH.Factory.createUser());
+      Route.gotoPage(Profile);
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.tearDown();
       v = null;
     },
 
-    "with user": {
-      setUp: function () {
-        TH.loginAs(v.user = TH.Factory.createUser());
-
-        Route.gotoPage(Profile);
-      },
-
-      "test signOut me": function () {
-        test.stub(UserAccount, 'logout');
-
-        TH.click('[name=signOut]');
-
-        assert.called(UserAccount.logout);
-        test.stub(Route, 'replacePage');
-
-        ClientLogin.wait(session, 'wait');
-        refute.called(Route.replacePage);
-        ClientLogin.ready(session, 'ready');
-        assert.calledWith(Route.replacePage, Event.Index);
-      },
-
-      "test signOut other clients": function () {
-        test.stub(UserAccount, 'logoutOtherClients');
-
-        TH.click('[name=signOutOthers]');
-
-        assert.dom('#SignOutOthers>p', 'Signing you out of any other sessions...');
-
-        assert.called(UserAccount.logoutOtherClients);
-
-        UserAccount.logoutOtherClients.yield('error');
-
-        assert.dom('#SignOutOthers>p', 'Unexpected error.');
-
-        UserAccount.logoutOtherClients.yield();
-
-        assert.dom('#SignOutOthers', function () {
-          assert.dom('>p', 'You have been signed out of any other sessions.');
-          TH.click('[name=close]');
+    "test rendering"() {
+      assert.dom('#Profile', function () {
+        assert.dom('h1', v.user.name);
+        assert.dom('.fields', fields => {
+          assert.dom('[name=name]', {value: v.user.name});
+          assert.dom('[name=initials]', {value: v.user.initials});
+          assert.dom('[name=email]', {value: v.user.email});
         });
+      });
+    },
 
-        refute.dom('#SignOutOthers');
-      },
+    "test change email"() {
+      assert.dom('form', function () {
+        TH.input('[name=name]', {value: v.user.name}, 'new name');
+        TH.click('[type=submit]');
+      });
 
+      assert.equals(User.me().name, 'new name');
 
-      "test rendering": function () {
-        assert.dom('#Profile', function () {
-          assert.dom('h1', v.user.name);
-        });
-      },
+    },
 
-      "test change password": function () {
-        var cpwStub = test.stub(UserAccount,'changePassword');
+    "test change password"() {
+      var cpwStub = stub(UserAccount,'changePassword');
 
-        TH.click('.link', "Change password");
-        assert.dom('#Profile .body #ChangePassword', function () {
-          TH.input('input[name=oldPassword]', 'oldpw');
-          assert.dom('button[type=submit][disabled=disabled]');
-          TH.input('input[name=newPassword]', 'newpw');
-          TH.input('input[name=confirm]', 'newp');
-          assert.dom('button[type=submit][disabled=disabled]');
-          TH.input('input[name=confirm]', 'newpw');
-          refute.dom('button[type=submit][disabled=disabled]');
-          TH.click('button[type=submit]');
+      TH.click('.link', "Change password");
+      assert.dom('#Profile .body #ChangePassword', function () {
+        TH.input('input[name=oldPassword]', 'oldpw');
+        assert.dom('button[type=submit][disabled=disabled]');
+        TH.input('input[name=newPassword]', 'newpw');
+        TH.input('input[name=confirm]', 'newp');
+        assert.dom('button[type=submit][disabled=disabled]');
+        TH.input('input[name=confirm]', 'newpw');
+        refute.dom('button[type=submit][disabled=disabled]');
+        TH.click('button[type=submit]');
 
-          assert.className(this, 'submitting');
+        assert.className(this, 'submitting');
 
-          assert.calledWith(cpwStub,v.user.email, 'oldpw', 'newpw', TH.match(function (func) {
-            v.func = func;
-            return typeof func === 'function';
-          }));
+        assert.calledWith(cpwStub,v.user.email, 'oldpw', 'newpw', TH.match(function (func) {
+          v.func = func;
+          return typeof func === 'function';
+        }));
 
-          test.stub(Route.history, 'back');
+        stub(Route.history, 'back');
 
-          v.func('fail');
+        v.func('fail');
 
-          assert.dom('.errorMsg', 'invalid password.');
+        assert.dom('.errorMsg', 'invalid password.');
 
-          refute.called(Route.history.back);
+        refute.called(Route.history.back);
 
-          v.func();
-        });
-        assert.called(Route.history.back);
-      },
+        v.func();
+      });
+      assert.called(Route.history.back);
     },
   });
 });

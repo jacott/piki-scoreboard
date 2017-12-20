@@ -1,9 +1,10 @@
 define(function(require, exports, module) {
-  const koru        = require('koru');
-  const {BaseModel} = require('koru/model');
-  const Val         = require('koru/model/validation');
-  const util        = require('koru/util');
-  const Org         = require('./org');
+  const koru            = require('koru');
+  const {BaseModel}     = require('koru/model');
+  const Val             = require('koru/model/validation');
+  const util            = require('koru/util');
+  const Role            = require('models/role');
+  const Org             = require('./org');
 
   const ROLE = {
     superUser: 's',
@@ -14,73 +15,17 @@ define(function(require, exports, module) {
   };
 
   class User extends BaseModel {
-    accessClasses(orgId) {
-      if (! this.isSuperUser() && this.org_id !== orgId)
-        return "readOnly";
-
-      let classes = "";
-      switch(this.safeRole) {
-      case 's':
-        classes += "sAccess ";
-      case 'a':
-        classes += "aAccess ";
-      case 'j':
-        classes += "jAccess";
-      }
-
-      return classes + " p";
-    }
-
     static isGuest() {
       return koru.userId() === 'guest';
     }
+
+    canAdminister(doc) {return this.canEdit(doc, /[sa]/)}
+    canJudge(doc) {return this.canEdit(doc, /[saj]/)}
 
     emailWithName() {
       return this.name.replace('/<>/','')+" <"+this.email+">";
     }
 
-    get safeRole() {
-      return this.attributes.role;
-    }
-
-    isSuperUser() {
-      return this.safeRole === ROLE.superUser;
-    }
-
-    isAdmin() {
-      switch (this.safeRole) {
-      case ROLE.admin: case ROLE.superUser:
-        return true;
-      default:
-        return false;
-      }
-    }
-
-    canAdminister(user) {
-      switch(this.safeRole) {
-      case ROLE.superUser:
-        return true;
-      case ROLE.admin:
-        return ! user || (user.attributes.org_id || user.org_id) === this.org_id;
-      }
-      return false;
-    }
-
-    validate() {
-      var me = User.me();
-      if (me && me.isSuperUser()) return;
-      if (!me) {
-        Val.addError(this, '_id', 'not_allowed');
-        return;
-      }
-      // user was not a su at last saved state so cannot change someone to a superuser
-      if (this.isSuperUser() || this.role === 's')
-        Val.addError(this, 'role', 'is_invalid');
-      // cannot change org_id for existing user and cannot set org_id diff to own org_id
-      if (('org_id' in this.changes) &&
-          (! this.$isNewRecord() || this.org_id !== me.org_id))
-        Val.addError(this, 'org_id', 'is_invalid');
-    }
     static me() {
       return koru.userId() && User.findById(koru.userId());
     }
@@ -101,8 +46,6 @@ define(function(require, exports, module) {
       email: {type:  'text', trim: true, required: true, maxLength: 200,
               inclusion: {allowBlank: true, matches: util.EMAIL_RE },  normalize: 'downcase' , unique: true},
       initials: {type: 'text', trim: true, required: true, maxLength: 3},
-      org_id: {type: 'belongs_to', required() {return this.role !== ROLE.superUser}},
-      role: {type: 'text', inclusion: {in: util.values(ROLE)}},
     },
   });
 

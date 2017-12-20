@@ -1,23 +1,24 @@
 define(function (require, exports, module) {
-  var test, v;
-  var TH = require('test-helper');
-  var ChangeLog = require('./change-log');
-  var Climber = require('models/climber');
+  const session         = require('koru/session');
+  const Climber         = require('models/climber');
   require('models/result');
-  var session = require('koru/session');
+  const TH              = require('test-helper');
+
+  const ChangeLog = require('./change-log');
+
+  let v = null;
 
   TH.testCase(module, {
-    setUp: function () {
-      test = this;
+    setUp() {
       v = {};
     },
 
-    tearDown: function () {
+    tearDown() {
       TH.clearDB();
       v = null;
     },
 
-    "test parentId": function () {
+    "test parentId"() {
       TH.login();
       var result = TH.Factory.createResult();
 
@@ -28,7 +29,7 @@ define(function (require, exports, module) {
       assert.same(cl.org_id, result.event.org_id);
     },
 
-    "test no changes": function () {
+    "test no changes"() {
       TH.login();
       var climber = TH.Factory.createClimber();
 
@@ -37,8 +38,8 @@ define(function (require, exports, module) {
       });
     },
 
-    "test save on remove": function () {
-      var climber = TH.Factory.createClimber({_id: '123'});
+    "test save on remove"() {
+      const climber = TH.Factory.createClimber({_id: '123'});
       TH.login();
       session.rpc('remove', 'Climber', '123');
 
@@ -54,7 +55,7 @@ define(function (require, exports, module) {
 
     },
 
-    "test save on update": function () {
+    "test save on update"() {
       TH.login();
       var climber = TH.Factory.createClimber({_id: '123'}),
           after = {name: 'new name'};
@@ -72,7 +73,7 @@ define(function (require, exports, module) {
                                     org_id: climber.org_id, type: 'update', model: 'Climber'});
     },
 
-    'test save on create': function () {
+    'test save on create'() {
       TH.login();
       var climber = TH.Factory.buildClimber({name: 'new climber'});
       climber.changes._id = '123';

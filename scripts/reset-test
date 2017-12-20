@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+. `dirname "$0"`/../config/environ.sh demo
+
+dropdb --if-exists pikitest
+createdb pikitest
+psql -q pikitest <db/schema.sql

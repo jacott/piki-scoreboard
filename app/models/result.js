@@ -51,7 +51,7 @@ define(function(require, exports, module) {
       var result = Result.findById(id);
       var event = result.event;
 
-      Val.allowAccessIf(! event.closed && user && (user.isSuperUser() || user.org_id === event.org_id));
+      Val.allowAccessIf(! event.closed && user && user.canJudge(event));
 
       var heat = new Heat(index, event.heats[result.category_id]);
 
@@ -78,7 +78,7 @@ define(function(require, exports, module) {
       var result = Result.findById(id);
       var event = result.event;
 
-      Val.allowAccessIf(user && (user.isSuperUser() || user.org_id === event.org_id));
+      Val.allowAccessIf(user && user.canJudge(event));
 
       var heat = new Heat(index, event.heats[result.category_id]);
 

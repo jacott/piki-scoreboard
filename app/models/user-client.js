@@ -6,6 +6,11 @@ define(function(require, exports, module) {
   return function (User) {
     const {pretendRole} = module.config();
 
+    User.defineFields({
+      org_id: {type: 'belongs_to'},
+      role: {type: 'text', inclusion: {in: util.values(User.ROLE), allowBlank: true}},
+    });
+
     if (pretendRole) {
       const desc = Object.getOwnPropertyDescriptor(User.prototype, 'safeRole');
       desc.get = function () {
@@ -14,7 +19,54 @@ define(function(require, exports, module) {
       Object.defineProperty(User.prototype, 'safeRole', desc);
     }
 
-    util.extend(User, {
+    const {ROLE} = User;
+
+    util.merge(User.prototype, {
+      accessClasses(orgId) {
+        if (! this.isSuperUser() && this.org_id !== orgId)
+          return "readOnly";
+
+        let classes = "";
+        switch(this.safeRole) {
+        case 's':
+          classes += "sAccess ";
+        case 'a':
+          classes += "aAccess ";
+        case 'j':
+          classes += "jAccess";
+        }
+
+        return classes + " p";
+      },
+
+      get safeRole() {
+        return this.attributes.role;
+      },
+
+      isSuperUser() {
+        return this.safeRole === ROLE.superUser;
+      },
+
+      isAdmin() {
+        switch (this.safeRole) {
+        case ROLE.admin: case ROLE.superUser:
+          return true;
+        default:
+          return false;
+        }
+      },
+
+      canEdit(doc, roleRe) {
+        const role = this.safeRole;
+        if (roleRe.test(this.safeRole)) {
+          return doc != null && doc.attributes !== undefined &&
+            (role === 's' || ((doc.attributes.org_id) || doc.org_id) === this.org_id);
+        }
+        return false;
+      }
+    });
+
+    util.merge(User, {
       forgotPassword(email, callback) {
         session.rpc("User.forgotPassword", email, callback);
       },

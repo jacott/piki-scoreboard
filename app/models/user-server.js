@@ -1,56 +1,163 @@
 define(function(require, exports, module) {
-  const Val         = require('koru/model/validation');
-  const session     = require('koru/session');
-  const UserAccount = require('koru/user-account');
-  const util        = require('koru/util');
+  const koru            = require('koru');
+  const makeSubject     = require('koru/make-subject');
+  const Val             = require('koru/model/validation');
+  const session         = require('koru/session');
+  const UserAccount     = require('koru/user-account');
+  const util            = require('koru/util');
+  const Role            = require('models/role');
+
+  const roleCache$ = Symbol(), observers$ = Symbol();
 
   return function (User) {
-    const FIELD_SPEC = {
+    const SELF_FIELD_SPEC = {
+      org_id: 'id',
       name: 'string',
-      email: 'string',
       initials: 'string',
-      org_id: 'string',
-      role: 'string',
+      email: 'string',
     };
 
-    require(['./change-log'], function (ChangeLog) {
-      ChangeLog.logChanges(User);
-    });
+    const FIELD_SPEC = Object.assign({
+      role: 'string',
+    }, SELF_FIELD_SPEC);
 
-    User.registerObserveField('org_id');
+    const NEW_FIELD_SPEC = {
+      _id: 'id',
+    };
 
-    User.onChange(function (doc, was) {
-      if (was === null) {
-        UserAccount.createUserLogin({email: doc.email, userId: doc._id});
-        UserAccount.sendResetPasswordEmail(doc);
-      } else if (was && was.email) {
-        UserAccount.updateOrCreateUserLogin({userId: doc._id, email: doc.email});
+    let orgObs = util.createDictionary();
+    {
+      require(['./change-log'], ChangeLog =>{ChangeLog.logChanges(User)});
+
+      User.onChange((now, undo)=>{
+        if (undo === null) {
+          UserAccount.createUserLogin({email: now.email, userId: now._id});
+          UserAccount.sendResetPasswordEmail(now);
+        } else {
+          if (undo && undo.email) {
+            UserAccount.updateOrCreateUserLogin({userId: now._id, email: now.email});
+          }
+          if (now != null) {
+            if (now._id === 'guest') return;
+            Role.db.query(`select org_id, role from "Role" where user_id = '${now._id}'`)
+              .forEach((role) => {
+                const obs = orgObs[role.org_id];
+                obs === undefined ||
+                  urNotify(obs, now, role, undo, now == null);
+              });
+          }
+        }
+      });
+
+      koru.onunload(module, Role.onChange((now, undo)=>{
+        const role = now || undo;
+        const obs = orgObs[role.org_id];
+        obs === undefined ||
+          urNotify(obs, User.findById(role.user_id), role, undo, now == null);
+      }));
+
+      const urNotify = (obs, realUser, role, undo, isRem)=>{
+        const user = new User(Object.assign({
+          role: role.role, org_id: role.org_id}, realUser.attributes));
+
+        obs.notify(isRem ? null : user, isRem ? user : undo);
+      };
+
+      User.beforeSave(User, doc => {
+        const {changes} = doc;
+        if ('org_id' in changes) {
+          const {org_id, role} = changes;
+          delete changes.org_id;
+          if (! ('role' in changes)) return;
+          delete changes.role;
+          if (role === 's') {
+            let suFound = false;
+            Role.where({user_id: doc._id}).forEach(r =>{
+              if (suFound || r.role !== 's')
+                r.$remove();
+              if (r.role === 's') {
+                suFound = true;
+                r.org_id === undefined || r.$update('org_id', null);
+              }
+            });
+            if (! suFound) {
+              Role.create({user_id: doc._id, role: 's'});
+            }
+          } else {
+            const roleDoc = Role.query.whereSql(
+              `user_id = {$user_id} and (org_id is null or org_id = {$org_id})`,
+              {org_id, user_id: doc._id}).fetchOne();
+            if (roleDoc === undefined)
+              Role.create({org_id, user_id: doc._id, role});
+            else if (roleDoc.role !== role) {
+              if (roleDoc.org_id === undefined)
+                roleDoc.$update({org_id, role});
+              else
+                roleDoc.$update({role});
+            }
+          }
+        }
+      });
+    }
+
+    util.merge(User, {
+      guestUser() {
+        return User.findById('guest') || (
+          User.docs.insert({_id: 'guest'}),
+          User.findById('guest'));
+      },
+
+      observeOrg_id([org_id], callback) {
+        return (orgObs[org_id] || (orgObs[org_id] = makeSubject(
+          {}, undefined, undefined, {allStopped() {
+            delete orgObs[org_id];
+          }}
+        ))).onChange(callback);
       }
     });
 
-    util.extend(User, {
-      guestUser() {
-        return User.findById('guest') || (
-          User.docs.insert({_id: 'guest', role: 'g'}),
-          User.findById('guest'));
-      },
-    });
+    const {ROLE} = User;
 
-    util.extend(User.prototype, {
+    util.merge(User.prototype, {
       authorize(userId) {
-        var role = User.ROLE;
+        const authUser = User.findById(userId);
+        Val.allowAccessIf(authUser && ('org_id' in this.changes) && ('org_id' in this.changes));
 
-        Val.assertDocChanges(this, FIELD_SPEC);
+        if (userId === this._id) {
+          Val.assertDocChanges(this, SELF_FIELD_SPEC);
+          return;
+        }
 
-        var authUser = User.query.where({
-          _id: userId,
-          role: {$in: [role.superUser, role.admin]},
-        }).fetchOne();
+        Val.allowAccessIf(authUser._id !== 'guest' && this._id !== 'guest');
 
-        Val.allowAccessIf(authUser);
+        const roleMatchUserSQL = `select 1 from "Role" as r2 where user_id = {$subjectId}`;
+        const changedFields = Object.keys(this.changes);
 
-        Val.allowAccessIf(this.$isNewRecord() || authUser.isSuperUser() || this.attributes.role !== role.superUser);
+        const queryExt = changedFields.length == 2 && ('role' in this.changes)
+              ? `exists(${roleMatchUserSQL} and r2.org_id = r1.org_id)`
+              : `not exists(${roleMatchUserSQL} and (r2.org_id is null or r2.org_id <> r1.org_id))`;
+
+        Val.allowAccessIf(Role.db.query(
+          `select exists(select 1 from "Role" as r1 where user_id = {$userId} and
+(org_id is null or (role = 'a' and org_id = {$orgId} and ${queryExt})))`,
+          {userId, subjectId: this._id, orgId: this.changes.org_id})[0].exists);
+
+        Val.assertDocChanges(this, FIELD_SPEC, NEW_FIELD_SPEC);
+
+        if (this.$isNewRecord()) {
+          const existingUser = User.where({email: (this.email||'').trim().toLowerCase()}).fetchOne();
+          if (existingUser.org_id !== this.changes.org_id) {
+            this.attributes = existingUser.attributes;
+            this.changes = {role: this.changes.role, org_id: this.changes.org_id};
+          }
+        }
       },
+
+      canEdit(doc, roleRe) {
+        if (doc == null || doc.attributes === undefined) return false;
+        const role = Role.readRole(this._id, doc.attributes.org_id || doc.org_id);
+        return roleRe.test(role.role);
+      }
     });
 
     session.defineRpc("User.forgotPassword", function (email, challenge, response) {

@@ -208,7 +208,7 @@ isClient && define(function (require, exports, module) {
 
         refute.dom('#UserForm');
 
-        refute(User.exists(v.user._id));
+        assert.same(v.user.$reload().attributes.role, undefined);
       },
     },
   });

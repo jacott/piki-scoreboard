@@ -1,9 +1,11 @@
 define(function (require, exports, module) {
   var test, v;
-  const koru = require('koru');
-  const util = require('koru/util');
-  const TH   = require('test-helper');
-  const User = require('./user');
+  const koru            = require('koru');
+  const util            = require('koru/util');
+  const Role            = require('models/role');
+  const TH              = require('test-helper');
+  const Factory         = require('test/factory');
+  const User            = require('./user');
 
   TH.testCase(module, {
     setUp() {
@@ -16,24 +18,14 @@ define(function (require, exports, module) {
       v = null;
     },
 
-    "test org_id required"() {
-      TH.loginAs(TH.Factory.createUser('su'));
-      var user = TH.Factory.buildUser({role: 's', org_id: null});
-
-      assert(user.$isValid(), TH.showErrors(user));
-
-      user.role = 'a';
-      refute(user.$isValid());
-    },
-
     "test isGuest"() {
       /**
        * Current user is guest only if logged in with koru.userId() 'guest'
        **/
-      var adminUser = TH.Factory.createUser({role: 'a'});
-      var user = TH.Factory.createUser({role: 'j'});
-      var su = TH.Factory.createUser('su');
-      var guest = isServer ? User.guestUser() : TH.Factory.createUser({_id: 'guest'});
+      var adminUser = Factory.createUser({role: 'a'});
+      var user = Factory.createUser({role: 'j'});
+      var su = Factory.createUser('su');
+      var guest = isServer ? User.guestUser() : Factory.createUser({_id: 'guest'});
 
       // not logged in
       assert.isFalse(User.isGuest());
@@ -48,57 +40,9 @@ define(function (require, exports, module) {
       assert.isTrue(User.isGuest());
     },
 
-    "test isSuperUser"() {
-      var user = TH.Factory.buildUser('su');
-
-      assert.isFalse(user.isSuperUser());
-      user.attributes.role = 's';
-
-      assert.isTrue(user.isSuperUser());
-
-      user.attributes.role = 'x';
-      assert.isFalse(user.isSuperUser());
-    },
-
-    "test isAdmin"() {
-      var adminUser = TH.Factory.createUser({role: 'a'});
-      var user = TH.Factory.createUser({role: 'j'});
-      var su = TH.Factory.createUser('su');
-
-      assert.isFalse(user.isAdmin());
-      user.role = 'a';
-      assert.isFalse(user.isAdmin());
-
-      assert.isTrue(adminUser.isAdmin());
-      assert.isTrue(su.isAdmin());
-
-    },
-
-    "test canAdminister"() {
-      var doc = new User({org_id: '123'});
-      doc.attributes.role = User.ROLE.superUser;
-
-      assert(doc.canAdminister());
-      assert(doc.canAdminister('x'));
-
-      doc.attributes.role = User.ROLE.admin;
-
-      assert(doc.canAdminister());
-      assert(doc.canAdminister({attributes: {org_id: doc.org_id}}));
-      assert(doc.canAdminister({attributes: {}, org_id: doc.org_id}));
-      refute(doc.canAdminister({attributes: {org_id: '456'}, org_id: doc.org_id}));
-
-      doc.attributes.role = User.ROLE.judge;
-      doc.changes.role = User.ROLE.superUser;
-
-      assert.same(doc.safeRole, User.ROLE.judge);
-
-      refute(doc.canAdminister());
-    },
-
     "test fetchAdminister"() {
       test.stub(koru, 'info');
-      var user = TH.Factory.createUser();
+      var user = Factory.createUser();
 
       var ca = test.stub(User.prototype, 'canAdminister').returns(false);
 
@@ -119,12 +63,12 @@ define(function (require, exports, module) {
     },
 
     "test emailWithName"() {
-      var user = TH.Factory.buildUser();
+      var user = Factory.buildUser();
       assert.same(user.emailWithName(), 'fn user 1 <email-user.1@test.co>');
 
     },
     'test creation'() {
-      var user=TH.Factory.createUser();
+      var user=Factory.createUser();
       var us = User.findById(user._id);
 
       assert(us);
