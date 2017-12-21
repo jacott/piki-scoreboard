@@ -74,7 +74,7 @@ babel-code-frame@^6.26.0:
     esutils "^2.0.2"
     js-tokens "^3.0.2"
 
-babel-core@>=6.25.0, babel-core@^6.26.0:
+babel-core@^6.26.0:
   version "6.26.0"
   resolved "https://registry.yarnpkg.com/babel-core/-/babel-core-6.26.0.tgz#af32f78b31a6fcef119c87b0fd8d9753f03a0bb8"
   dependencies:
@@ -296,7 +296,7 @@ css-selector-parser@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/css-selector-parser/-/css-selector-parser-1.3.0.tgz#5f1ad43e2d8eefbfdc304fcd39a521664943e3eb"
 
-csv-parse@>=1.2.0:
+csv-parse@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-2.0.0.tgz#4ea22c973233987f07688c601a2d460234ff56d1"
 
@@ -603,9 +603,9 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
-koru@^0.16.3:
-  version "0.16.3"
-  resolved "https://registry.yarnpkg.com/koru/-/koru-0.16.3.tgz#a65c0f2e5192fbc37ce333f08bd8742fff7e3865"
+koru@^0.16.4:
+  version "0.16.4"
+  resolved "https://registry.yarnpkg.com/koru/-/koru-0.16.4.tgz#a670e94e0cd4aeb546499c70f32c19e6bf557591"
   dependencies:
     autoprefixer "^7.2.2"
     babel-generator "^6.26.0"

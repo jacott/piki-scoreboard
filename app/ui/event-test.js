@@ -104,6 +104,9 @@ isClient && define(function (require, exports, module) {
           });
         });
       });
+      TH.click('button.selected.series.tab');
+
+      assert.dom('.list nav', 'Add new series');
     },
 
     "test switching series tabs"() {

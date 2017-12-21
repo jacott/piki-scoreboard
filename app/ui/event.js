@@ -124,12 +124,14 @@ define(function(require, exports, module) {
   }
 
   Tpl.$events({
-    'click .tabNames>button'(event) {
+    'click .tabNames>button:not(.selected)'(event) {
+      const tpl = Tpl[this.getAttribute('name')];
+      if (tpl === undefined) return;
       Dom.stopEvent();
       const opts = {};
       const search =  this.getAttribute('data-search');
       if (search) opts.search = search;
-      Route.gotoPage(Tpl[this.getAttribute('name')], opts);
+      Route.gotoPage(tpl, opts);
     },
   });
 
