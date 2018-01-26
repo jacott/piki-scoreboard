@@ -20,7 +20,7 @@ define(function(require, exports, module) {
           } else {
             db.query(
               `insert into "Role" (_id, org_id, user_id, role) values ($1, $2, $1, $3)`, [
-                user._id, user.org_id, user.role
+                user._id, user.role === 's' ? null : user.org_id, user.role
               ]
             );
           }
