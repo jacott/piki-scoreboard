@@ -84,22 +84,43 @@ define(function(require) {
         if (score % 10) result += "+";
         return result;
       case 'B':
-        if (score == 0) return "0t 0b";
-        var mod, result = "";
-        for(var i = 0; i < 2; ++i,
-                score = Math.floor(score/10000)) {
-
-          if (mod = (99 - (score % 100)))
-            result = mod + result;
-          mod = Math.floor(score/100) % 100;
-          result = mod + (i == 0 ? 'b' : 't') + result;
-          if (i === 0) result = " " + result;
-        }
-        return result;
+        // FIXME check whether event.rulesVersion is 2018 or pre2018 and call numberToBoulderScore2018() or numberToBoulderScorePre2018()
+        return this.numberToBoulderScorePre2018(score, index);
       }
     }
 
+    numberToBoulderScorePre2018(score, index) {
+      if (score == 0) return "0t 0b";
+      var mod, result = "";
+      for(var i = 0; i < 2; ++i,
+              score = Math.floor(score/10000)) {
+
+        if (mod = (99 - (score % 100)))
+          result = mod + result;
+        mod = Math.floor(score/100) % 100;
+        result = mod + (i == 0 ? 'b' : 't') + result;
+        if (i === 0) result = " " + result;
+      }
+      return result;
+    }
+
+    numberToBoulderScore2018(score, index) {
+      if (score == 0) return "0T0Z";
+      var mod, result = "";
+      for (var i = 0; i < 4; ++i, score = Math.floor(score/100)) {
+        if (i < 2) {
+          mod = 99 - (score % 100);
+          result = mod + (i === 0 ? "AZ" : "AT") + result;
+        } else {
+          mod = score % 100;
+          result = mod + (i === 2 ? "Z" : "T") + result;
+        }
+      }
+      return result;
+    }
+
     scoreToNumber(score, index) {
+      // FIXME this line not tested? when can this occur?
       if (score.trim() === '') return;
 
       if (index === 99) {
@@ -125,6 +146,7 @@ define(function(require) {
         }
         break;
       case 'B':
+        // FIXME retire this code
         var m = /^\s*(\d{1,2})t(\d{1,2})?\s+(\d{1,2})b(\d{1,2})?\s*$/.exec(score);
         if (m) {
           var t = +m[1], ta = +(m[2]||0);
@@ -137,9 +159,15 @@ define(function(require) {
       return false;
     }
 
+    // FIXME rename boulderScoreToNumberPre2018 ?
     boulderScoreToNumber(b, ba, t, ta) {
       if (b == null) return null;
       return t*1000000 + (99-ta)*10000 + b*100 + (99 - ba);
+    }
+
+    boulderScoreToNumber2018(z, az, t, at) {
+      if (z == null) return null;
+      return t*1000000 + z*10000 + (99-at)*100 + (99 - az);
     }
 
     list() {

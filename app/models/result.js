@@ -133,6 +133,7 @@ define(function(require, exports, module) {
 
       Result.query.onId(id).updatePartial(
         'problems', [index - 1, round || NaN],
+        // FIXME check if event.rulesVersion is pre2018 or 2018 and call boulderScoreToNumberPre2018() or boulderScoreToNumber2018()
         'scores', [index, dnc === "dnc" ? -1 : score = heat.boulderScoreToNumber(b, ba, t, ta) || NaN]
       );
     },

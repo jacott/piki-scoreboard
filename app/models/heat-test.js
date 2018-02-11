@@ -148,6 +148,26 @@ define(function (require, exports, module) {
       assert.same(heat.numberToScore(1.535, -2 ), 1.54);
     },
 
+     "test boulder boulderScoreToNumber2018"() {
+      var heat = new Heat(1, 'BFF');
+
+       assert.same(heat.boulderScoreToNumber2018(4,6,3,3  ), 3049693);
+       assert.same(heat.boulderScoreToNumber2018(0,0,0,0  ),    9999);
+       assert.same(heat.boulderScoreToNumber2018(4,20,0,0 ),   49979);
+       assert.same(heat.boulderScoreToNumber2018(5,99,2,20), 2057900);
+     },
+
+    "test boulder numberToBoulderScore2018"() {
+      var heat = new Heat(1, 'BFF');
+
+      assert.same(heat.numberToBoulderScore2018(3049693  ), '3T4Z3AT6AZ');
+      assert.same(heat.numberToBoulderScore2018(0        ), '0T0Z');
+      assert.same(heat.numberToBoulderScore2018( 49979   ), '0T4Z0AT20AZ');
+      assert.same(heat.numberToBoulderScore2018(2057900  ), '2T5Z20AT99AZ');
+      // what is this testing?
+      //      assert.same(heat.numberToScore(1, 0      ), 1);
+    },
+
     "sortByStartOrder": {
       setUp() {
         v.call = function (number, results) {
