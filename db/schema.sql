@@ -2,12 +2,11 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.6.6
--- Dumped by pg_dump version 9.6.6
+-- Dumped from database version 9.6.7
+-- Dumped by pg_dump version 9.6.7
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
@@ -131,7 +130,8 @@ CREATE TABLE "Event" (
     errors jsonb,
     closed boolean,
     "teamType_ids" character varying(24)[],
-    series_id character varying(24)
+    series_id character varying(24),
+    "ruleVersion" smallint DEFAULT 0
 );
 
 
@@ -387,4 +387,3 @@ CREATE UNIQUE INDEX "Role_user_id_org_id" ON "Role" USING btree (user_id, org_id
 --
 -- PostgreSQL database dump complete
 --
-
