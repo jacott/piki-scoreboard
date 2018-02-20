@@ -24,12 +24,16 @@ define(function (require, exports, module) {
 
       assert(event.org);
       assert.equals(event.teamType_ids, ['tt1']);
+      assert.equals(event.ruleVersion, 1);
     },
 
     'test standard validators'() {
       var validators = Event._fieldValidators;
 
-      assert.validators(validators.name, {maxLength: [200], required: [true], trim: [true], unique: [{scope: ['org_id', 'series_id']}]});
+      assert.validators(validators.name, {
+        maxLength: [200], required: [true], trim: [true],
+        unique: [{scope: ['org_id', 'series_id']}]});
+      assert.validators(validators.ruleVersion, {required: [true], number: [{integer: true, $gte: 0, $lte: 1}]});
       assert.validators(validators.date, {inclusion: [{matches: /^\d{4}-[01]\d-[0-3]\d$/ }]});
       assert.validators(validators.closed, {boolean: ['trueOnly']});
     },
@@ -89,7 +93,7 @@ define(function (require, exports, module) {
       "test okay"() {
         v.heats[v.cat._id] = 'LQF8F2';
 
-        assert(v.event.$isValid(), TH.showErrors(v.event));
+        assert.msg(TH.showErrors(v.event))(v.event.$isValid());
       },
 
       "test wrong org"() {

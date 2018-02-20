@@ -58,6 +58,8 @@ define(function(require, exports, module) {
       closed: {type: 'boolean', boolean: 'trueOnly'},
       teamType_ids: 'has_many',
       series_id: 'belongs_to',
+      ruleVersion: {type: 'number', required: true,
+                    number: {integer: true, $gte: 0, $lte: 1}, default: 1},
     },
   });
 

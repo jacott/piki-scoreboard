@@ -7,6 +7,7 @@ define(function(require, exports, module) {
 
   const FIELD_SPEC = {
     name: 'string',
+    ruleVersion: 'number',
     teamType_ids: ['id'],
     date: 'string',
     closed: match.or(match.boolean, match.string, match.nil),

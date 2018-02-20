@@ -118,6 +118,7 @@ define(function(require, exports, module) {
 
       return new Factory.Builder('Event', options).genName()
         .addRef('org')
+        .addField('ruleVersion', 1)
         .addField('heats')
         .addField('date', '2014-04-01');
     },

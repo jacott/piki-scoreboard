@@ -61,6 +61,7 @@ define(function (require, exports, module) {
         event.changes = {'name': 'new name'};
         assert.docChanges(event, {
           name: 'string',
+          ruleVersion: 'number',
           teamType_ids: ['id'],
           date: 'string',
           closed: TH.match(arg => {
