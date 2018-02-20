@@ -145,29 +145,27 @@ define(function(require) {
           return m[1]*10000 + extra*10 + (m[3] ? 5 : 0);
         }
         break;
-      case 'B':
-        // FIXME retire this code
-        var m = /^\s*(\d{1,2})t(\d{1,2})?\s+(\d{1,2})b(\d{1,2})?\s*$/.exec(score);
-        if (m) {
-          var t = +m[1], ta = +(m[2]||0);
-          var b = +(m[3]||0), ba = +(m[4]||0);
-          if (t > ta || b > ba) return false;
-          return this.boulderScoreToNumber(b, ba, t, ta);
-        }
-        if (score.match(/^\s*0\s*$/)) return 0;
+      // case 'B':
+      //   // FIXME retire this code
+      //   var m = /^\s*(\d{1,2})t(\d{1,2})?\s+(\d{1,2})b(\d{1,2})?\s*$/.exec(score);
+      //   if (m) {
+      //     var t = +m[1], ta = +(m[2]||0);
+      //     var b = +(m[3]||0), ba = +(m[4]||0);
+      //     if (t > ta || b > ba) return false;
+      //     return this.boulderScoreToNumber(b, ba, t, ta);
+      //   }
+      //   if (score.match(/^\s*0\s*$/)) return 0;
       }
       return false;
     }
 
-    // FIXME rename boulderScoreToNumberPre2018 ?
-    boulderScoreToNumber(b, ba, t, ta) {
+    boulderScoreToNumber(b, ba, t, ta, ruleVersion) {
       if (b == null) return null;
-      return t*1000000 + (99-ta)*10000 + b*100 + (99 - ba);
-    }
-
-    boulderScoreToNumber2018(z, az, t, at) {
-      if (z == null) return null;
-      return t*1000000 + z*10000 + (99-at)*100 + (99 - az);
+      if (ruleVersion === 0) {
+        return t*1000000 + (99-ta)*10000 + b*100 + (99 - ba);
+      } else {
+        return t*1000000 + b*10000 + (99-ta)*100 + (99 - ba);
+      }
     }
 
     list() {

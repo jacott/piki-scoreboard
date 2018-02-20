@@ -94,15 +94,14 @@ define(function(require, exports, module) {
                            problem >= 0 && problem < heat.problems );
 
       if (typeof bonus === "number") {
-        if (top && bonus > top) {
-          top = bonus;
-        } else if (! bonus && top) {
+        Val.allowIfValid(! top || bonus <= top);
+        if (! bonus && top) {
           bonus = top;
         }
 
-        Val.allowAccessIf(top < 100 && bonus < 100 &&
-                             (top === 0 || top >= bonus) &&
-                             (bonus !== 0 || top === 0));
+        Val.allowIfValid(top < 100 && bonus < 100 &&
+                         (top === 0 || top >= bonus) &&
+                         (bonus !== 0 || top === 0));
 
         round[problem] = bonus+top*100;
       } else {
@@ -133,8 +132,7 @@ define(function(require, exports, module) {
 
       Result.query.onId(id).updatePartial(
         'problems', [index - 1, round || NaN],
-        // FIXME check if event.rulesVersion is pre2018 or 2018 and call boulderScoreToNumberPre2018() or boulderScoreToNumber2018()
-        'scores', [index, dnc === "dnc" ? -1 : score = heat.boulderScoreToNumber(b, ba, t, ta) || NaN]
+        'scores', [index, dnc === "dnc" ? -1 : score = heat.boulderScoreToNumber(b, ba, t, ta, event.ruleVersion) || NaN]
       );
     },
   });

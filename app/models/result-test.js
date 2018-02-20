@@ -181,14 +181,16 @@ define(function (require, exports, module) {
         });
       },
 
-      "test top,  bonus range"() {
-        // top < bonus
-        v.rpc("Result.setBoulderScore", v.result._id, 1, 1, 4, 3);
-        assert.equals(v.result.$reload().scores, [1, 1950195]);
+      "test bonus > top"() {
+        assert.exception(()=>{
+          v.rpc("Result.setBoulderScore", v.result._id, 1, 1, 4, 3);
+        }, {error: 400});
+      },
 
+      "test top,  bonus range"() {
         // top > 0, bonus 0
         v.rpc("Result.setBoulderScore", v.result._id, 1, 1, 0, 3);
-        assert.equals(v.result.$reload().scores, [1, 1960196]);
+        assert.equals(v.result.$reload().scores, [1, 1019696]);
       },
 
       "test dnc"() {
@@ -202,7 +204,7 @@ define(function (require, exports, module) {
 
         v.rpc("Result.setBoulderScore", v.result._id, 1, 1, 0, 0);
 
-        assert.equals(v.result.$reload().scores, [1, 990099]);
+        assert.equals(v.result.$reload().scores, [1, 9999]);
         assert.equals(v.result.problems[0], [0, -1]);
       },
 
@@ -222,6 +224,25 @@ define(function (require, exports, module) {
       },
 
       "test update attempts"() {
+        v.rpc("Result.setBoulderScore", v.result._id, 1, 2, 3, 4);
+
+        assert.calledWith(Val.ensureNumber, 1, 2, 3, 4);
+        assert.calledWith(Val.ensureString, v.result._id);
+
+        assert.equals(v.result.$reload().scores, [1, 1019596]);
+        assert.equals(v.result.problems[0][1], 403);
+
+        v.rpc("Result.setBoulderScore", v.result._id, 1, 1, 1, 1);
+        assert.equals(v.result.$reload().scores, [1, 2029495]);
+        assert.equals(v.result.problems[0], [101, 403]);
+
+        v.rpc("Result.setBoulderScore", v.result._id, 1, 2, 5, 0);
+        assert.equals(v.result.$reload().scores, [1, 1029893]);
+        assert.equals(v.result.problems[0], [101, 5]);
+      },
+
+      "test other ruleVersion, update attempts"() {
+        v.event.ruleVersion = 0;
         v.rpc("Result.setBoulderScore", v.result._id, 1, 2, 3, 4);
 
         assert.calledWith(Val.ensureNumber, 1, 2, 3, 4);
