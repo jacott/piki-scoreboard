@@ -111,6 +111,26 @@ define(function (require, exports, module) {
       assert.same(heat.scoreToNumber(' 1:09 ',99),      69);
     },
 
+    "test boulder scoreToNumber"() {
+      var heat = new Heat(1, 'BFF');
+
+      assert.same(heat.scoreToNumber(' 3t3 4b6 ' ), false);
+    },
+
+    "test boulder boulderScoreToNumber"() {
+      var heat = new Heat(1, 'BFF');
+
+      assert.same(heat.boulderScoreToNumber(4,6,3,3  ), 3049693);
+      assert.same(heat.boulderScoreToNumber(0,0,0,0  ),    9999);
+      assert.same(heat.boulderScoreToNumber(4,20,0,0 ),   49979);
+      assert.same(heat.boulderScoreToNumber(5,99,2,20), 2057900);
+
+      assert.same(heat.boulderScoreToNumber(4,6,3,3  , 0), 3960493);
+      assert.same(heat.boulderScoreToNumber(0,0,0,0  , 0),  990099);
+      assert.same(heat.boulderScoreToNumber(4,20,0,0 , 0),  990479);
+      assert.same(heat.boulderScoreToNumber(5,99,2,20, 0), 2790500);
+    },
+
     "test lead numberToScore"() {
       var heat = new Heat(1, 'LQQF26F26F8');
 
@@ -124,48 +144,24 @@ define(function (require, exports, module) {
       assert.same(heat.numberToScore(1.535, -2 ), 1.54);
     },
 
-    "test boulder scoreToNumber"() {
-      var heat = new Heat(1, 'BFF');
-
-      assert.same(heat.scoreToNumber(' 3t3 4b6 ' ), 3960493);
-      assert.same(heat.scoreToNumber(' 0'        ),       0);
-      assert.same(heat.scoreToNumber(' 0t 0b '   ),  990099);
-      assert.same(heat.scoreToNumber(' 0t 4b20'  ),  990479);
-      assert.same(heat.scoreToNumber(' 2t20 5b99'), 2790500);
-      assert.same(heat.scoreToNumber(' dnc '     ),      -1);
-    },
-
     "test boulder numberToScore"() {
       var heat = new Heat(1, 'BFF');
 
-      assert.same(heat.numberToScore(3960493   ), '3t3 4b6');
-      assert.same(heat.numberToScore(0         ), '0t 0b');
-      assert.same(heat.numberToScore( 990479   ), '0t 4b20');
-      assert.same(heat.numberToScore(2790500   ), '2t20 5b99');
       assert.same(heat.numberToScore(     -1   ), 'DNC');
       assert.same(heat.numberToScore(          ), '');
+      // ASK what situation is this testing?
       assert.same(heat.numberToScore(1, 0      ), 1);
       assert.same(heat.numberToScore(1.535, -2 ), 1.54);
-    },
 
-     "test boulder boulderScoreToNumber2018"() {
-      var heat = new Heat(1, 'BFF');
+      assert.same(heat.numberToScore(3049693  ), '3T4Z3AT6AZ');
+      assert.same(heat.numberToScore(0        ), '0T0Z');
+      assert.same(heat.numberToScore( 49979   ), '0T4Z0AT20AZ');
+      assert.same(heat.numberToScore(2057900  ), '2T5Z20AT99AZ');
 
-       assert.same(heat.boulderScoreToNumber2018(4,6,3,3  ), 3049693);
-       assert.same(heat.boulderScoreToNumber2018(0,0,0,0  ),    9999);
-       assert.same(heat.boulderScoreToNumber2018(4,20,0,0 ),   49979);
-       assert.same(heat.boulderScoreToNumber2018(5,99,2,20), 2057900);
-     },
-
-    "test boulder numberToBoulderScore2018"() {
-      var heat = new Heat(1, 'BFF');
-
-      assert.same(heat.numberToBoulderScore2018(3049693  ), '3T4Z3AT6AZ');
-      assert.same(heat.numberToBoulderScore2018(0        ), '0T0Z');
-      assert.same(heat.numberToBoulderScore2018( 49979   ), '0T4Z0AT20AZ');
-      assert.same(heat.numberToBoulderScore2018(2057900  ), '2T5Z20AT99AZ');
-      // what is this testing?
-      //      assert.same(heat.numberToScore(1, 0      ), 1);
+      assert.same(heat.numberToScore(3960493   , null, 0), '3t3 4b6');
+      assert.same(heat.numberToScore(0         , null, 0), '0t 0b');
+      assert.same(heat.numberToScore( 990479   , null, 0), '0t 4b20');
+      assert.same(heat.numberToScore(2790500   , null, 0), '2t20 5b99');
     },
 
     "sortByStartOrder": {

@@ -303,10 +303,10 @@ define(function(require, exports, module) {
           var data = {
             result: result, heat: -2,
             score: scores[i] == null && heat.total !== heat.rankIndex ? ''
-              : heat.numberToScore(Math.pow(result.rankMult, 1/i), -2)};
+              : heat.numberToScore(Math.pow(result.rankMult, 1/i), -2, result.event.ruleVersion)};
         else
           var data = {result: result, canInput: canInput, heat: i,
-                      score: heat.numberToScore(scores[i], i),
+                      score: heat.numberToScore(scores[i], i, result.event.ruleVersion),
                       rank: scores[i] == null ? '' : result['rank'+i]};
 
         frag.appendChild(Score.$render(data));

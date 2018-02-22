@@ -138,7 +138,7 @@ isClient && define(function (require, exports, module) {
         v.category = TH.Factory.createCategory({type: 'B', heatFormat: 'QF6'});
         v.event = TH.Factory.createEvent();
         v.result = TH.Factory.createResult({
-          scores: [0.1, 3830485], problems: [[302, 0, 1, 101, 1210]],
+          scores: [0.1, 3048385], problems: [[302, 0, 1, 101, 1210]],
         });
 
         TH.login();
@@ -197,7 +197,7 @@ isClient && define(function (require, exports, module) {
               });
               assert.dom('td:nth-child(3).score', function () {
                 assert.dom('i', '1');
-                assert.dom('span', '3t16 4b14');
+                assert.dom('span', '3T4Z16AT14AZ');
               });
             });
           });

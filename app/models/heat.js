@@ -64,7 +64,7 @@ define(function(require) {
       return heatName;
     }
 
-    numberToScore(score, index) {
+    numberToScore(score, index, ruleVersion) {
       if (index === 0) {
         return score;
       }
@@ -84,8 +84,11 @@ define(function(require) {
         if (score % 10) result += "+";
         return result;
       case 'B':
-        // FIXME check whether event.rulesVersion is 2018 or pre2018 and call numberToBoulderScore2018() or numberToBoulderScorePre2018()
-        return this.numberToBoulderScorePre2018(score, index);
+        if (ruleVersion === 0) {
+          return this.numberToBoulderScorePre2018(score, index);
+        } else {
+          return this.numberToBoulderScore2018(score, index);
+        }
       }
     }
 
@@ -145,8 +148,8 @@ define(function(require) {
           return m[1]*10000 + extra*10 + (m[3] ? 5 : 0);
         }
         break;
+      // FIXME retire this code? Is there any situation where case is 'B'? Case 'B' is not covered in tests.
       // case 'B':
-      //   // FIXME retire this code
       //   var m = /^\s*(\d{1,2})t(\d{1,2})?\s+(\d{1,2})b(\d{1,2})?\s*$/.exec(score);
       //   if (m) {
       //     var t = +m[1], ta = +(m[2]||0);
