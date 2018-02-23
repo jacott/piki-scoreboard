@@ -8,18 +8,17 @@ define(function(require, exports, module) {
   const Model       = require('model');
 
   const TH = Object.create(require('test-helper'));
-  const geddon = TH.geddon;
 
   util.merge(TH, {
     mockClientSub () {
-      var sub = {
-        match: geddon.test.stub(),
+      const sub = {
+        match: TH.stub(),
         onStop (func) {
-          geddon.test.onEnd(func);
+          TH.onEnd(func);
         },
       };
 
-      geddon.test.spy(sub, 'onStop');
+      TH.spy(sub, 'onStop');
       return sub;
     },
 
@@ -47,7 +46,7 @@ define(function(require, exports, module) {
 
     stubVerifyToken (token) {
       token = (token || 'ulid|ultoken').split('|');
-      geddon.test.stub(UserAccount, 'verifyToken').withArgs(...token).returns({userId: TH.userId()});
+      TH.stub(UserAccount, 'verifyToken').withArgs(...token).returns({userId: TH.userId()});
     },
 
     mockSubscribe (v, id, name, ...args) {

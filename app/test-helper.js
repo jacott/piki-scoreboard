@@ -17,7 +17,6 @@ define(function(require, exports, module) {
   const {hasOwn} = util;
 
   let TH = Object.create(require('koru/test-helper'));
-  const geddon = TH.geddon;
 
   let user = null;
   let txSave = null, txClient = null;
@@ -69,7 +68,7 @@ define(function(require, exports, module) {
           conn.dbId = 'sch00';
           if (v) v.conn = conn;
         }
-        return geddon.test.intercept(session, 'rpc', (method, ...args) => {
+        return TH.intercept(session, 'rpc', (method, ...args) => {
           conn.userId = koru.userId();
           const prevUserId = util.thread.userId;
           const prevConnection = util.thread.connection;
@@ -85,7 +84,7 @@ define(function(require, exports, module) {
           }
         });
       } else {
-        return geddon.test.intercept(session, 'rpc', (method, ...args) => {
+        return TH.intercept(session, 'rpc', (method, ...args) => {
           return session._rpcs[method].apply(util.thread, args);
         });
       }
@@ -96,7 +95,7 @@ define(function(require, exports, module) {
     },
 
     loginAs(newUser, func) {
-      const {test} = geddon;
+      const {test} = TH;
 
       if (newUser !== user) {
         user && this.user.restore();
@@ -205,7 +204,7 @@ define(function(require, exports, module) {
 
 
 
-  geddon.onStart(() => {
+  TH.Core.onStart(() => {
     koruAfTimeout = koru.afTimeout;
     koruSetTimeout = koru.setTimeout;
     koruClearTimeout = koru.clearTimeout;
@@ -230,7 +229,7 @@ define(function(require, exports, module) {
     }
   });
 
-  geddon.onEnd(() => {
+  TH.Core.onEnd(() => {
     if (isServer && txSave) {
       txSave.transaction = null;
       txSave = null;
@@ -254,12 +253,12 @@ define(function(require, exports, module) {
   });
 
   if (isServer) {
-    geddon.onTestStart(() => {
+    TH.Core.onTestStart(() => {
       dbBroker.db = txClient;
       txSave && txClient.query('BEGIN');
     });
 
-    geddon.onTestEnd(() => {
+    TH.Core.onTestEnd(() => {
       txSave && txClient.query('ROLLBACK');
     });
   } else {
@@ -267,7 +266,7 @@ define(function(require, exports, module) {
     localStorage._resetValue = () => ({orgs: orgsStr, orgSN: 'SN1'});
   }
 
-  const ga = geddon.assertions;
+  const ga = TH.Core.assertions;
 
   ga.add('docChanges', {
     assert(doc, spec, newSpec, func) {

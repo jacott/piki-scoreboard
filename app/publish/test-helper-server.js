@@ -3,12 +3,10 @@ define(function(require, exports, module) {
   const serverConnection = require('koru/session/server-connection-factory');
   const util             = require('koru/util');
 
-  return function (TH) {
-    const geddon = TH.geddon;
-
+  return TH =>{
     util.merge(TH, {
       mockConnection (sessId, session) {
-        const {test} = geddon;
+        const {test} = TH;
         const conn = new (serverConnection(session || this.mockSession()))({
           send: test.stub(), on: test.stub()}, {}, sessId || 's123', () => {});
         conn.userId = koru.userId();

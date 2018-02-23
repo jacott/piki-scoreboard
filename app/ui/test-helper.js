@@ -72,7 +72,7 @@ define(function(require, exports, module) {
 
     stubRAF(v) {
       var func;
-      TH.geddon.test.intercept(window, 'requestAnimationFrame', function (arg) {
+      TH.intercept(window, 'requestAnimationFrame', function (arg) {
         func = arg;
         return 123;
       });
@@ -101,16 +101,14 @@ define(function(require, exports, module) {
 
   var onAnimationEnd;
 
-  TH.geddon.onStart(function () {
+  TH.Core.onStart(()=>{
     onAnimationEnd = Dom.Ctx.prototype.onAnimationEnd;
     Dom.Ctx.prototype.onAnimationEnd = function (func, repeat) {
       func(this, this.element());
     };
   });
 
-  TH.geddon.onEnd(function () {
-    Dom.Ctx.prototype.onAnimationEnd = onAnimationEnd;
-  });
+  TH.Core.onEnd(()=>{Dom.Ctx.prototype.onAnimationEnd = onAnimationEnd});
 
   module.exports = TH;
 });
