@@ -257,20 +257,33 @@ define(function(require, exports, module) {
       });
       return frag;
     },
+
     scores() {
-      var frag = document.createDocumentFragment();
-      var parentCtx = Dom.ctx($.element.parentNode);
-      var result = parentCtx.data;
-      var scores = result.scores;
+      const frag = document.createDocumentFragment();
+      const parentCtx = Dom.ctx($.element.parentNode);
+      const result = parentCtx.data;
+      const scores = result.scores;
+      const heat = $.ctx.parentCtx.data.heat;
 
-      var heat = $.ctx.parentCtx.data.heat;
+      const {number} = heat;
+      const boulder = heat.type === 'B';
+      let canInput = parentCtx.parentCtx.data.canInput;
 
-      var number = heat.number;
-      var boulder = heat.type === 'B';
-      var canInput = parentCtx.parentCtx.data.canInput;
+      const renderScore = (i, canInput, qr)=>{
+        frag.appendChild(Score.$render(
+          qr ? {
+            result: result, heat: -2,
+            score: scores[i] == null && heat.total !== heat.rankIndex ? ''
+              : heat.numberToScore(Math.pow(result.rankMult, 1/i), -2, result.event.ruleVersion)
+          } : {
+            result: result, canInput: canInput, heat: i,
+            score: heat.numberToScore(scores[i], i, result.event.ruleVersion),
+            rank: scores[i] == null ? '' : result['rank'+i]}
+        ));
+      };
 
       if (boulder && number >= 0) {
-        renderBoulderScore(canInput);
+        frag.appendChild(BoulderScore.$render({result, heat, canInput}));
       }
 
       canInput = canInput && ! boulder;
@@ -297,24 +310,6 @@ define(function(require, exports, module) {
         renderScore(heat.number - 1, null, heat.rankIndex === heat.number - 1);
       }
       return frag;
-
-      function renderScore(i, canInput, qr) {
-        if (qr)
-          var data = {
-            result: result, heat: -2,
-            score: scores[i] == null && heat.total !== heat.rankIndex ? ''
-              : heat.numberToScore(Math.pow(result.rankMult, 1/i), -2, result.event.ruleVersion)};
-        else
-          var data = {result: result, canInput: canInput, heat: i,
-                      score: heat.numberToScore(scores[i], i, result.event.ruleVersion),
-                      rank: scores[i] == null ? '' : result['rank'+i]};
-
-        frag.appendChild(Score.$render(data));
-      }
-
-      function renderBoulderScore(canInput) {
-        frag.appendChild(BoulderScore.$render({result: result, heat: heat, canInput: canInput}));
-      }
     },
   });
 
@@ -327,16 +322,23 @@ define(function(require, exports, module) {
     },
 
     score() {
+      let elm;
       if (this.canInput) {
-        var elm = document.createElement('input');
+        elm = document.createElement('input');
         elm.setAttribute('placeholder', this.heat === 99 ? "m:ss" : "n+");
         elm.tabIndex = this.heat;
         elm.className = 'score';
         if (this.score != null)
           elm.value = this.score.toString();
       } else {
-        var elm = document.createElement('span');
-        elm.textContent = this.score;
+        const {score} = this;
+        const parts = typeof score === 'number' ? null : this.score.split(/([TZA]+)/);
+        if (parts === null || parts.length == 1) {
+          elm = document.createElement('span');
+          elm.textContent = this.score;
+        } else {
+          elm =  Dom.h({span: parts.map(p => /^[TZA]+$/.test(p) ? {b: p} : p)});
+        }
       }
 
       return elm;

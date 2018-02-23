@@ -1,14 +1,16 @@
 isClient && define(function (require, exports, module) {
-  var test, v;
   const Route         = require('koru/ui/route');
   const App           = require('ui/app');
   const EventRegister = require('ui/event-register');
   const sut           = require('./event-category');
   const TH            = require('./test-helper');
 
+  const {stub, spy, onEnd} = TH;
+
+  let v = null;
+
   TH.testCase(module, {
     setUp() {
-      test = this;
       v = {
         org: TH.Factory.createOrg(),
         category: TH.Factory.createCategory(),
@@ -24,8 +26,8 @@ isClient && define(function (require, exports, module) {
       TH.Factory.createCompetitor({team_ids: [v.t1._id, v.t2._id], number: 123});
       v.result2 = TH.Factory.createResult({scores: [0.3]});
       TH.setOrg(v.org);
-      v.eventSub = test.stub(App, 'subscribe').withArgs('Event')
-        .returns({stop: v.stop = test.stub()});
+      v.eventSub = stub(App, 'subscribe').withArgs('Event')
+        .returns({stop: v.stop = stub()});
       Route.gotoPage(sut, {eventId: v.event._id, append: v.category._id, search: '&type=results'});
       v.eventSub.yield();
     },
@@ -197,7 +199,10 @@ isClient && define(function (require, exports, module) {
               });
               assert.dom('td:nth-child(3).score', function () {
                 assert.dom('i', '1');
-                assert.dom('span', '3T4Z16AT14AZ');
+                assert.dom('span', '3T4Z16AT14AZ', elm =>{
+                  assert.dom('b', 'T');
+                  assert.dom('b', 'Z');
+                });
               });
             });
           });
