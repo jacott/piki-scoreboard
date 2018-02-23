@@ -123,8 +123,8 @@ define(function(require) {
     }
 
     scoreToNumber(score, index) {
-      // FIXME this line not tested? when can this occur?
-      if (score.trim() === '') return;
+      if (score.trim() === '')
+        return;
 
       if (index === 99) {
         var m = /^\s*(?:(\d{1,2})[.:])?([0-5]\d)\s*$/.exec(score);
@@ -148,16 +148,8 @@ define(function(require) {
           return m[1]*10000 + extra*10 + (m[3] ? 5 : 0);
         }
         break;
-      // FIXME retire this code? Is there any situation where case is 'B'? Case 'B' is not covered in tests.
-      // case 'B':
-      //   var m = /^\s*(\d{1,2})t(\d{1,2})?\s+(\d{1,2})b(\d{1,2})?\s*$/.exec(score);
-      //   if (m) {
-      //     var t = +m[1], ta = +(m[2]||0);
-      //     var b = +(m[3]||0), ba = +(m[4]||0);
-      //     if (t > ta || b > ba) return false;
-      //     return this.boulderScoreToNumber(b, ba, t, ta);
-      //   }
-      //   if (score.match(/^\s*0\s*$/)) return 0;
+      case 'B':
+        throw new Error('Boulder scores may not be converted this way');
       }
       return false;
     }

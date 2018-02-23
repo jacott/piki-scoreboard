@@ -135,7 +135,7 @@ define(function (require, exports, module) {
       "test delete middle score"() {
         v.result.$update({scores: [1, 220000, 440000]});
 
-        v.rpc("Result.setScore", v.result._id, 1, '');
+        v.rpc("Result.setScore", v.result._id, 1, '  ');
 
         assert.equals(v.result.$reload().scores, [1, NaN, 440000]);
       },

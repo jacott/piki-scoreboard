@@ -111,12 +111,6 @@ define(function (require, exports, module) {
       assert.same(heat.scoreToNumber(' 1:09 ',99),      69);
     },
 
-    "test boulder scoreToNumber"() {
-      var heat = new Heat(1, 'BFF');
-
-      assert.same(heat.scoreToNumber(' 3t3 4b6 ' ), false);
-    },
-
     "test boulder boulderScoreToNumber"() {
       var heat = new Heat(1, 'BFF');
 

@@ -11,7 +11,9 @@ define(function(require, exports, module) {
   };
 
   return model =>{
-    // FIXME ChangeLog.logChanges(model);
+    require(['models/change-log'], ChangeLog => {
+      ChangeLog.logChanges(model);
+    });
 
     util.extend(model.prototype, {
       authorize(userId) {
