@@ -337,7 +337,7 @@ define(function(require, exports, module) {
           elm = document.createElement('span');
           elm.textContent = this.score;
         } else {
-          elm =  Dom.h({span: parts.map(p => /^[TZA]+$/.test(p) ? {b: p} : p)});
+          elm =  Dom.h({class: 'tza-score', span: parts.map(p => /^[TZA]+$/.test(p) ? {b: p} : {span: p})});
         }
       }
 

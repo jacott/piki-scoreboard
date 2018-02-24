@@ -66,10 +66,25 @@
           background-color: fade(@colorInputErrorBG, 80%);
         }
       }
-      b {
-        color: #088;
-        font-size: .8em;
-        margin-right: .1em;
+      .tza-score {
+        .flexFlow(row, nowrap);
+        min-width: 8em;
+        align-items: flex-end;
+        justify-content: flex-start;
+        span {
+          flex-basis: 4em;
+          text-align: right;
+          &:nth-of-type(3) {
+            margin-left: .4em;
+          }
+        }
+        b {
+          font-weight: 100;
+          color: fade(#088, 80%);
+          font-size: .8em;
+          position: relative;
+          top: .2em;
+        }
       }
       >i {
         font-style: normal;
