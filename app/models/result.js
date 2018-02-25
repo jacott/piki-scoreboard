@@ -64,7 +64,9 @@ define(function(require, exports, module) {
 
       Val.allowAccessIf(heat.type === 'L' && index >=0 && index <= heat.total);
 
-      Result.query.onId(id).updatePartial('scores', [index, heat.scoreToNumber(score) || NaN]);
+      Result.query.onId(id).updatePartial(
+        'scores',
+        [`${index}.$partial`, ['$replace', heat.scoreToNumber(score) || null]]);
     },
 
     setBoulderScore(id, index, problem, bonus, top) {
@@ -131,8 +133,12 @@ define(function(require, exports, module) {
       }
 
       Result.query.onId(id).updatePartial(
-        'problems', [index - 1, round || NaN],
-        'scores', [index, dnc === "dnc" ? -1 : score = heat.boulderScoreToNumber(b, ba, t, ta, event.ruleVersion) || NaN]
+        'problems', [`${index - 1}.$partial`, ['$replace', round || null]],
+        'scores', [`${index}.$partial`, [
+          '$replace',
+          dnc === "dnc"
+            ? -1
+            : score = heat.boulderScoreToNumber(b, ba, t, ta, event.ruleVersion) || null]]
       );
     },
   });
