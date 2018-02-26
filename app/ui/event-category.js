@@ -332,11 +332,12 @@ define(function(require, exports, module) {
           elm.value = this.score.toString();
       } else {
         const {score} = this;
-        const parts = typeof score === 'number' ? null : this.score.split(/([TZA]+)/);
-        if (parts === null || parts.length == 1) {
+        const parts = typeof score === 'number' ? null : this.score.split(/([TZA]+)(?!o)/);
+        if (parts === null || parts.length < 4) {
           elm = document.createElement('span');
           elm.textContent = this.score;
         } else {
+
           elm =  Dom.h({class: 'tza-score', span: parts.map(p => /^[TZA]+$/.test(p) ? {b: p} : {span: p})});
         }
       }

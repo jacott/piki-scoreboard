@@ -108,6 +108,10 @@ isClient && define(function (require, exports, module) {
             }});
           });
         });
+        v.result2.setScore(2, "Top");
+        assert.dom('.score>span', "Top", elm =>{
+          assert.same(elm.firstChild.data, "Top");
+        });
       });
     },
 
