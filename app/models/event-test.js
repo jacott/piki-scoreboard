@@ -33,7 +33,8 @@ define(function (require, exports, module) {
       assert.validators(validators.name, {
         maxLength: [200], required: [true], trim: [true],
         unique: [{scope: ['org_id', 'series_id']}]});
-      assert.validators(validators.ruleVersion, {required: [true], number: [{integer: true, $gte: 0, $lte: 1}]});
+      assert.validators(validators.ruleVersion, {
+        required: ['not_null'], number: [{integer: true, $gte: 0, $lte: 1}]});
       assert.validators(validators.date, {inclusion: [{matches: /^\d{4}-[01]\d-[0-3]\d$/ }]});
       assert.validators(validators.closed, {boolean: ['trueOnly']});
     },
