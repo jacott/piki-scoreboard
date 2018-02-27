@@ -3,72 +3,80 @@
     <li><a class="link topics" href="{{tag}}">{{desc}}</a></li>
   </template>
   <template name="NavResultsStartLists">
-    <p>
-      To go to <b><i>Results</i></b> or <b><i>Start lists</i></b> for a particular event:
-      <ul>
-        <li>If you are on a page relating to the event, click <i>Results</i> or <i>Start lists</i> in the main menu.</li>
-        <li>If the event name is displayed in the page header (the page header shows the event visited last), click that, then click <i>Results</i> or <i>Start lists</i> in the main menu.</li>
-        <li>Otherwise, go to your organization's Piki home page by clicking your organization's name at the top left of page, and click <i>Events</i> in the main menu. Click on the desired event in the list. This takes you to the <i>Results</i> page for the event; to go to the <i>Start lists</i>, click <i>Start lists</i> in the main menu.</li>
-      </ul>
-    </p>
+    <ol>
+      <li>If you are not already at a page for the desired event, click <i>Calendar</i> in the menu and click the desired event in the list.</li>
+      <li>Click <i>Results</i> or <i>Start lists</i> in the menu bar.</li>
+    </ol>
   </template>
   <template name="NavStartLists">
-    <p>
-      To go to <b><i>Start lists</i></b> for a particular event:
-      <ul>
-        <li>If you are on a page relating to the event, click <i>Start lists</i> in the main menu.</li>
-        <li>If the event name is displayed in the page header (the page header shows the event visited last), click that, then click <i>Start lists</i> in the main menu.</li>
-        <li>Otherwise, go to your organization's Piki home page by clicking your organization's name at the top left of page, and click <i>Events</i> in the main menu. Click on the desired event in the list. Click <i>Start lists</i> in the main menu.</li>
-      </ul>
-    </p>
+    <ol>
+      <li>If you are not already at a page for the desired event, click <i>Calendar</i> in the menu and click the desired event in the list.</li>
+      <li>Click <i>Start lists</i> in the menu bar.</li>
+    </ol>
   </template>
   <template name="NavSeriesResults">
     <p>
       To go to <b><i>Series results</i></b>:
       <ol>
-        <li>Click <i>Series</i> in the main menu. If the page is blank, click <i>Series</i> in the main menu again.</li>
-        <li>Click on the desired series in the list.</li>
-        <li>Click <i>Individual results</i>.</li>
+        <li>Click <i>Calendar</i> in the menu.</li>
+        <li>Click <i>Series</i> in the menu bar.</li>
+        <li>Click the desired series in the list.</li>
+        <li>Click <i>Individual results</i> in the menu bar.</li>
       </ol>
     </p>
   </template>
   <template name="NavTeamResults">
     <p>
-      To go to <b><i>Team results</i></b> for a particular event or series:
-      <ul>
-        <li>If you are on a page relating to the event/series, click <i>Team results</i> in the main menu.</li>
-        <li>If the event/series name is displayed in the page header (the page header shows the event/series visited last), click that, then click <i>Team results</i> in the main menu.</li>
-        <li>Otherwise, go to your organization's Piki home page by clicking your organization's name at the top left of page, and click <i>Events</i> or <i>Series</i> in the main menu. Click on the desired event/series in the list. Click <i>Team results</i> in the main menu.</li>
-      </ul>
+      To go to <b><i>Team results</i></b> for an event or series:
+      <ol>
+        <li>If you are not already at a page for the desired event or series:
+          <ul>
+            <li>To go to the desired event, click <i>Calendar</i> in the menu, and click the desired event in the list.</li>
+            <li>To go to the desired series, click <i>Calendar</i> in the menu, then click <i>Series</i> in the menu bar, and click the desired series in the list.</li>
+          </ul>
+        </li>
+        <li>Click <i>Team results</i> in the menu bar.</li>
+      </ol>
     </p>
     <p>
-      If there is more than one team type, for example club and school, toggle between the team results for each team type by clicking on the ellipsis next to the team type in the table heading.
+      If there is more than one team type, for example <i>club</i> and <i>school</i>, toggle between the team results for each team type by clicking on the ellipsis (<i class="more_vert">more_vert</i>) next to the team type in the table heading.
+    </p>
+  </template>
+  <template name="NavEvent">
+    <p>
+      Click <i>Calendar</i> in the menu and click the desired event in the list.
+    </p>
+  </template>
+  <template name="NavEditEvent">
+    <ol>
+      <li>If you are not already at a page for the desired event, click <i>Calendar</i> in the menu and click the desired event in the list.</li>
+      <li>Click <i>Edit event</i> in the menu bar.</li>
+    </ol>
+    <p>
+      (You must be signed in.)
+    </p>
+  </template>
+  <template name="NavReg">
+    <ol>
+      <li>If you are not already at a page for the desired event, click <i>Calendar</i> in the menu and click the desired event in the list.</li>
+      <li>Click <i>Registrations</i> in the menu bar.</li>
+    </ol>
+    <p>
+      (You must be signed in.)
+    </p>
+  </template>
+  <template name="SignedIn">
+    <p>
+      You must be signed in, and on a Piki page for your organization (not for a different Piki organization).
     </p>
   </template>
   <template name="SelectCategoriesToPrint">
-    Only categories with the same competition format (the same number of qualification routes/rounds and the same number of final rounds) can be selected together; categories with different competition formats must be selected and printed separately.
+    <p>
+      Only categories with the same competition format (the same number of qualification routes/rounds and the same number of final rounds) can be selected together; categories with different competition formats must be selected and printed separately.
+    </p>
   </template>
   <template name="Judgingsheets">
     are intended for use as judging sheets, for recording results by hand during climbing.
-  </template>
-  <template name="NavGoToEditEvent">
-    <p>
-      To go to the <b><i>Edit event</i></b> page for an event:
-      <ul>
-        <li>If you are on a page relating to the event, click <i>Edit event</i> in the main menu.</li>
-        <li>If the event name is displayed in the page header, click that, then click <i>Edit event</i> in the main menu.</li>
-        <li>Otherwise, go to your organization's Piki home page by clicking your organization's name at the top left of page, and click <i>Events</i> in the main menu. Click on the desired event in the list, then click <i>Edit event</i> in the main menu.</li>
-      </ul>
-    </p>
-  </template>
-  <template name="NavGoToCompCat">
-    <p>
-      To go to <b><i>Competitor categories</i></b>:
-      <ol>
-        <li>Go to your organization's Piki home page by clicking your organization's name at the top left of the page.</li>
-        <li>Click <i>Competitor categories</i> in the main menu.</li>
-      </ol>
-    </p>
   </template>
   <template name="CompFormatLead">
     <section>
@@ -108,25 +116,6 @@
       </p>
     </section>
   </template>
-  <template name="NavGoToReg">
-    <p>
-      To go to the <b><i>Registrations</i></b> page for an event:
-      <ul>
-        <li>If you are on a page relating to the event, click <i>Registrations</i> in the main menu.</li>
-        <li>If the event name is displayed in the page header, click that, then click <i>Registrations</i> in the main menu.</li>
-        <li>Otherwise, go to your organization's Piki home page by clicking your organization's name at the top left of page, and click <i>Events</i> in the main menu. Click on the desired event in the list, then click <i>Registrations</i> in the main menu.</li>
-      </ul>
-    </p>
-  </template>
-  <template name="NavGoToClimbers">
-    <p>
-      To go to your organization's <b><i>Climbers</i></b> list:
-      <ol>
-        <li>Go to your organization's Piki home page by clicking your organization's name at the top left of the page.</li>
-        <li>Click <i>Climbers</i> in the main menu.</li>
-      </ol>
-    </p>
-  </template>
 
   <div id="Help" class="document">
     <button name="close">Close help</button>
@@ -146,7 +135,7 @@
     <section name="general-info">
       <h1>General Information</h1>
       <ul>
-        <li>Piki is a results-management system for <a href="https://www.ifsc-climbing.org">IFSC</a>-format climbing competitions. Piki allows some customization of the <i>competition format</i>: administrators can designate the number of rounds in the competition, the quota of competitors for each round, and the number of boulders for each round in a Boulder competition. Piki's <i>scoring system</i> follows the IFSC rules and is not customizable.</li>
+        <li>Piki is a results-management system for <a href="https://www.ifsc-climbing.org">IFSC</a>-format climbing competitions. Piki allows some customization of the <i>competition format</i>: Admins can designate the number of rounds in the competition, the quota of competitors for each round, and the number of boulders for each round in a boulder competition. Piki's <i>scoring system</i> follows the IFSC rules and is not customizable.</li>
         <li>Piki is in <b>beta</b>:
           <ul>
             <li>New features are being added which may change the way Piki works.</li>
@@ -159,17 +148,16 @@
     </section>
 
     <section name="org-reg">
-      <h1>Apply to register as an organization</h1>
-      <p>Please read the <a href="#disclaimer">Disclaimer</a> and <a href="#general-info">General information</a>, and then <a href="mailto:piki@vimaly.com?subject=Application%20to%20register%20as%20an%20organization%20on%20Piki&body=Organization%20name:%20%0a%0aOrganization%20website:%20%0a%0aOrganization%20email%20address:%20%0a%0aName%20of%20person%20to%20be%20my%20organization's%20Piki%20admin:%20%0a%0aThe%20email%20address%20that%20person%20wishes%20to%20use%20to%20sign%20in:%20%0a%0aName%20and%20date%20of%20the%20first%20event%20where%20we%20would%20like%20to%20test%20Piki:%20%0a%0aMy%20organization%20_____________________________%20(insert%20organization%20name)%20understands%20and%20accepts%20the%20Disclaimer%20and%20General%20Information%20in%20the%20Help%20on%20the%20Piki%20website.%0a%0aHow%20we%20heard%20about%20Piki:%20%0a%0aAny%20further%20information:%20">apply to register as an organization</a>.
-        </p>
+      <h1>Apply to use Piki for your organization's climbing competitions</h1>
+      <p>Please read the <a href="#disclaimer">Disclaimer</a> and <a href="#general-info">General information</a>, and then <a href="mailto:piki@vimaly.com?subject=Application%20to%20register%20as%20an%20organization%20on%20Piki&body=Organization%20name:%20%0a%0aOrganization%20website:%20%0a%0aOrganization%20email%20address:%20%0a%0aName%20of%20person%20to%20be%20my%20organization's%20Piki%20Admin:%20%0a%0aThe%20email%20address%20that%20person%20wishes%20to%20use%20to%20sign%20in:%20%0a%0aName%20and%20date%20of%20the%20first%20event%20where%20we%20would%20like%20to%20test%20Piki:%20%0a%0aMy%20organization%20_____________________________%20(insert%20organization%20name)%20understands%20and%20accepts%20the%20Disclaimer%20and%20General%20Information%20in%20the%20Help%20on%20the%20Piki%20website.%0a%0aHow%20we%20heard%20about%20Piki:%20%0a%0aAny%20further%20information:%20">apply to register as an organization</a>.
+      </p>
     </section>
 
     <section name="user-reg">
-      <h1>Register as a user</h1>
+      <h1>Sign up to manage your organization's Piki events</h1>
       <p>
-        To manage your organization’s events, please contact your
-        organization administrator to arrange to be
-        added as a Piki user.
+        Please contact a <i>Piki Org Admin</i> from your organization to arrange to be added as a Piki user.
+      </p>
       <p>
         When you have been added as a user, a <i>Reset password</i> link will be sent to the email address entered for you.
       </p>
@@ -178,15 +166,12 @@
     <section name="user-add">
       <h1>Add users</h1>
       <p>
-        Organization admins only.
-      <p>
-        You must be signed in.
+        Org Admins only.
       </p>
-      <ol>
-        <li>Click your user name (top right-hand of page).</li>
-        <li>Click <i>System setup</i>.</li>
-        <li>Add new user.</li>
-      </ol>
+      {{> SignedIn}}
+      <p>
+        Click <i>Org settings</i> in the menu, and then click <i>Add new user</i>.
+      </p>
       <p>
         Once the new user is added, a <i>Reset password</i> email will be sent to the email address entered for the new user.
       </p>
@@ -195,15 +180,12 @@
     <section name="user-edit">
       <h1>Edit users' details and delete users</h1>
       <p>
-        Organization admins only.
+        Org Admins only.
       </p>
-      <p>
-        You must be signed in.
-      </p>
+      {{> SignedIn}}
       <ol>
-        <li>Click your user name (top right-hand of page).</li>
-        <li>Click <i>System setup</i>.</li>
-        <li>Select the user's name.</li>
+        <li>Click <i>Org settings</i> in the menu.</li>
+        <li>Click the user's name.</li>
         <li>Edit the user's details and click <i>Save</i>.<br>
           Or, to delete the user, click <i>Delete</i>, and confirm in the popup box.</li>
       </ol>
@@ -212,43 +194,37 @@
     <section name="teams">
       <h1>Add and edit teams and team types</h1>
       <p>
-        Organization admins only.
+        Admins only.
       </p>
-      <p>
-        You must be signed in.
-      </p>
+      {{> SignedIn}}
       <ol>
-        <li>Go to your organization's Piki home page by clicking your organization's name at the top left of the page.</li>
-        <li>Click <i>Teams</i> in the main menu.</li>
-        <li>Add and edit team types (e.g. Club, School, Country).</br>
+        <li>Click <i>Teams</i> in the menu.</li>
+        <li>Add and edit team types (e.g. Club, School, Nation).<br>
           Add and edit teams for each team type.</li>
       </ol>
       <p>
         If your organization will be <a href="#upload-registrations">uploading registrations from file</a> then the team name or code ("short name") used here must be the same as the team name or code used in the upload file.
       </p>
       <p>
-        To designate which team types competitors may represent at a given event,
-        <inlinehelp>
-          <a href="#go-to-edit-event">go to the <i>Edit event</i> page</a><popup>{{> NavGoToEditEvent}}</popup>
-        </inlinehelp>
-        for that event.
+        Editing a team's details changes those details in all past, current and future events.
       </p>
       <p>
-        Editing a team's details changes those details in all past, current and future events.
+        To designate which team types competitors may represent at a given event,
+        <inlinehelp>
+          go to the <i>Edit event</i> page<popup>{{> NavEditEvent}}</popup>
+        </inlinehelp>
+        for that event.
       </p>
     </section>
 
     <section name="climbers">
       <h1>Add and edit climbers on your organization's <i>Climbers</i> list</h1>
       <p>
-        Organization admins only.
+        Admins only.
       </p>
-      <p>
-        You must be signed in.
-      </p>
+      {{> SignedIn}}
       <ol>
-        <li>Go to your organization's Piki home page by clicking your organization's name at the top left of the page.</li>
-        <li>Click <i>Climbers</i> in the main menu.</li>
+        <li>Click <i>Climbers</i> in the menu.</li>
         <li>Add and edit climbers.</li>
       </ol>
       <p>
@@ -262,23 +238,21 @@
     <section name="comp-cat">
       <h1>Add and edit competitor categories</h1>
       <p>
-        Organization admins only.
+        Admins only.
       </p>
-      <p>
-        You must be signed in.
-      </p>
+      {{> SignedIn}}
       <ol>
-        <li>Go to your organization's Piki home page by clicking your organization's name at the top left of the page.</li>
-        <li>Click <i>Competitor categories</i> in the main menu.</li>
+        <li>Click <i>Categories</i> in the menu.</li>
         <li>Click <i>Add new category</i>.<br>
           Or, to edit an existing category, select the category from the list.<br>
           <b>Note:</b> editing an existing category will change that
           category only for new events. To edit a category for an
           event already created,
           <inlinehelp>
-            <a href="#go-to-edit-event">go to the <i>Edit event</i> page</a><popup>{{> NavGoToEditEvent}}</popup>
+            go to the <i>Edit event</i> page<popup>{{> NavEditEvent}}</popup>
           </inlinehelp>
-          for that event.<br>  Instructions:<br>
+          for that event.<br>
+          Instructions:<br>
           <ol>
             <li>Enter the <b>category name</b>, e.g. <i>Female Youth A Lead</i>.</li>
 
@@ -324,23 +298,18 @@
     <section name="comp-format">
       <h1>Competition format</h1>
       <p>
-        Organization admins only.
+        Admins only.
       </p>
-      <p>
-        You must be signed in.
-      </p>
+      {{> SignedIn}}
       <p>
         To set the competition format for a category:<br>
         <ul>
-          <li>For an event in which there are already competitors registered in the category,
+          <li>For a single event,
             <inlinehelp>
-              <a href="#go-to-edit-event">go to the <i>Edit event</i> page</a><popup>{{> NavGoToEditEvent}}</popup>
+              go to the <i>Edit event</i> page<popup>{{> NavEditEvent}}</popup>
             </inlinehelp>
             for that event, and enter a competition format code as detailed below.</li>
-          <li>For new events and events in which there are not yet competitors registered in the category,
-            <inlinehelp>
-              <a href="#go-to-comp-cat">go to <i>Competitor categories</i></a><popup>{{> NavGoToCompCat}}</popup>
-            </inlinehelp>, select a competitor category, and enter a competition format code as detailed below.
+          <li>For all new events and all existing events in which there are not yet competitors registered in the category, click <i>Categories</i> in the menu, select a competitor category, and enter a competition format code as detailed below.
           </li>
         </ul>
       </p>
@@ -351,101 +320,46 @@
     </section>
 
     <section name="series-add">
-      <h1>Add series</h1>
+      <h1>Add and edit series</h1>
       <p>
-        Organization admins only.
+        Admins only.
       </p>
-      <p>
-        You must be signed in.
-      </p>
+      {{> SignedIn}}
       <ol>
-        <li>Go to your organization's Piki home page by clicking your organization's name at the top left of the page.</li>
-        <li>Click <i>Series</i> in the main menu.</li>
-        <li>Click <i>Add new series</i>.</li>
-        <li>Add series.</li>
+        <li>Click <i>Calendar</i> in the menu.</li>
+        <li>Click <i>Series</i> in the menu bar.</li>
+        <li>Click <i>Add new series</i>.<br>
+          Or, to edit an existing series, click the desired series in the list, and click <i>Edit</i> in the menu bar.<br>
+          Or, to add a new event to a series, click the desired series in the list, and click <i>Events</i> in the menu bar, then click <i>Add new event</i>.</li>
       </ol>
-    </section>
-
-    <section name="series-edit">
-      <h1>Edit series</h1>
       <p>
-        Organization admins only.
-      </p>
-      <p>
-        You must be signed in.
-      </p>
-      <ol>
-        <li><a href="#go-to-series-results">Go to the series</a>.</li>
-        <li>Click <i>Edit</i> in the main menu.</li>
-        <li>Edit the series' details.</li>
-      </ol>
-    </section>
-
-    <section name="series-add-event">
-      <h1>Add an event to a series</h1>
-      <p>
-        Organization admins only.
-      </p>
-      <p>
-        You must be signed in.
-      </p>
-      <p>
-        To add an existing event to a series:
+        To add an existing event to a series or remove an event from a series:
         <ol>
-          <li><a href="#go-to-edit-event">Go to the <i>Edit event</i> page</a> for the event.</li>
-          <li>Select the desired series from the dropdown <i>Series</i> menu.</li>
-          <li>Click <i>Save</i>.</li>
-        </ol>
-      </p>
-      <p>
-        To create a new event and add it to a series:
-        <ol>
-          <li><a href="#go-to-series-results">Go to the series</a>.</li>
-          <li>Click <i>Events</i> in the main menu.</li>
-          <li>Click the <i>Add new event</i> button.</li>
-          <li>Add event.</li>
+          <li>
+            <inlinehelp>
+              Go to the <i>Edit event</i> page<popup>{{> NavEditEvent}}</popup>
+            </inlinehelp>
+            for the event.
+          </li>
+          <li>In the <i>Series</i> dropdown menu, select the desired series, or select <i>none</i> to remove the event from the series.</li>
         </ol>
       </p>
     </section>
 
     <section name="event-add">
-      <h1>Add events</h1>
+      <h1>Add, edit and delete events</h1>
       <p>
-        Organization admins only.
+        Admins only.
       </p>
-      <p>
-        You must be signed in.
-      </p>
+      {{> SignedIn}}
       <ol>
-        <li>Go to your organization's Piki home page by clicking your organization's name at the top left of the page.</li>
-        <li>Click <i>Events</i> in the main menu.</li>
-        <li>Click <i>Add new event</i>.</li>
-        <li>Add event.</li>
-      </ol>
-    </section>
-
-    <section name="event-edit">
-      <h1>Edit and delete events</h1>
-      <p>
-        Organization admins only.
-      </p>
-      <p>
-        You must be signed in.
-      </p>
-      <ol>
-        <li>
+        <li>Click <i>Calendar</i> in the menu.</li>
+        <li>Click <i>Add new event</i>.<br>
+          Or, to edit or delete an existing event,
           <inlinehelp>
-            <a href="#go-to-edit-event">Go to the <i>Edit event</i> page</a><popup>{{> NavGoToEditEvent}}</popup>
+            go to the <i>Edit event</i> page<popup>{{> NavEditEvent}}</popup>
           </inlinehelp>
           for the event.
-        </li>
-        <li>On the <i>Edit event</i> page, edit the event’s name or date, edit the
-          <inlinehelp>
-            <a href="#comp-format-lead">competition format</a><popup>{{> CompFormatLead}}{{> CompFormatBoulder}}</popup>
-          </inlinehelp>
-          of any of the competitor categories, and click <i>Save</i> to confirm.<br>
-          Or, to delete the event, click <i>Delete</i>, and confirm in the popup box.<br>
-          <b>Note:</b> only categories in which there is a competitor registered will show in the list for editing competition format.
         </li>
       </ol>
     </section>
@@ -453,16 +367,14 @@
     <section name="registration">
       <h1>Register climbers for an event</h1>
       <p>
-        Organization admins only.
+        Admins only.
       </p>
-      <p>
-        You must be signed in.
-      </p>
+      {{> SignedIn}}
 
       <section>
         <span name="upload-registrations">
           <h1>Upload multiple registrations from file</h1>
-          <p>The current <i>Upload registrations</i> feature is designed for use with Climbing NZ's registration system. Climbing NZ users, please contact your organization administrator for instructions.
+          <p>The current <i>Upload registrations</i> feature is a hack designed for use with Climbing NZ's registration system. Climbing NZ users, please contact your Org Admin for instructions. Other organizations, please <a href="mailto:piki@vimaly.com?subject=requesting%20Piki%20upload%20reg%20instructions%20and%20sample">email Piki</a> to request instructions and a sample CSV file showing the format you will need to use in your upload file.
           </p>
       </section>
 
@@ -471,7 +383,7 @@
         <ol>
           <li>
             <inlinehelp>
-              <a href="#go-to-registrations">Go to the <i>Registrations</i> page</a><popup>{{> NavGoToReg}}</popup>
+              Go to the <i>Registrations</i> page<popup>{{> NavReg}}</popup>
             </inlinehelp>
             for the event.
           </li>
@@ -488,39 +400,33 @@
     <section name="reg-change">
       <h1>Change or remove a competitor’s registration</h1>
       <p>
-        Organization admins only.
+        Admins only.
       </p>
-      <p>
-        You must be signed in.
-      </p>
+      {{> SignedIn}}
       <ol>
         <li>
           <inlinehelp>
-            <a href="#go-to-registrations">Go to the <i>Registrations</i> page</a><popup>{{> NavGoToReg}}</popup>
+            Go to the <i>Registrations</i> page<popup>{{> NavReg}}</popup>
           </inlinehelp>
           for the event.
         </li>
         <li>On the <i>Registrations</i> page, click on the competitor’s name.</li>
         <li>Change the competitor's registration, and click <i>Save</i> to confirm.<br>
-            Or deregister the competitor and confirm in the popup box.</li>
+          Or deregister the competitor and confirm in the popup box.</li>
       </ol>
     </section>
 
     <section name="comp-number">
       <h1>Designate or change a competitor number</h1>
       <p>
-        Organization admins only.
+        Admins only.
       </p>
-      <p>
-        You must be signed in.
-      </p>
+      {{> SignedIn}}
       <ol>
         <li>
+          Click <i>Climbers</i> in the menu, or
           <inlinehelp>
-            <a href="#go-to-climbers">Go to your organization's <i>Climbers</i> list</a><popup>{{> NavGoToClimbers}}</popup>
-          </inlinehelp>, or
-          <inlinehelp>
-            <a href="#go-to-registrations">go to the <i>Registrations</i> page</a><popup>{{> NavGoToReg}}</popup>
+            go to the <i>Registrations</i> page<popup>{{> NavReg}}</popup>
           </inlinehelp>
           for an event in which the competitor is registered.
         </li>
@@ -528,34 +434,33 @@
         <li>Enter the competitor number in the cell provided.</li>
         <li>Click <i>Save</i> to confirm.</li>
       </ol>
-
     </section>
 
     <section name="view-and-print">
       <h1>Print judging sheets</h1>
-        <p>
-          Printed <a href="#go-to-results-start-lists">start lists</a> {{> Judgingsheets}}
-        </p>
+      <p>
+        Printed
+        <inlinehelp>
+          start lists<popup>{{> NavStartLists}}</popup>
+        </inlinehelp>
+         {{> Judgingsheets}}
+      </p>
     </section>
 
     <section name="results">
 
       <h1>Enter and edit results</h1>
       <p>
-        Organization admins and judges only.
+        Admins and judges only.
       </p>
-      <p>
-        You must be signed in.
-      </p>
+      {{> SignedIn}}
       <ol>
         <li>
           <inlinehelp>
-            <a href="#go-to-results-start-lists">Go to the <i>Start lists</i> page</a><popup>{{> NavStartLists}}</popup>
+            Go to the <i>Start lists</i> page<popup>{{> NavStartLists}}</popup>
           </inlinehelp>
-          for the event, and click on the desired round or route.</br>
+          for the event, and click on the desired round or route.<br>
           Alternatively, from the <i>Results</i> page for the desired round or route, click <i>Show start order</i> at the top right of the page, or click in one of the <i>score</i> cells.
-        </li>
-          </ul>
         </li>
         <li>At the start list, click in the appropriate cell in the
           table and type the score (see <i>Lead scores</i> and <i>Boulder scores</i> below for details).</li>
@@ -592,22 +497,22 @@
               <th>In:</th>
             </tr>
             <tr>
-              <td>The competitor's <b>attempts to complete the boulder</b></td>
+              <td>The number of attempts in which the <b>competitor completed the boulder</b></td>
               <td>The number of attempts it took the competitor to complete the boulder</td>
               <td>The <b>top left cell</b> in the score box</td>
             </tr>
             <tr>
-              <td>The competitor's <b>attempts to achieve the bonus</b></td>
-              <td>The number of attempts it took the competitor to achieve the bonus</td>
+              <td>The number of attempts in which the <b>competitor achieved the zone hold</b></td>
+              <td>The number of attempts it took the competitor to achieve the zone hold</td>
               <td>The <b>lower right cell</b> in the score box</td>
             </tr>
             <tr>
-              <td>The competitor <b>did not complete the boulder</b></td>
-              <td>"<b>-</b>" (dash)</td>
+              <td>The competitor attempted and <b>did not complete the boulder</b></td>
+              <td>"<b>-</b>" (dash) (Optional)</td>
               <td>The <b>top left cell</b> in the score box</td>
             </tr>
             <tr>
-              <td>The competitor attempted the boulder and <b>did not achieve the bonus</b></td>
+              <td>The competitor attempted the boulder and <b>did not achieve the zone hold</b></td>
               <td>"<b>-</b>" (dash)</td>
               <td>Either cell in the score box</td>
             </tr>
@@ -618,8 +523,18 @@
             <tr>
           </table>
           <br>
-          <b>Note:</b> If a number for attempts to achieve the bonus is entered which is greater than the attempts to complete the boulder, the score will not be saved and the cell will be highlighted to indicate an invalid score, because it is not possible for a competitor to take more attempts to achieve the bonus than to complete the boulder.<br><br>
+          <b>Note:</b> If a number for attempts to achieve the zone hold is entered which is greater than the attempts to complete the boulder, the score will not be saved and the cell will be highlighted to indicate an invalid score, because it is not possible for a competitor to take more attempts to achieve the zone hold than to complete the boulder.<br><br>
           <b>Piki totals the boulder scores entered and displays the sum</b> in the format:
+          <ul>
+            <li><tt><b><i>n</i>T <i>n</i>Z <i>a</i>AT <i>a</i>AZ</b></tt> (<i>n</i> = the number of tops or zone holds achieved; <i>a</i>
+              = the number of attempts taken to achieve those tops or
+              zone holds;<br> e.g. 2T 3Z 5AT 4AZ is a score indicating 2 tops
+              achieved in 5 attempts and 3 zone holds achieved in 4
+              attempts)</li>
+            <li><tt>0T 0Z</tt> (no tops or zone holds achieved)</li>
+          </ul>
+        <p>
+          Or prior to 2018 in the format:
           <ul>
             <li><tt><b><i>n</i>t<i>a n</i>b<i>a</i></b></tt> (<i>n</i> = the number of tops or bonus holds achieved; <i>a</i>
               = the number of attempts taken to achieve those tops or
@@ -636,6 +551,9 @@
     <section name="navigate">
       <h1>Navigate Piki</h1>
       <span name="go-to-results-start-lists">
+        <p>
+          To go to <b><i>Results</i></b> or <b><i>Start lists</i></b> for an event:
+        </p>
         {{> NavResultsStartLists}}
       </span>
       <span name="go-to-team-results">
@@ -647,21 +565,19 @@
       <span name="user-sign-in">
         <p>To <b><i>sign in</i></b> as a user:</p>
         <ul>
-          <li>Click <i>Sign in</i> (top right-hand of page), and sign in.</li>
+          <li>Click <i>Sign in</i> in the menu.</li>
           <li>If you do not know your password, click <i>Sign in</i>, then click <i>Forgot password</i>.</li>
         </ul>
       </span>
       <span name="go-to-edit-event">
-        {{> NavGoToEditEvent}}
+        To go to the <b><i>Edit event</i></b> page for an event:
+        {{> NavEditEvent}}
       </span>
       <span name="go-to-registrations">
-        {{> NavGoToReg}}
-      </span>
-      <span name="go-to-comp-cat">
-        {{> NavGoToCompCat}}
-      </span>
-      <span name="go-to-climbers">
-        {{> NavGoToClimbers}}
+        <p>
+          To go to the <b><i>Registrations</i></b> page for an event:
+          {{> NavReg}}
+        </p>
       </span>
     </section>
 
@@ -673,7 +589,7 @@
           <li>That Piki will be available at a specific time or that it will continue to be available.</li>
           <li>That Piki will include a desired feature, even a feature considered essential to the running of a competition, or will continue to include existing features.</li>
           <li>That Piki will be free of significant defects at any time.</li>
-          <li>To endeavour to fix known defects.</li>
+          <li>To fix known defects.</li>
           <li>That Piki will function as described in this <i>Help</i> document or in other communications.</li>
           <li>That Piki organizations and users will continue to have access to their Piki accounts.</li>
           <li>That data entered into the Piki system will be kept private. We will endeavour to ensure, but do not undertake, that only Piki's developers and the organization's users with admin status can access users' email addresses.</li>
@@ -693,7 +609,7 @@
       <section>
 
         <h1>I can't see content I'm looking for</h1>
-        <p>Ensure you are at the Piki page of the correct organization. When you are at the Piki page of one organization, you cannot see the content of another organization.
+        <p>Ensure you are on a Piki page of the correct organization. When you are on a Piki page of one organization, you cannot see the content of another organization.
         </p>
         <p>Ensure you are signed in with the appropriate access status:
           admin or judge.
@@ -712,7 +628,11 @@
 
         <h1>Where are the judging sheets for entering scores by hand during climbing?</h1>
         <p>
-          Printed <a href="#go-to-results-start-lists">start lists</a> {{> Judgingsheets}}
+          Printed
+          <inlinehelp>
+            start lists<popup>{{> NavStartLists}}</popup>
+          </inlinehelp>
+           {{> Judgingsheets}}
         </p>
 
         <h1>What does a score of <i>DNC</i> or <i>nc</i> mean?</h1>
@@ -720,39 +640,27 @@
         </p>
 
         <h1>What does a score of "<b>-</b>" (dash) mean?</h1>
-        <p>The competitor attempted the boulder and did not achieve the bonus.
+        <p>The competitor attempted the boulder and did not achieve the zone hold.
         </p>
 
-        <h1>I don't understand how the rankings or series results or team results are calculated</h1>
+        <h1>How are the rankings, series results or team results calculated?</h1>
         <p>Piki calculates rankings, series results and team results as set out in the <a href="https://www.ifsc-climbing.org">IFSC</a> rules.
         </p>
 
         <h1>I can't select all of the categories I want to print</h1>
-        <p>{{> SelectCategoriesToPrint}}
-        </p>
-
-        <h1>A competitor did not climb a qualification route or round, and I
-          would like their qualification rank to be displayed in the
-          results</h1>
-        <p><b>Lead</b><br>
-          Enter "<tt>dnc</tt>" (did not climb) as the competitor's score for the route(s) in which they did not climb.
-        </p>
-        <p><b>Bouldering</b><br>
-          Enter "<tt>nc</tt>" (did not climb) as the competitor's score in one of the cells for at least one of the boulders of the round.
-        </p>
-
+        {{> SelectCategoriesToPrint}}
       </section>
     </section>
 
     <section name="contact-us">
       <h1>Contact us</h1>
       <p>
-        <a href="mailto:piki@vimaly.com?subject=Application%20to%20register%20as%20an%20organization%20on%20Piki&body=Organization%20name:%20%0a%0aOrganization%20website:%20%0a%0aOrganization%20email%20address:%20%0a%0aName%20of%20person%20to%20be%20my%20organization's%20Piki%20admin:%20%0a%0aThe%20email%20address%20that%20person%20wishes%20to%20use%20to%20sign%20in:%20%0a%0aName%20and%20date%20of%20the%20first%20event%20where%20we%20would%20like%20to%20test%20Piki:%20%0a%0aMy%20organization%20_____________________________%20(insert%20organization%20name)%20understands%20and%20accepts%20the%20Disclaimer%20and%20General%20Information%20in%20the%20Help%20on%20the%20Piki%20website.%0a%0aHow%20we%20heard%20about%20Piki:%20%0a%0aAny%20further%20information:%20">Apply to register as an organization</a>. (Please read the <a href="#disclaimer">Disclaimer</a> and <a href="#general-info">General information</a>.)
+        <a href="mailto:piki@vimaly.com?subject=Application%20to%20register%20as%20an%20organization%20on%20Piki&body=Organization%20name:%20%0a%0aOrganization%20website:%20%0a%0aOrganization%20email%20address:%20%0a%0aName%20of%20person%20to%20be%20my%20organization's%20Piki%20Admin:%20%0a%0aThe%20email%20address%20that%20person%20wishes%20to%20use%20to%20sign%20in:%20%0a%0aName%20and%20date%20of%20the%20first%20event%20where%20we%20would%20like%20to%20test%20Piki:%20%0a%0aMy%20organization%20_____________________________%20(insert%20organization%20name)%20understands%20and%20accepts%20the%20Disclaimer%20and%20General%20Information%20in%20the%20Help%20on%20the%20Piki%20website.%0a%0aHow%20we%20heard%20about%20Piki:%20%0a%0aAny%20further%20information:%20">Apply to register as an organization</a>. (Please read the <a href="#disclaimer">Disclaimer</a> and <a href="#general-info">General information</a>.)
       </p>
-      <p>To arrange to be added as a <b>Piki user</b> to manage your organization’s events, please contact your
-        organization administrator.
+      <p>
+        To sign up to manage your organization's Piki events, please contact a <i>Piki Org Admin</i> from your organization to arrange to be added as a Piki user.
       </p>
-      <p>If you have feedback, suggestions, or questions not answered in the Help, please <a href="mailto:piki@vimaly.com?subject=enquiry%20from%20website">email Piki</a>. We have a long list of improvements we'd like to make to Piki; it's very helpful to hear from Piki's users which improvements and new features would be most useful to you.
+      <p>If you have feedback, suggestions, or questions not answered in the Help, please <a href="mailto:piki@vimaly.com?subject=enquiry%20from%20Piki%20website">email Piki</a>. We have a long list of improvements we'd like to make to Piki; it's very helpful to hear from Piki's users which improvements and new features would be most useful to you.
       </p>
     </section>
 

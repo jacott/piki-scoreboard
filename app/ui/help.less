@@ -1,3 +1,5 @@
+@import "global.lessimport";
+
 #Help {
   padding: 10px;
   max-width: 780px;
@@ -24,6 +26,10 @@
     float: right;
   }
 
+  i.more_vert {
+    .md-inline-icon("more_vert");
+  }
+
   section section>h1 {
     font-size: 1.2em;
   }
@@ -34,5 +40,9 @@
       padding: 4px;
       border: 1px solid #aaa;
     }
+  }
+
+  inlinehelp {
+    color: @cPrimaryText;
   }
 }
