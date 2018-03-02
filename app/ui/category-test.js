@@ -53,7 +53,7 @@ isClient && define(function (require, exports, module) {
           TH.change('[name=type]', 'L');
           TH.input('[name=heatFormat]', 'QQF26F8');
           TH.input('[name=group]', 'A');
-          TH.change('[name=gender]', 'm');
+          TH.selectMenu('[name=gender]', 'm');
           TH.input('[name=minAge]', '14');
           TH.change('[name=maxAge]', '15');
           TH.click('[type=submit]');
