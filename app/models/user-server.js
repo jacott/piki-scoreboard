@@ -146,7 +146,7 @@ define(function(require, exports, module) {
 
         if (this.$isNewRecord()) {
           const existingUser = User.where({email: (this.email||'').trim().toLowerCase()}).fetchOne();
-          if (existingUser.org_id !== this.changes.org_id) {
+          if (existingUser !== undefined && existingUser.org_id !== this.changes.org_id) {
             this.attributes = existingUser.attributes;
             this.changes = {role: this.changes.role, org_id: this.changes.org_id};
           }

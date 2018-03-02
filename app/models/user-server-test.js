@@ -150,18 +150,42 @@ define(function (require, exports, module) {
         const org = Factory.createOrg();
         const subject = Factory.createUser({_id: 'subjUser'});
         const org2 = Factory.createOrg();
+        const admin = Factory.createUser('admin', {_id: 'adminUser'});
+
         const sub2 = new User({});
         sub2.changes = {
           _id: 'sub2', org_id: org2._id,
           name: 'sub 2', initials: 'S2',
-          email: subject.email, role: 'c',
+          email: '   '+subject.email.toUpperCase()+'   ', role: 'c',
         };
 
-        const admin = Factory.createUser('admin', {_id: 'adminUser'});
         sub2.authorize(admin._id);
 
         assert.equals(sub2.changes, {org_id: org2._id, role: 'c'});
         assert.equals(sub2.attributes, subject.attributes);
+      },
+
+      "test new record new email"() {
+        const org = Factory.createOrg();
+        const subject = Factory.createUser({_id: 'subjUser'});
+        const org2 = Factory.createOrg();
+        const admin = Factory.createUser('admin', {_id: 'adminUser'});
+
+        const sub2 = new User({});
+        sub2.changes = {
+          _id: 'sub2', org_id: org2._id,
+          name: 'sub 2', initials: 'S2',
+          email: 'new'+subject.email, role: 'c',
+        };
+
+        sub2.authorize(admin._id);
+
+        assert.equals(sub2.changes, {
+          _id: 'sub2', org_id: org2._id,
+          name: 'sub 2', initials: 'S2',
+          email: 'new'+subject.email, role: 'c',
+        });
+        assert.equals(sub2.attributes, {});
       },
 
       "test admin changing superuser"() {
