@@ -7,8 +7,6 @@ define(function(require, exports, module) {
   const util            = require('koru/util');
   const Role            = require('models/role');
 
-  const roleCache$ = Symbol(), observers$ = Symbol();
-
   return function (User) {
     const SELF_FIELD_SPEC = {
       org_id: 'id',
@@ -25,14 +23,18 @@ define(function(require, exports, module) {
       _id: 'id',
     };
 
+    const createLogin = user=>{
+      UserAccount.updateOrCreateUserLogin({email: user.email, userId: user._id});
+      UserAccount.sendResetPasswordEmail(user);
+    };
+
     let orgObs = util.createDictionary();
     {
       require(['./change-log'], ChangeLog =>{ChangeLog.logChanges(User)});
 
       User.onChange((now, undo)=>{
         if (undo === null) {
-          UserAccount.createUserLogin({email: now.email, userId: now._id});
-          UserAccount.sendResetPasswordEmail(now);
+          createLogin(now);
         } else {
           if (undo && undo.email) {
             UserAccount.updateOrCreateUserLogin({userId: now._id, email: now.email});
@@ -68,6 +70,7 @@ define(function(require, exports, module) {
         if ('org_id' in changes) {
           const {org_id, role} = changes;
           delete changes.org_id;
+
           if (! ('role' in changes)) return;
           delete changes.role;
           if (role === 's') {
@@ -84,13 +87,22 @@ define(function(require, exports, module) {
               Role.create({user_id: doc._id, role: 's'});
             }
           } else {
+
             const roleDoc = Role.query.whereSql(
               `user_id = {$user_id} and (org_id is null or org_id = {$org_id})`,
               {org_id, user_id: doc._id}).fetchOne();
-            if (roleDoc === undefined)
-              Role.create({org_id, user_id: doc._id, role});
-            else if (roleDoc.role !== role) {
-              if (roleDoc.org_id === undefined)
+            if (roleDoc === undefined) {
+              if (role != null) {
+                Role.create({org_id, user_id: doc._id, role});
+                createLogin(doc);
+              }
+            } else if (roleDoc.role !== role) {
+              if (role == null) {
+                roleDoc.$remove();
+                if (! Role.exists({user_id: doc._id})) {
+                  UserAccount.model.where({userId: doc._id}).remove();
+                };
+              } else if (roleDoc.org_id === undefined)
                 roleDoc.$update({org_id, role});
               else
                 roleDoc.$update({role});
@@ -121,7 +133,8 @@ define(function(require, exports, module) {
     util.merge(User.prototype, {
       authorize(userId) {
         const authUser = User.findById(userId);
-        Val.allowAccessIf(authUser && ('org_id' in this.changes) && ('org_id' in this.changes));
+
+        Val.allowAccessIf(authUser && ('org_id' in this.changes));
 
         if (userId === this._id) {
           Val.assertDocChanges(this, SELF_FIELD_SPEC);
@@ -160,7 +173,7 @@ define(function(require, exports, module) {
       }
     });
 
-    session.defineRpc("User.forgotPassword", function (email, challenge, response) {
+    session.defineRpc("User.forgotPassword", (email, challenge, response)=>{
       Val.ensureString(email);
 
       email = email.trim();

@@ -146,6 +146,18 @@ define(function (require, exports, module) {
         }
       },
 
+      "test org_is not in changes"() {
+        const org = Factory.createOrg();
+        const subject = Factory.createUser({_id: 'subjUser'});
+        const admin = Factory.createUser('admin', {_id: 'adminUser'});
+        const user = Factory.createUser('su', {_id: 'suUser'});
+        user.changes = {name: 'new name'};
+        TH.noInfo();
+        assert.exception(()=>{
+          user.authorize(admin._id);
+        }, {error: 403});
+      },
+
       "test new record same email"() {
         const org = Factory.createOrg();
         const subject = Factory.createUser({_id: 'subjUser'});
@@ -240,15 +252,40 @@ define(function (require, exports, module) {
       const org2 = Factory.createOrg();
       user.changes = {org_id: org2._id, role: 'c'};
 
+      stub(UserAccount, 'sendResetPasswordEmail');
+
       user.$$save();
 
       assert(Role.exists({org_id: org2._id, user_id: user._id, role: 'c'}));
+
+      assert.calledWith(UserAccount.sendResetPasswordEmail, user);
+
+      assert(UserAccount.model.exists({userId: user._id, email: user.email}));
 
       user.changes = {org_id: org2._id, role: 'a'};
 
       user.$$save();
 
       assert(Role.exists({org_id: org2._id, user_id: user._id, role: 'a'}));
+    },
+
+    "test delete"() {
+      const org2 = Factory.createOrg();
+      const user = Factory.createUser();
+      UserAccount.createUserLogin({email: user.email, userId: user._id});
+      user.changes = {org_id: org2._id, role: null};
+
+      user.$$save();
+
+      refute(Role.exists({org_id: org2._id, user_id: user._id}));
+      refute(UserAccount.model.exists({email: user.email}));
+
+      /** make sure does not create is missing **/
+      user.changes = {org_id: org2._id, role: null};
+
+      user.$$save();
+
+      refute(Role.exists({org_id: org2._id, user_id: user._id}));
     },
 
     "test createUser"() {
