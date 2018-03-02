@@ -1,22 +1,23 @@
 define(function(require, exports, module) {
-  const koru         = require('koru');
-  const Dom          = require('koru/dom');
-  const CompleteList = require('koru/ui/complete-list');
-  const Dialog       = require('koru/ui/dialog');
-  const Form         = require('koru/ui/form');
-  const Route        = require('koru/ui/route');
-  const SelectMenu   = require('koru/ui/select-menu');
-  const util         = require('koru/util');
-  const Category     = require('models/category');
-  const Climber      = require('models/climber');
-  const Competitor   = require('models/competitor');
-  const Team         = require('models/team');
-  const TeamType     = require('models/team-type');
-  const TeamTpl      = require('ui/team');
-  const TeamHelper   = require('ui/team-helper');
-  const App          = require('./app-base');
+  const koru            = require('koru');
+  const Dom             = require('koru/dom');
+  const CompleteList    = require('koru/ui/complete-list');
+  const Dialog          = require('koru/ui/dialog');
+  const Form            = require('koru/ui/form');
+  const Route           = require('koru/ui/route');
+  const SelectMenu      = require('koru/ui/select-menu');
+  const util            = require('koru/util');
+  const Category        = require('models/category');
+  const Climber         = require('models/climber');
+  const Competitor      = require('models/competitor');
+  const Team            = require('models/team');
+  const TeamType        = require('models/team-type');
+  const User            = require('models/user');
+  const TeamTpl         = require('ui/team');
+  const TeamHelper      = require('ui/team-helper');
+  const App             = require('./app-base');
   require('./climber');
-  const eventTpl     = require('./event');
+  const eventTpl        = require('./event');
 
   const Tpl   = Dom.newTemplate(require('koru/html!./event-register'));
   const $ = Dom.current;
@@ -33,6 +34,7 @@ define(function(require, exports, module) {
   koru.onunload(module, ()=>{eventTpl.route.removeBase(Tpl)});
 
   const base = eventTpl.route.addBase(module, Tpl);
+
   base.addTemplate(module, Add, {
     focus: true,
     defaultPage: true,
@@ -415,6 +417,8 @@ define(function(require, exports, module) {
     competitor.team_ids = climber.team_ids;
     competitor.number = climber.number;
   }
+
+  App.abortEntryIfGuest(Tpl);
 
   return Tpl;
 });

@@ -25,7 +25,25 @@ define(function(require, exports, module) {
 
   koru.onunload(module, 'reload');
 
-  util.extend(App, {
+  util.merge(App, {
+    abortEntryIfGuest(Tpl) {
+      let orig;
+      const override = (page, pageRoute, callback)=>{
+        if (koru.userId() == null || User.isGuest()) {
+          Route.abortPage(Route.root.defaultPage);
+          return;
+        }
+
+        orig == null || orig.call(Tpl, page, pageRoute, callback);
+      };
+      if (Tpl.onEntry == null) {
+        orig = Tpl.onBaseEntry;
+        Tpl.onBaseEntry = override;
+      } else {
+        orig = Tpl.onEntry;
+        Tpl.onEntry = override;
+      }
+    },
     AVATAR_URL: 'https://secure.gravatar.com/avatar/',
 
     text: ResourceString.text,

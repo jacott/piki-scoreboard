@@ -1,38 +1,38 @@
 define(function(require, exports, module) {
-  var koru = require('koru');
-  var App   = require('./app-base');
-  var Dom   = require('koru/dom');
-  var Route = require('koru/ui/route');
-  var Tpl   = Dom.newTemplate(require('koru/html!./reg-upload'));
-  var util  = require('koru/util');
-  var eventTpl = require('./event');
+  const koru            = require('koru');
+  const Dom             = require('koru/dom');
+  const Form            = require('koru/ui/form');
+  const Route           = require('koru/ui/route');
+  const util            = require('koru/util');
+  const RegUpload       = require('models/reg-upload-client');
+  const App             = require('./app-base');
   require('./climber');
-  var Form = require('koru/ui/form');
-  var RegUpload = require('models/reg-upload-client');
+  const eventTpl        = require('./event');
 
-  var $ = Dom.current;
+  const Tpl   = Dom.newTemplate(require('koru/html!./reg-upload'));
+  const $ = Dom.current;
 
-  koru.onunload(module, function () {
-    eventTpl.route.removeTemplate(Tpl);
-  });
+  koru.onunload(module, ()=>{eventTpl.route.removeTemplate(Tpl)});
 
   eventTpl.route.addTemplate(module, Tpl, {
     focus: true,
-    data: function (page, pageRoute) {
+    data(page, pageRoute) {
       if (! eventTpl.event) Route.abortPage();
 
       return eventTpl.event;
     }
   });
 
+  App.abortEntryIfGuest(Tpl);
+
   Tpl.$extend({
-    $created: function (ctx) {
+    $created(ctx) {
       Dom.autoUpdate(ctx);
     },
   });
 
   Tpl.$helpers({
-    eachError: function () {
+    eachError() {
       var frag = document.createDocumentFragment();
 
       this.errors && this.errors.forEach(function (error) {
@@ -43,7 +43,7 @@ define(function(require, exports, module) {
   });
 
   Tpl.$events({
-    'change input[name=filename]': function (event) {
+    'change input[name=filename]'(event) {
       var fileInput = this;
       var file;
       var mFile;
@@ -67,15 +67,15 @@ define(function(require, exports, module) {
   });
 
   Tpl.ErrorRow.$helpers({
-    line: function () {
+    line() {
       return this[0];
     },
 
-    fields: function () {
+    fields() {
       return JSON.stringify(this[1]);
     },
 
-    message: function () {
+    message() {
       return this[2];
     },
 

@@ -228,6 +228,8 @@ define(function(require, exports, module) {
     }
   });
 
+  App.abortEntryIfGuest(Tpl.Edit);
+
   Tpl.Add.$events({
     'click [name=cancel]': cancel,
     'click [type=submit]': Form.submitFunc('AddEvent', 'back'),

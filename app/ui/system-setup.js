@@ -140,5 +140,7 @@ define(function(require, exports, module) {
     }),
   });
 
+  App.abortEntryIfGuest(Tpl);
+
   return Tpl;
 });
