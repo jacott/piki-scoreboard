@@ -149,6 +149,7 @@ define(function (require, exports, module) {
 
       assert.same(heat.numberToScore(3049693  ), '3T4Z3AT6AZ');
       assert.same(heat.numberToScore(0        ), '0T0Z');
+      assert.same(heat.numberToScore(9999     ), '0T0Z');
       assert.same(heat.numberToScore( 49979   ), '0T4Z0AT20AZ');
       assert.same(heat.numberToScore(2057900  ), '2T5Z20AT99AZ');
 

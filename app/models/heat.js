@@ -93,7 +93,7 @@ define(function(require) {
     }
 
     numberToBoulderScorePre2018(score, index) {
-      if (score == 0) return "0t 0b";
+      if (score == 0) return "0t 0b"; // redundant?
       var mod, result = "";
       for(var i = 0; i < 2; ++i,
               score = Math.floor(score/10000)) {
@@ -108,7 +108,8 @@ define(function(require) {
     }
 
     numberToBoulderScore2018(score, index) {
-      if (score == 0) return "0T0Z";
+      if (score == 0) return "0T0Z"; // redundant?
+      if (score == 9999) return "0T0Z";
       var mod, result = "";
       for (var i = 0; i < 4; ++i, score = Math.floor(score/100)) {
         if (i < 2) {
