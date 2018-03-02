@@ -6,7 +6,7 @@ define(function(require, exports, module) {
   const util  = require('koru/util');
   const Org   = require('models/org');
   const User  = require('models/user');
-  const App   = require('./app-base');
+  const App   = require('./app');
 
   const Tpl = Dom.newTemplate(require('koru/html!./system-setup'));
 
@@ -140,7 +140,7 @@ define(function(require, exports, module) {
     }),
   });
 
-  App.abortEntryIfGuest(Tpl);
+  App.restrictAccess(Tpl);
 
   return Tpl;
 });

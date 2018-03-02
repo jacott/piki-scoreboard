@@ -26,10 +26,10 @@ define(function(require, exports, module) {
   koru.onunload(module, 'reload');
 
   util.merge(App, {
-    abortEntryIfGuest(Tpl) {
+    restrictAccess(Tpl, rolere=/[as]/) {
       let orig;
       const override = (page, pageRoute, callback)=>{
-        if (koru.userId() == null || User.isGuest()) {
+        if (koru.userId() == null || User.isGuest() || ! rolere.test(User.me().safeRole)) {
           Route.abortPage(Route.root.defaultPage);
           return;
         }

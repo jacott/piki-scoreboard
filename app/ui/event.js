@@ -228,7 +228,7 @@ define(function(require, exports, module) {
     }
   });
 
-  App.abortEntryIfGuest(Tpl.Edit);
+  App.restrictAccess(Tpl.Edit);
 
   Tpl.Add.$events({
     'click [name=cancel]': cancel,

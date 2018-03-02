@@ -23,7 +23,7 @@ define(function(require, exports, module) {
     }
   });
 
-  App.abortEntryIfGuest(Tpl);
+  App.restrictAccess(Tpl);
 
   Tpl.$extend({
     $created(ctx) {

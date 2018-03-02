@@ -1,14 +1,15 @@
 isClient && define(function (require, exports, module) {
-  var test, v;
   const Dom         = require('koru/dom');
   const Route       = require('koru/ui/route');
   const UserAccount = require('koru/user-account');
   const Org         = require('models/org');
   const User        = require('models/user');
   const Factory     = require('test/factory');
-  const App         = require('./app-base');
-  const SystemSetup = require('./system-setup');
+  const App         = require('./app');
   const TH          = require('./test-helper');
+
+  const SystemSetup = require('./system-setup');
+  var test, v;
 
   TH.testCase(module, {
     setUp() {

@@ -418,7 +418,7 @@ define(function(require, exports, module) {
     competitor.number = climber.number;
   }
 
-  App.abortEntryIfGuest(Tpl);
+  App.restrictAccess(Tpl);
 
   return Tpl;
 });

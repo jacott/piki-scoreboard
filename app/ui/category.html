@@ -2,7 +2,7 @@
   <template name="Index" extends="/CrudPage.Index">
     <div>
       <nav>
-        {{pageLink name="addCategory" value="Add new category" template="Category.Add"}}
+        {{pageLink name="addCategory" class="adminAccess" value="Add new category" template="Category.Add"}}
       </nav>
       <section class="categories">
         <h1>Competitor categories</h1>
