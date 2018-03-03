@@ -148,7 +148,6 @@ isClient && define(function (require, exports, module) {
         });
         TH.input('[name=initials]', 'FB');
         TH.change('[name=role]', 'a');
-        TH.change('[name=org_id]', v.org._id);
         TH.input('[name=email]', 'FB@foo.com');
         TH.click('[type=submit]');
       });
