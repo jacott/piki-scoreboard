@@ -56,6 +56,26 @@ isClient && define(function (require, exports, module) {
       });
     },
 
+    "test clearAllNumbers"() {
+      stub(session, 'rpc');
+      Route.gotoPage(sut.Index);
+
+      TH.click('[name=clearAllNumbers]');
+
+      TH.confirmRemove(()=> {
+        assert.dom('h1', 'Clear all climber numbers?');
+      });
+
+      assert.calledWith(session.rpc, 'Climber.clearAllNumbers', v.org._id, TH.match(f => v.cb = f));
+
+      assert.dom('#Flash .notice:not(.transient)', 'Clearing all climber numbers...');
+
+      v.cb();
+
+      refute.dom('#Flash .notice:not(.transient)');
+      assert.dom('#Flash .notice.transient', 'Climber numbers cleared');
+    },
+
     "test adding new climber"() {
       var team = TH.Factory.createTeam();
 

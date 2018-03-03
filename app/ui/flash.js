@@ -49,6 +49,7 @@ define(function(require, exports, module) {
     const ctx = Dom.myCtx(elm);
     flash.appendChild(elm);
     transient && ctx.onDestroy(koru.afTimeout(() => {close(elm)}, 7000));
+    return elm;
   }
 
   function close(elm) {

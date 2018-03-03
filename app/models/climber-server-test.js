@@ -1,21 +1,24 @@
 define(function (require, exports, module) {
-  var test, v;
-  const koru    = require('koru');
-  const Val     = require('koru/model/validation');
-  const session = require('koru/session');
-  const TH      = require('test-helper');
-  const Climber = require('./climber');
-  const Org     = require('./org');
-  const Result  = require('./result');
-  const User    = require('./user');
+  const koru            = require('koru');
+  const Val             = require('koru/model/validation');
+  const session         = require('koru/session');
+  const TH              = require('test-helper');
+  const Factory         = require('test/factory');
+  const Climber         = require('./climber');
+  const Org             = require('./org');
+  const Result          = require('./result');
+  const User            = require('./user');
+
+  const {stub, spy, onEnd} = TH;
+
+  let v = null;
 
   TH.testCase(module, {
     setUp() {
-      test = this;
       v = {};
-      v.org = TH.Factory.createOrg();
-      v.user = TH.Factory.createUser();
-      test.stub(koru, 'info');
+      v.org = Factory.createOrg();
+      v.user = Factory.createUser();
+      stub(koru, 'info');
     },
 
     tearDown() {
@@ -25,29 +28,29 @@ define(function (require, exports, module) {
 
     "test merge"() {
       v.rpc = TH.mockRpc();
-      test.stub(Val, 'assertCheck');
-      test.spy(Climber.prototype, 'authorize');
+      stub(Val, 'assertCheck');
+      spy(Climber.prototype, 'authorize');
 
       TH.login();
 
-      const c1 = TH.Factory.createClimber();
-      const c2 = TH.Factory.createClimber();
-      const comp21 = TH.Factory.createCompetitor();
-      const comp22 = TH.Factory.createCompetitor();
-      const result21 = TH.Factory.createResult();
+      const c1 = Factory.createClimber();
+      const c2 = Factory.createClimber();
+      const comp21 = Factory.createCompetitor();
+      const comp22 = Factory.createCompetitor();
+      const result21 = Factory.createResult();
 
-      const c3 = TH.Factory.createClimber();
-      const comp31 = TH.Factory.createCompetitor();
-      const result31 = TH.Factory.createResult();
+      const c3 = Factory.createClimber();
+      const comp31 = Factory.createCompetitor();
+      const result31 = Factory.createResult();
 
-      const c4 = TH.Factory.createClimber();
-      const comp41 = TH.Factory.createCompetitor();
-      const result41 = TH.Factory.createResult();
+      const c4 = Factory.createClimber();
+      const comp41 = Factory.createCompetitor();
+      const result41 = Factory.createResult();
 
       const myConns = {
-        a: {org_id: c1.org_id, sendBinary: test.stub()},
-        b: {org_id: c1.org_id, sendBinary: test.stub()},
-        c: {org_id: 'other', sendBinary: test.stub()},
+        a: {org_id: c1.org_id, sendBinary: stub()},
+        b: {org_id: c1.org_id, sendBinary: stub()},
+        c: {org_id: 'other', sendBinary: stub()},
       };
 
       TH.stubProperty(session, 'conns', {value: myConns});
@@ -76,43 +79,72 @@ define(function (require, exports, module) {
       refute.called(myConns.c.sendBinary);
     },
 
+    "clearAllNumbers": {
+      setUp() {
+        v.org = Factory.createOrg();
+      },
+
+      "test non admin"() {
+        v.rpc = TH.mockRpc();
+        spy(Val, 'assertCheck');
+
+        TH.loginAs(Factory.createUser('judge'));
+
+        assert.exception(()=>{
+          v.rpc("Climber.clearAllNumbers");
+        }, {error: 403});
+
+        assert.calledWith(Val.assertCheck, v.org_id, 'id');
+      },
+
+      "test success"() {
+        v.rpc = TH.mockRpc();
+
+        TH.loginAs(Factory.createUser('admin'));
+
+        const c1 = Factory.createClimber({number: 123});
+        const c2 = Factory.createClimber({number: 456});
+
+        const org2 = Factory.createOrg();
+
+        const c3 = Factory.createClimber({number: 123});
+
+        v.rpc("Climber.clearAllNumbers", v.org._id);
+
+        assert.same(c1.number, undefined);
+        assert.same(c2.$reload(true).number, undefined);
+        assert.same(c3.$reload(true).number, 123);
+      },
+    },
+
     "authorize": {
       "test denied"() {
-        var oOrg = TH.Factory.createOrg();
-        var oUser = TH.Factory.createUser();
+        const oOrg = Factory.createOrg();
+        const oUser = Factory.createUser();
 
-        var climber = TH.Factory.buildClimber();
+        const climber = Factory.buildClimber();
 
-        assert.accessDenied(function () {
-          climber.authorize(v.user._id);
-        });
+        assert.accessDenied(()=>{climber.authorize(v.user._id)});
       },
 
       "test allowed"() {
-        var climber = TH.Factory.buildClimber();
+        const climber = Factory.buildClimber();
 
-        refute.accessDenied(function () {
-          climber.authorize(v.user._id);
-        });
+        refute.accessDenied(()=>{climber.authorize(v.user._id)});
       },
 
       "test okay to remove"() {
-        var climber = TH.Factory.createClimber();
+        const climber = Factory.createClimber();
 
-        refute.accessDenied(function () {
-          climber.authorize(v.user._id, {remove: true});
-        });
+        refute.accessDenied(()=>{climber.authorize(v.user._id, {remove: true})});
 
       },
 
       "test remove in use"() {
-        var climber = TH.Factory.createClimber();
-        var competitor = TH.Factory.createCompetitor();
+        const climber = Factory.createClimber();
+        const competitor = Factory.createCompetitor();
 
-        assert.accessDenied(function () {
-          climber.authorize(v.user._id, {remove: true});
-        });
-
+        assert.accessDenied(()=>{climber.authorize(v.user._id, {remove: true})});
       },
     },
 

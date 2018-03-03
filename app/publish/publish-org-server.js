@@ -31,11 +31,8 @@ define(function(require, exports, module) {
     this.onStop(() => {handles.forEach(handle => {handle.stop()})});
 
     const sendUpdate = this.sendUpdate.bind(this);
-    const sendUser = (doc, was) => {
-      this.sendUpdate(doc, was);
-    };
 
-    handles.push(User.observeOrg_id([org_id], sendUser));
+    handles.push(User.observeOrg_id([org_id], sendUpdate));
     User.db.query(`select u.*,r.role, r.org_id from "User" as u, "Role" as r
 where (r.org_id is null or r.org_id = {$org_id}) and r.user_id = u._id
 `, {org_id, userId}).forEach(d => {this.sendUpdate(new User(d))});

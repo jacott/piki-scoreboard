@@ -1,11 +1,12 @@
 define(function (require, exports, module) {
-  var test, v;
-  const TH      = require('test-helper');
-  const Climber = require('./climber');
+  const TH              = require('test-helper');
+  const Factory         = require('test/factory');
+  const Climber         = require('./climber');
+
+  let v = null;
 
   TH.testCase(module, {
     setUp() {
-      test = this;
       v = {};
     },
 
@@ -15,7 +16,7 @@ define(function (require, exports, module) {
     },
 
     'test creation'() {
-      var climber=TH.Factory.createClimber({team_ids: ['tm1']});
+      const climber = Factory.createClimber({team_ids: ['tm1']});
 
       assert(Climber.exists(climber._id));
 

@@ -1,10 +1,11 @@
 define(function(require) {
-  const Val       = require('koru/model/validation');
-  const session   = require('koru/session');
-  const util      = require('koru/util');
-  const Model     = require('model');
-  const ChangeLog = require('./change-log');
-  const User      = require('./user');
+  const Val             = require('koru/model/validation');
+  const session         = require('koru/session');
+  const util            = require('koru/util');
+  const Model           = require('model');
+  const Role            = require('models/role');
+  const ChangeLog       = require('./change-log');
+  const User            = require('./user');
 
   const FIELD_SPEC = {
     name: 'string',
@@ -63,6 +64,14 @@ define(function(require) {
           if (conn.org_id === climber.org_id)
             conn.sendBinary('B', ['mergeClimbers', climberId, ids]);
         }
+      },
+
+      clearAllNumbers(org_id) {
+        Val.assertCheck(org_id, 'id');
+        Val.allowAccessIf(/[as]/.test(Role.readRole(this.userId, org_id).role));
+        Climber.where('org_id', org_id).whereNot('number', null).forEach(doc => {
+          doc.$update('number', null);
+        });
       },
     });
 

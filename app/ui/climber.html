@@ -2,7 +2,10 @@
   <template name="Index" extends="/CrudPage.Index">
     <div>
       <nav>
-        {{pageLink class="adminAccess link" name="addClimber" value="Add new climber" template="Climber.Add"}}
+        {{pageLink class="adminAccess link" name="addClimber"
+        value="Add new climber" template="Climber.Add"}}
+        <button name="clearAllNumbers" class="adminAccess link"
+                type="button">Clear all climber numbers</button>
       </nav>
       <section class="climbers index-list">
         <h1>Climbers</h1>

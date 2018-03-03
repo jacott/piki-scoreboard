@@ -1,17 +1,18 @@
 define(function(require, exports, module) {
-  const koru       = require('koru');
-  const Dom        = require('koru/dom');
-  const session    = require('koru/session');
-  const Dialog     = require('koru/ui/dialog');
-  const Form       = require('koru/ui/form');
-  const Route      = require('koru/ui/route');
-  const util       = require('koru/util');
-  const Climber    = require('models/climber');
-  const TeamType   = require('models/team-type');
-  const CrudPage   = require('ui/crud-page');
-  const Flash      = require('ui/flash');
-  const TeamHelper = require('ui/team-helper');
-  const App        = require('./app-base');
+  const koru            = require('koru');
+  const Dom             = require('koru/dom');
+  const session         = require('koru/session');
+  const ConfirmRemove   = require('koru/ui/confirm-remove');
+  const Dialog          = require('koru/ui/dialog');
+  const Form            = require('koru/ui/form');
+  const Route           = require('koru/ui/route');
+  const util            = require('koru/util');
+  const Climber         = require('models/climber');
+  const TeamType        = require('models/team-type');
+  const CrudPage        = require('ui/crud-page');
+  const Flash           = require('ui/flash');
+  const TeamHelper      = require('ui/team-helper');
+  const App             = require('./app-base');
 
   const Tpl = CrudPage.newTemplate(module, Climber, require('koru/html!./climber'));
   const $ = Dom.current;
@@ -49,6 +50,23 @@ define(function(require, exports, module) {
 
   Index.$events({
     'menustart [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent(ctx => TeamType.query.fetch()),
+
+    'click [name=clearAllNumbers]'(event) {
+      Dom.stopEvent();
+      ConfirmRemove.show({
+        title: "Clear all climber numbers?", okay: 'Clear',
+        description: Dom.h({
+          div: 'You are about to permanently clear all climbers numbers. Do you want to continue?'}),
+        onConfirm() {
+          const notice = Flash.confirm('Clearing all climber numbers...');
+          session.rpc('Climber.clearAllNumbers', App.orgId, err => {
+            Dom.remove(notice);
+            err == null ? Flash.notice('Climber numbers cleared') : Flash.error(err);
+          });
+        }
+      });
+
+    },
   });
 
   Tpl.Add.$events({
@@ -136,16 +154,15 @@ define(function(require, exports, module) {
         classes: 'warn',
         okay: 'Merge',
         content: Tpl.ConfirmMerge,
-        callback: function(confirmed) {
-          if (confirmed) {
-            Dom.addClass(page, 'merging');
-            session.rpc('Climber.merge', ctx.data._id,
-                        Object.keys(ctx.selected),
-                        err => {
-                          Route.history.back();
-                          err || Flash.notice("Climbers merged");
-                        });
-          }
+        onConfirm(confirmed) {
+          Dom.addClass(page, 'merging');
+          session.rpc(
+            'Climber.merge', ctx.data._id,
+            Object.keys(ctx.selected),
+            err => {
+              Route.history.back();
+              err ? Flash.error(err) : Flash.notice("Climbers merged");
+            });
         },
       });
 

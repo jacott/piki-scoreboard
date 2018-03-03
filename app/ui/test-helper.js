@@ -85,16 +85,19 @@ define(function(require, exports, module) {
     },
 
     confirmRemove(func) {
-      var dialog = document.body.querySelector('.Dialog');
+      const dialog = document.body.querySelector('.Dialog #ConfirmRemove');
       assert.elideFromStack.msg('should display Confirm Dialog')(dialog);
-      assert.elideFromStack.dom(dialog, function () {
-        assert.elideFromStack.dom('#ConfirmRemove', function () {
-          func && func();
-        });
-        TH.click('[name=okay]');
-        assert.elideFromStack.msg('should close confirm dialog')
-          .same(this.parentNode, null);
+      TH.confirm(func);
+    },
 
+    confirm(func) {
+      const dialog = document.body.querySelector('.Dialog');
+      assert.elideFromStack.msg('should display Confirm Dialog')(dialog);
+      assert.elideFromStack.dom(dialog, elm=>{
+        const data = Dom.current.data(elm);
+        assert.isFunction(data.onConfirm);
+        func && func(elm);
+        TH.click('[name=okay]');
       });
     },
   });
