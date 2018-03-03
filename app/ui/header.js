@@ -148,6 +148,7 @@ define(function(require, exports, module) {
           const updateAll = () => {
             App.setAccess();
             ctx.updateAllTags();
+            Route.replacePage(Route.currentPage, Route.currentPageRoute);
           };
 
           ctx.userObserve = User.observeId(uid, updateAll);
