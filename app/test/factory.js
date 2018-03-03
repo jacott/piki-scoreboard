@@ -24,7 +24,11 @@ define(function(require, exports, module) {
 
       admin(options) {
         util.reverseExtend(options, {role: Model.User.ROLE.admin});
-      }
+      },
+
+      judge(options) {
+        util.reverseExtend(options, {role: Model.User.ROLE.judge});
+      },
     },
   });
 

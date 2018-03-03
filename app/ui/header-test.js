@@ -44,14 +44,14 @@ isClient && define(function (require, exports, module) {
       Dom.remove(Dom('.glassPane'));
 
       /** logging in is not good enough **/
-      const admin = Factory.createUser('admin');
+      const admin = Factory.createUser('admin'); // not yet admin
       TH.loginAs(admin);
       TH.click('#Header [name=menu]');
 
       assert.dom('#SelectMenu', elm => {refute.dom('li', 'Org settings')});
       Dom.remove(Dom('.glassPane'));
 
-      /** need to be on org's own site as well **/
+      /** need to be on org's own site  **/
       const series = Factory.createSeries();
       const event = EventTpl.event = Factory.createEvent({series_id: series._id});
       Route.gotoPage(TeamTpl, {orgSN: admin.org.shortName});
@@ -62,6 +62,17 @@ isClient && define(function (require, exports, module) {
       });
 
       assert.calledWith(Route.gotoPath, 'system-setup');
+
+      Dom.remove(Dom('.glassPane'));
+
+      /** judge is not good enough **/
+      const judge = Factory.createUser('judge');
+      TH.loginAs(judge);
+
+      TH.click('#Header [name=menu]');
+      assert.dom('#SelectMenu', elm => {
+        refute.dom('li', 'Org settings');
+      });
     },
 
     "test Calendar"() {

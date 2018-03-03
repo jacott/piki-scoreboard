@@ -14,7 +14,7 @@ define(function(require, exports, module) {
   const TeamType    = require('models/team-type');
   const PrintHelper = require('ui/print-helper');
   const SeriesTpl   = require('ui/series');
-  const App         = require('./app-base');
+  const App         = require('./app');
 
   const Tpl   = Dom.newTemplate(require('koru/html!./event'));
   const $ = Dom.current;
