@@ -16,15 +16,6 @@ define(function(require, exports, module) {
 
   Tpl.title = "Categories";
 
-  Index.$events({
-    'click .categories tr'(event) {
-      Dom.stopEvent();
-
-      var data = $.data(this);
-      Route.gotoPage(Tpl.Edit, {modelId: data._id});
-    },
-  });
-
   Tpl.Form.$helpers({
     typeList() {
       return [['', ''], ["L", "Lead"], ["B", "Boulder"]];

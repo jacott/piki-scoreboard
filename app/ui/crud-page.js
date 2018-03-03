@@ -1,8 +1,9 @@
 define(function(require, exports, module) {
-  const Dom   = require('koru/dom');
-  const Route = require('koru/ui/route');
-  const util  = require('koru/util');
-  const App   = require('ui/app');
+  const Dom             = require('koru/dom');
+  const Route           = require('koru/ui/route');
+  const util            = require('koru/util');
+  const User            = require('models/user');
+  const App             = require('ui/app');
 
   const Tpl = Dom.newTemplate(module, require('koru/html!./crud-page'));
   const $ = Dom.current;
@@ -23,14 +24,14 @@ define(function(require, exports, module) {
       base.addTemplate(subm, subTpl.Index, {defaultPage: true, path: ''});
       base.addTemplate(subm, subTpl.Add, {
         focus: true,
-        data: function () {
+        data() {
           return new model({org_id: App.orgId});
         }
       });
 
       base.addTemplate(subm, subTpl.Edit, {
         focus: true,
-        data: function (page, pageRoute) {
+        data(page, pageRoute) {
 
           const doc = model.findById(pageRoute.modelId);
           if (doc) return doc;
@@ -61,7 +62,16 @@ define(function(require, exports, module) {
           subTpl.Index.setSortFunc();
           $.ctx.updateAllTags();
         },
+        'click .index-list tr'(event) {
+          Dom.stopEvent();
+          if (! User.me().isAdmin()) return;
+
+          Route.gotoPage(subTpl.Edit, {modelId: $.data(this)._id});
+        },
       });
+
+      App.restrictAccess(subTpl.Edit);
+      App.restrictAccess(subTpl.Add);
 
       return subTpl;
     },

@@ -49,15 +49,6 @@ define(function(require, exports, module) {
 
   Index.$events({
     'menustart [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent(ctx => TeamType.query.fetch()),
-
-    'click .climbers tr'(event) {
-      if (! Dom.hasClass(document.body, 'aAccess')) return;
-
-      Dom.stopEvent();
-
-      var data = $.data(this);
-      Route.gotoPage(Tpl.Edit, {modelId: data._id});
-    },
   });
 
   Tpl.Add.$events({

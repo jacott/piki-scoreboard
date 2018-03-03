@@ -72,14 +72,6 @@ define(function(require, exports, module) {
       openAddTeam();
     },
 
-    'click .teams tr'(event) {
-      if (! Dom.hasClass(document.body, 'aAccess')) return;
-      Dom.stopEvent();
-
-      var data = $.data(this);
-      Route.gotoPage(Tpl.Edit, {modelId: data._id});
-    },
-
     'menustart [name=teamType_id]'(event) {
       Dom.stopEvent();
       let ctx = $.ctx;
