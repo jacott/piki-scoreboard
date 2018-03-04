@@ -29,6 +29,11 @@ define(function (require, exports, module) {
       assert.same(v.user.role, 'g');
     },
 
+    "test user not logged in"() {
+      const org = Factory.createOrg({shortName: 'o1'});
+      refute.exception(()=>{sut.call(v.sub, 'o1')});
+    },
+
     "test publish"() {
       const matchUser = v.sub.match.withArgs('User', TH.match.func);
       const matchEvent = v.sub.match.withArgs('Event', TH.match.func);

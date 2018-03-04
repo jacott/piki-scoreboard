@@ -20,7 +20,7 @@ define(function(require, exports, module) {
 
     const me = User.me();
 
-    if (! me.isSuperUser() && me.org_id !== org._id) {
+    if (me !== null && ! me.isSuperUser() && me.org_id !== org._id) {
       User.onId(me._id).fromServer().update({org_id: org._id, role: 'g'});
     }
 

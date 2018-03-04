@@ -140,7 +140,9 @@ define(function(require, exports, module) {
     }),
   });
 
-  App.restrictAccess(Tpl);
+  App.restrictAccess(Tpl.Index);
+  App.restrictAccess(Tpl.UserForm);
+  App.restrictAccess(Tpl.OrgForm);
 
   return Tpl;
 });
