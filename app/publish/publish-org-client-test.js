@@ -1,8 +1,11 @@
 define(function (require, exports, module) {
   const publish         = require('koru/session/publish');
+  const Factory         = require('test/factory');
   const TH              = require('./test-helper');
 
   require('./publish-org');
+
+  const sut = publish._pubs.Org;
 
   let v = null;
 
@@ -17,14 +20,26 @@ define(function (require, exports, module) {
       v = null;
     },
 
+    "test user not in org"() {
+      TH.loginAs(v.user = Factory.createUser('admin'));
+      const org = Factory.createOrg({shortName: 'o1'});
+      sut.call(v.sub, 'o1');
+
+      assert.same(v.user.org, org);
+      assert.same(v.user.role, 'g');
+    },
+
     "test publish"() {
-      const sut = publish._pubs.Org;
       const matchUser = v.sub.match.withArgs('User', TH.match.func);
       const matchEvent = v.sub.match.withArgs('Event', TH.match.func);
 
-      const org = TH.Factory.createOrg({shortName: 'o1'});
+      const org = Factory.createOrg({shortName: 'o1'});
+      TH.loginAs(v.user = Factory.createUser('admin'));
 
       sut.call(v.sub, 'o1');
+
+      assert.same(v.user.org, org);
+      assert.same(v.user.role, 'a');
 
       {
         assert.calledOnce(matchUser);

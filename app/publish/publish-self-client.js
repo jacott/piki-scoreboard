@@ -1,20 +1,12 @@
 define(function(require, exports, module) {
-  var publish = require('koru/session/publish');
-  var koru = require('koru');
+  const koru            = require('koru');
+  const publish         = require('koru/session/publish');
 
-  koru.onunload(module, function () {
-    publish._destroy('Self');
-  });
+  koru.onunload(module, ()=>{publish._destroy('Self')});
 
   publish({name: 'Self', init() {
-    var sub = this;
+    this.match('User', doc => this.userId === doc._id);
 
-    sub.match('User', function (doc) {
-      return sub.userId === doc._id;
-    });
-
-    sub.match('Org', function (doc) {
-      return true;
-    });
+    this.match('Org', doc => true);
   }});
 });

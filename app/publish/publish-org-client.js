@@ -8,6 +8,7 @@ define(function(require, exports, module) {
   const Series          = require('models/series');
   const Team            = require('models/team');
   const TeamType        = require('models/team-type');
+  const User            = require('models/user');
 
   const orgChildren = ['Climber', 'Event', 'Series', 'Category', 'TeamType', 'Team'];
 
@@ -16,6 +17,12 @@ define(function(require, exports, module) {
   publish({name: 'Org', init(shortName) {
     const org = Org.findBy('shortName', shortName);
     if (org === undefined) return this.error(new koru.Error(404, 'org not found'));
+
+    const me = User.me();
+
+    if (! me.isSuperUser() && me.org_id !== org._id) {
+      User.onId(me._id).fromServer().update({org_id: org._id, role: 'g'});
+    }
 
     this.match('User', doc => doc.org_id == null ||
                (doc.org_id === org._id && doc.role != null));
