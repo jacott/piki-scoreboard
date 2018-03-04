@@ -1,12 +1,12 @@
 define(function(require, exports, module) {
-  const koru      = require('koru');
-  const BaseModel = require('koru/model/base-model');
-  const Val       = require('koru/model/validation');
-  const util      = require('koru/util');
-  const Team      = require('models/team');
-  const Category  = require('./category');
-  const Climber   = require('./climber');
-  const Event     = require('./event');
+  const koru            = require('koru');
+  const Val             = require('koru/model/validation');
+  const util            = require('koru/util');
+  const {BaseModel}     = require('model');
+  const Team            = require('models/team');
+  const Category        = require('./category');
+  const Climber         = require('./climber');
+  const Event           = require('./event');
 
   class Competitor extends Team.HasTeam {
     setTeam(teamType_id, team_id) {

@@ -1,6 +1,6 @@
 define(function(require, exports, module) {
-  const BaseModel       = require('koru/model/base-model');
   const util            = require('koru/util');
+  const {BaseModel}     = require('model');
 
   class Role extends BaseModel {
     static readRole(user_id, org_id) {
