@@ -56,9 +56,9 @@ define(function(require, exports, module) {
       ConfirmRemove.show({
         title: "Clear all climber numbers?", okay: 'Clear',
         description: Dom.h({div: [
-          'You are about to permanently clear all climbers numbers. Do you want to continue?',
+          'You are about to permanently clear all climber numbers. Do you want to continue?',
           {br: ''}, {br: ''},
-          "Note: Numbers will not be removed from climbers' previous registrations in events."
+          "Note: numbers will not be removed from climbers' previous registrations in events."
         ]}),
         onConfirm() {
           const notice = Flash.confirm('Clearing all climber numbers...');
