@@ -110,9 +110,10 @@ define(function(require, exports, module) {
 
 
     const query = `button[name="${page.name}"]`;
-    let button = page.parent === Tpl && tabList.querySelector(
-      pageRoute.search ? `${query}[data-search="${pageRoute.search}"]` : query
-    );
+    let button = page.parent === Tpl
+        ? tabList.querySelector(
+          pageRoute.search ? `${query}[data-search="${pageRoute.search}"]` : query)
+        : null;
 
     if (! button) {
       if (Dom.Event.Register.$contains(page))

@@ -1,22 +1,23 @@
 define(function(require, exports, module) {
-  const koru        = require('koru');
-  const Dom         = require('koru/dom');
-  const md5sum      = require('koru/md5sum');
-  const Random      = require('koru/random');
-  const session     = require('koru/session');
-  const Dialog      = require('koru/ui/dialog');
-  const Route       = require('koru/ui/route');
-  const SelectMenu  = require('koru/ui/select-menu');
-  const UserAccount = require('koru/user-account');
-  const ClientLogin = require('koru/user-account/client-login');
-  const util        = require('koru/util');
-  const uColor      = require('koru/util-color');
-  const Org         = require('models/org');
-  const User        = require('models/user');
-  const Flash       = require('ui/flash');
-  const Help        = require('ui/help');
-  const NotifyBar   = require('ui/notify-bar');
-  const App         = require('./app-base');
+  const koru            = require('koru');
+  const Dom             = require('koru/dom');
+  const DomTemplate     = require('koru/dom/template');
+  const md5sum          = require('koru/md5sum');
+  const Random          = require('koru/random');
+  const session         = require('koru/session');
+  const Dialog          = require('koru/ui/dialog');
+  const Route           = require('koru/ui/route');
+  const SelectMenu      = require('koru/ui/select-menu');
+  const UserAccount     = require('koru/user-account');
+  const ClientLogin     = require('koru/user-account/client-login');
+  const util            = require('koru/util');
+  const uColor          = require('koru/util-color');
+  const Org             = require('models/org');
+  const User            = require('models/user');
+  const Flash           = require('ui/flash');
+  const Help            = require('ui/help');
+  const NotifyBar       = require('ui/notify-bar');
+  const App             = require('./app-base');
 
   const Tpl = Dom.newTemplate(require('koru/html!./header'));
   const $ = Dom.current;
@@ -148,7 +149,9 @@ define(function(require, exports, module) {
           const updateAll = () => {
             App.setAccess();
             ctx.updateAllTags();
-// FIXME            Route.replacePage(Route.currentPage, Route.currentPageRoute);
+
+            Route.currentPage instanceof DomTemplate
+              && Route.replacePage(Route.currentPage, Route.currentPageRoute);
           };
 
           ctx.userObserve = User.observeId(uid, updateAll);

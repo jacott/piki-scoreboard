@@ -1,29 +1,75 @@
 isClient && define(function (require, exports, module) {
-  const koru           = require('koru');
-  const Dom            = require('koru/dom');
-  const Route          = require('koru/ui/route');
-  const UserAccount    = require('koru/user-account');
-  const Event          = require('models/event');
-  const Series         = require('models/series');
-  const Factory        = require('test/factory');
-  const EventTpl       = require('ui/event');
-  const SystemSetupTpl = require('ui/system-setup');
-  const TeamTpl        = require('ui/team');
-  const TH             = require('./test-helper');
+  const koru            = require('koru');
+  const Dom             = require('koru/dom');
+  const session         = require('koru/session');
+  const Route           = require('koru/ui/route');
+  const UserAccount     = require('koru/user-account');
+  const ClientLogin     = require('koru/user-account/client-login');
+  const Event           = require('models/event');
+  const Series          = require('models/series');
+  const Factory         = require('test/factory');
+  const App             = require('ui/app');
+  const EventTpl        = require('ui/event');
+  const SystemSetupTpl  = require('ui/system-setup');
+  const TeamTpl         = require('ui/team');
+  const TH              = require('./test-helper');
+
+  const {stub, spy, onEnd, stubProperty} = TH;
 
   const sut      = require('./header');
-  var v;
+
+  let v = null;
 
   TH.testCase(module, {
     setUp() {
       v = {};
       sut.show();
-      this.stub(Route, 'gotoPath');
+      stub(Route, 'gotoPath');
     },
 
     tearDown() {
       TH.tearDown();
       v = null;
+    },
+
+    "test observe user"() {
+      const org = Factory.createOrg();
+      const guest = Factory.createUser('guest');
+      const judge = Factory.createUser('judge');
+      const admin = Factory.createUser('admin');
+
+      App.orgId = org._id;
+
+      ClientLogin.setUserId(session, guest._id);
+      ClientLogin.ready(session);
+
+      Route.replacePage(TeamTpl);
+      spy(Route, 'replacePage');
+
+      assert.equals(document.body.className.split(' ').sort(), ['isGuest', 'readOnlyAccess']);
+
+      refute.called(Route.replacePage);
+
+
+
+      ClientLogin.setUserId(session, judge._id);
+      ClientLogin.ready(session);
+      assert.equals(document.body.className.split(' ').sort(), ['jAccess', 'pAccess']);
+      assert.calledWith(Route.replacePage, TeamTpl.Index);
+
+      Route.replacePage.reset();
+      ClientLogin.setUserId(session, admin._id);
+      ClientLogin.ready(session);
+      assert.equals(document.body.className.split(' ').sort(), ['aAccess', 'jAccess', 'pAccess']);
+      assert.calledWith(Route.replacePage, TeamTpl.Index);
+
+      Route.replacePage();
+      Route.replacePage.reset();
+
+      ClientLogin.setUserId(session, judge._id);
+      ClientLogin.ready(session);
+      assert.same(document.body.className, 'readOnlyAccess');
+      refute.called(Route.replacePage);
     },
 
     "test event in menu"() {
@@ -124,8 +170,8 @@ isClient && define(function (require, exports, module) {
 
     "test sign out"() {
       TH.login();
-      TH.stubProperty(Route, 'currentPageRoute', {value: {orgSN: 'CNZ'}});
-      this.stub(UserAccount, 'logout');
+      stubProperty(Route, 'currentPageRoute', {value: {orgSN: 'CNZ'}});
+      stub(UserAccount, 'logout');
 
       TH.selectMenu('#Header [name=menu]', '$help', function () {
         assert.dom(this.parentNode, elm => refute.dom('li', 'Sign in'));
@@ -142,7 +188,7 @@ isClient && define(function (require, exports, module) {
 
       assert.called(UserAccount.logout);
 
-      this.stub(UserAccount, 'logoutOtherClients');
+      stub(UserAccount, 'logoutOtherClients');
       TH.selectMenu('[name=avatar]', '$signOutOther');
 
       assert.calledWith(UserAccount.logoutOtherClients, TH.match.func);
