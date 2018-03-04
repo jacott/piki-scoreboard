@@ -25,32 +25,32 @@ bundleAll.bundle({
   // }, codeMap);
 
   const { code } = babel.transformFromAst(ast, codeMap, {
-    comments: true,
-    compact: false,
-    // comments: false,
-    // compact: true,
-    // // sourceMaps: true,
-    // // inputSourceMap: mapIn,
-    // plugins: [
-    //   "minify-mangle-names",
-    //   ["minify-replace", {
-    //     replacements: [{
-    //       identifierName: "isClient",
-    //       replacement: {
-    //         type: "booleanLiteral",
-    //         value: true,
-    //       },
-    //     }, {
-    //       identifierName: "isServer",
-    //       replacement: {
-    //         type: "booleanLiteral",
-    //         value: false,
-    //       },
-    //     }],
-    //   }],
-    //   "minify-dead-code-elimination",
-    //   "minify-constant-folding",
-    // ],
+    comments: false,
+    compact: true,
+//    sourceMaps: true,
+//    inputSourceMap: mapIn,
+    plugins: [
+      "minify-mangle-names",
+      ["minify-replace", {
+        replacements: [{
+          identifierName: "isClient",
+          replacement: {
+            type: "booleanLiteral",
+            value: true,
+          },
+        }, {
+          identifierName: "isServer",
+          replacement: {
+            type: "booleanLiteral",
+            value: false,
+          },
+        }],
+      }],
+      "minify-simplify",
+      "transform-merge-sibling-variables",
+      "minify-dead-code-elimination",
+      "minify-constant-folding",
+    ],
   });
 
   fs.writeFileSync(Path.join("build", 'index.css'), css);

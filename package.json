@@ -17,6 +17,7 @@
   "author": "Geoff Jacobsen <geoffjacobsen@gmail.com>",
   "dependencies": {
     "babel-core": "^6.26.0",
+    "babel-preset-minify": "^0.2.0",
     "csv-parse": "^2.0.0",
     "koru": "^0.16.6",
     "pg-libpq": "^1.1.1"
