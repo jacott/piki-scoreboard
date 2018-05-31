@@ -2,6 +2,8 @@
 set -e
 cd `dirname "$0"`/..
 
+uglify=`npm bin`/uglifyjs
+
 branch="$1"
 
 lockKey=$branch
@@ -25,13 +27,15 @@ version=`git describe --tags --always --long --match 'v*'`
 
 echo $branch $version $PWD
 
-if test -e tmp/yarn.lock && ${NODE} -v | cat - yarn.lock | diff -q - tmp/yarn.lock >/dev/null;then
+PKG_LOCK=npm-shrinkwrap.json
+
+if test -e tmp/${PKG_LOCK} && ${NODE} -v | cat - ${PKG_LOCK} | diff -q - tmp/${PKG_LOCK} >/dev/null;then
     :
 else
-    echo 'yarn install...'
+    echo 'npm install...'
     rm -rf node_modules
-    yarn
-    ${NODE} -v | cat - yarn.lock >tmp/yarn.lock
+    npm i
+    ${NODE} -v | cat - ${PKG_LOCK} >tmp/${PKG_LOCK}
 fi
 
 echo -e "bundle client: css, js..."
@@ -53,7 +57,8 @@ cd app
 
 echo "Compressing..."
 
-gzip -k index.css index.html
+${uglify} <../build/index.js --safari10 --define isClient=true --define isServer=false -m -o index.js
+gzip -k index.css index.html index.js
 
 
 echo "archiving..."
@@ -73,7 +78,7 @@ tar -c -z -C /u/build-piki \
     --exclude="*app/**/*-test.js" \
     --file  $tarfile\
     app config db build node_modules \
-    LICENSE README.md .koru yarn.lock package.json scripts
+    LICENSE README.md .koru ${PKG_LOCK} package.json scripts
 
 ln -sf $(basename $tarfile) piki-current.tar.gz
 
