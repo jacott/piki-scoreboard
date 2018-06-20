@@ -11,14 +11,14 @@ fi
 
 
 if [[ -e tmp/${PKG_LOCK} && -e node_modules ]] && ${NODE} -v |
-           cat - ${PKG_LOCK} package.json| diff -q - tmp/${PKG_LOCK} >/dev/null;then
+           cat - ${PKG_LOCK} | diff -q - tmp/${PKG_LOCK} >/dev/null;then
     echo 'node_modules okay'
 else
     echo 'npm install...'
     mkdir -p tmp
     rm -rf node_modules
     npm i
-    ${NODE} -v | cat - ${PKG_LOCK} package.json >tmp/${PKG_LOCK}
+    ${NODE} -v | cat - ${PKG_LOCK} >tmp/${PKG_LOCK}
 fi
 
 

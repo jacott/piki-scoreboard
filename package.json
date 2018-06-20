@@ -16,10 +16,9 @@
   ],
   "author": "Geoff Jacobsen <geoffjacobsen@gmail.com>",
   "dependencies": {
-    "babel-core": "^6.26.0",
-    "csv-parse": "^2.4.0",
-    "koru": "^0.20.0",
-    "pg-libpq": "^2.1.0"
+    "csv-parse": "^2.5.0",
+    "koru": "^0.21.0",
+    "pg-libpq": "^2.2.1"
   },
   "engines": {
     "node": ">=8.11.2"

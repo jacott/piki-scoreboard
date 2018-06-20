@@ -29,8 +29,6 @@ init() {
 completeConfig() {
     echo "configure for $appName..."
     version=$(cat build/version)
-    echo -e "window.KORU_APP_VERSION='${version}';\c" |
-        cat - build/index.js >app/index.js
     echo "export KORU_APP_VERSION='${version}'" |
         cat - config/$branch.sh >config/piki.sh
     [[ -e config/$branch-config.js ]] &&

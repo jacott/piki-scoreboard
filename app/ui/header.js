@@ -51,7 +51,7 @@ define(function(require, exports, module) {
     color() {
       const user = getUser();
       if (user) {
-        const rnd = Random.create(user.email);
+        const rnd = new Random(user.email);
 
         const color = uColor.rgb2hex(uColor.hsl2rgb({
           h: rnd.fraction(), s: 1 - rnd.fraction()/2, l: 0.5}));

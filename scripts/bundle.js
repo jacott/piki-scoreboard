@@ -1,38 +1,41 @@
 const Path = require('path');
 const fs = require('fs');
 const bundleAll = require('koru/lib/bundle-all');
-const babel = require("babel-core");
-
-const {parse} = require('babylon');
 
 process.chdir(__dirname+'/..');
 var rootDir = process.cwd();
 
 bundleAll.bundle({
-}, function ({ast, code: codeMap, css}) {
+}, function ({ast, css, compiler}) {
   process.chdir(rootDir);
 
-  // const polyfillCode = fs.readFileSync(require.resolve('babel-polyfill/browser.js')).toString();
-  // codeMap['/babel-polyfill.js'] = polyfillCode;
-  // const polyfillAst = parse(polyfillCode, {sourceType: 'module', sourceFilename: '/babel-polyfill.js'}).program;
+  console.log(`minifying`);
 
-  // ast.body.splice(0, 0, polyfillAst);
-
-  // const { code: codeIn, map: mapIn } = generate(ast, {
-  //   comments: false,
-  //   compact: true,
-  //   sourceMaps: true,
-  // }, codeMap);
-
-  const { code } = babel.transformFromAst(ast, codeMap, {
-    comments: false,
-    compact: true,
-//    sourceMaps: true,
-//    inputSourceMap: mapIn,
+  const { code, error } = compiler.terser.minify(ast, {
+    compress: {
+      dead_code: true,
+      global_defs: {
+        isClient: true,
+        isServer: false,
+      },
+      ecma: 6,
+    },
+    mangle: true,
+    safari10: true,
+    output: {
+      // beautify: true,
+      // indent_level: 2,
+      ast: false,
+      code: true,
+    }
   });
 
+  if (error) {
+    throw error;
+  }
+
   fs.writeFileSync(Path.join("build", 'index.css'), css);
-  // fs.writeFileSync(Path.join("build", 'pre-index-es5.js'),
-  //                  polyfillCode + es5Code); // +"\n//# sourceMappingURL=/index.js.map\n"
   fs.writeFileSync(Path.join("build", 'index.js'), code);
+//  fs.writeFileSync(Path.join("build", 'config.js'), configCode);
+//  fs.writeFileSync(indexPrefix+"js.map", JSON.stringify(map));
 });

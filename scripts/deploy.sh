@@ -2,8 +2,6 @@
 set -e
 cd `dirname "$0"`/..
 
-uglify=`npm bin`/uglifyjs
-
 branch="$1"
 
 lockKey=$branch
@@ -38,9 +36,11 @@ else
     ${NODE} -v | cat - ${PKG_LOCK} >tmp/${PKG_LOCK}
 fi
 
-echo -e "bundle client: css, js..."
+echo "bundle client: css, js..."
 
 $NODE --es_staging scripts/bundle.js $branch >/dev/null
+
+echo "Compressing..."
 
 MD5SUM=$(cat node_modules/yaajs/yaa.js config/$branch-config.js build/index.js \
                  build/index.css app/index.html|md5sum -b)
@@ -51,18 +51,16 @@ sed <build/index.html >app/index.html "s/CACHE_BUST_HASH/$MD5SUM/g"
 
 echo "$version,$MD5SUM" >build/version
 
+printf "window.KORU_APP_VERSION='%s,%s';" $version $MD5SUM |
+    cat - build/index.js >app/index.js
+
 mv build/index.css app
 
 cd app
 
-echo "Compressing..."
-
-${uglify} <../build/index.js --safari10 --define isClient=true --define isServer=false -m -o index.js
-gzip -k index.css index.html index.js
-
+gzip -9 -k index.css index.html index.js
 
 echo "archiving..."
-
 
 cd $tmpdir
 
@@ -78,7 +76,8 @@ tar -c -z -C /u/build-piki \
     --exclude="*app/**/*-test.js" \
     --file  $tarfile\
     app config db build node_modules \
-    LICENSE README.md .koru ${PKG_LOCK} package.json scripts
+    LICENSE README.md .koru ${PKG_LOCK} package.json npm-shrinkwrap.json \
+    scripts
 
 ln -sf $(basename $tarfile) piki-current.tar.gz
 
