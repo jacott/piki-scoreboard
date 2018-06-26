@@ -18,7 +18,7 @@
   "dependencies": {
     "csv-parse": "^2.5.0",
     "koru": "^0.21.0",
-    "pg-libpq": "^2.2.1"
+    "pg-libpq": "^2.2.2"
   },
   "engines": {
     "node": ">=8.11.2"

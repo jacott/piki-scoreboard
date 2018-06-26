@@ -38,7 +38,7 @@ fi
 
 echo "bundle client: css, js..."
 
-$NODE --es_staging scripts/bundle.js $branch >/dev/null
+$NODE --es_staging scripts/bundle.js $branch
 
 echo "Compressing..."
 

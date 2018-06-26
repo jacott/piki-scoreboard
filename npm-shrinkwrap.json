@@ -633,9 +633,9 @@
       "integrity": "sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns="
     },
     "pg-libpq": {
-      "version": "2.2.1",
-      "resolved": "https://registry.npmjs.org/pg-libpq/-/pg-libpq-2.2.1.tgz",
-      "integrity": "sha512-+gWIpm7kOoXZE2uVhX/5j0n3eYySRcqS6MTxyuvVoHiFQgqatG/CjcusI9Ns8D0kPWiNifb4hprbyGU9EY9jMg==",
+      "version": "2.2.2",
+      "resolved": "https://registry.npmjs.org/pg-libpq/-/pg-libpq-2.2.2.tgz",
+      "integrity": "sha512-7uabEuS/PKLjzX8DIa0F5yroIhFN0KLeg0ZCrnskOaKNq0xBqCkDZlmv5bdRqBIW9lt7ZpcupO+ZyUfzn1pSNQ==",
       "requires": {
         "bindings": "^1.3.0"
       }

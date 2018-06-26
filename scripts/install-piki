@@ -31,9 +31,9 @@ completeConfig() {
     version=$(cat build/version)
     echo "export KORU_APP_VERSION='${version}'" |
         cat - config/$branch.sh >config/piki.sh
-    [[ -e config/$branch-config.js ]] &&
+    if [[ -e config/$branch-config.js ]];then
         mv config/$branch-config.js config/piki-config.js
-    gzip -k app/index.js
+    fi
 }
 
 configNginx() {

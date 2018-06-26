@@ -5,6 +5,8 @@ const bundleAll = require('koru/lib/bundle-all');
 process.chdir(__dirname+'/..');
 var rootDir = process.cwd();
 
+console.log(`bundling`);
+
 bundleAll.bundle({
 }, function ({ast, css, compiler}) {
   process.chdir(rootDir);
