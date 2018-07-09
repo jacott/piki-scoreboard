@@ -17,11 +17,11 @@
   "author": "Geoff Jacobsen <geoffjacobsen@gmail.com>",
   "dependencies": {
     "csv-parse": "^2.5.0",
-    "koru": "^0.21.0",
-    "pg-libpq": "^2.2.2"
+    "koru": "^0.22.0",
+    "pg-libpq": "^2.2.3"
   },
   "engines": {
     "node": ">=8.11.2"
   },
-  "version": "1.2.3"
+  "version": "1.2.4"
 }
