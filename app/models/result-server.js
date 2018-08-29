@@ -22,7 +22,7 @@ define(function(require, exports, module) {
   return function (Result) {
     ChangeLog.logChanges(Result, {parent: Event});
 
-    util.extend(Result.prototype, {
+    util.merge(Result.prototype, {
       authorize(userId) {
         Val.assertDocChanges(this, FIELD_SPEC, NEW_FIELD_SPEC);
         User.fetchAdminister(userId, this);

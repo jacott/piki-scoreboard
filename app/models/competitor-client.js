@@ -7,7 +7,7 @@ define(function(require, exports, module) {
   return function (model) {
     model.eventIndex = model.addUniqueIndex('event_id', 'climber_id');
 
-    util.extend(model.prototype, {
+    util.merge(model.prototype, {
       categoryIdForGroup: function (group) {
         var groupHash = this.$cache.groupHash || (this.$cache.groupHash = makeGroupHash(this.category_ids));
         return groupHash[group];

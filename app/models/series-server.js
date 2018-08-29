@@ -19,7 +19,7 @@ define(function(require, exports, module) {
 
   return function (Series) {
     Series.registerObserveField('org_id');
-    util.extend(Series.prototype, {
+    util.merge(Series.prototype, {
       authorize(userId) {
         User.fetchAdminister(userId, this);
 

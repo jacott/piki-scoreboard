@@ -10,7 +10,7 @@ define(function(require, exports, module) {
       return this.constructor._parentIdField && this[this.constructor._parentIdField];
     };
 
-    util.extend(model, {
+    util.merge(model, {
       logChanges(subject, options) {
         options = options || {};
         subject._parent = options.parent;

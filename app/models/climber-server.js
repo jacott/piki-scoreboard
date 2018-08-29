@@ -75,7 +75,7 @@ define(function(require) {
       },
     });
 
-    util.extend(Climber.prototype, {
+    util.merge(Climber.prototype, {
       authorize(userId, options) {
         Val.assertDocChanges(this, FIELD_SPEC, NEW_FIELD_SPEC);
         User.fetchAdminister(userId, this);

@@ -19,7 +19,7 @@ define(function(require, exports, module) {
 
     TeamType.registerObserveField('org_id');
 
-    util.extend(TeamType.prototype, {
+    util.merge(TeamType.prototype, {
       authorize(userId, options) {
         Val.assertDocChanges(this, FIELD_SPEC, NEW_FIELD_SPEC);
         User.fetchAdminister(userId, this);

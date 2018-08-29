@@ -3,7 +3,7 @@ define(function(require, exports, module) {
   const TeamType = require('models/team-type');
 
   return function (Event) {
-    util.extend(Event.prototype, {
+    util.merge(Event.prototype, {
       get sortedTeamTypes() {
         let list = this.$cache.sortedTeamTypes;
         if (! list) {

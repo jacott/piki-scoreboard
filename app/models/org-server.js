@@ -15,7 +15,7 @@ define(function(require, exports, module) {
       ChangeLog.logChanges(model);
     });
 
-    util.extend(model.prototype, {
+    util.merge(model.prototype, {
       authorize(userId) {
         Val.assertDocChanges(this, FIELD_SPEC);
         Val.allowAccessIf(Role.where({

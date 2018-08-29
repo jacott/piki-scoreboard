@@ -20,7 +20,7 @@ define(function(require, exports, module) {
       climber_id: 'id',
     };
 
-    util.extend(model.prototype, {
+    util.merge(model.prototype, {
       authorize(userId) {
         Val.ensureString(this.event_id);
 

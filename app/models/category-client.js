@@ -14,7 +14,7 @@ define(function(require, exports, module) {
   return function(model) {
     setGroupIndex(model);
 
-    util.extend(model, {
+    util.merge(model, {
       groupApplicable: function (climber, func) {
         var org_id = climber.org_id;
         var docs = model.docs;

@@ -36,7 +36,7 @@ define(function (require, exports, module) {
         scores: [0.6, 99], time: 123, climber_id: climbers[1]._id,
       }].forEach(attrs => {
         const competitor_id = TH.Factory.createCompetitor({event_id: ev1._Id, climber_id: attrs.climber_id})._id;
-        TH.Factory.createResult(util.extend(attrs, {competitor_id, event_id: ev1._id, category_id: cats[0]._id}));
+        TH.Factory.createResult(util.merge(attrs, {competitor_id, event_id: ev1._id, category_id: cats[0]._id}));
       });
 
       [{
@@ -47,7 +47,7 @@ define(function (require, exports, module) {
         scores: [0.6, 99], climber_id: climbers[2]._id,
       }].forEach(attrs => {
         const competitor_id = TH.Factory.createCompetitor({event_id: ev1._Id, climber_id: attrs.climber_id})._id;
-        TH.Factory.createResult(util.extend(attrs, {competitor_id, event_id: ev1._id, category_id: cats[1]._id}));
+        TH.Factory.createResult(util.merge(attrs, {competitor_id, event_id: ev1._id, category_id: cats[1]._id}));
       });
 
       [{
@@ -56,7 +56,7 @@ define(function (require, exports, module) {
         scores: [0.6, 50], climber_id: climbers[2]._id,
       }].forEach(attrs => {
         const competitor_id = TH.Factory.createCompetitor({event_id: ev1._Id, climber_id: attrs.climber_id})._id;
-        TH.Factory.createResult(util.extend(attrs, {competitor_id, event_id: ev2._id, category_id: cats[1]._id}));
+        TH.Factory.createResult(util.merge(attrs, {competitor_id, event_id: ev2._id, category_id: cats[1]._id}));
       });
       test.spy(Val, 'ensureString');
 
@@ -109,7 +109,7 @@ define(function (require, exports, module) {
       }].forEach((attrs, index) => {
         const competitor_id = TH.Factory.createCompetitor({_id: 'cp'+ ++cpidx, event_id: ev1._id, climber_id: attrs.climber_id,
                                                            team_ids: team_ids[index]})._id;
-        TH.Factory.createResult(util.extend(attrs, {competitor_id, event_id: ev1._id, category_id: cats[0]._id}));
+        TH.Factory.createResult(util.merge(attrs, {competitor_id, event_id: ev1._id, category_id: cats[0]._id}));
       });
 
       [{
@@ -121,7 +121,7 @@ define(function (require, exports, module) {
       }].forEach((attrs, index) => {
         const competitor_id = TH.Factory.createCompetitor({_id: 'cp'+ ++cpidx, event_id: ev1._id, climber_id: attrs.climber_id,
                                                            team_ids: team_ids[index]})._id;
-        TH.Factory.createResult(util.extend(attrs, {competitor_id, event_id: ev1._id, category_id: cats[1]._id}));
+        TH.Factory.createResult(util.merge(attrs, {competitor_id, event_id: ev1._id, category_id: cats[1]._id}));
       });
 
       team_ids = [['tm11'], ['tm10', 'tm21']];
@@ -132,7 +132,7 @@ define(function (require, exports, module) {
       }].forEach((attrs, index) => {
         const competitor_id = TH.Factory.createCompetitor({_id: 'cp'+ ++cpidx, event_id: ev2._id, climber_id: attrs.climber_id,
                                                            team_ids: team_ids[index]})._id;
-        TH.Factory.createResult(util.extend(attrs, {competitor_id, event_id: ev2._id, category_id: cats[1]._id}));
+        TH.Factory.createResult(util.merge(attrs, {competitor_id, event_id: ev2._id, category_id: cats[1]._id}));
       });
 
       test.spy(Val, 'ensureString');

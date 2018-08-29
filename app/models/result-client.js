@@ -6,7 +6,7 @@ define(function(require, exports, module) {
   return function (Result) {
     Result.eventCatIndex = Result.addUniqueIndex('event_id', 'category_id', 'climber_id');
 
-    util.extend(Result.prototype, {
+    util.merge(Result.prototype, {
       setScore(index, score) {
         var num = new Heat(index, this.event.heats[this.category_id]).scoreToNumber(score, index);
         if (index === 99 && this.time === num) return;

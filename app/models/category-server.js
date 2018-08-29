@@ -23,7 +23,7 @@ define(function(require, exports, module) {
   return function (Category) {
     Category.registerObserveField('org_id');
 
-    util.extend(Category.prototype, {
+    util.merge(Category.prototype, {
       authorize(userId, options) {
         Val.assertDocChanges(this, FIELD_SPEC, NEW_FIELD_SPEC);
         User.fetchAdminister(userId, this);

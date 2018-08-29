@@ -25,7 +25,7 @@ define(function(require, exports, module) {
 
     Event.registerObserveField('org_id');
 
-    util.extend(Event.prototype, {
+    util.merge(Event.prototype, {
       authorize(userId) {
         const user = User.fetchAdminister(userId, this);
 

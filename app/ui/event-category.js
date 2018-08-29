@@ -84,7 +84,7 @@ define(function(require, exports, module) {
     $created(ctx, elm) {
       var data = ctx.data;
       var showingResults = data.showingResults;
-      util.extend(data, {
+      util.merge(data, {
         category: Category.findById(data.category_id),
         heat: new Heat(data.heatNumber,  eventTpl.event.heats[data.category_id]),
         get selectHeat() {return this.heat.number},

@@ -3,7 +3,7 @@ define(function(require, exports, module) {
   const base   = require('koru/resource-string');
   const util   = require('koru/util');
 
-  util.extend(base.en, {
+  util.merge(base.en, {
     unsupported_import_format:  'The uploaded file is unsupported',
   });
 

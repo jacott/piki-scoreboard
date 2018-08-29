@@ -21,7 +21,7 @@ define(function(require, exports, module) {
 
     Team.registerObserveField('org_id');
 
-    util.extend(Team.prototype, {
+    util.merge(Team.prototype, {
       authorize(userId, options) {
         Val.assertDocChanges(this, FIELD_SPEC, NEW_FIELD_SPEC);
         User.fetchAdminister(userId, this);

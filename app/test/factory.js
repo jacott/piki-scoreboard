@@ -9,25 +9,25 @@ define(function(require, exports, module) {
   Factory.traits({
     User: {
       guest(options) {
-        util.reverseExtend(options, {
+        util.reverseMerge(options, {
           _id: 'guest',
           name: undefined, initials: undefined,
           email: undefined, role: 'g', org_id: null
         });
       },
       su(options) {
-        util.reverseExtend(options, {
+        util.reverseMerge(options, {
           name: "Super User", initials: "SU",
           email: "su@example.com", role: 's', org_id: null
         });
       },
 
       admin(options) {
-        util.reverseExtend(options, {role: Model.User.ROLE.admin});
+        util.reverseMerge(options, {role: Model.User.ROLE.admin});
       },
 
       judge(options) {
-        util.reverseExtend(options, {role: Model.User.ROLE.judge});
+        util.reverseMerge(options, {role: Model.User.ROLE.judge});
       },
     },
   });
