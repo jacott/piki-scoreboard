@@ -1,26 +1,26 @@
-define(function(require, exports, module) {
+define((require)=>{
   const Val       = require('koru/model/validation');
   const util      = require('koru/util');
   const ChangeLog = require('./change-log');
   const Event     = require('./event');
   const User      = require('./user');
 
-  return model =>{
-    ChangeLog.logChanges(model);
+  return Competitor =>{
+    ChangeLog.logChanges(Competitor);
 
-    var FIELD_SPEC = {
+    const FIELD_SPEC = {
       category_ids: ['id'],
       team_ids: ['id'],
       number: 'integer',
     };
 
-    var NEW_FIELD_SPEC = {
+    const NEW_FIELD_SPEC = {
       _id: 'id',
       event_id: 'id',
       climber_id: 'id',
     };
 
-    util.merge(model.prototype, {
+    util.merge(Competitor.prototype, {
       authorize(userId) {
         Val.ensureString(this.event_id);
 

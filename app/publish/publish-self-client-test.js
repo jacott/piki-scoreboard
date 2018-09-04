@@ -1,33 +1,32 @@
-define(function (require, exports, module) {
-  var test, v;
-  var TH = require('./test-helper');
-  require('./publish-self');
-  var publish = require('koru/session/publish');
+define((require, exports, module)=>{
+  const publish         = require('koru/session/publish');
+  const TH              = require('./test-helper');
 
-  TH.testCase(module, {
-    setUp: function () {
-      test = this;
-      v = {};
+  require('./publish-self-client');
+
+  let v = {};
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    beforeEach(()=>{
       v.sub = TH.mockClientSub();
-    },
+    });
 
-    tearDown: function () {
+    afterEach(()=>{
       TH.cleanUpTest(v);
-      v = null;
-    },
+      v = {};
+    });
 
-    "test publish": function () {
-      var sut = publish._pubs.Self;
-      var matchUser = v.sub.match.withArgs('User', TH.match.func);
-      var matchOrg = v.sub.match.withArgs('Org', TH.match.func);
+    test("publish", ()=>{
+      const sut = publish._pubs.Self;
+      const matchUser = v.sub.match.withArgs('User', TH.match.func);
+      const matchOrg = v.sub.match.withArgs('Org', TH.match.func);
 
       sut.call(v.sub, 'o1');
 
       assert.calledOnce(matchUser);
       assert.calledOnce(matchOrg);
 
-      var mu = matchUser.args(0, 1);
-      var mo = matchOrg.args(0, 1);
+      const mu = matchUser.args(0, 1);
+      const mo = matchOrg.args(0, 1);
 
       v.sub.userId = 'ufoo';
 
@@ -35,6 +34,6 @@ define(function (require, exports, module) {
       assert.isFalse(mu({_id: 'xfoo'}));
 
       assert.isTrue(mo());
-    },
+    });
   });
 });

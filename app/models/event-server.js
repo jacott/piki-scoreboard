@@ -1,9 +1,9 @@
-define(function(require, exports, module) {
-  const match     = require('koru/match');
-  const Val       = require('koru/model/validation');
-  const util      = require('koru/util');
-  const ChangeLog = require('./change-log');
-  const User      = require('./user');
+define((require)=>{
+  const match           = require('koru/match');
+  const Val             = require('koru/model/validation');
+  const util            = require('koru/util');
+  const ChangeLog       = require('./change-log');
+  const User            = require('./user');
 
   const FIELD_SPEC = {
     name: 'string',
@@ -20,7 +20,7 @@ define(function(require, exports, module) {
     org_id: 'id',
   };
 
-  return function (Event) {
+  return Event =>{
     ChangeLog.logChanges(Event);
 
     Event.registerObserveField('org_id');
@@ -29,7 +29,7 @@ define(function(require, exports, module) {
       authorize(userId) {
         const user = User.fetchAdminister(userId, this);
 
-        var changes = this.changes;
+        const {changes} = this;
 
         Val.assertDocChanges(this, FIELD_SPEC, NEW_FIELD_SPEC);
 

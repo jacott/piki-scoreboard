@@ -1,73 +1,64 @@
-define(function (require, exports, module) {
-  const koru       = require('koru');
-  const Val        = require('koru/model/validation');
-  const TH         = require('test-helper');
-  const Competitor = require('./competitor');
-  const Event      = require('./event');
-  const User       = require('./user');
+define((require, exports, module)=>{
+  const Val             = require('koru/model/validation');
+  const TH              = require('test-helper');
+  const Competitor      = require('./competitor');
+  const Event           = require('./event');
+  const User            = require('./user');
 
   const {stub, spy} = TH;
 
-  let v = null;
-
-  TH.testCase(module, {
-    setUp() {
-      v = {};
-      v.event = TH.Factory.createEvent();
-      v.user = TH.Factory.createUser();
-      stub(koru, 'info');
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    let event, user;
+    beforeEach(()=>{
+      event = TH.Factory.createEvent();
+      user = TH.Factory.createUser();
+      TH.noInfo();
 
       stub(Val, 'ensureString');
-    },
+    });
 
-    tearDown() {
+    afterEach(()=>{
       TH.clearDB();
-      v = null;
-    },
+    });
 
-    "authorize": {
-      "test denied"() {
-        var oOrg = TH.Factory.createOrg();
-        var oEvent = TH.Factory.createEvent();
-        var oUser = TH.Factory.createUser();
+    group("authorize", ()=>{
+      test("denied", ()=>{
+        const oOrg = TH.Factory.createOrg();
+        const oEvent = TH.Factory.createEvent();
+        const oUser = TH.Factory.createUser();
 
-        var competitor = TH.Factory.buildCompetitor();
+        const competitor = TH.Factory.buildCompetitor();
 
-        assert.accessDenied(function () {
-          competitor.authorize(v.user._id);
-        });
-      },
+        assert.accessDenied(()=>{competitor.authorize(user._id)});
+      });
 
-      "test allowed"() {
+      test("allowed", ()=>{
         spy(Val, 'assertDocChanges');
 
-        var competitor = TH.Factory.buildCompetitor({number: 123});
+        const competitor = TH.Factory.buildCompetitor({number: 123});
 
-        refute.accessDenied(function () {
-          competitor.authorize(v.user._id);
+        refute.accessDenied(()=>{
+          competitor.authorize(user._id);
         });
 
-        assert.calledWith(Val.ensureString, v.event._id);
-        assert.calledWith(Val.assertDocChanges, TH.matchModel(competitor),
-                          {category_ids: ['id'],
-                           team_ids: ['id'],
-                           number: 'integer'},
-                          {_id: 'id',
-                           event_id: 'id',
-                           climber_id: 'id',
-                          });
-      },
-
-      "test event closed"() {
-        var event = TH.Factory.createEvent({closed: true});
-        var competitor = TH.Factory.buildCompetitor();
-
-        assert.accessDenied(function () {
-          competitor.authorize(v.user._id);
+        assert.calledWith(Val.ensureString, event._id);
+        assert.calledWith(Val.assertDocChanges, TH.matchModel(competitor), {
+          category_ids: ['id'],
+          team_ids: ['id'],
+          number: 'integer'
+        }, {
+          _id: 'id',
+          event_id: 'id',
+          climber_id: 'id',
         });
+      });
 
-      },
-    },
+      test("event closed", ()=>{
+        const event = TH.Factory.createEvent({closed: true});
+        const competitor = TH.Factory.buildCompetitor();
 
+        assert.accessDenied(()=>{competitor.authorize(user._id)});
+      });
+    });
   });
 });

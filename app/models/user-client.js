@@ -1,9 +1,9 @@
-define(function(require, exports, module) {
-  const koru    = require('koru');
-  const session = require('koru/session');
-  const util    = require('koru/util');
+define((require, exports, module)=>{
+  const koru            = require('koru');
+  const session         = require('koru/session');
+  const util            = require('koru/util');
 
-  return function (User) {
+  return User =>{
     const {pretendRole} = module.config();
 
     User.defineFields({

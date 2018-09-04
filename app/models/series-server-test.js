@@ -1,46 +1,44 @@
-define(function (require, exports, module) {
-  var test, v;
-  const util       = require('koru/util');
-  const TH         = require('test-helper');
-  const Series     = require('./series');
+define((require, exports, module)=>{
+  const util            = require('koru/util');
+  const TH              = require('test-helper');
 
-  TH.testCase(module, {
-    setUp() {
-      test = this;
-      v = {};
-      v.rpc = TH.mockRpc();
-      v.org = TH.Factory.createOrg();
-      v.user = TH.Factory.createUser();
-    },
+  const Series = require('./series');
 
-    tearDown() {
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    let rpc, org, user;
+    beforeEach(()=>{
+      rpc = TH.mockRpc();
+      org = TH.Factory.createOrg();
+      user = TH.Factory.createUser();
+    });
+
+    afterEach(()=>{
       TH.clearDB();
-      v = null;
-    },
+    });
 
-    "authorize": {
-      "test wrong org denied"() {
-        var oOrg = TH.Factory.createOrg();
-        var oUser = TH.Factory.createUser();
+    group("authorize", ()=>{
+      test("wrong org denied", ()=>{
+        const oOrg = TH.Factory.createOrg();
+        const oUser = TH.Factory.createUser();
 
-        var series = TH.Factory.buildSeries();
+        const series = TH.Factory.buildSeries();
 
         TH.noInfo();
-        assert.accessDenied(function () {
-          series.authorize(v.user._id);
+        assert.accessDenied(()=>{
+          series.authorize(user._id);
         });
-      },
+      });
 
-      "test allowed"() {
-        var series = TH.Factory.buildSeries();
+      test("allowed", ()=>{
+        const series = TH.Factory.buildSeries();
 
-        refute.accessDenied(function () {
-          series.authorize(v.user._id);
+        refute.accessDenied(()=>{
+          series.authorize(user._id);
         });
-      },
+      });
 
-      'test permitParams'() {
-        var series = TH.Factory.buildSeries();
+      test("permitParams", ()=>{
+        const series = TH.Factory.buildSeries();
 
         series.attributes = series.changes;
         series.changes = {'name': 'new name'};
@@ -54,42 +52,42 @@ define(function (require, exports, module) {
               && arg.$test(false) && ! arg.$test([])
               && arg.$test("f") && ! arg.$test(1);
           }),
-        }, function () {
-          series.authorize(v.user._id);
+        }, ()=>{
+          series.authorize(user._id);
         });
 
-      },
+      });
 
-      "test closing"() {
-        var series = TH.Factory.buildSeries();
+      test("closing", ()=>{
+        const series = TH.Factory.buildSeries();
         series.attributes = series.changes;
         series.changes = {closed: true};
 
-        refute.accessDenied(function () {
-          series.authorize(v.user._id);
+        refute.accessDenied(()=>{
+          series.authorize(user._id);
         });
-      },
+      });
 
-      "test change on closed"() {
-        var series = TH.Factory.buildSeries({closed: true});
+      test("change on closed", ()=>{
+        const series = TH.Factory.buildSeries({closed: true});
         series.attributes = series.changes;
         series.changes = {name: 'bob'};
 
         TH.noInfo();
-        assert.accessDenied(function () {
-          series.authorize(v.user._id);
+        assert.accessDenied(()=>{
+          series.authorize(user._id);
         });
-      },
+      });
 
-      "test opening"() {
-        var series = TH.Factory.buildSeries({closed: false});
+      test("opening", ()=>{
+        const series = TH.Factory.buildSeries({closed: false});
         series.attributes = series.changes;
         series.changes = {closed: 'true'};
 
-        refute.accessDenied(function () {
-          series.authorize(v.user._id);
+        refute.accessDenied(()=>{
+          series.authorize(user._id);
         });
-      },
-    }
+      });
+    });
   });
 });

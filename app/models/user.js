@@ -1,8 +1,8 @@
-define(function(require, exports, module) {
+define((require, exports, module)=>{
   const koru            = require('koru');
-  const {BaseModel}     = require('koru/model');
   const Val             = require('koru/model/validation');
   const util            = require('koru/util');
+  const Model           = require('model');
   const Role            = require('models/role');
   const Org             = require('./org');
 
@@ -14,7 +14,7 @@ define(function(require, exports, module) {
     admin: 'a',
   };
 
-  class User extends BaseModel {
+  class User extends Model.BaseModel {
     static isGuest() {
       return koru.userId() === 'guest';
     }
@@ -31,7 +31,7 @@ define(function(require, exports, module) {
     }
 
     static fetchAdminister(userId, doc) {
-      var user = User.toDoc(userId);
+      const user = User.toDoc(userId);
       Val.allowAccessIf(user && user.canAdminister(doc));
       return user;
     }
@@ -39,12 +39,13 @@ define(function(require, exports, module) {
 
   User.ROLE = ROLE;
 
-  module.exports = User.define({
+  User.define({
     module,
     fields: {
       name: {type:  'text', trim: true, required: true, maxLength: 200},
       email: {type:  'text', trim: true, required: true, maxLength: 200,
-              inclusion: {allowBlank: true, matches: util.EMAIL_RE },  normalize: 'downcase' , unique: true},
+              inclusion: {allowBlank: true, matches: util.EMAIL_RE },
+              normalize: 'downcase' , unique: true},
       initials: {type: 'text', trim: true, required: true, maxLength: 3},
     },
   });

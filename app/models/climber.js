@@ -1,9 +1,6 @@
-define(function(require, exports, module) {
-  const koru        = require('koru');
-  const {BaseModel} = require('koru/model');
-  const util        = require('koru/util');
-  const Org         = require('./org');
-  const Team        = require('./team');
+define((require, exports, module)=>{
+  const Org             = require('./org');
+  const Team            = require('./team');
 
   class Climber extends Team.HasTeam {
     get yearOfBirth() {
@@ -11,7 +8,7 @@ define(function(require, exports, module) {
     }
   }
 
-  module.exports = Climber.define({
+  Climber.define({
     module,
     fields: {
       name: {type:  'text', trim: true, required: true, maxLength: 200, unique: {scope: 'org_id'}},
@@ -26,4 +23,6 @@ define(function(require, exports, module) {
   });
 
   require('koru/env!./climber')(Climber);
+
+  return Climber;
 });

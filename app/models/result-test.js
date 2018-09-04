@@ -1,275 +1,276 @@
-define(function (require, exports, module) {
-  var test, v;
-  const koru     = require('koru');
-  const Val      = require('koru/model/validation');
-  const Random   = require('koru/random').global;
-  const util     = require('koru/util');
-  const TH       = require('test-helper');
-  const Factory  = require('test/factory');
-  const Category = require('./category');
-  const Result   = require('./result');
+define((require, exports, module)=>{
+  const Val             = require('koru/model/validation');
+  const Random          = require('koru/random').global;
+  const util            = require('koru/util');
+  const TH              = require('test-helper');
+  const Factory         = require('test/factory');
+  const Category        = require('./category');
 
-  TH.testCase(module, {
-    setUp() {
-      test = this;
-      v = {};
-      v.categories = TH.Factory.createList(3, 'createCategory');
-      v.catIds = util.mapField(v.categories);
+  const {stub, spy, onEnd} = TH;
 
-      v.competitor = TH.Factory.buildCompetitor({category_ids: v.catIds});
-      v.competitor.$$save();
+  const Result = require('./result');
 
-      v.rpc = TH.mockRpc();
-      test.stub(koru, 'info');
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    let categories, catIds, competitor, rpc;
+    beforeEach(()=>{
+      categories = Factory.createList(3, 'createCategory');
+      catIds = util.mapField(categories);
 
-      TH.loginAs(TH.Factory.createUser('su'));
+      competitor = Factory.buildCompetitor({category_ids: catIds});
+      competitor.$$save();
 
-      test.spy(Val, 'ensureString');
-      test.spy(Val, 'ensureNumber');
-    },
+      rpc = TH.mockRpc();
+      TH.noInfo();
 
-    tearDown() {
+      TH.loginAs(Factory.createUser('su'));
+
+      spy(Val, 'ensureString');
+      spy(Val, 'ensureNumber');
+    });
+
+    afterEach(()=>{
       TH.clearDB();
-      v = null;
-    },
+    });
 
-    "test result has competitor"() {
-      this.stub(Random, 'fraction').returns(0.54321);
-      const comp2 = Factory.buildCompetitor({category_ids: v.catIds});
+    test("result has competitor", ()=>{
+      stub(Random, 'fraction').returns(0.54321);
+      const comp2 = Factory.buildCompetitor({category_ids: catIds});
       comp2.$$save();
       let res = Result.where({competitor_id: comp2._id}).fetchOne();
       assert(res);
-      assert.equals(res.event_id, v.competitor.event_id);
+      assert.equals(res.event_id, competitor.event_id);
       assert.equals(res.scores, [0.54321]);
-    },
+    });
 
-    "competitor registration": {
-      setUp() {
-        v.cat1 = TH.Factory.createCategory({_id: 'cat1', type: 'L', heatFormat: 'QQF8'});
-        v.cat2 = TH.Factory.createCategory({_id: 'cat2', type: 'B', heatFormat: 'QQF26F8'});
-        v.event = TH.Factory.createEvent({heats: undefined});
-      },
+    group("competitor registration", ()=>{
+      let cat1, cat2, event;
+      beforeEach(()=>{
+        cat1 = Factory.createCategory({_id: 'cat1', type: 'L', heatFormat: 'QQF8'});
+        cat2 = Factory.createCategory({_id: 'cat2', type: 'B', heatFormat: 'QQF26F8'});
+        event = Factory.createEvent({heats: undefined});
+      });
 
-      "test new category"() {
-        var result = TH.Factory.buildResult({category_id: v.cat1._id});
-        result.$$save();
-        assert.equals(v.event.$reload().heats, {cat1: 'LQQF8'});
+      test("new category", ()=>{
+        Factory.buildResult({category_id: cat1._id}).$$save();
+        assert.equals(event.$reload().heats, {cat1: 'LQQF8'});
 
-        var result = TH.Factory.buildResult({category_id: v.cat2._id});
-        result.$$save();
-        assert.equals(v.event.$reload().heats, {cat1: 'LQQF8', cat2: 'BQQF26F8'});
+        Factory.buildResult({category_id: cat2._id}).$$save();
+        assert.equals(event.$reload().heats, {cat1: 'LQQF8', cat2: 'BQQF26F8'});
+      });
 
-      },
-
-      "test no more in category"() {
+      test("no more in category", ()=>{
         const results = [1,2].map(()=>{
-          const result = TH.Factory.buildResult({category_id: v.cat1._id});
+          const result = Factory.buildResult({category_id: cat1._id});
           result.$$save();
           return result;
         });
 
         results[0].$remove();
-        assert.equals(v.event.$reload().heats, {cat1: 'LQQF8'});
+        assert.equals(event.$reload().heats, {cat1: 'LQQF8'});
 
         results[1].$remove();
-        assert.equals(v.event.$reload().heats, {});
-      },
-    },
+        assert.equals(event.$reload().heats, {});
+      });
+    });
 
-    "Result.setScore": {
-      setUp() {
-        v.category = TH.Factory.createCategory({heatFormat: "QQF26F8", type: 'L'});
-        v.event = TH.Factory.createEvent({heats: [v.category._id]});
-        v.result = TH.Factory.createResult({scores: [1]});
-      },
+    group("Result.setScore", ()=>{
+      let category, event, result;
+      beforeEach(()=>{
+        category = Factory.createCategory({heatFormat: "QQF26F8", type: 'L'});
+        event = Factory.createEvent({heats: [category._id]});
+        result = Factory.createResult({scores: [1]});
+      });
 
-      "test authorized"() {
-        v.otherOrg = TH.Factory.createOrg();
-        TH.loginAs(v.user = TH.Factory.createUser());
-
-        assert.accessDenied(function () {
-          v.rpc("Result.setScore", v.result._id, 1, '23.5+');
-        });
-      },
-
-      "test can't call setBoulderScore"() {
-        assert.accessDenied(function () {
-          v.rpc("Result.setBoulderScore", v.result._id, 1, 2, 3, 4);
-        });
-      },
-
-      "test index out of range"() {
-        assert.accessDenied(function () {
-          v.rpc("Result.setScore", v.result._id, -1, '23.5+');
-        });
+      test("authorized", ()=>{
+        const otherOrg = Factory.createOrg();
+        const user = Factory.createUser();
+        TH.loginAs(user);
 
         assert.accessDenied(function () {
-          v.rpc("Result.setScore", v.result._id, 5, '23.5+');
+          rpc("Result.setScore", result._id, 1, '23.5+');
         });
-      },
+      });
 
-      "test invalid time"() {
+      test("can't call setBoulderScore", ()=>{
         assert.accessDenied(function () {
-          v.rpc("Result.setScore", v.result._id, 99, '2:63');
+          rpc("Result.setBoulderScore", result._id, 1, 2, 3, 4);
         });
-      },
+      });
 
-      "test update time"() {
-        v.rpc("Result.setScore", v.result._id, 99, '2:23');
+      test("index out of range", ()=>{
+        assert.accessDenied(function () {
+          rpc("Result.setScore", result._id, -1, '23.5+');
+        });
+
+        assert.accessDenied(function () {
+          rpc("Result.setScore", result._id, 5, '23.5+');
+        });
+      });
+
+      test("invalid time", ()=>{
+        assert.accessDenied(function () {
+          rpc("Result.setScore", result._id, 99, '2:63');
+        });
+      });
+
+      test("update time", ()=>{
+        rpc("Result.setScore", result._id, 99, '2:23');
 
         assert.calledWith(Val.ensureNumber, 99);
-        assert.calledWith(Val.ensureString, v.result._id, '2:23');
+        assert.calledWith(Val.ensureString, result._id, '2:23');
 
-        assert.equals(v.result.$reload().time, (2*60+23));
-      },
+        assert.equals(result.$reload().time, (2*60+23));
+      });
 
-      "test updates"() {
-        v.rpc("Result.setScore", v.result._id, 1, '23.5+');
+      test("updates", ()=>{
+        rpc("Result.setScore", result._id, 1, '23.5+');
 
         assert.calledWith(Val.ensureNumber, 1);
-        assert.calledWith(Val.ensureString, v.result._id, '23.5+');
+        assert.calledWith(Val.ensureString, result._id, '23.5+');
 
-        assert.equals(v.result.$reload().scores, [1, 235005]);
-      },
+        assert.equals(result.$reload().scores, [1, 235005]);
+      });
 
-      "test delete middle score"() {
-        v.result.$update({scores: [1, 220000, 440000]});
+      test("delete middle score", ()=>{
+        result.$update({scores: [1, 220000, 440000]});
 
-        v.rpc("Result.setScore", v.result._id, 1, '  ');
+        rpc("Result.setScore", result._id, 1, '  ');
 
-        assert.equals(v.result.$reload(true).scores, [1, undefined, 440000]);
-      },
+        assert.equals(result.$reload(true).scores, [1, undefined, 440000]);
+      });
 
-      "test delete last score"() {
-        v.result.$update({scores: [1, 220000, 440000]});
+      test("delete last score", ()=>{
+        result.$update({scores: [1, 220000, 440000]});
 
-        v.rpc("Result.setScore", v.result._id, 2, '');
+        rpc("Result.setScore", result._id, 2, '');
 
-        assert.equals(v.result.$reload().scores, [1, 220000, undefined]);
-      },
-    },
+        assert.equals(result.$reload().scores, [1, 220000, undefined]);
+      });
+    });
 
-    "Result.setBoulderScore": {
-      setUp() {
-        v.category = TH.Factory.createCategory({heatFormat: "Q:3F8:2", type: 'B'});
-        v.event = TH.Factory.createEvent({heats: [v.category._id]});
-        v.result = TH.Factory.createResult({scores: [1]});
-      },
+    group("Result.setBoulderScore", ()=>{
+      let category, event, result;
+      beforeEach(()=>{
+        category = Factory.createCategory({heatFormat: "Q:3F8:2", type: 'B'});
+        event = Factory.createEvent({heats: [category._id]});
+        result = Factory.createResult({scores: [1]});
+      });
 
-      "test authorized"() {
-        v.otherOrg = TH.Factory.createOrg();
-        TH.loginAs(v.user = TH.Factory.createUser());
-
-        assert.accessDenied(function () {
-          v.rpc("Result.setBoulderScore", v.result._id, 1, 1, 3, 7);
-        });
-      },
-
-      "test can't call setScore"() {
-        assert.accessDenied(function () {
-          v.rpc("Result.setScore", v.result._id, 1, '23.5+');
-        });
-      },
-
-      "test index out of range"() {
-        assert.accessDenied(function () {
-          v.rpc("Result.setBoulderScore", v.result._id, -1, 1, 2, 3);
-        });
+      test("authorized", ()=>{
+        const otherOrg = Factory.createOrg();
+        const user = Factory.createUser();
+        TH.loginAs(user);
 
         assert.accessDenied(function () {
-          v.rpc("Result.setBoulderScore", v.result._id, 1, 4, 4, 5);
+          rpc("Result.setBoulderScore", result._id, 1, 1, 3, 7);
         });
-      },
+      });
 
-      "test bonus > top"() {
+      test("can't call setScore", ()=>{
+        assert.accessDenied(function () {
+          rpc("Result.setScore", result._id, 1, '23.5+');
+        });
+      });
+
+      test("index out of range", ()=>{
+        assert.accessDenied(function () {
+          rpc("Result.setBoulderScore", result._id, -1, 1, 2, 3);
+        });
+
+        assert.accessDenied(function () {
+          rpc("Result.setBoulderScore", result._id, 1, 4, 4, 5);
+        });
+      });
+
+      test("bonus > top", ()=>{
         assert.exception(()=>{
-          v.rpc("Result.setBoulderScore", v.result._id, 1, 1, 4, 3);
+          rpc("Result.setBoulderScore", result._id, 1, 1, 4, 3);
         }, {error: 400});
-      },
+      });
 
-      "test top,  bonus range"() {
+      test("top,  bonus range", ()=>{
         // top > 0, bonus 0
-        v.rpc("Result.setBoulderScore", v.result._id, 1, 1, 0, 3);
-        assert.equals(v.result.$reload().scores, [1, 1019696]);
-      },
+        rpc("Result.setBoulderScore", result._id, 1, 1, 0, 3);
+        assert.equals(result.$reload().scores, [1, 1019696]);
+      });
 
-      "test dnc"() {
-        v.rpc("Result.setBoulderScore", v.result._id, 1, 2, "dnc");
-
-        assert.calledWith(Val.ensureNumber, 1, 2);
-        assert.calledWith(Val.ensureString, v.result._id);
-
-        assert.equals(v.result.$reload().scores, [1, -1]);
-        assert.equals(v.result.problems[0][1], -1);
-
-        v.rpc("Result.setBoulderScore", v.result._id, 1, 1, 0, 0);
-
-        assert.equals(v.result.$reload().scores, [1, 9999]);
-        assert.equals(v.result.problems[0], [0, -1]);
-      },
-
-      "test clear middle"() {
-        v.result.$update({scores: [1, 2, 3, 4], problems: [[2,1],[4],[7,8]]});
-        v.rpc("Result.setBoulderScore", v.result._id, 2, 1);
-        assert.equals(v.result.$reload(true).scores, [1, 2, , 4]);
-        assert.equals(v.result.problems, [[2, 1], [null], [7, 8]]);
-      },
-
-      "test clear"() {
-        v.rpc("Result.setBoulderScore", v.result._id, 1, 2);
+      test("dnc", ()=>{
+        rpc("Result.setBoulderScore", result._id, 1, 2, "dnc");
 
         assert.calledWith(Val.ensureNumber, 1, 2);
-        assert.calledWith(Val.ensureString, v.result._id);
+        assert.calledWith(Val.ensureString, result._id);
 
-        assert.equals(v.result.$reload().scores, [1]);
-        assert.equals(v.result.problems[0], [,null]);
+        assert.equals(result.$reload().scores, [1, -1]);
+        assert.equals(result.problems[0][1], -1);
 
-        v.rpc("Result.setBoulderScore", v.result._id, 1, 1);
+        rpc("Result.setBoulderScore", result._id, 1, 1, 0, 0);
 
-        assert.equals(v.result.$reload().scores, [1]);
-        assert.equals(v.result.problems[0], [null, null]);
-      },
+        assert.equals(result.$reload().scores, [1, 9999]);
+        assert.equals(result.problems[0], [0, -1]);
+      });
 
-      "test update attempts"() {
-        v.rpc("Result.setBoulderScore", v.result._id, 1, 2, 3, 4);
+      test("clear middle", ()=>{
+        result.$update({scores: [1, 2, 3, 4], problems: [[2,1],[4],[7,8]]});
+        rpc("Result.setBoulderScore", result._id, 2, 1);
+        assert.equals(result.$reload(true).scores, [1, 2, , 4]);
+        assert.equals(result.problems, [[2, 1], [null], [7, 8]]);
+      });
+
+      test("clear", ()=>{
+        rpc("Result.setBoulderScore", result._id, 1, 2);
+
+        assert.calledWith(Val.ensureNumber, 1, 2);
+        assert.calledWith(Val.ensureString, result._id);
+
+        assert.equals(result.$reload().scores, [1]);
+        assert.equals(result.problems[0], [,null]);
+
+        rpc("Result.setBoulderScore", result._id, 1, 1);
+
+        assert.equals(result.$reload().scores, [1]);
+        assert.equals(result.problems[0], [null, null]);
+      });
+
+      test("update attempts", ()=>{
+        rpc("Result.setBoulderScore", result._id, 1, 2, 3, 4);
 
         assert.calledWith(Val.ensureNumber, 1, 2, 3, 4);
-        assert.calledWith(Val.ensureString, v.result._id);
+        assert.calledWith(Val.ensureString, result._id);
 
-        assert.equals(v.result.$reload().scores, [1, 1019596]);
-        assert.equals(v.result.problems[0][1], 403);
+        assert.equals(result.$reload().scores, [1, 1019596]);
+        assert.equals(result.problems[0][1], 403);
 
-        v.rpc("Result.setBoulderScore", v.result._id, 1, 1, 1, 1);
-        assert.equals(v.result.$reload().scores, [1, 2029495]);
-        assert.equals(v.result.problems[0], [101, 403]);
+        rpc("Result.setBoulderScore", result._id, 1, 1, 1, 1);
+        assert.equals(result.$reload().scores, [1, 2029495]);
+        assert.equals(result.problems[0], [101, 403]);
 
-        v.rpc("Result.setBoulderScore", v.result._id, 1, 2, 5, 0);
-        assert.equals(v.result.$reload().scores, [1, 1029893]);
-        assert.equals(v.result.problems[0], [101, 5]);
-      },
+        rpc("Result.setBoulderScore", result._id, 1, 2, 5, 0);
+        assert.equals(result.$reload().scores, [1, 1029893]);
+        assert.equals(result.problems[0], [101, 5]);
+      });
 
-      "test other ruleVersion, update attempts"() {
-        v.event.ruleVersion = 0;
-        v.rpc("Result.setBoulderScore", v.result._id, 1, 2, 3, 4);
+      test("other ruleVersion, update attempts", ()=>{
+        event.ruleVersion = 0;
+        rpc("Result.setBoulderScore", result._id, 1, 2, 3, 4);
 
         assert.calledWith(Val.ensureNumber, 1, 2, 3, 4);
-        assert.calledWith(Val.ensureString, v.result._id);
+        assert.calledWith(Val.ensureString, result._id);
 
-        assert.equals(v.result.$reload().scores, [1, 1950196]);
-        assert.equals(v.result.problems[0][1], 403);
+        assert.equals(result.$reload().scores, [1, 1950196]);
+        assert.equals(result.problems[0][1], 403);
 
-        v.rpc("Result.setBoulderScore", v.result._id, 1, 1, 1, 1);
-        assert.equals(v.result.$reload().scores, [1, 2940295]);
-        assert.equals(v.result.problems[0], [101, 403]);
+        rpc("Result.setBoulderScore", result._id, 1, 1, 1, 1);
+        assert.equals(result.$reload().scores, [1, 2940295]);
+        assert.equals(result.problems[0], [101, 403]);
 
-        v.rpc("Result.setBoulderScore", v.result._id, 1, 2, 5, 0);
-        assert.equals(v.result.$reload().scores, [1, 1980293]);
-        assert.equals(v.result.problems[0], [101, 5]);
-      },
-    },
+        rpc("Result.setBoulderScore", result._id, 1, 2, 5, 0);
+        assert.equals(result.$reload().scores, [1, 1980293]);
+        assert.equals(result.problems[0], [101, 5]);
+      });
+    });
 
-    "test displayTimeTaken"() {
-      var result = TH.Factory.buildResult();
+    test("displayTimeTaken", ()=>{
+      const result = Factory.buildResult();
 
       assert.same(result.displayTimeTaken(), "");
 
@@ -279,61 +280,63 @@ define(function (require, exports, module) {
       result.time = 69;
       assert.same(result.displayTimeTaken(), "1:09");
 
-    },
+    });
 
-    "test unscoredHeat"() {
-      var category = TH.Factory.createCategory({heatFormat: "QQF26F8"});
-      var event = TH.Factory.createEvent({heats: [category._id]});
-      var result = TH.Factory.createResult();
+    test("unscoredHeat", ()=>{
+      const category = Factory.createCategory({heatFormat: "QQF26F8"});
+      const event = Factory.createEvent({heats: [category._id]});
+      const result = Factory.createResult();
 
       assert.same(result.unscoredHeat(), 1);
 
       result.scores.push(123);
       result.scores.push(223);
       assert.same(result.unscoredHeat(), 3);
-    },
+    });
 
-    "test associated"() {
-      var result = TH.Factory.createResult();
+    test("associated", ()=>{
+      const result = Factory.createResult();
 
       assert(result.climber);
       assert(result.category);
       assert(result.event);
-    },
+    });
 
-    "test created when competitor registered"() {
-      var cat1Comp = TH.Factory.buildCompetitor({category_ids: v.catIds});
+    test("created when competitor registered", ()=>{
+      const cat1Comp = Factory.buildCompetitor({category_ids: catIds});
       cat1Comp.$$save();
-      assert(v.r2 = Result.query.where({category_id: v.categories[0]._id}).fetchOne());
-      v.results = Result.query.where({category_id: v.categories[1]._id}).fetch();
-      assert.same(v.results.length, 2);
-      v.result = v.results[0];
+      const r2 = Result.query.where({category_id: categories[0]._id}).fetchOne();
+      assert(r2);
+      const results = Result.query.where({category_id: categories[1]._id}).fetch();
+      assert.same(results.length, 2);
+      const result = results[0];
 
-      assert.same(v.result.event_id, v.competitor.event_id);
-      assert.same(v.result.climber_id, v.competitor.climber_id);
-      assert.between(v.result.scores[0], 0, 1);
-      refute.same(v.r2.scores[0], v.result.scores[0]);
-    },
+      assert.same(result.event_id, competitor.event_id);
+      assert.same(result.climber_id, competitor.climber_id);
+      assert.between(result.scores[0], 0, 1);
+      refute.same(r2.scores[0], result.scores[0]);
+    });
 
-    "test deleted when competitor cat removed"() {
-      v.competitor.category_ids = v.catIds.slice(1);
-      v.competitor.$$save();
+    test("deleted when competitor cat removed", ()=>{
+      competitor.category_ids = catIds.slice(1);
+      competitor.$$save();
 
-      assert.same(Result.query.where('category_id', v.categories[0]._id).count(), 0);
-      assert.same(Result.query.where('category_id', v.categories[1]._id).count(), 1);
-      assert.same(Result.query.where('category_id', v.categories[2]._id).count(), 1);
-    },
+      assert.same(Result.query.where('category_id', categories[0]._id).count(), 0);
+      assert.same(Result.query.where('category_id', categories[1]._id).count(), 1);
+      assert.same(Result.query.where('category_id', categories[2]._id).count(), 1);
+    });
 
-    "test all deleted when competitor deregistered"() {
-      var climber = TH.Factory.createClimber();
-      var comp2 = TH.Factory.buildCompetitor({event_id: v.competitor.event_id, category_id: v.competitor.category_id});
+    test("all deleted when competitor deregistered", ()=>{
+      const climber = Factory.createClimber();
+      const comp2 = Factory.buildCompetitor({
+        event_id: competitor.event_id, category_id: competitor.category_id});
       comp2.$$save();
 
 
-      v.competitor.$remove();
+      competitor.$remove();
 
       assert.same(Result.query.count(), 1);
-    },
+    });
 
   });
 });

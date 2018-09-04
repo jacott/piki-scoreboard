@@ -1,16 +1,14 @@
-isServer && define(function (require, exports, module) {
+isServer && define((require, exports, module)=>{
   const Org             = require('models/org');
   const User            = require('models/user');
-  const Factory         = require('test/factory');
   const TH              = require('test-helper');
+  const Factory         = require('test/factory');
 
   const Role = require('./role');
-  let v = {};
 
   TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
     afterEach(()=>{
       TH.clearDB();
-      v = {};
     });
 
     test("persistence", ()=>{

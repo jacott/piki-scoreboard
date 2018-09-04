@@ -1,28 +1,26 @@
-isClient && define(function (require, exports, module) {
-  var test, v;
-  var TH = require('./test-helper');
-  var sut = require('./category');
-  var Route = require('koru/ui/route');
-  var Category = require('models/category');
-  var App = require('ui/app');
+isClient && define((require, exports, module)=>{
+  const Route           = require('koru/ui/route');
+  const Category        = require('models/category');
+  const App             = require('ui/app');
+  const TH              = require('./test-helper');
 
-  TH.testCase(module, {
-    setUp: function () {
-      test = this;
-      v = {};
-      v.org =  TH.Factory.createOrg();
+  const sut = require('./category');
+
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    let org;
+    beforeEach(()=>{
+      org =  TH.Factory.createOrg();
       TH.login();
-      TH.setOrg(v.org);
+      TH.setOrg(org);
       App.setAccess();
-    },
+    });
 
-    tearDown: function () {
+    afterEach(()=>{
       TH.tearDown();
-      v = null;
-    },
+    });
 
-    "test rendering": function () {
-      var categories = TH.Factory.createList(2, 'createCategory');
+    test("rendering", ()=>{
+      const categories = TH.Factory.createList(2, 'createCategory');
 
       Route.gotoPage(sut.Index);
 
@@ -40,14 +38,14 @@ isClient && define(function (require, exports, module) {
         });
         assert.dom('nav [name=addCategory]', 'Add new category');
       });
-    },
+    });
 
-    "test adding new category": function () {
+    test("adding new category", ()=>{
       Route.gotoPage(sut.Index);
 
-      assert.dom('#Category', function () {
+      assert.dom('#Category', ()=>{
         TH.click('[name=addCategory]');
-        assert.dom('#AddCategory', function () {
+        assert.dom('#AddCategory', ()=>{
           TH.input('[name=name]', 'Dynomites Wellington');
           TH.input('[name=shortName]', 'YB M');
           TH.change('[name=type]', 'L');
@@ -61,55 +59,56 @@ isClient && define(function (require, exports, module) {
         refute.dom('#AddCategory');
       });
 
-      var cat = Category.query.where({org_id: v.org._id, name: 'Dynomites Wellington', shortName: 'YB M', gender: 'm', group: 'A', minAge: 14, maxAge: 15, heatFormat: 'QQF26F8'}).fetchOne();
-
-      assert(cat);
+      assert(Category.exists({
+        org_id: org._id, name: 'Dynomites Wellington', shortName: 'YB M',
+        gender: 'm', group: 'A', minAge: 14, maxAge: 15, heatFormat: 'QQF26F8'}));
 
       assert.dom('#Category [name=addCategory]');
-    },
+    });
 
-    "edit": {
-      setUp: function () {
-        v.category = TH.Factory.createCategory();
-        v.category2 = TH.Factory.createCategory();
+    group("edit", ()=>{
+      let category, category2;
+      beforeEach(()=>{
+        category = TH.Factory.createCategory();
+        category2 = TH.Factory.createCategory();
 
         Route.gotoPage(sut.Index);
 
-        TH.click('td', v.category.name);
-      },
+        TH.click('td', category.name);
+      });
 
-      "test change heat format": function () {
+      test("change heat format", ()=>{
         assert.dom('#EditCategory', function () {
           TH.input('[name=heatFormat]', 'QQF2');
         });
         TH.click('#EditCategory [type=submit]');
 
-        assert.same(v.category.$reload().heatFormat, 'QQF2');
-      },
+        assert.same(category.$reload().heatFormat, 'QQF2');
+      });
 
-      "test change name": function () {
+      test("change name", ()=>{
         assert.dom('#EditCategory', function () {
-          assert.dom('h1', 'Edit ' + v.category.name);
-          TH.input('[name=name]', {value: v.category.name}, 'new name');
+          assert.dom('h1', 'Edit ' + category.name);
+          TH.input('[name=name]', {value: category.name}, 'new name');
           TH.click('[type=submit]');
         });
 
         assert.dom('#Category td', 'new name');
-      },
+      });
 
-      "test delete": function () {
+      test("delete", ()=>{
         assert.dom('#EditCategory', function () {
           TH.click('[name=delete]');
         });
 
         assert.dom('.Dialog.Confirm', function () {
-          assert.dom('h1', 'Delete ' + v.category.name + '?');
+          assert.dom('h1', 'Delete ' + category.name + '?');
           TH.click('[name=cancel]');
         });
 
         refute.dom('.Dialog');
 
-        assert(Category.exists(v.category._id));
+        assert(Category.exists(category._id));
 
         TH.click('#EditCategory [name=delete]');
 
@@ -119,9 +118,9 @@ isClient && define(function (require, exports, module) {
 
         refute.dom('#EditCategory');
 
-        refute(Category.exists(v.category._id));
-      },
-    },
+        refute(Category.exists(category._id));
+      });
+    });
 
 
   });

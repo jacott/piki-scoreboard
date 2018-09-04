@@ -1,9 +1,9 @@
-define(function(require, exports, module) {
-  const Model     = require('koru/model');
-  const Val       = require('koru/model/validation');
-  const util      = require('koru/util');
-  const ChangeLog = require('./change-log');
-  const User      = require('./user');
+define((require)=>{
+  const Model           = require('koru/model');
+  const Val             = require('koru/model/validation');
+  const util            = require('koru/util');
+  const ChangeLog       = require('./change-log');
+  const User            = require('./user');
 
   const FIELD_SPEC = {
     name: 'string',
@@ -16,7 +16,7 @@ define(function(require, exports, module) {
     teamType_id: 'id',
   };
 
-  return function (Team) {
+  return Team =>{
     ChangeLog.logChanges(Team);
 
     Team.registerObserveField('org_id');

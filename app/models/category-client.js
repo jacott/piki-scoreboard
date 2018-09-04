@@ -1,40 +1,26 @@
-define(function(require, exports, module) {
-  var util = require('koru/util');
-  var koru = require('koru');
+define((require, exports, module)=>{
+  const util            = require('koru/util');
 
-  var groupOrgs = {};
+  const groupOrgs = {};
 
-  var obHandle;
+  let obHandle;
 
-  koru.onunload(module, function () {
-    obHandle && obHandle.stop();
-    obHandle = null;
-  });
+  const setGroupIndex = model =>{
+    const groupRemove = (doc)=>{
+      const group = getGroup(doc.org_id, doc.group);
+      delete group[doc._id];
 
-  return function(model) {
-    setGroupIndex(model);
+      for(const noop in group) return;
+      const groups = groupOrgs[doc.org_id];
+      delete groups[doc.group];
 
-    util.merge(model, {
-      groupApplicable: function (climber, func) {
-        var org_id = climber.org_id;
-        var docs = model.docs;
+      for(const noop in groups) return;
+      delete groupOrgs[doc.org_id];
+    };
 
-        Object.keys(groupOrgs[org_id] || {}).sort().forEach(function (group) {
-          var col = [];
-          for(var id in getGroup(org_id, group)) {
-            col.push(docs[id]);
-          }
-          col.sort(util.compareByName);
-          func(group, col);
-        });
-      },
-    });
-  };
-
-  function setGroupIndex(model) {
-    model.onChange(function (doc, was) {
-      if (doc) {
-        if (was) {
+    model.onChange((doc, was)=>{
+      if (doc != null) {
+        if (was != null) {
           if (was.hasOwnProperty('org_id') || was.hasOwnProperty('group')) {
             groupRemove(doc.$withChanges(was));
           }
@@ -44,23 +30,33 @@ define(function(require, exports, module) {
         groupRemove(was);
       }
     });
+  };
 
-    function groupRemove(doc) {
-      var group = getGroup(doc.org_id, doc.group);
-      delete group[doc._id];
-
-      for(var noop in group) return;
-      var groups = groupOrgs[doc.org_id];
-      delete groups[doc.group];
-
-      for(var noop in groups) return;
-      delete groupOrgs[doc.org_id];
-    }
-  }
-
-  function getGroup(org_id, group) {
-    var groups = groupOrgs[org_id] || (groupOrgs[org_id] = {});
+  const getGroup = (org_id, group)=>{
+    const groups = groupOrgs[org_id] || (groupOrgs[org_id] = {});
     return groups[group] || (groups[group] = {});
-  }
+  };
 
+  module.onUnload(()=>{
+    obHandle && obHandle.stop();
+    obHandle = null;
+  });
+
+  return Category =>{
+    setGroupIndex(Category);
+
+    Category.groupApplicable = (climber, func)=>{
+      const org_id = climber.org_id;
+      const docs = Category.docs;
+
+      Object.keys(groupOrgs[org_id] || {}).sort().forEach(group =>{
+        const col = [];
+        for(const id in getGroup(org_id, group)) {
+          col.push(docs[id]);
+        }
+        col.sort(util.compareByName);
+        func(group, col);
+      });
+    };
+  };
 });

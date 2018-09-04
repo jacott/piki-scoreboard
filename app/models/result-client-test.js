@@ -1,25 +1,21 @@
-define(function (require, exports, module) {
-  var test, v;
-  const session = require('koru/session');
-  const TH      = require('test-helper');
-  const Result  = require('./result');
+define((require, exports, module)=>{
+  const session         = require('koru/session');
+  const TH              = require('test-helper');
 
-  TH.testCase(module, {
-    setUp() {
-      test = this;
-      v = {};
-    },
+  const {stub, spy, onEnd} = TH;
 
-    tearDown() {
+  const Result = require('./result');
+
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    afterEach(()=>{
       TH.clearDB();
-      v = null;
-    },
+    });
 
-    "test setScore number"() {
+    test("setScore number", ()=>{
       TH.login();
       var result = TH.Factory.createResult({scores: [1]});
 
-      var rpc = test.spy(session._rpcs, 'Result.setScore');
+      var rpc = spy(session._rpcs, 'Result.setScore');
 
       result.setScore(1, '23.5+');
 
@@ -29,13 +25,13 @@ define(function (require, exports, module) {
 
       result.$reload().setScore(1, '23.5+'); // setting again
       refute.msg('should not update').called(rpc);
-    },
+    });
 
-    "test setScore time"() {
+    test("setScore time", ()=>{
       TH.login();
       var result = TH.Factory.createResult({scores: [1]});
 
-      var rpc = test.spy(session._rpcs, 'Result.setScore');
+      var rpc = spy(session._rpcs, 'Result.setScore');
 
       result.setScore(99, '1:02');
 
@@ -45,50 +41,51 @@ define(function (require, exports, module) {
 
       result.$reload().setScore(99, '1:02'); // setting again
       refute.msg('should not update').called(rpc);
-    },
+    });
 
-    "setBoulderScore": {
-      setUp() {
+    group("setBoulderScore", ()=>{
+      let result, rpc;
+      beforeEach(()=>{
         TH.login();
         TH.Factory.createCategory({type: 'B'});
-        v.result = TH.Factory.createResult({scores: [1]});
+        result = TH.Factory.createResult({scores: [1]});
 
-        v.rpc = test.spy(session._rpcs, 'Result.setBoulderScore');
-      },
+        rpc = spy(session._rpcs, 'Result.setBoulderScore');
+      });
 
-      "test dnc"() {
-        v.result.setBoulderScore(1, 2, "dnc");
-        assert.calledWith(v.rpc, v.result._id, 1, 2, "dnc");
+      test("dnc", ()=>{
+        result.setBoulderScore(1, 2, "dnc");
+        assert.calledWith(rpc, result._id, 1, 2, "dnc");
 
-        v.rpc.reset();
+        rpc.reset();
 
-        v.result.$reload().setBoulderScore(1, 2, "dnc"); // setting again
-        refute.msg('should not update').called(v.rpc);
-      },
+        result.$reload().setBoulderScore(1, 2, "dnc"); // setting again
+        refute.msg('should not update').called(rpc);
+      });
 
-      "test clear"() {
-        v.result.setBoulderScore(1, 2);
-        assert.calledWith(v.rpc, v.result._id, 1);
+      test("clear", ()=>{
+        result.setBoulderScore(1, 2);
+        assert.calledWith(rpc, result._id, 1);
 
-        v.rpc.reset();
+        rpc.reset();
 
-        v.result.$reload().setBoulderScore(1, 2); // setting again
-        refute.msg('should not update').called(v.rpc);
-      },
+        result.$reload().setBoulderScore(1, 2); // setting again
+        refute.msg('should not update').called(rpc);
+      });
 
-      "test set attempts"() {
-        v.result.setBoulderScore(1, 2, 3, 4);
+      test("set attempts", ()=>{
+        result.setBoulderScore(1, 2, 3, 4);
 
-        assert.calledWith(v.rpc, v.result._id, 1, 2, 3, 4);
+        assert.calledWith(rpc, result._id, 1, 2, 3, 4);
 
-        v.rpc.reset();
+        rpc.reset();
 
-        v.result.$reload().setBoulderScore(1, 2, 3, 4); // setting again
-        refute.msg('should not update').called(v.rpc);
-      },
-    },
+        result.$reload().setBoulderScore(1, 2, 3, 4); // setting again
+        refute.msg('should not update').called(rpc);
+      });
+    });
 
-    "test index"() {
+    test("index", ()=>{
       var result = TH.Factory.createResult();
 
       assert.equals(Result.eventCatIndex.lookup({
@@ -96,6 +93,6 @@ define(function (require, exports, module) {
         category_id: result.category_id,
         climber_id: result.climber_id,
       }), result._id);
-    },
+    });
   });
 });

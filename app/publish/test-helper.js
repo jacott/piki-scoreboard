@@ -1,15 +1,16 @@
-define(function(require, exports, module) {
-  const koru        = require('koru');
-  const Val         = require('koru/model/validation');
-  const session     = require('koru/session');
-  const message     = require('koru/session/message');
-  const UserAccount = require('koru/user-account');
-  const util        = require('koru/util');
-  const Model       = require('model');
+define((require)=>{
+  const koru            = require('koru');
+  const Val             = require('koru/model/validation');
+  const session         = require('koru/session');
+  const message         = require('koru/session/message');
+  const UserAccount     = require('koru/user-account');
+  const util            = require('koru/util');
+  const Model           = require('model');
+  const BaseTH          = require('test-helper');
 
-  const TH = Object.create(require('test-helper'));
+  const TH = {
+    __proto__: BaseTH,
 
-  util.merge(TH, {
     mockClientSub () {
       const sub = {
         match: TH.stub(),
@@ -23,7 +24,7 @@ define(function(require, exports, module) {
     },
 
     stubMatchers (sub, names) {
-      var matchers = {};
+      const matchers = {};
       names.split(' ').forEach(function (name) {
         matchers[name] = sub.match.withArgs(name, TH.match.func);
       });
@@ -31,9 +32,9 @@ define(function(require, exports, module) {
     },
 
     assertMatchersCalled (matchers) {
-      var funcs = {};
-      for (var key in matchers) {
-        var match = matchers[key];
+      const funcs = {};
+      for (const key in matchers) {
+        const match = matchers[key];
         assert.calledOnce(match);
         funcs[key] = match.args(0, 1);
       }
@@ -54,7 +55,7 @@ define(function(require, exports, module) {
         v.conn = this.mockConnection(null, v.session);
         v.send = v.conn.ws.send;
       }
-      var pub = session._commands.P;
+      const pub = session._commands.P;
       pub.call(v.conn, [id, name, args]);
 
       return v.conn._subs[id];
@@ -64,9 +65,9 @@ define(function(require, exports, module) {
       TH.clearDB();
       v.conn && v.conn.close();
     },
-  });
+  };
 
   require('koru/env!./test-helper')(TH);
 
-  module.exports = TH;
+  return TH;
 });

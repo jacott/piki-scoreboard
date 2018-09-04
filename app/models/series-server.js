@@ -1,8 +1,8 @@
-define(function(require, exports, module) {
-  const match       = require('koru/match');
-  const Val         = require('koru/model/validation');
-  const util        = require('koru/util');
-  const User        = require('models/user');
+define((require, exports, module)=>{
+  const match           = require('koru/match');
+  const Val             = require('koru/model/validation');
+  const util            = require('koru/util');
+  const User            = require('models/user');
 
   const FIELD_SPEC = {
     name: 'string',
@@ -17,7 +17,7 @@ define(function(require, exports, module) {
     org_id: 'id',
   };
 
-  return function (Series) {
+  return Series =>{
     Series.registerObserveField('org_id');
     util.merge(Series.prototype, {
       authorize(userId) {

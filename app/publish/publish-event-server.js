@@ -1,10 +1,10 @@
-define(function(require, exports, module) {
-  const koru    = require('koru');
-  const Val     = require('koru/model/validation');
-  const publish = require('koru/session/publish');
-  const Model   = require('model');
+define((require, exports, module)=>{
+  const koru            = require('koru');
+  const Val             = require('koru/model/validation');
+  const publish         = require('koru/session/publish');
+  const Model           = require('model');
   require('models/competitor');
-  const Event   = require('models/event');
+  const Event           = require('models/event');
   require('models/result');
 
   const orgChildren = ['Competitor', 'Result'];

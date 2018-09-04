@@ -1,27 +1,26 @@
-define(function(require, exports, module) {
-  const koru        = require('koru');
-  const Dom         = require('koru/dom');
-  const makeSubject = require('koru/make-subject');
-  const Val         = require('koru/model/validation');
-  const Form        = require('koru/ui/form');
-  const Route       = require('koru/ui/route');
-  const util        = require('koru/util');
-  const Category    = require('models/category');
-  const Event       = require('models/event');
-  const Heat        = require('models/heat');
-  const Result      = require('models/result');
-  const Series      = require('models/series');
-  const TeamType    = require('models/team-type');
-  const PrintHelper = require('ui/print-helper');
-  const SeriesTpl   = require('ui/series');
-  const App         = require('./app');
+define((require, exports, module)=>{
+  const Dom             = require('koru/dom');
+  const Val             = require('koru/model/validation');
+  const Observable      = require('koru/observable');
+  const Form            = require('koru/ui/form');
+  const Route           = require('koru/ui/route');
+  const util            = require('koru/util');
+  const Category        = require('models/category');
+  const Event           = require('models/event');
+  const Heat            = require('models/heat');
+  const Result          = require('models/result');
+  const Series          = require('models/series');
+  const TeamType        = require('models/team-type');
+  const PrintHelper     = require('ui/print-helper');
+  const SeriesTpl       = require('ui/series');
+  const App             = require('./app');
 
   const Tpl   = Dom.newTemplate(require('koru/html!./event'));
   const $ = Dom.current;
-  const Index = Route.root.defaultPage = Tpl.Index;
-
+  const {Index} = Tpl;
   const sortByDate = util.compareByField('date', -1);
 
+  Route.root.defaultPage = Index;
 
   const compareCategories = (a, b)=>{
     const ai = a._id, bi = b._id;
@@ -42,17 +41,110 @@ define(function(require, exports, module) {
 
   const base = Route.root.addBase(module, Tpl, 'eventId');
   base.async = true;
-  koru.onunload(module, ()=>{
+  module.onUnload(()=>{
     Route.root.defaultPage = null;
     Route.root.removeBase(Tpl);
   });
 
   let eventSub, resultOb;
 
+  const pageChange = (page, pageRoute)=>{
+    const tabList = Dom('#Event>div>nav.tabbed');
+    const old = tabList.getElementsByClassName('selected')[0];
+
+    Dom.removeClass(old, "selected");
+
+    const query = `button[name="${page.name}"]`;
+    let button = page.parent === Tpl
+        ? tabList.querySelector(
+          pageRoute.search ? `${query}[data-search="${pageRoute.search}"]` : query)
+        : null;
+
+    if (! button) {
+      if (Dom.Event.Register.$contains(page))
+        button =  tabList.querySelector('[name="Register"]');
+    }
+
+    Dom.setClass('hide', ! button, tabList);
+    Dom.addClass(button, "selected");
+  };
+
+  const listType = ()=>{
+    return "type=" + (Tpl.Show.results ? "results" : "startlists");
+  };
+
+  const FORMAT_ROW = Dom.h({class: 'fmt', tr: {td: '', $colspan: 8}});
+
+  const buildTable = (table)=>{
+    const cats = Category.docs;
+    let lastType, lastStyle;
+    Dom.removeChildren(table);
+    Object.keys(Result.eventCatIndex.lookup({event_id: Tpl.event._id})||{})
+      .map(cat_id => cats[cat_id]).sort(compareCategories)
+      .forEach(doc =>{
+        if (doc == null) return;
+        const thisType = Tpl.event.heatTypes(doc._id);
+        if (lastType !== thisType) {
+          lastType = thisType;
+          const fr = FORMAT_ROW.cloneNode(true);
+          if (lastStyle !== thisType[0]) {
+            lastStyle = thisType[0];
+            Dom.addClass(fr, lastStyle);
+          }
+          fr.firstChild.textContent = "Format: " + Event.describeFormat(thisType);
+          table.appendChild(fr);
+        }
+        table.appendChild(Tpl.CatList.$autoRender(doc));
+      });
+  };
+
+  const cancel = (event)=>{
+    Dom.stopEvent();
+    Route.history.back();
+  };
+
+  const observeScores = ()=>{
+    resultOb && resultOb.stop();
+
+    const counts = Tpl.scoreCounts = new Observable();
+
+    const calcScores = (doc, was)=>{
+      const res = doc || was;
+      if (res.event_id !== (Tpl.event && Tpl.event._id)) return;
+
+      const oldScores = (was && (doc ? doc.$withChanges(was) : was).scores) || [];
+      const newScores = (doc && doc.scores) || [];
+
+      const len = Math.max(oldScores.length, newScores.length);
+      const scores = counts[res.category_id] || (counts[res.category_id]  = []);
+      let changed = false;
+
+      for(let i = 0; i < len; ++i) {
+        const count = (newScores[i] != null ?
+                       (oldScores[i] == null ? 1 : 0) :
+                       (oldScores[i] != null ? -1 : 0));
+        if (count != 0) {
+          changed = true;
+          scores[i] = (scores[i] || 0) + count;
+        }
+      }
+
+      if (changed) {
+        counts.notify(res.category_id);
+      }
+    };
+
+    resultOb = Result.onChange(calcScores);
+
+    const docs = Result.docs;
+    for (let id in docs)
+      calcScores(docs[id], null);
+  };
+
   Tpl.$extend({
     base,
-    onBaseEntry(page, pageRoute, callback) {
-      var elm = Tpl.$autoRender({});
+    onBaseEntry: (page, pageRoute, callback)=>{
+      const elm = Tpl.$autoRender({});
       pageRoute.eventId &&
         Dom.myCtx(elm).onDestroy(Event.observeId(
           pageRoute.eventId, doc => Dom.setTitle(doc && doc.displayName)));
@@ -70,9 +162,7 @@ define(function(require, exports, module) {
             observeScores();
 
             eventSub && eventSub.stop();
-            eventSub = App.subscribe('Event', pageRoute.eventId, function () {
-              callback();
-            });
+            eventSub = App.subscribe('Event', pageRoute.eventId, ()=>{callback()});
           }
         }
       }
@@ -90,39 +180,17 @@ define(function(require, exports, module) {
       pageChange(page, pageRoute);
     },
 
-    onBaseExit(page, pageRoute) {
+    onBaseExit: (page, pageRoute)=>{
       Tpl.stopNotify && Tpl.stopNotify();
       Dom.removeId('Event');
       Route.title = null;
     },
 
-    stop() {
+    stop: ()=>{
       eventSub && eventSub.stop();
       Tpl.event = null;
     },
   });
-
-  function pageChange(page, pageRoute) {
-    const tabList = Dom('#Event>div>nav.tabbed');
-    const old = tabList.getElementsByClassName('selected')[0];
-
-    Dom.removeClass(old, "selected");
-
-
-    const query = `button[name="${page.name}"]`;
-    let button = page.parent === Tpl
-        ? tabList.querySelector(
-          pageRoute.search ? `${query}[data-search="${pageRoute.search}"]` : query)
-        : null;
-
-    if (! button) {
-      if (Dom.Event.Register.$contains(page))
-        button =  tabList.querySelector('[name="Register"]');
-    }
-
-    Dom.setClass('hide', ! button, tabList);
-    Dom.addClass(button, "selected");
-  }
 
   Tpl.$events({
     'click .tabNames>button:not(.selected)'(event) {
@@ -168,7 +236,7 @@ define(function(require, exports, module) {
     'click .list tr'(event) {
       Dom.stopEvent();
 
-      var data = $.data(this);
+      const data = $.data(this);
 
       if ($.ctx.tab === 'series')
         Route.gotoPath('series/'+data._id);
@@ -245,7 +313,7 @@ define(function(require, exports, module) {
   Tpl.Edit.$events({
     'click [name=cancel]': cancel,
     'click [name=delete]'(event) {
-      var doc = $.data();
+      const doc = $.data();
 
       Dom.stopEvent();
       Dom.Dialog.confirm({
@@ -265,8 +333,8 @@ define(function(require, exports, module) {
     'click [type=submit]': Form.submitFunc('EditEvent', Tpl),
 
     'change [name=changeFormat]'(event) {
-      var cat = $.data(this);
-      var ev = Tpl.event;
+      const cat = $.data(this);
+      const ev = Tpl.event;
 
       ev.$change('heats')[cat._id] = cat.type + this.value;
       if (ev.$save()) {
@@ -328,15 +396,15 @@ define(function(require, exports, module) {
 
   Tpl.Edit.Cat.$helpers({
     eventFormat() {
-    var event = $.ctx.parentCtx.data;
-    var format = event.heats[this._id];
+    const event = $.ctx.parentCtx.data;
+    const format = event.heats[this._id];
     if (format)
       return format.slice(1);
     else
       return this.heatFormat; // not yet copied to event
     } ,
     describeFormat() {
-      var event = $.ctx.parentCtx.data;
+      const event = $.ctx.parentCtx.data;
       return Event.describeFormat(event.heats[this._id] || this.type+this.heatFormat);
     }
   });
@@ -347,76 +415,44 @@ define(function(require, exports, module) {
     },
 
     heats() {
-      var cat = this;
-      var frag = document.createDocumentFragment();
-      var counts = Tpl.scoreCounts[cat._id] || [];
-      var format = Tpl.event.heats[cat._id];
-      if (! format) format = cat.type + cat.heatFormat;
-      var heat = new Heat(-1,  format);
-      var total = heat.total;
+      const cat = this;
+      const frag = document.createDocumentFragment();
+      const counts = Tpl.scoreCounts[cat._id] || [];
+      const format = Tpl.event.heats[cat._id] || cat.type + cat.heatFormat;
+      const heat = new Heat(-1,  format);
+      let total = heat.total;
       if (Tpl.Show.results) ++total;
 
-      for(var i = 1; i < total && counts[i]; ++i) {
+      const addHeat = (i)=>{
+        const elm = document.createElement('td');
+        elm.appendChild(Form.pageLink({
+          value: heat.getName(i), template: "Event.Category", append: cat._id,
+          search: listType() + "&heat="+i,
+        }));
+        frag.appendChild(elm);
+      };
+
+      let i = 1;
+      for(; i < total && counts[i]; ++i) {
         addHeat(i);
       }
       if (! Tpl.Show.results) {
         addHeat(i);
-        var link = $.data($.element.previousElementSibling.firstChild);
-        link.search += "&heat="+i;
+        $.data($.element.previousElementSibling.firstChild).search += "&heat="+i;
       }
 
       if (i < 7) {
-        var elm = document.createElement('td');
+        const elm = document.createElement('td');
         elm.setAttribute('colspan', 7 - i);
         frag.appendChild(elm);
       }
 
 
       return frag;
-
-      function addHeat(i) {
-        var elm = document.createElement('td');
-        elm.appendChild(Form.pageLink({
-          value: heat.getName(i), template: "Event.Category", append: cat._id,
-          search: listType() + "&heat="+i,
-        }));
-        frag.appendChild(elm);
-      }
     },
 
-    listType: listType,
+    listType,
   });
-
-  function listType() {
-    return "type=" + (Tpl.Show.results ? "results" : "startlists");
-  }
-
-  const FORMAT_ROW = Dom.h({class: 'fmt', tr: {td: '', $colspan: 8}});
-
-  function buildTable(table) {
-    var cats = Category.docs;
-    var lastType, lastStyle;
-    Dom.removeChildren(table);
-    Object.keys(Result.eventCatIndex.lookup({event_id: Tpl.event._id})||{})
-      .map(function (cat_id) {
-        return cats[cat_id];
-      }).sort(compareCategories)
-      .forEach(function (doc) {
-        if (! doc) return;
-        var thisType = Tpl.event.heatTypes(doc._id);
-        if (lastType !== thisType) {
-          lastType = thisType;
-          var fr = FORMAT_ROW.cloneNode(true);
-          if (lastStyle !== thisType[0]) {
-            lastStyle = thisType[0];
-            Dom.addClass(fr, lastStyle);
-          }
-          fr.firstChild.textContent = "Format: " + Event.describeFormat(thisType);
-          table.appendChild(fr);
-        }
-        table.appendChild(Tpl.CatList.$autoRender(doc));
-      });
-  }
 
   Tpl.Show.$helpers({
     listType() {
@@ -429,20 +465,20 @@ define(function(require, exports, module) {
         return;
       }
 
-      var table = document.createElement('table');
+      const table = document.createElement('table');
       Dom.addClass(table, 'categories');
 
 
       buildTable(table);
 
-      $.ctx.onDestroy(Result.onChange(function (doc, was) {
+      $.ctx.onDestroy(Result.onChange((doc, was)=>{
         if (doc && was) return; // already showing this row
         buildTable(table);
       }));
 
-      $.ctx.onDestroy(Tpl.scoreCounts.onChange(function (cat_id) {
-        var elm = document.getElementById('cat_'+cat_id);
-        elm && Dom.myCtx(elm).updateAllTags();
+      $.ctx.onDestroy(Tpl.scoreCounts.onChange((cat_id)=>{
+        const elm = document.getElementById('cat_'+cat_id);
+        elm === null || Dom.myCtx(elm).updateAllTags();
       }));
 
       return table;
@@ -450,7 +486,7 @@ define(function(require, exports, module) {
   });
 
   Tpl.Show.$events({
-    'click .select': PrintHelper.clickSelect(function (me, selected, parent) {
+    'click .select': PrintHelper.clickSelect((me, selected, parent)=>{
       const action = parent.getElementsByClassName('action')[0];
 
       const firstFormat = me && Tpl.event.heatTypes($.data(me)._id);
@@ -468,15 +504,17 @@ define(function(require, exports, module) {
 
     'click .printResults'(event) {
       Dom.stopEvent();
-      var heatNumber = +this.getAttribute('data-heat');
-      var parent = event.currentTarget;
-      var selected = parent.getElementsByClassName('selected');
+      const heatNumber = +this.getAttribute('data-heat');
+      const parent = event.currentTarget;
+      const selected = parent.getElementsByClassName('selected');
 
 
-      var elm = document.createElement('section');
+      const elm = document.createElement('section');
       elm.className = 'print-only';
-      for(var i = 0; i < selected.length; ++i) {
-        elm.appendChild(Tpl.Category.$render({showingResults: Tpl.Show.results, heatNumber: heatNumber, category_id: $.data(selected[i])._id}));
+      for(let i = 0; i < selected.length; ++i) {
+        elm.appendChild(Tpl.Category.$render({
+          showingResults: Tpl.Show.results, heatNumber: heatNumber,
+          category_id: $.data(selected[i])._id}));
       }
       parent.parentNode.appendChild(elm);
       Dom.addClass(parent, 'no-print');
@@ -498,10 +536,19 @@ define(function(require, exports, module) {
   Tpl.Show.Action.$helpers({
     content() {
       if (this.fmt) {
-        var frag = document.createDocumentFragment();
-        var elm = document.createElement('span');
+        const frag = document.createDocumentFragment();
+        const elm = document.createElement('span');
         elm.textContent = "Print ";
         frag.appendChild(elm);
+
+        const heat = (number, name)=>{
+          if (number < -1 || number === 99) return;
+          const elm = document.createElement('button');
+          elm.textContent = name;
+          elm.setAttribute('data-heat', number);
+          elm.className = "link printResults";
+          frag.appendChild(elm);
+        };
 
         Tpl.Show.results && heat(-1, 'General');
 
@@ -510,62 +557,8 @@ define(function(require, exports, module) {
         return frag;
       } else
         return "Select categories to print";
-
-      function heat(number, name) {
-        if (number < -1 || number === 99) return;
-        var elm = document.createElement('button');
-        elm.textContent = name;
-        elm.setAttribute('data-heat', number);
-        elm.className = "link printResults";
-        frag.appendChild(elm);
-      }
     },
   });
-
-  function cancel(event) {
-    Dom.stopEvent();
-    Route.history.back();
-  }
-
-  function observeScores() {
-    resultOb && resultOb.stop();
-
-    const counts = Tpl.scoreCounts = {};
-
-    makeSubject(counts);
-
-    resultOb = Result.onChange(calcScores);
-
-    const docs = Result.docs;
-    for (let id in docs)
-      calcScores(docs[id], null);
-
-    function calcScores(doc, was) {
-      var res = doc || was;
-      if (res.event_id !== (Tpl.event && Tpl.event._id)) return;
-
-      var oldScores = (was && (doc ? doc.$withChanges(was) : was).scores) || [];
-      var newScores = (doc && doc.scores) || [];
-
-      var len = Math.max(oldScores.length, newScores.length);
-      var scores = counts[res.category_id] || (counts[res.category_id]  = []);
-      var changed = false;
-
-      for(var i = 0; i < len; ++i) {
-        var count = (newScores[i] != null ?
-                     (oldScores[i] == null ? 1 : 0) :
-                     (oldScores[i] != null ? -1 : 0));
-        if (count) {
-          changed = true;
-          scores[i] = (scores[i] || 0) + count;
-        }
-      }
-
-      if (changed) {
-        counts.notify(res.category_id);
-      }
-    }
-  }
 
   return Tpl;
 });

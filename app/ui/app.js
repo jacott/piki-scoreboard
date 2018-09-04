@@ -9,9 +9,9 @@ define(function(require, exports, module) {
   const uColor          = require('koru/util-color');
   const Org             = require('models/org');
   const User            = require('models/user');
-  require('publish/publish-event');
-  require('publish/publish-org');
-  require('publish/publish-self');
+  require('publish/publish-event-client');
+  require('publish/publish-org-client');
+  require('publish/publish-self-client');
   const ResourceString  = require('resource-string');
   const header          = require('ui/header');
   const Loading         = require('ui/loading');

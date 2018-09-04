@@ -1,13 +1,13 @@
-define(function(require, exports, module) {
+define((require, exports, module)=>{
   const koru            = require('koru');
-  const makeSubject     = require('koru/make-subject');
   const Val             = require('koru/model/validation');
+  const Observable      = require('koru/observable');
   const session         = require('koru/session');
   const UserAccount     = require('koru/user-account');
   const util            = require('koru/util');
   const Role            = require('models/role');
 
-  return function (User) {
+  return User =>{
     const SELF_FIELD_SPEC = {
       org_id: 'id',
       name: 'string',
@@ -120,11 +120,9 @@ define(function(require, exports, module) {
       },
 
       observeOrg_id([org_id], callback) {
-        return (orgObs[org_id] || (orgObs[org_id] = makeSubject(
-          {}, undefined, undefined, {allStopped() {
-            delete orgObs[org_id];
-          }}
-        ))).onChange(callback);
+        return (orgObs[org_id] || (orgObs[org_id] = new Observable(()=>{
+          delete orgObs[org_id];
+        }))).add(callback);
       }
     });
 

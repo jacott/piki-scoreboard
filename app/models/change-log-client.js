@@ -1,1 +1,1 @@
-define(function() {return function () {}});
+define(()=> ()=>{});

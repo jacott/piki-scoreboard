@@ -1,8 +1,8 @@
-define(function(require, exports, module) {
-  const Model = require('koru/model');
-  const Val   = require('koru/model/validation');
-  const util  = require('koru/util');
-  const User  = require('./user');
+define((require, exports, module)=>{
+  const Model           = require('koru/model');
+  const Val             = require('koru/model/validation');
+  const util            = require('koru/util');
+  const User            = require('./user');
 
   const FIELD_SPEC = {
     name: 'string',
@@ -20,7 +20,7 @@ define(function(require, exports, module) {
     org_id: 'id',
   };
 
-  return function (Category) {
+  return Category =>{
     Category.registerObserveField('org_id');
 
     util.merge(Category.prototype, {

@@ -1,27 +1,21 @@
-isServer && define(function (require, exports, module) {
-  var test, v;
-  var TH = require('test-helper');
-  var emailText = require('./email-text');
+isServer && define((require, exports, module)=>{
+  const TH              = require('test-helper');
 
-  TH.testCase(module, {
-    setUp: function () {
-      test = this;
-      v = {};
-    },
+  const emailText = require('./email-text');
 
-    tearDown: function () {
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    afterEach(()=>{
       TH.clearDB();
-      v = null;
-    },
+    });
 
-    "test sendResetPasswordEmailText": function () {
-      var user = TH.Factory.createUser({name: 'Kate Sheppard'});
-      var result = emailText.sendResetPasswordEmailText(user, 'foo-bar');
+    test("sendResetPasswordEmailText", ()=>{
+      const user = TH.Factory.createUser({name: 'Kate Sheppard'});
+      const result = emailText.sendResetPasswordEmailText(user, 'foo-bar');
 
       assert.match(result, /Hello Kate Sheppard/);
 
       assert.match(result, /http:\/\/test.piki\/#reset-password\/foo-bar/);
-    },
+    });
 
   });
 });

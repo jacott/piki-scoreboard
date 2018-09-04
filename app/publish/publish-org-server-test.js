@@ -1,4 +1,4 @@
-define(function (require, exports, module) {
+define((require, exports, module)=>{
   const koru            = require('koru');
   const Model           = require('koru/model');
   const Val             = require('koru/model/validation');
@@ -10,24 +10,23 @@ define(function (require, exports, module) {
 
   const {stub, spy, onEnd} = TH;
 
-  const sut             = require('./publish-org');
-  let v = null;
+  const sut             = require('./publish-org-server');
 
-  TH.testCase(module, {
-    setUp() {
-      v = {};
+  let v = {};
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    beforeEach(()=>{
       v.org = Factory.createOrg();
       v.user = Factory.createUser();
       TH.loginAs(v.user);
       stub(Val, 'ensureString');
-    },
+    });
 
-    tearDown() {
+    afterEach(()=>{
       TH.cleanUpTest(v);
-      v = null;
-    },
+      v = {};
+    });
 
-    "test publish"() {
+    test("publish", ()=>{
       const org1 = Factory.createOrg({shortName: 'foo'});
       const org_id = org1._id;
 
@@ -91,14 +90,14 @@ define(function (require, exports, module) {
       sub.stop();
 
       stopSpys.forEach(spy=>{assert.called(spy)});
-    },
+    });
 
-    "test org not found"() {
+    test("org not found", ()=>{
       var sub = TH.mockSubscribe(v, 's123', 'Org', 'bad');
 
       refute(sub);
 
       assert.calledWith(v.conn.sendBinary, 'P', ['s123', 404, 'Org not found']);
-    },
+    });
   });
 });

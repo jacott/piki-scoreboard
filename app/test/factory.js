@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define((require)=>{
   const Factory         = require('koru/model/test-factory');
   const Random          = require('koru/random');
   const util            = require('koru/util');
@@ -38,8 +38,10 @@ define(function(require, exports, module) {
   Factory.defines({
     Org(options) {
       return new Factory.Builder('Org', options).genName()
-        .addField('email', 'email' in options || Factory.generateName('email').replace(/\s+/g, '') + '@vimaly.com')
-        .addField('shortName', 'shortName' in options || Factory.generateName('SN').replace(/\s+/g, ''));
+        .addField('email', 'email' in options || Factory.generateName('email')
+                  .replace(/\s+/g, '') + '@vimaly.com')
+        .addField('shortName', 'shortName' in options || Factory.generateName('SN')
+                  .replace(/\s+/g, ''));
     },
 
     TeamType(options) {
@@ -62,7 +64,8 @@ define(function(require, exports, module) {
         .addField('group', 'A male')
         .addField('type', 'L')
         .addField('gender', 'm')
-        .addField('shortName', 'shortName' in options || Factory.generateName('SN').replace(/\s+/g, ''));
+        .addField('shortName', 'shortName' in options || Factory.generateName('SN')
+                  .replace(/\s+/g, ''));
     },
 
     Climber(options) {
@@ -112,9 +115,9 @@ define(function(require, exports, module) {
       }
 
       if (options.heats && 'forEach' in options.heats) {
-        var heats = {};
+        const heats = {};
         options.heats.forEach(heat =>{
-          var category = Model.Category.findById(heat);
+          const category = Model.Category.findById(heat);
           heats[heat] = category.type + category.heatFormat;
         });
         options.heats = heats;
@@ -129,7 +132,7 @@ define(function(require, exports, module) {
 
     Series(options) {
       if (options.teamType_ids === undefined) {
-        var teamType = Factory.last.teamType || Factory.createTeamType();
+        const teamType = Factory.last.teamType || Factory.createTeamType();
         options.teamType_ids = [teamType._id];
       }
 
@@ -142,7 +145,8 @@ define(function(require, exports, module) {
       const username = 'username' in options ? options.username : Factory.generateName('user');
       const user = new Factory.Builder('User', options)
             .addField('name', 'name' in options || 'fn '+username)
-            .addField('email', 'email' in options || ('email-'+username.replace(/\s+/g,'.')+'@test.co').toLowerCase())
+            .addField('email', 'email' in options ||
+                      ('email-'+username.replace(/\s+/g,'.')+'@test.co').toLowerCase())
             .addField('initials', 'initials' in options || 'u'+username.substring(4))
       ;
 

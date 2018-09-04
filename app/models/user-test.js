@@ -1,31 +1,26 @@
-define(function (require, exports, module) {
-  var test, v;
-  const koru            = require('koru');
+define((require, exports, module)=>{
   const util            = require('koru/util');
   const Role            = require('models/role');
   const TH              = require('test-helper');
   const Factory         = require('test/factory');
-  const User            = require('./user');
 
-  TH.testCase(module, {
-    setUp() {
-      test = this;
-      v = {};
-    },
+  const {stub, spy, onEnd} = TH;
 
-    tearDown() {
+  const User = require('./user');
+
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    afterEach(()=>{
       TH.clearDB();
-      v = null;
-    },
+    });
 
-    "test isGuest"() {
+    test("isGuest", ()=>{
       /**
        * Current user is guest only if logged in with koru.userId() 'guest'
        **/
-      var adminUser = Factory.createUser({role: 'a'});
-      var user = Factory.createUser({role: 'j'});
-      var su = Factory.createUser('su');
-      var guest = isServer ? User.guestUser() : Factory.createUser({_id: 'guest'});
+      const adminUser = Factory.createUser({role: 'a'});
+      const user = Factory.createUser({role: 'j'});
+      const su = Factory.createUser('su');
+      const guest = isServer ? User.guestUser() : Factory.createUser({_id: 'guest'});
 
       // not logged in
       assert.isFalse(User.isGuest());
@@ -38,44 +33,44 @@ define(function (require, exports, module) {
       assert.isFalse(User.isGuest());
       TH.loginAs(guest);
       assert.isTrue(User.isGuest());
-    },
+    });
 
-    "test fetchAdminister"() {
-      test.stub(koru, 'info');
-      var user = Factory.createUser();
+    test("fetchAdminister", ()=>{
+      TH.noInfo();
+      const user = Factory.createUser();
 
-      var ca = test.stub(User.prototype, 'canAdminister').returns(false);
+      const ca = stub(User.prototype, 'canAdminister').returns(false);
 
-      assert.accessDenied(function () {
+      assert.accessDenied(()=>{
         User.fetchAdminister(user._id, 'x');
       });
 
       assert.calledOnceWith(ca, 'x');
       assert.same(ca.firstCall.thisValue._id, user._id);
 
-       assert.accessDenied(function () {
+       assert.accessDenied(()=>{
         User.fetchAdminister('123');
       });
 
       ca.returns(true);
 
       assert.same(User.fetchAdminister(user._id)._id, user._id);
-    },
+    });
 
-    "test emailWithName"() {
-      var user = Factory.buildUser();
+    test("emailWithName", ()=>{
+      const user = Factory.buildUser();
       assert.same(user.emailWithName(), 'fn user 1 <email-user.1@test.co>');
 
-    },
-    'test creation'() {
-      var user=Factory.createUser();
-      var us = User.findById(user._id);
+    });
+    test("creation", ()=>{
+      const user=Factory.createUser();
+      const us = User.findById(user._id);
 
       assert(us);
-    },
+    });
 
-    'test standard validators'() {
-      var validators = User._fieldValidators;
+    test("standard validators", ()=>{
+      const validators = User._fieldValidators;
 
       assert.validators(validators.name, {
         maxLength: [200], required: [true], trim: [true],
@@ -89,6 +84,6 @@ define(function (require, exports, module) {
       assert.validators(validators.initials, {
         maxLength: [3], required: [true], trim: [true],
       });
-    },
+    });
   });
 });

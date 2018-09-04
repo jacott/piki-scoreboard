@@ -1,31 +1,29 @@
-define(function(require, exports, module) {
-  const util     = require('koru/util');
-  const Climber  = require('models/climber');
-  const Team     = require('models/team');
-  const Category = require('./category');
+define((require)=>{
+  const util            = require('koru/util');
+  const Category        = require('./category');
 
-  return function (model) {
-    model.eventIndex = model.addUniqueIndex('event_id', 'climber_id');
-
-    util.merge(model.prototype, {
-      categoryIdForGroup: function (group) {
-        var groupHash = this.$cache.groupHash || (this.$cache.groupHash = makeGroupHash(this.category_ids));
-        return groupHash[group];
-      },
-
-    });
-  };
-
-  function makeGroupHash(ids) {
-    var groupHash = {};
-    if (! ids) return groupHash;
-    var docs = Category.docs;
-    for(var i = 0; i < ids.length; ++i) {
-      var id = ids[i];
-      var doc = docs[id];
-      if (doc)
+  const makeGroupHash = (ids)=>{
+    const groupHash = {};
+    if (ids == null) return groupHash;
+    const {docs} = Category;
+    for(let i = 0; i < ids.length; ++i) {
+      const id = ids[i];
+      const doc = docs[id];
+      if (doc !== undefined)
         groupHash[doc.group] = id;
     }
     return groupHash;
-  }
+  };
+
+  return Competitor =>{
+    Competitor.eventIndex = Competitor.addUniqueIndex('event_id', 'climber_id');
+
+    util.merge(Competitor.prototype, {
+      categoryIdForGroup(group) {
+        const groupHash = this.$cache.groupHash || (
+          this.$cache.groupHash = makeGroupHash(this.category_ids));
+        return groupHash[group];
+      },
+    });
+  };
 });

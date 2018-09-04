@@ -1,8 +1,8 @@
-define(function(require, exports, module) {
-  const koru    = require('koru');
-  const publish = require('koru/session/publish');
+define((require, exports, module)=>{
+  const koru            = require('koru');
+  const publish         = require('koru/session/publish');
   require('models/competitor');
-  const Event   = require('models/event');
+  const Event           = require('models/event');
   require('models/result');
 
   const orgChildren = ['Competitor', 'Result'];

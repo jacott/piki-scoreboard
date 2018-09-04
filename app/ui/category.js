@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define((require, exports, module)=>{
   const koru     = require('koru');
   const Dom      = require('koru/dom');
   const Form     = require('koru/ui/form');
@@ -10,16 +10,19 @@ define(function(require, exports, module) {
 
   const Tpl = CrudPage.newTemplate(module, Category, require('koru/html!./category'));
   const $ = Dom.current;
-  const Index = Tpl.Index;
+  const {Index} = Tpl;
 
   const typeNameComparitor = util.compareByFields('type', 'heatFormat', 'name');
 
   Tpl.title = "Categories";
 
+  const cancel = (event)=>{
+    Dom.stopEvent();
+    Route.gotoPage(Tpl);
+  };
+
   Tpl.Form.$helpers({
-    typeList() {
-      return [['', ''], ["L", "Lead"], ["B", "Boulder"]];
-    },
+    typeList: ()=> [['', ''], ["L", "Lead"], ["B", "Boulder"]],
   });
 
   Tpl.Add.$events({
@@ -55,11 +58,6 @@ define(function(require, exports, module) {
       ctx.data.$clearChanges();
     }
   });
-
-  function cancel(event) {
-    Dom.stopEvent();
-    Route.gotoPage(Tpl);
-  }
 
   return Tpl;
 });

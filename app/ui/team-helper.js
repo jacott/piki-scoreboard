@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define((require, exports, module)=>{
   const Dom             = require('koru/dom');
   const SelectMenu      = require('koru/ui/select-menu');
   const util            = require('koru/util');
@@ -80,16 +80,11 @@ define(function(require, exports, module) {
   };
 
   Tpl.AssignTeamTypes.$helpers({
-    teamTypes,
-  });
-
-  function teamTypes(each) {
-    return {
+    teamTypes: each =>({
       query: TeamType.query,
       compare: util.compareByName,
-    };
-  }
-
+    }),
+  });
 
   Tpl.AssignTeamTypes.TeamType.$helpers({
     checked() {

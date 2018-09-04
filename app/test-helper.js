@@ -1,5 +1,4 @@
-define(function(require, exports, module) {
-  'use strict';
+define((require, exports, module)=>{
   const koru            = require('koru');
   const localStorage    = require('koru/local-storage');
   const Model           = require('koru/model');

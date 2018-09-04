@@ -2,7 +2,7 @@ window.requirejs = window.yaajs;
 
 window.history.replaceState(null, document.title = 'Piki Test Mode', '/');
 
-define(function(require, exports, module) {
+define((require, exports, module)=>{
   const koru            = require('koru/main');
   const Model           = require('model');
 

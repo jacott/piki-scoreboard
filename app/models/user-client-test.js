@@ -1,18 +1,14 @@
-define(function (require, exports, module) {
-  var test, v;
-  const session = require('koru/session');
-  const TH      = require('test-helper');
-  const User    = require('./user');
+define((require, exports, module)=>{
+  const session         = require('koru/session');
+  const TH              = require('test-helper');
+
+  const {stub, spy, onEnd} = TH;
+
+  const User = require('./user');
 
   TH.testCase(module, {
-    setUp() {
-      test = this;
-      v = {};
-    },
-
     tearDown() {
       TH.clearDB();
-      v = null;
     },
 
     "test isSuperUser"() {
@@ -72,11 +68,12 @@ define(function (require, exports, module) {
     },
 
     "test forgotPassword"() {
-      test.stub(session, 'rpc');
+      stub(session, 'rpc');
+      const cb = stub();
 
-      User.forgotPassword('email@address', v.stub = test.stub());
+      User.forgotPassword('email@address', cb);
 
-      assert.calledWith(session.rpc, 'User.forgotPassword', 'email@address', v.stub);
+      assert.calledWith(session.rpc, 'User.forgotPassword', 'email@address', cb);
     },
   });
 });

@@ -1,17 +1,14 @@
-define(function(require, exports, module) {
-  var Val = require('koru/model/validation');
-  var util = require('koru/util');
-  var koru = require('koru');
-  var Model = require('model');
+define((require, exports, module)=>{
+  const Model           = require('model');
 
-  var model = Model.define(module, {
+  class ChangeLog extends Model.BaseModel {
     get parentSubject () {
-      var pm = Model[this.parent];
+      const pm = Model[this.parent];
       return new pm(pm.attrFind(this.parent_id));
     }
-  });
+  }
 
-  model.defineFields({
+  ChangeLog.define({module, fields: {
     createdAt: 'auto_timestamp',
     model: 'text',
     model_id: 'id',
@@ -21,17 +18,17 @@ define(function(require, exports, module) {
     before: 'text',
     after: 'text',
     aux: 'text',
-  });
+  }});
 
   // Handle circular dependency
-  require(['./user', './org'], function () {
-    model.defineFields({
+  require(['./user', './org'], ()=>{
+    ChangeLog.defineFields({
       user_id: 'belongs_to',
       org_id: 'belongs_to',
     });
   });
 
-  require('koru/env!./change-log')(model);
+  require('koru/env!./change-log')(ChangeLog);
 
-  return model;
+  return ChangeLog;
 });

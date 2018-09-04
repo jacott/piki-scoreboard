@@ -1,24 +1,18 @@
-define(function (require, exports, module) {
-  var test, v;
-  const Team       = require('models/team');
-  const TH         = require('test-helper');
-  const Category   = require('./category');
+define((require, exports, module)=>{
+  const Team            = require('models/team');
+  const TH              = require('test-helper');
+  const Category        = require('./category');
+
   const Competitor = require('./competitor');
 
-  TH.testCase(module, {
-    setUp() {
-      test = this;
-      v = {};
-    },
-
-    tearDown() {
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    afterEach(()=>{
       TH.clearDB();
-      v = null;
-    },
+    });
 
-    'test creation'() {
-      var team = TH.Factory.createTeam();
-      var competitor=TH.Factory.createCompetitor();
+    test("creation", ()=>{
+      const team = TH.Factory.createTeam();
+      const competitor=TH.Factory.createCompetitor();
 
       assert(Competitor.exists(competitor._id));
 
@@ -26,22 +20,22 @@ define(function (require, exports, module) {
       assert(competitor.climber);
       assert.equals(competitor.team_ids, [team._id]);
       assert(Category.exists({org_id: competitor.event.org_id, _id: competitor.category_ids[0]}));
-    },
+    });
 
-    "test null team_ids"() {
+    test("null team_ids", ()=>{
       const competitor = new Competitor();
 
       assert.equals(competitor.team_ids, []);
-    },
+    });
 
-    'test standard validators'() {
-      var validators = Competitor._fieldValidators;
+    test("standard validators", ()=>{
+      const validators = Competitor._fieldValidators;
 
       assert.validators(validators.number, {number: [{integer: true, $gt: 0}]});
-    },
+    });
 
 
-    "test changing number updates climber"() {
+    test("changing number updates climber", ()=>{
       let climber = TH.Factory.createClimber({number: 123});
       let competitor = TH.Factory.buildCompetitor({climber_id: climber._id, number: 345});
       competitor.$$save();
@@ -52,9 +46,9 @@ define(function (require, exports, module) {
 
       competitor.$update('number', undefined);
       assert.equals(climber.$reload().number, undefined);
-    },
+    });
 
-    "test changing teams updates climber"() {
+    test("changing teams updates climber", ()=>{
       let tt1 = TH.Factory.createTeamType();
       let team1 = TH.Factory.createTeam({_id: 'team1'});
       let team2 = TH.Factory.createTeam({_id: 'team2'});
@@ -71,6 +65,6 @@ define(function (require, exports, module) {
 
       competitor.$update('team_ids', []);
       assert.equals(climber.$reload().team_ids, [team3._id, team2._id]);
-    },
+    });
   });
 });

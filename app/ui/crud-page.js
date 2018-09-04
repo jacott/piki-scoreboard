@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define((require, exports, module)=>{
   const Dom             = require('koru/dom');
   const Route           = require('koru/ui/route');
   const util            = require('koru/util');
@@ -24,15 +24,12 @@ define(function(require, exports, module) {
       base.addTemplate(subm, subTpl.Index, {defaultPage: true, path: ''});
       base.addTemplate(subm, subTpl.Add, {
         focus: true,
-        data() {
-          return new model({org_id: App.orgId});
-        }
+        data: ()=> new model({org_id: App.orgId}),
       });
 
       base.addTemplate(subm, subTpl.Edit, {
         focus: true,
-        data(page, pageRoute) {
-
+        data: (page, pageRoute)=>{
           const doc = model.findById(pageRoute.modelId);
           if (doc) return doc;
 

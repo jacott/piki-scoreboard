@@ -1,9 +1,9 @@
-define(function(require, exports, module) {
-  const {BaseModel}     = require('model');
+define((require, exports, module)=>{
+  const Model           = require('model');
   const Org             = require('models/org');
   const TeamType        = require('./team-type');
 
-  class Team extends BaseModel {
+  class Team extends Model.BaseModel {
     static teamMap(list) {
       let map = {};
       list && list.forEach(id => {
@@ -14,7 +14,7 @@ define(function(require, exports, module) {
     }
   }
 
-  class HasTeam extends BaseModel {
+  class HasTeam extends Model.BaseModel {
     get teamMap() {
 
       let map = this.$cache.teamMap;
@@ -25,13 +25,13 @@ define(function(require, exports, module) {
     }
 
     getTeam(id) {
-      return this.teamMap[BaseModel.toId(id)];
+      return this.teamMap[Model.BaseModel.toId(id)];
     }
   }
 
   Team.HasTeam = HasTeam;
 
-  module.exports = Team.define({
+  Team.define({
     module,
     fields: {
       name: {type:  'text', trim: true, required: true, maxLength: 200, unique: {scope: 'org_id'}},
@@ -42,4 +42,6 @@ define(function(require, exports, module) {
   });
 
   require('koru/env!./team')(Team);
+
+  return Team;
 });

@@ -1,37 +1,16 @@
-define(function(require, exports, module) {
+define((require, exports, module)=>{
   const koru            = require('koru');
   const Random          = require('koru/random');
   const util            = require('koru/util');
   const Model           = require('model');
   const User            = require('./user');
 
-  return model =>{
+  return ChangeLog =>{
     Model.BaseModel.prototype.$parentId = function () {
       return this.constructor._parentIdField && this[this.constructor._parentIdField];
     };
 
-    util.merge(model, {
-      logChanges(subject, options) {
-        options = options || {};
-        subject._parent = options.parent;
-        subject._parentIdField = options.parent && (options.parentIdField || util.uncapitalize(options.parent.modelName)+'_id');
-
-        observeChanges(subject, options.aux, options.callback);
-      },
-
-      create(attributes) {
-        var now = util.newDate();
-        Model._support._updateTimestamps(attributes, model.updateTimestamps, now);
-        attributes._id = Random.id();
-        Model._support._updateTimestamps(attributes, model.createTimestamps, now);
-        model.docs.insert(attributes);
-        return new model(attributes);
-      },
-    });
-
-    koru.runFiber(()=>{model.addIndex('createdAt', -1, 'parent_id')});
-
-    function observeChanges(subject, aux, callback) {
+    const observeChanges = (subject, aux, callback)=>{
       subject.onChange((doc, undo)=>{
         const userId = koru.userId();
         if (userId == null) return;
@@ -47,32 +26,30 @@ define(function(require, exports, module) {
           user_id: userId,
           org_id: sub.org_id,
         };
+        let cl;
         if (! doc) {
           params.type= 'remove';
           params.before = JSON.stringify(undo.attributes);
-          var cl = model.create(params);
+          cl = ChangeLog.create(params);
         } else {
-          var cl = createChangeLog(params, subject, aux, doc, undo);
+          cl = createChangeLog(params, subject, aux, doc, undo);
         }
         callback && callback(cl, doc, undo);
       });
-    }
+    };
 
-    function createChangeLog(params, subject, aux, doc, was) {
+    const createChangeLog = (params, subject, aux, doc, was)=>{
       const {attributes} = doc;
 
       params.type = was ? 'update' : 'create';
 
       if (was) {
-        var after = {};
-        var count = 0;
-        for(var key in was) {
+        const after = {};
+        let count = 0;
+        for(const key in was) {
           ++count;
-          if (key.match(/\./)) {
-            var val = util.lookupDottedValue(key, attributes);
-          } else {
-            var val = attributes[key];
-          }
+          const val = key.match(/\./)
+                ? util.lookupDottedValue(key, attributes) :  attributes[key];
 
           if (val !== undefined)
             after[key] = val;
@@ -89,8 +66,26 @@ define(function(require, exports, module) {
       if (typeof params.aux === 'object')
         params.aux = JSON.stringify(params.aux);
 
-      return model.create(params);
-    }
+      return ChangeLog.create(params);
+    };
 
+    util.merge(ChangeLog, {
+      logChanges(subject, options) {
+        options = options || {};
+        subject._parent = options.parent;
+        subject._parentIdField = options.parent && (options.parentIdField || util.uncapitalize(options.parent.modelName)+'_id');
+
+        observeChanges(subject, options.aux, options.callback);
+      },
+
+      create(attributes) {
+        const now = util.newDate();
+        Model._support._updateTimestamps(attributes, ChangeLog.updateTimestamps, now);
+        attributes._id = Random.id();
+        Model._support._updateTimestamps(attributes, ChangeLog.createTimestamps, now);
+        ChangeLog.docs.insert(attributes);
+        return new ChangeLog(attributes);
+      },
+    });
   };
 });

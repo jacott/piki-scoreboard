@@ -1,32 +1,28 @@
-define(function(require, exports, module) {
-  const koru        = require('koru');
+define((require, exports, module)=>{
+  const koru            = require('koru');
   require('koru/server');
-  const UserAccount = require('koru/user-account');
-  const Ranking     = require('models/ranking');
+  const UserAccount     = require('koru/user-account');
+  const Ranking         = require('models/ranking');
   require('models/reg-upload-server');
-  require('publish/publish-event');
-  require('publish/publish-org');
-  require('publish/publish-self');
+  require('publish/publish-event-server');
+  require('publish/publish-org-server');
+  require('publish/publish-self-server');
 
-
-  koru.onunload(module, restart);
 
   const emailConfig = koru.config.userAccount.emailConfig;
-  emailConfig.sendResetPasswordEmailText = function(user, resetToken) {
-    return require('server/email-text').sendResetPasswordEmailText(user, resetToken);
-  };
+  emailConfig.sendResetPasswordEmailText = (user, resetToken)=> require('server/email-text')
+    .sendResetPasswordEmailText(user, resetToken);
 
-  function restart(mod, error) {
+  module.onUnload((mod, error)=>{
     if (error) return;
     const modId = mod.id;
-    setTimeout(function () {
-      require(modId, function (sc) {
-        sc.start && sc.start();
-      });
+    setTimeout(()=>{
+      require(modId, sc =>{sc.start && sc.start()});
     });
-  }
+  });
 
-  return function () {
+
+  return ()=>{
     require('koru/email').initPool(koru.config.mailUrl);
     UserAccount.init();
   };

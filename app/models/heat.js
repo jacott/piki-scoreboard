@@ -1,4 +1,4 @@
-define(function(require) {
+define((require)=>{
   const FINAL_NAMES = ['Final', 'Semi final', 'Quarter final'];
 
   class Heat {

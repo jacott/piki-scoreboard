@@ -1,19 +1,20 @@
-define(function(require, exports, module) {
-  const TH       = Object.create(require('test-helper'));
-  const koru         = require('koru');
-  const Dom          = require('koru/dom');
-  const localStorage = require('koru/local-storage');
+define((require, exports, module)=>{
+  const koru            = require('koru');
+  const Dom             = require('koru/dom');
+  const localStorage    = require('koru/local-storage');
   require('koru/ui/helpers');
-  const Route        = require('koru/ui/route');
-  const KoruUITH     = require('koru/ui/test-helper');
-  const util         = require('koru/util');
-  const Factory      = require('test/factory');
-  const App          = require('ui/app');
+  const Route           = require('koru/ui/route');
+  const KoruUITH        = require('koru/ui/test-helper');
+  const util            = require('koru/util');
+  const BaseTH          = require('test-helper');
+  const Factory         = require('test/factory');
+  const App             = require('ui/app');
 
   koru.onunload(module, 'reload');
 
-  util.mergeOwnDescriptors(TH, KoruUITH);
-  util.merge(TH, {
+  const TH = {
+    __proto__: BaseTH,
+
     setOrg(org) {
       org = org || Factory.createOrg();
       App.orgId = org._id;
@@ -34,17 +35,9 @@ define(function(require, exports, module) {
       document.head.appendChild(style);
     },
 
-    findDomEvent(template, type) {
-      return template._events.filter(function (event) {
-        return event[0] === type;
-      });
-    },
-
     pointer(node, eventName, args) {
       if (typeof node === 'string') {
-        assert.elideFromStack.dom(node, function () {
-          TH.pointer(this, eventName, args);
-        });
+        assert.elideFromStack.dom(node, elm =>{TH.pointer(elm, eventName, args)});
       } else {
         assert.elideFromStack(node,'node not found');
         if (typeof eventName === 'object') {
@@ -71,13 +64,13 @@ define(function(require, exports, module) {
     },
 
     stubRAF(v) {
-      var func;
-      TH.intercept(window, 'requestAnimationFrame', function (arg) {
+      let func = null;
+      TH.intercept(window, 'requestAnimationFrame', arg =>{
         func = arg;
         return 123;
       });
-      v.nextRaf = function () {
-        if (func) {
+      v.nextRaf = ()=>{
+        if (func !== null) {
           func();
           func = null;
         }
@@ -100,9 +93,11 @@ define(function(require, exports, module) {
         TH.click('[name=okay]');
       });
     },
-  });
+  };
 
-  var onAnimationEnd;
+  util.mergeOwnDescriptors(TH, KoruUITH);
+
+  let onAnimationEnd;
 
   TH.Core.onStart(()=>{
     onAnimationEnd = Dom.Ctx.prototype.onAnimationEnd;

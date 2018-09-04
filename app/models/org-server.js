@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define((require)=>{
   const Model           = require('koru/model');
   const Val             = require('koru/model/validation');
   const util            = require('koru/util');

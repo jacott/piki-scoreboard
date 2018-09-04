@@ -1,19 +1,15 @@
-define(function(require, exports, module) {
-  const util       = require('koru/util');
-  const Competitor = require('models/competitor');
-  const Heat       = require('models/heat');
-  const Result     = require('models/result');
-  const Team       = require('models/team');
+define((require)=>{
+  const Competitor      = require('models/competitor');
+  const Heat            = require('models/heat');
+  const Result          = require('models/result');
+  const Team            = require('models/team');
 
-  function findCompetitorTeamIds(id) {
-    return Competitor.findById(id).team_ids;
-  }
+  const findCompetitorTeamIds = id => Competitor.findById(id).team_ids;
 
-  function findResults(category_id, event_id) {
-    return Result.where({category_id, event_id}).fetch();
-  }
+  const findResults = (category_id, event_id)=> Result.where({category_id, event_id}).fetch();
 
-  exports.getTeamScores = function(event, options={findCompetitorTeamIds, findResults}) {
+  const Ranking = {
+    getTeamScores(event, options={findCompetitorTeamIds, findResults}) {
     const number = event.maxTeamEnties || 30;
     let category_ids = Object.keys(event.heats);
     let scores = {};
@@ -49,7 +45,10 @@ define(function(require, exports, module) {
     });
 
     return scores;
+    },
   };
 
-  require('koru/env!./ranking')(exports);
+  require('koru/env!./ranking')(Ranking);
+
+  return Ranking;
 });

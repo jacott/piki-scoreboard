@@ -1,5 +1,4 @@
-define(function (require, exports, module) {
-  const koru            = require('koru');
+define((require, exports, module)=>{
   const Val             = require('koru/model/validation');
   const session         = require('koru/session');
   const UserAccount     = require('koru/user-account');
@@ -12,29 +11,25 @@ define(function (require, exports, module) {
   const {stub, spy, onEnd, intercept} = TH;
 
   const User = require('./user');
-  let v = null;
 
-  TH.testCase(module, {
-    setUp() {
-      v = {};
-    },
-
-    tearDown() {
+  let v = {};
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    afterEach(()=>{
       TH.clearDB();
-      v = null;
-    },
+      v = {};
+    });
 
-    "observeOrg_id": {
-      setUp() {
+    group("observeOrg_id", ()=>{
+      beforeEach(()=>{
         intercept(UserAccount, 'sendResetPasswordEmail', ()=>{});
         v.org = Factory.createOrg();
         const cb = (doc, undo) => {v.doc = doc; v.undo = undo};
         onEnd(User.observeOrg_id([v.org._id], cb));
         v.user = User.create({
           email: 'foo@bar.com', name: 'foo', initials: 'F'});
-      },
+      });
 
-      "test role"() {
+      test("role", ()=>{
         const org_id = v.org._id;
         const {user} = v;
         assert.same(v.doc, undefined);
@@ -60,9 +55,9 @@ define(function (require, exports, module) {
           email: user.email, name: user.name, initials: user.initials,
           _id: user._id
         });
-      },
+      });
 
-      "test user field"() {
+      test("user field", ()=>{
         const {user} = v;
         const org1 = v.org;
         const org2 = Factory.createOrg();
@@ -78,17 +73,17 @@ define(function (require, exports, module) {
         assert.equals(v.doc.attributes.org_id, org1._id);
         assert.equals(v.doc2.name, 'new name');
         assert.equals(v.doc2.attributes.org_id, org2._id);
-      },
-    },
+      });
+    });
 
-    "test guestUser"() {
+    test("guestUser", ()=>{
       const guest = User.guestUser();
       assert.equals(guest._id, 'guest');
 
       assert.equals(guest.attributes, User.guestUser().attributes);
-    },
+    });
 
-    "test canAdminister"() {
+    test("canAdminister", ()=>{
       const org_id = Factory.createOrg()._id;
       const doc = Factory.createUser({org_id: undefined, role: 's'});
       const role = Role.query.fetchOne();
@@ -107,10 +102,10 @@ define(function (require, exports, module) {
       role.$update({role: User.ROLE.judge});
 
       refute(doc.canAdminister());
-    },
+    });
 
-    "authorize": {
-      "test accessDenied"() {
+    group("authorize", ()=>{
+      test("accessDenied", ()=>{
         TH.noInfo();
         const org = Factory.createOrg();
         const subject = Factory.createUser({_id: 'subjUser'});
@@ -144,9 +139,9 @@ define(function (require, exports, module) {
           subject.changes = {role: 'j'};
           assert.accessDenied(()=>{subject.authorize(user._id)});
         }
-      },
+      });
 
-      "test org_is not in changes"() {
+      test("org_is not in changes", ()=>{
         const org = Factory.createOrg();
         const subject = Factory.createUser({_id: 'subjUser'});
         const admin = Factory.createUser('admin', {_id: 'adminUser'});
@@ -156,9 +151,9 @@ define(function (require, exports, module) {
         assert.exception(()=>{
           user.authorize(admin._id);
         }, {error: 403});
-      },
+      });
 
-      "test new record same email"() {
+      test("new record same email", ()=>{
         const org = Factory.createOrg();
         const subject = Factory.createUser({_id: 'subjUser'});
         const org2 = Factory.createOrg();
@@ -175,9 +170,9 @@ define(function (require, exports, module) {
 
         assert.equals(sub2.changes, {org_id: org2._id, role: 'c'});
         assert.equals(sub2.attributes, subject.attributes);
-      },
+      });
 
-      "test new record new email"() {
+      test("new record new email", ()=>{
         const org = Factory.createOrg();
         const subject = Factory.createUser({_id: 'subjUser'});
         const org2 = Factory.createOrg();
@@ -198,9 +193,9 @@ define(function (require, exports, module) {
           email: 'new'+subject.email, role: 'c',
         });
         assert.equals(sub2.attributes, {});
-      },
+      });
 
-      "test admin changing superuser"() {
+      test("admin changing superuser", ()=>{
         TH.noInfo();
         const org = Factory.createOrg();
         const user = Factory.createUser({_id: 'userId', org_id: org._id, role: User.ROLE.admin});
@@ -208,17 +203,17 @@ define(function (require, exports, module) {
         subject.changes = {org_id: org._id, role: 'a'};
 
         assert.accessDenied(()=>{subject.authorize(user._id)});
-      },
+      });
 
-      "test self change"() {
+      test("self change", ()=>{
         const org = Factory.createOrg();
         const subject = Factory.createUser({_id: 'subjUser', role: 'c'});
         subject.changes = {org_id: org._id};
         refute.accessDenied(()=>{subject.authorize(subject._id)});
-      },
-    },
+      });
+    });
 
-    "test make su"() {
+    test("make su", ()=>{
       const org = Factory.createOrg();
       const subject = Factory.createUser({_id: 'subjUser', role: 'c'});
       const org2 = Factory.createOrg();
@@ -231,9 +226,9 @@ define(function (require, exports, module) {
       assert.equals(Role.query.map(r => [r.org_id, r.user_id, r.role]), [[
         undefined, 'subjUser', 's'
       ]]);
-    },
+    });
 
-    "test make not su"() {
+    test("make not su", ()=>{
       const org = Factory.createOrg();
       const subject = Factory.createUser('su', {_id: 'subjUser'});
 
@@ -245,9 +240,9 @@ define(function (require, exports, module) {
         org._id, 'subjUser', 'c'
       ]]);
 
-    },
+    });
 
-    "test role changes"() {
+    test("role changes", ()=>{
       const user = Factory.createUser();
       const org2 = Factory.createOrg();
       user.changes = {org_id: org2._id, role: 'c'};
@@ -267,9 +262,9 @@ define(function (require, exports, module) {
       user.$$save();
 
       assert(Role.exists({org_id: org2._id, user_id: user._id, role: 'a'}));
-    },
+    });
 
-    "test delete"() {
+    test("delete", ()=>{
       const org2 = Factory.createOrg();
       const user = Factory.createUser();
       UserAccount.createUserLogin({email: user.email, userId: user._id});
@@ -286,9 +281,9 @@ define(function (require, exports, module) {
       user.$$save();
 
       refute(Role.exists({org_id: org2._id, user_id: user._id}));
-    },
+    });
 
-    "test createUser"() {
+    test("createUser", ()=>{
       stub(UserAccount, 'sendResetPasswordEmail', (user, token)=>{
         assert(User.exists({_id: user._id}));
       });
@@ -306,9 +301,9 @@ define(function (require, exports, module) {
       assert.calledWith(UserAccount.sendResetPasswordEmail, TH.matchModel(user));
 
       assert.same(ChangeLog.query.count(), 1);
-    },
+    });
 
-    "test change email"() {
+    test("change email", ()=>{
       const org = Factory.createOrg();
       Factory.createUser('su');
       TH.login();
@@ -323,39 +318,39 @@ define(function (require, exports, module) {
       const ul = UserAccount.model.findBy('userId', user._id);
 
       assert.same(ul.email, user.email);
-    },
+    });
 
-    "forgotPassword": {
-      setUp() {
+    group("forgotPassword", ()=>{
+      beforeEach(()=>{
         stub(Val, 'ensureString');
         stub(UserAccount, 'sendResetPasswordEmail');
         v.rpc = TH.mockRpc();
-      },
+      });
 
-      "test missing email"() {
+      test("missing email", ()=>{
         const res = v.rpc('User.forgotPassword', '  ');
 
         assert.equals(res, {email: 'is_required'});
         refute.called(UserAccount.sendResetPasswordEmail);
-      },
+      });
 
-      "test invalid email"() {
+      test("invalid email", ()=>{
         const res = v.rpc('User.forgotPassword', ' xyz ');
 
         assert.equals(res, {email: 'is_invalid'});
         refute.called(UserAccount.sendResetPasswordEmail);
-      },
+      });
 
-      "test user without userAccount"() {
+      test("user without userAccount", ()=>{
         const user = Factory.createUser({email: 'foo@bar.com'});
         const res = v.rpc('User.forgotPassword', 'foo@bar.com  ');
 
         assert.equals(res, {success: true});
 
         refute.calledWith(UserAccount.sendResetPasswordEmail);
-      },
+      });
 
-      "test success"() {
+      test("success", ()=>{
         const user = Factory.buildUser({email: 'foo@bar.com'});
         user.$save('force');
         const res = v.rpc('User.forgotPassword', 'foo@bar.com  ');
@@ -365,7 +360,7 @@ define(function (require, exports, module) {
         assert.calledWith(Val.ensureString, 'foo@bar.com  ');
 
         assert.calledWith(UserAccount.sendResetPasswordEmail, TH.matchModel(user));
-      },
-    }
+      });
+    });
   });
 });

@@ -1,21 +1,38 @@
-define(function(require, exports, module) {
-  var App    = require('./app-base');
-  var Dom    = require('koru/dom');
-  var Route = require('koru/ui/route');
+define((require, exports, module)=>{
+  const Dom             = require('koru/dom');
+  const Route           = require('koru/ui/route');
+  const App             = require('./app-base');
 
-  var Tpl = Dom.newTemplate(require('koru/html!./help'));
+  const Tpl = Dom.newTemplate(require('koru/html!./help'));
+  const $ = Dom.current;
 
-  var $ = Dom.current;
+  let clickCount = 0;
 
-  var clickCount = 0;
+  const clicked = (event)=>{
+    if (Dom.hasClass(event.target, 'link') && ! Dom.hasClass(event.target, 'topics'))
+      Dom.Dialog.close();
+  };
+
+  const scrollToTag = (tag)=>{
+    Dom.removeClass(document.querySelector('#Help section.current'), 'current');
+
+    if (tag) {
+      var elm = document.querySelector('#Help [name="'+ tag + '"]');
+      Dom.addClass(elm, 'current');
+      elm.scrollIntoView(true);
+    } else {
+      document.getElementById('Help').parentNode.scrollIntoView(true);
+
+    }
+  };
 
   Tpl.$helpers({
-    contents: function () {
-      var ol = document.createElement('ol');
-      var sections = $.element.parentNode.parentNode.querySelectorAll('section');
-      for(var i = 0; i < sections.length; ++i) {
-        var elm = sections[i];
-        var name = elm.getAttribute('name');
+    contents() {
+      const ol = document.createElement('ol');
+      const sections = $.element.parentNode.parentNode.querySelectorAll('section');
+      for(let i = 0; i < sections.length; ++i) {
+        const elm = sections[i];
+        const name = elm.getAttribute('name');
         if (name)
           ol.appendChild(Tpl.ContentLine.$render({tag: '#'+name, desc: elm.firstChild.textContent}));
       }
@@ -24,13 +41,13 @@ define(function(require, exports, module) {
   });
 
   Tpl.$events({
-    'click [name=close]': function (event) {
+    'click [name=close]'(event) {
       Dom.stopEvent();
       Dom.Dialog.close();
     },
 
-    'click a': function (event) {
-      var href = this.getAttribute('href') || '';
+    'click a'(event) {
+      const href = this.getAttribute('href') || '';
       if (href.match(/:/))
         return;
 
@@ -46,34 +63,15 @@ define(function(require, exports, module) {
   });
 
   Tpl.$extend({
-    $created: function (ctx, elm) {
+    $created(ctx, elm) {
       clickCount = 0;
       document.addEventListener('click', clicked, true);
     },
 
-    $destroyed: function (ctx, elm) {
+    $destroyed(ctx, elm) {
       document.removeEventListener('click', clicked, true);
     },
   });
-
-
-  function clicked(event) {
-    if (Dom.hasClass(event.target, 'link') && ! Dom.hasClass(event.target, 'topics'))
-      Dom.Dialog.close();
-  }
-
-  function scrollToTag(tag) {
-    Dom.removeClass(document.querySelector('#Help section.current'), 'current');
-
-    if (tag) {
-      var elm = document.querySelector('#Help [name="'+ tag + '"]');
-      Dom.addClass(elm, 'current');
-      elm.scrollIntoView(true);
-    } else {
-      document.getElementById('Help').parentNode.scrollIntoView(true);
-
-    }
-  }
 
   return Tpl;
 });

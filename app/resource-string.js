@@ -1,17 +1,16 @@
-define(function(require, exports, module) {
-  const format = require('koru/format');
-  const base   = require('koru/resource-string');
-  const util   = require('koru/util');
+define((require)=>{
+  const format          = require('koru/format');
+  const base            = require('koru/resource-string');
 
-  util.merge(base.en, {
+  Object.assign(base.en, {
     unsupported_import_format:  'The uploaded file is unsupported',
   });
 
-  base.text = function (text) {
-    var m = /^([^:]+):(.*)$/.exec(text);
-    if (m) {
-      var fmt = base.en[m[1]];
-      if (fmt) {
+  base.text = text =>{
+    const m = /^([^:]+):(.*)$/.exec(text);
+    if (m !== null) {
+      const fmt = base.en[m[1]];
+      if (fmt !== undefined) {
         return format(fmt, m[2].split(':'));
       }
     }

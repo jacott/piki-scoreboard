@@ -1,16 +1,16 @@
-define(function(require, exports, module) {
-  const koru        = require('koru');
-  const {BaseModel} = require('koru/model');
-  const Val         = require('koru/model/validation');
-  const Random      = require('koru/random').global;
-  const util        = require('koru/util');
-  const Category    = require('./category');
-  const Competitor  = require('./competitor');
-  const Event       = require('./event');
-  const Heat        = require('./heat');
-  const User        = require('./user');
+define((require, exports, module)=>{
+  const koru            = require('koru');
+  const Val             = require('koru/model/validation');
+  const Random          = require('koru/random').global;
+  const util            = require('koru/util');
+  const Model           = require('model');
+  const Category        = require('./category');
+  const Competitor      = require('./competitor');
+  const Event           = require('./event');
+  const Heat            = require('./heat');
+  const User            = require('./user');
 
-  class Result extends BaseModel {
+  class Result extends Model.BaseModel {
     unscoredHeat() {
       return this.scores.length;
     }
@@ -27,7 +27,7 @@ define(function(require, exports, module) {
       return this.event && this.event.org_id;
     }
   }
-  module.exports = Result.define({
+  Result.define({
     module,
     fields: {
       event_id: 'belongs_to',
@@ -143,56 +143,56 @@ define(function(require, exports, module) {
     },
   });
 
-  Result.beforeCreate(Competitor, function (doc) {
-    addResults(doc.category_ids || [], doc);
-  });
-
-  Result.beforeUpdate(Competitor, function (doc) {
-    var added = util.diff(doc.changes.category_ids || [], doc.attributes.category_ids || []);
-
-    addResults(added, doc);
-    var removed = util.diff(doc.attributes.category_ids || [], doc.changes.category_ids || []);
-    removeResults(removed, doc);
-  });
-
-  Result.beforeRemove(Competitor, function (doc) {
-    removeResults(doc.category_ids || [], doc);
-  });
-
-  function addResults(ids, doc) {
-    ids.forEach(function (catId) {
-      var result = Result.create({
+  const addResults = (ids, doc)=>{
+    ids.forEach(catId =>{
+      Result.create({
         category_id: catId, event_id: doc.event_id,
         climber_id: doc.climber_id,
         competitor_id: doc._id,
         scores: [Random.fraction()],
       });
     });
-  }
+  };
 
-  function removeResults(ids, doc) {
-    ids.forEach(function (catId) {
-      Result.query.where({climber_id: doc.climber_id, category_id: catId, event_id: doc.event_id}).remove();
+  const removeResults = (ids, doc)=>{
+    ids.forEach(catId =>{
+      Result.query.where({
+        climber_id: doc.climber_id, category_id: catId, event_id: doc.event_id}).remove();
     });
-  }
+  };
 
-  Result.beforeCreate(Result, function (doc) {
-    var event = Event.findById(doc.event_id);
+  Result.beforeCreate(Result, doc =>{
+    const event = Event.findById(doc.event_id);
     if (event.heats && doc.category_id in event.heats) return;
     Event.query.onId(doc.event_id).updatePartial('heats', buildHeat(doc, ! event.heats));
-    });
+  });
 
-  Result.beforeRemove(Result, function (doc) {
-    if (Result.query.where({event_id: doc.event_id, category_id: doc.category_id}).whereNot('_id', doc._id).count(1))
+  Result.beforeRemove(Result, doc =>{
+    if (Result.query.where({
+      event_id: doc.event_id, category_id: doc.category_id}).whereNot('_id', doc._id).count(1))
       return;
 
     Event.query.onId(doc.event_id).updatePartial('heats', [doc.category_id]);
   });
 
-  function buildHeat(doc, newHeats) {
+  const buildHeat = (doc, newHeats)=>{
     const category  = Category.findById(doc.category_id);
     return [doc.category_id, category.type + category.heatFormat];
-  }
+  };
+
+  Result.beforeCreate(Competitor, doc =>{addResults(doc.category_ids || [], doc)});
+
+  Result.beforeUpdate(Competitor, doc =>{
+    const added = util.diff(doc.changes.category_ids || [], doc.attributes.category_ids || []);
+    addResults(added, doc);
+
+    const removed = util.diff(doc.attributes.category_ids || [], doc.changes.category_ids || []);
+    removeResults(removed, doc);
+  });
+
+  Result.beforeRemove(Competitor, doc =>{removeResults(doc.category_ids || [], doc)});
 
   require('koru/env!./result')(Result);
+
+  return Result;
 });

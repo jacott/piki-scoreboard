@@ -1,87 +1,87 @@
-define(function (require, exports, module) {
-  var test, v;
-  const koru     = require('koru');
-  const Event    = require('models/event');
-  const Series   = require('models/series');
-  const Team     = require('models/team');
-  const TH       = require('test-helper');
-  const Org      = require('./org');
+define((require, exports, module)=>{
+  const koru            = require('koru');
+  const Event           = require('models/event');
+  const Series          = require('models/series');
+  const Team            = require('models/team');
+  const TH              = require('test-helper');
+  const Org             = require('./org');
+  const User            = require('./user');
+
+  const {stub, spy, onEnd} = TH;
+
   const TeamType = require('./team-type');
-  const User     = require('./user');
 
-  TH.testCase(module, {
-    setUp() {
-      test = this;
-      v = {};
-      v.org = TH.Factory.createOrg();
-      v.user = TH.Factory.createUser();
-      test.stub(koru, 'info');
-    },
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    let org, user;
+    beforeEach(()=>{
+      org = TH.Factory.createOrg();
+      user = TH.Factory.createUser();
+      stub(koru, 'info');
+    });
 
-    tearDown() {
+    afterEach(()=>{
       TH.clearDB();
-      v = null;
-    },
+    });
 
-    "authorize": {
-      "test denied"() {
-        var oOrg = TH.Factory.createOrg();
-        var oUser = TH.Factory.createUser();
+    group("authorize", ()=>{
+      test("denied", ()=>{
+        const oOrg = TH.Factory.createOrg();
+        const oUser = TH.Factory.createUser();
 
-        var teamType = TH.Factory.buildTeamType();
+        const teamType = TH.Factory.buildTeamType();
 
-        assert.accessDenied(function () {
-          teamType.authorize(v.user._id);
+        assert.accessDenied(()=>{
+          teamType.authorize(user._id);
         });
-      },
+      });
 
-      "test allowed"() {
-        var teamType = TH.Factory.buildTeamType();
+      test("allowed", ()=>{
+        const teamType = TH.Factory.buildTeamType();
 
-        refute.accessDenied(function () {
-          teamType.authorize(v.user._id);
+        refute.accessDenied(()=>{
+          teamType.authorize(user._id);
         });
-      },
+      });
 
-      "test okay to remove"() {
-        var teamType = TH.Factory.createTeamType();
+      test("okay to remove", ()=>{
+        const teamType = TH.Factory.createTeamType();
 
-        refute.accessDenied(function () {
-          teamType.authorize(v.user._id, {remove: true});
+        refute.accessDenied(()=>{
+          teamType.authorize(user._id, {remove: true});
         });
 
-      },
+      });
 
-      "test remove in use with team"() {
-        var teamType = TH.Factory.createTeamType();
+      test("remove in use with team", ()=>{
+        const teamType = TH.Factory.createTeamType();
         TH.Factory.createTeam();
 
-        assert.accessDenied(function () {
-          teamType.authorize(v.user._id, {remove: true});
+        assert.accessDenied(()=>{
+          teamType.authorize(user._id, {remove: true});
         });
 
-      },
+      });
 
-      "test remove in use with series"() {
-        var teamType = TH.Factory.createTeamType();
+      test("remove in use with series", ()=>{
+        const teamType = TH.Factory.createTeamType();
         TH.Factory.createSeries({teamType_ids: [teamType._id]});
 
-        assert.accessDenied(function () {
-          teamType.authorize(v.user._id, {remove: true});
+        assert.accessDenied(()=>{
+          teamType.authorize(user._id, {remove: true});
         });
 
-      },
+      });
 
-      "test remove in use with event"() {
-        var teamType = TH.Factory.createTeamType();
+      test("remove in use with event", ()=>{
+        const teamType = TH.Factory.createTeamType();
         TH.Factory.createEvent({teamType_ids: [teamType._id]});
 
-        assert.accessDenied(function () {
-          teamType.authorize(v.user._id, {remove: true});
+        assert.accessDenied(()=>{
+          teamType.authorize(user._id, {remove: true});
         });
 
-      },
-    },
+      });
+    });
 
   });
 });

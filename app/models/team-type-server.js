@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define((require)=>{
   const Val       = require('koru/model/validation');
   const util      = require('koru/util');
   const ChangeLog = require('./change-log');
@@ -14,7 +14,7 @@ define(function(require, exports, module) {
     org_id: 'id',
   };
 
-  return function (TeamType) {
+  return TeamType =>{
     ChangeLog.logChanges(TeamType);
 
     TeamType.registerObserveField('org_id');

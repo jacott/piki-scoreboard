@@ -1,4 +1,4 @@
-define(function (require, exports, module) {
+define((require, exports, module)=>{
   const koru            = require('koru');
   const Model           = require('koru/model');
   const publish         = require('koru/session/publish');
@@ -9,29 +9,24 @@ define(function (require, exports, module) {
 
   const {stub, spy, onEnd} = TH;
 
-  const sut = require('./publish-self');
+  const sut = require('./publish-self-server');
 
-  let v = null;
-
-  TH.testCase(module, {
-    setUp() {
-      v = {};
-    },
-
-    tearDown() {
+  let v = {};
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    afterEach(()=>{
       TH.cleanUpTest(v);
-      v = null;
-    },
+      v = {};
+    });
 
-    "test publish guest"() {
+    test("publish guest", ()=>{
       const sub = TH.mockSubscribe(v, 's123', 'Self');
 
       assert.same(v.conn.userId, 'guest');
 
       assert(sub._stop);
-    },
+    });
 
-    "test publish user"() {
+    test("publish user", ()=>{
       const org1 = Factory.createOrg();
       const user = Factory.createUser();
       const org2 = Factory.createOrg();
@@ -75,9 +70,9 @@ define(function (require, exports, module) {
 
       assert.called(uStop);
       assert.called(oStop);
-    },
+    });
 
-    "test user not found"() {
+    test("user not found", ()=>{
       stub(koru, 'userId').returns('bad');
 
       const sub = TH.mockSubscribe(v, 's123', 'Self');
@@ -85,6 +80,6 @@ define(function (require, exports, module) {
       refute(sub);
 
       assert.calledWith(v.conn.sendBinary, 'P', ['s123', 404, 'User not found']);
-    },
+    });
   });
 });

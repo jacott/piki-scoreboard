@@ -1,9 +1,8 @@
-define(function(require, exports, module) {
-  const Val       = require('koru/model/validation');
-  const util      = require('koru/util');
-  const Event     = require('models/event');
-  const ChangeLog = require('./change-log');
-  const User      = require('./user');
+define((require)=>{
+  const Val             = require('koru/model/validation');
+  const Event           = require('models/event');
+  const ChangeLog       = require('./change-log');
+  const User            = require('./user');
 
   const FIELD_SPEC = {
     time: 'integer',
@@ -19,16 +18,13 @@ define(function(require, exports, module) {
     competitor_id: 'id',
   };
 
-  return function (Result) {
+  return Result =>{
     ChangeLog.logChanges(Result, {parent: Event});
 
-    util.merge(Result.prototype, {
-      authorize(userId) {
-        Val.assertDocChanges(this, FIELD_SPEC, NEW_FIELD_SPEC);
-        User.fetchAdminister(userId, this);
-        Val.allowAccessIf(! this.event.closed);
-      },
-    });
-
+    Result.prototype.authorize = function (userId) {
+      Val.assertDocChanges(this, FIELD_SPEC, NEW_FIELD_SPEC);
+      User.fetchAdminister(userId, this);
+      Val.allowAccessIf(! this.event.closed);
+    };
   };
 });

@@ -1,40 +1,38 @@
-define(function (require, exports, module) {
+define((require, exports, module)=>{
   const publish         = require('koru/session/publish');
   const Factory         = require('test/factory');
   const TH              = require('./test-helper');
 
-  require('./publish-org');
+  require('./publish-org-client');
 
   const sut = publish._pubs.Org;
 
-  let v = null;
-
-  TH.testCase(module, {
-    setUp() {
-      v = {};
+  let v = {};
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    beforeEach(()=>{
       v.sub = TH.mockClientSub();
-    },
+    });
 
-    tearDown() {
+    afterEach(()=>{
       TH.cleanUpTest(v);
-      v = null;
-    },
+      v = {};
+    });
 
-    "test user not in org"() {
+    test("user not in org", ()=>{
       TH.loginAs(v.user = Factory.createUser('admin'));
       const org = Factory.createOrg({shortName: 'o1'});
       sut.call(v.sub, 'o1');
 
       assert.same(v.user.org, org);
       assert.same(v.user.role, 'g');
-    },
+    });
 
-    "test user not logged in"() {
+    test("user not logged in", ()=>{
       const org = Factory.createOrg({shortName: 'o1'});
       refute.exception(()=>{sut.call(v.sub, 'o1')});
-    },
+    });
 
-    "test publish"() {
+    test("publish", ()=>{
       const matchUser = v.sub.match.withArgs('User', TH.match.func);
       const matchEvent = v.sub.match.withArgs('Event', TH.match.func);
 
@@ -67,6 +65,6 @@ define(function (require, exports, module) {
         'Climber Event Series Category Team TeamType'.split(' ')
           .forEach(name =>{assert.calledWith(v.sub.match, name, m)});
       }
-    },
+    });
   });
 });

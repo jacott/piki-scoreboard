@@ -1,53 +1,51 @@
-define(function (require, exports, module) {
-  var test, v;
-  var TH = require('test-helper');
-  var RegUpload = require('./reg-upload-client');
-  var session = require('koru/session');
-  var Event = require('models/event');
+define((require, exports, module)=>{
+  const session         = require('koru/session');
+  const Event           = require('models/event');
+  const TH              = require('test-helper');
 
-  TH.testCase(module, {
-    setUp: function () {
-      test = this;
-      v = {
-        event: TH.Factory.createEvent(),
-        fileReader: window.FileReader,
-      };
-    },
+  const {stub, spy, onEnd, match: m} = TH;
 
-    tearDown: function () {
+  const RegUpload = require('./reg-upload-client');
+
+  let v = {};
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    beforeEach(()=>{
+      v.event = TH.Factory.createEvent();
+      v.fileReader = window.FileReader;
+    });
+
+    afterEach(()=>{
       window.fileReader = v.fileReader;
-      v = null;
-    },
+      v = {};
+    });
 
-    'test uploading': function () {
-      var file = {name: 'foo.csv', slice: test.stub().returns("abcd")};
-      var frStub = window.FileReader = TH.MockFileReader(v);
+    test("uploading", ()=>{
+      const file = {name: 'foo.csv', slice: stub().returns("abcd")};
+      const frStub = window.FileReader = TH.MockFileReader(v);
 
-      test.stub(session, 'rpc');
+      stub(session, 'rpc');
 
-      RegUpload.upload(v.event._id, file, function (error, result) {
+      RegUpload.upload(v.event._id, file, (error, result)=>{
         v.callResultError = error;
         v.callResultResult = result;
       });
 
       assert.equals(v.fileReaderargs, []);
-      var fr = v.fileReader;
+      const fr = v.fileReader;
       assert.same(fr.constructor, frStub);
       assert.isFunction(fr.onload);
       assert.same(fr._result2Str(), "abcd");
 
       fr.onload();
+      let callResultFunc;
       assert.calledWithExactly(session.rpc, 'Reg.upload', v.event._id,
-                               TH.match(function (arg) {return 'abcd' === fr._result2Str(arg)}),
-                               TH.match(function (func) {
-                                 v.callResultFunc = func;
-                                 return typeof func === 'function';
-                               }));
+                               m(arg => 'abcd' === fr._result2Str(arg)),
+                               m(func => callResultFunc = func));
 
-      v.callResultFunc('bad file', 'the result');
+      callResultFunc('bad file', 'the result');
 
       assert.same(v.callResultError, 'bad file');
       assert.same(v.callResultResult, 'the result');
-    },
+    });
   });
 });

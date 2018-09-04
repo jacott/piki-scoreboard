@@ -1,4 +1,4 @@
-define(function (require, exports, module) {
+define((require, exports, module)=>{
   const koru            = require('koru');
   const Val             = require('koru/model/validation');
   const session         = require('koru/session');
@@ -11,23 +11,20 @@ define(function (require, exports, module) {
 
   const {stub, spy, onEnd} = TH;
 
-  let v = null;
-
-  TH.testCase(module, {
-    setUp() {
-      v = {};
-      v.org = Factory.createOrg();
-      v.user = Factory.createUser();
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    let org, user;
+    beforeEach(()=>{
+      org = Factory.createOrg();
+      user = Factory.createUser();
       stub(koru, 'info');
-    },
+    });
 
-    tearDown() {
+    afterEach(()=>{
       TH.clearDB();
-      v = null;
-    },
+    });
 
-    "test merge"() {
-      v.rpc = TH.mockRpc();
+    test("merge", ()=>{
+      const rpc = TH.mockRpc();
       stub(Val, 'assertCheck');
       spy(Climber.prototype, 'authorize');
 
@@ -55,7 +52,7 @@ define(function (require, exports, module) {
 
       TH.stubProperty(session, 'conns', {value: myConns});
 
-      v.rpc("Climber.merge", c1._id, [c2._id, c3._id]);
+      rpc("Climber.merge", c1._id, [c2._id, c3._id]);
 
       assert.calledWith(Val.assertCheck, c1._id, 'id');
       assert.calledWith(Val.assertCheck, [c2._id, c3._id], ['id']);
@@ -77,28 +74,28 @@ define(function (require, exports, module) {
       assert.calledWith(myConns.a.sendBinary, 'B', ['mergeClimbers', c1._id, [c2._id, c3._id]]);
       assert.calledWith(myConns.b.sendBinary, 'B', ['mergeClimbers', c1._id, [c2._id, c3._id]]);
       refute.called(myConns.c.sendBinary);
-    },
+    });
 
-    "clearAllNumbers": {
-      setUp() {
-        v.org = Factory.createOrg();
-      },
+    group("clearAllNumbers", ()=>{
+      beforeEach(()=>{
+        org = Factory.createOrg();
+      });
 
-      "test non admin"() {
-        v.rpc = TH.mockRpc();
+      test("non admin", ()=>{
+        const rpc = TH.mockRpc();
         spy(Val, 'assertCheck');
 
         TH.loginAs(Factory.createUser('judge'));
 
         assert.exception(()=>{
-          v.rpc("Climber.clearAllNumbers");
+          rpc("Climber.clearAllNumbers");
         }, {error: 403});
 
-        assert.calledWith(Val.assertCheck, v.org_id, 'id');
-      },
+        assert.calledWith(Val.assertCheck, undefined, 'id');
+      });
 
-      "test success"() {
-        v.rpc = TH.mockRpc();
+      test("success", ()=>{
+        const rpc = TH.mockRpc();
 
         TH.loginAs(Factory.createUser('admin'));
 
@@ -109,44 +106,43 @@ define(function (require, exports, module) {
 
         const c3 = Factory.createClimber({number: 123});
 
-        v.rpc("Climber.clearAllNumbers", v.org._id);
+        rpc("Climber.clearAllNumbers", org._id);
 
         assert.same(c1.number, undefined);
         assert.same(c2.$reload(true).number, undefined);
         assert.same(c3.$reload(true).number, 123);
-      },
-    },
+      });
+    });
 
-    "authorize": {
-      "test denied"() {
+    group("authorize", ()=>{
+      test("denied", ()=>{
         const oOrg = Factory.createOrg();
         const oUser = Factory.createUser();
 
         const climber = Factory.buildClimber();
 
-        assert.accessDenied(()=>{climber.authorize(v.user._id)});
-      },
+        assert.accessDenied(()=>{climber.authorize(user._id)});
+      });
 
-      "test allowed"() {
+      test("allowed", ()=>{
         const climber = Factory.buildClimber();
 
-        refute.accessDenied(()=>{climber.authorize(v.user._id)});
-      },
+        refute.accessDenied(()=>{climber.authorize(user._id)});
+      });
 
-      "test okay to remove"() {
+      test("okay to remove", ()=>{
         const climber = Factory.createClimber();
 
-        refute.accessDenied(()=>{climber.authorize(v.user._id, {remove: true})});
+        refute.accessDenied(()=>{climber.authorize(user._id, {remove: true})});
 
-      },
+      });
 
-      "test remove in use"() {
+      test("remove in use", ()=>{
         const climber = Factory.createClimber();
         const competitor = Factory.createCompetitor();
 
-        assert.accessDenied(()=>{climber.authorize(v.user._id, {remove: true})});
-      },
-    },
-
+        assert.accessDenied(()=>{climber.authorize(user._id, {remove: true})});
+      });
+    });
   });
 });

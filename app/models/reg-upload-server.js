@@ -1,34 +1,36 @@
-var Future = requirejs.nodeRequire('fibers/future');
-var parse = require('csv-parse');
+const parse = require('csv-parse');
 
-define(function(require, exports, module) {
-  const koru       = require('koru');
-  const Val        = require('koru/model/validation');
-  const session    = require('koru/session');
-  const Category   = require('models/category');
-  const Climber    = require('models/climber');
-  const Competitor = require('models/competitor');
-  const Event      = require('models/event');
+define((require, exports, module)=>{
+  const koru            = require('koru');
+  const Val             = require('koru/model/validation');
+  const session         = require('koru/session');
+  const util            = require('koru/util');
+  const Category        = require('models/category');
+  const Climber         = require('models/climber');
+  const Competitor      = require('models/competitor');
+  const Event           = require('models/event');
   require('models/result');
-  const Team       = require('models/team');
-  const TeamType   = require('models/team-type');
-  const User       = require('models/user');
+  const Team            = require('models/team');
+  const TeamType        = require('models/team-type');
+  const User            = require('models/user');
+
+  const {Future} = util;
 
   session.defineRpc('Reg.upload', function (eventId, data) {
     Val.ensureString(eventId);
 
-    const ROLE = User.ROLE;
+    const {ROLE} = User;
 
     const user = User.findById(this.userId);
     Val.allowAccessIf(user);
 
-    var event = Event.findById(eventId);
+    const event = Event.findById(eventId);
     Val.allowAccessIf(event && user.canAdminister(event));
 
     const clubTeamType = TeamType.where({org_id:  event.org_id, name: 'Club'}).fetchOne();
     Val.allowAccessIf(clubTeamType, 'No Team type named Club found for this organization');
 
-    var future = new Future();
+    const future = new Future();
 
     parse(new Buffer(data).toString(), {
       columns: function () {return ['Fee level', 'First Name', 'Last Name', 'Birth Date', 'Participant ID']}
@@ -40,14 +42,19 @@ define(function(require, exports, module) {
 
     future.wait();
 
-    var errors = [];
-    var row;
-    var climbers = {};
+    const errors = [];
+    const climbers = {};
+    let row;
+
+    const get = (field)=>{
+      const val = row[field];
+      return val && val.trim();
+    };
 
     if (data.length === 0)
       throw new koru.Error(415, 'unsupported_import_format');
 
-    for(var i = 0; i < data.length; ++i) {
+    for(let i = 0; i < data.length; ++i) {
       row =  data[i];
       var name = get('First Name') + ' ' + get('Last Name');
       if (name in climbers)
@@ -56,47 +63,33 @@ define(function(require, exports, module) {
         climbers[name] = 1;
     }
 
-    for(var i = 0; i < data.length; ++i) {
-      try {
-        row =  data[i];
-        importCompetitor();
-      } catch(ex) {
-        errors.push([i+1, data[i], ex.toString()]);
-      }
-    };
-
-    Event.query.onId(event._id).update({errors: errors});
-
-    function importCompetitor() {
-      var name = get('First Name') + ' ' + get('Last Name');
+    const importCompetitor = ()=>{
+      const name = get('First Name') + ' ' + get('Last Name');
 
       if (climbers[name] > 1)
         throw 'Name: "' + name + '" registered ' + climbers[name] + ' times';
 
-      var meta = get('Fee level');
+      const meta = get('Fee level');
 
-      var clubName = meta.split(',')[0].trim();
+      const clubName = meta.split(',')[0].trim();
 
-      var club = Team.query.where({name: clubName, teamType_id: clubTeamType._id}).fetchOne();
-      if (! club) throw "Can't find club '" + clubName + "'";
+      const club = Team.query.where({name: clubName, teamType_id: clubTeamType._id}).fetchOne();
+      if (club === undefined) throw "Can't find club '" + clubName + "'";
 
-      var codes = /\[(.+)\]/.exec(meta);
+      const mCodes = /\[(.+)\]/.exec(meta);
 
-      codes = codes && codes[1].trim().split(',');
+      const codes = mCodes === null ? undefined : mCodes[1].trim().split(',');
 
-      var gender = (codes && codes[0][0]) || null;
+      let gender = (codes && codes[0][0]) || null;
       gender = gender && gender.toLowerCase();
 
-      var climber = Climber.query.where({name: name, org_id: event.org_id}).fetchOne();
-
-      if (! climber) {
-        climber = Climber.build({
-          name: name, org_id: event.org_id, team_ids: [club._id],
-          dateOfBirth: get('Birth Date').trim(),
-          gender: gender,
-          uploadId: get('Participant ID'),
-        });
-      }
+      const climber = Climber.query.where({name: name, org_id: event.org_id}).fetchOne() ||
+            Climber.build({
+              name: name, org_id: event.org_id, team_ids: [club._id],
+              dateOfBirth: get('Birth Date').trim(),
+              gender,
+              uploadId: get('Participant ID'),
+            });
 
       if (climber.dateOfBirth !== get('Birth Date').trim())
         throw "Climber's date-of-birth does not match: " + climber.dateOfBirth;
@@ -109,9 +102,9 @@ define(function(require, exports, module) {
       if (! (codes && codes.length))
         throw "Invalid or missing codes";
 
-      var category_ids = [];
+      const category_ids = [];
 
-      codes.forEach(function (code) {
+      codes.forEach(code =>{
         code = code.trim();
         var cat = Category.query.where({shortName: code, org_id: event.org_id}).fetchOne();
         if (! cat) {
@@ -120,7 +113,8 @@ define(function(require, exports, module) {
         category_ids.push(cat._id);
       });
 
-      var competitor = Competitor.query.where({event_id: event._id, climber_id: climber._id}).fetchOne() ||
+      const competitor = Competitor.query
+            .where({event_id: event._id, climber_id: climber._id}).fetchOne() ||
             Competitor.build({
               event_id: event._id,
               climber_id: climber._id,
@@ -130,11 +124,17 @@ define(function(require, exports, module) {
 
       competitor.category_ids = category_ids.sort();
       competitor.$$save();
-    }
+    };
 
-    function get(field) {
-      var val = row[field];
-      return val && val.trim();
-    }
+    for(let i = 0; i < data.length; ++i) {
+      try {
+        row =  data[i];
+        importCompetitor();
+      } catch(ex) {
+        errors.push([i+1, data[i], ex.toString()]);
+      }
+    };
+
+    Event.query.onId(event._id).update({errors: errors});
   });
 });

@@ -1,5 +1,5 @@
 const path = require('path');
-define(function(require, exports, module) {
+define((require)=>{
   const koru            = require('koru');
   const DBDriver        = require('koru/config!DBDriver');
   const Migration       = require('koru/migrate/migration');
@@ -10,7 +10,7 @@ define(function(require, exports, module) {
   const Role            = require('models/role');
   const User            = require('models/user');
 
-  function initNewInstall() {
+  const initNewInstall = ()=>{
     if (User.query.count(1) === 0) {
       const id = Random.id();
       User.docs.insert({_id: id, name: "Super User", initials: "SU", email: "su@example.com"});
@@ -19,10 +19,11 @@ define(function(require, exports, module) {
 
       Org.create({name: 'Example org', shortName: 'EG', email: "su@example.com"});
     }
-  }
+  };
 
   return ()=>{
-    DBDriver.isPG && new Migration(DBDriver.defaultDb).migrateTo(path.resolve(koru.appDir, '../db/migrate'), '~');
+    DBDriver.isPG && new Migration(DBDriver.defaultDb)
+      .migrateTo(path.resolve(koru.appDir, '../db/migrate'), '~');
     initNewInstall();
 
     Model.ensureIndexes();

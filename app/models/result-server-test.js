@@ -1,55 +1,54 @@
-define(function (require, exports, module) {
-  var test, v;
-  const koru   = require('koru');
-  const TH     = require('test-helper');
-  const Org    = require('./org');
+define((require, exports, module)=>{
+  const koru            = require('koru');
+  const TH              = require('test-helper');
+  const Org             = require('./org');
+  const User            = require('./user');
+
+  const {stub, spy, onEnd} = TH;
+
   const Result = require('./result');
-  const User   = require('./user');
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    let org, user;
+    beforeEach(()=>{
+      org = TH.Factory.createOrg();
+      user = TH.Factory.createUser();
+      stub(koru, 'info');
+    });
 
-  TH.testCase(module, {
-    setUp() {
-      test = this;
-      v = {};
-      v.org = TH.Factory.createOrg();
-      v.user = TH.Factory.createUser();
-      test.stub(koru, 'info');
-    },
-
-    tearDown() {
+    afterEach(()=>{
       TH.clearDB();
-      v = null;
-    },
+    });
 
-    "authorize": {
-      "test denied"() {
-        var oOrg = TH.Factory.createOrg();
-        var oUser = TH.Factory.createUser();
+    group("authorize", ()=>{
+      test("denied", ()=>{
+        const oOrg = TH.Factory.createOrg();
+        const oUser = TH.Factory.createUser();
 
-        var result = TH.Factory.buildResult();
+        const result = TH.Factory.buildResult();
 
-        assert.accessDenied(function () {
-          result.authorize(v.user._id);
+        assert.accessDenied(()=>{
+          result.authorize(user._id);
         });
-      },
+      });
 
-      "test allowed"() {
-        var result = TH.Factory.buildResult();
+      test("allowed", ()=>{
+        const result = TH.Factory.buildResult();
 
-        refute.accessDenied(function () {
-          result.authorize(v.user._id);
+        refute.accessDenied(()=>{
+          result.authorize(user._id);
         });
-      },
+      });
 
-      "test event closed"() {
-        var event = TH.Factory.createEvent({closed: true});
-        var result = TH.Factory.buildResult();
+      test("event closed", ()=>{
+        const event = TH.Factory.createEvent({closed: true});
+        const result = TH.Factory.buildResult();
 
-        assert.accessDenied(function () {
-          result.authorize(v.user._id);
+        assert.accessDenied(()=>{
+          result.authorize(user._id);
         });
 
-      },
-    },
+      });
+    });
 
   });
 });

@@ -1,8 +1,5 @@
-define(function(require, exports, module) {
-  const koru            = require('koru');
+define((require, exports, module)=>{
   const Val             = require('koru/model/validation');
-  const util            = require('koru/util');
-  const {BaseModel}     = require('model');
   const Team            = require('models/team');
   const Category        = require('./category');
   const Climber         = require('./climber');
@@ -27,7 +24,7 @@ define(function(require, exports, module) {
     get number() {return this.climber.number}
   }
 
-  module.exports = Competitor.define({
+  Competitor.define({
     module,
     fields: {
       event_id: 'belongs_to',
@@ -78,4 +75,6 @@ define(function(require, exports, module) {
   });
 
   require('koru/env!./competitor')(Competitor);
+
+  return Competitor;
 });

@@ -1,41 +1,36 @@
-define(function (require, exports, module) {
-  var test, v;
-  const session    = require('koru/session');
-  const message    = require('koru/session/message');
-  const util       = require('koru/util');
-  const Competitor = require('models/competitor');
-  const Result     = require('models/result');
-  const TH         = require('test-helper');
-  const Climber    = require('./climber');
+define((require, exports, module)=>{
+  const session         = require('koru/session');
+  const message         = require('koru/session/message');
+  const util            = require('koru/util');
+  const Competitor      = require('models/competitor');
+  const Result          = require('models/result');
+  const TH              = require('test-helper');
+  const Factory         = require('test/factory');
+  const Climber         = require('./climber');
 
-  TH.testCase(module, {
-    setUp() {
-      test = this;
-      v = {};
-    },
-
-    tearDown() {
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    afterEach(()=>{
       TH.clearDB();
-      v = null;
-    },
+    });
 
-    "test broadcasted mergeClimbers"() {
-      const dest = TH.Factory.createClimber();
+    test("broadcasted mergeClimbers", ()=>{
+      const dest = Factory.createClimber();
 
-      const c2 = TH.Factory.createClimber();
-      const comp21 = TH.Factory.createCompetitor();
-      const comp22 = TH.Factory.createCompetitor();
-      const result21 = TH.Factory.createResult();
+      const c2 = Factory.createClimber();
+      const comp21 = Factory.createCompetitor();
+      const comp22 = Factory.createCompetitor();
+      const result21 = Factory.createResult();
 
-      const c3 = TH.Factory.createClimber();
-      const comp31 = TH.Factory.createCompetitor();
-      const result31 = TH.Factory.createResult();
+      const c3 = Factory.createClimber();
+      const comp31 = Factory.createCompetitor();
+      const result31 = Factory.createResult();
 
-      const c4 = TH.Factory.createClimber();
-      const comp41 = TH.Factory.createCompetitor();
-      const result41 = TH.Factory.createResult();
+      const c4 = Factory.createClimber();
+      const comp41 = Factory.createCompetitor();
+      const result41 = Factory.createResult();
 
-      session._onMessage(v.conn, message.encodeMessage('B', ['mergeClimbers', dest._id, [c2._id, c3._id]], session.globalDict));
+      session._onMessage(undefined, message.encodeMessage('B', [
+        'mergeClimbers', dest._id, [c2._id, c3._id]], session.globalDict));
 
       assert.same(Climber.query.count(), 2);
       assert.same(comp41.$reload(true).climber_id, c4._id);
@@ -46,29 +41,29 @@ define(function (require, exports, module) {
       assert.same(result21.$reload(true).climber_id, dest._id);
       assert.same(result31.$reload(true).climber_id, dest._id);
       assert.same(result41.$reload(true).climber_id, c4._id);
-    },
+    });
 
-    "test team"() {
-      v.tt = TH.Factory.createList(2, 'createTeamType');
-      v.teams1 = TH.Factory.createList(2, 'createTeam', function (index, options) {
-        options.teamType_id = v.tt[0]._id;
+    test("team", ()=>{
+      const tt = Factory.createList(2, 'createTeamType');
+      const teams1 = Factory.createList(2, 'createTeam', (index, options)=>{
+        options.teamType_id = tt[0]._id;
       });
 
-      v.teams2 = TH.Factory.createList(2, 'createTeam', function (index, options) {
-        options.teamType_id = v.tt[1]._id;
+      const teams2 = Factory.createList(2, 'createTeam', (index, options)=>{
+        options.teamType_id = tt[1]._id;
       });
 
-      let climber = TH.Factory.createClimber({team_ids: [v.teams1[0]._id]});
-      let climber2 = TH.Factory.createClimber();
+      let climber = Factory.createClimber({team_ids: [teams1[0]._id]});
+      let climber2 = Factory.createClimber();
 
-      assert.equals(climber.getTeam(v.tt[0]), TH.matchModel(v.teams1[0]));
-      assert.equals(climber2.getTeam(v.tt[0]), undefined);
+      assert.equals(climber.getTeam(tt[0]), TH.matchModel(teams1[0]));
+      assert.equals(climber2.getTeam(tt[0]), undefined);
 
-    },
+    });
 
-    "test search"() {
-      var names = ['Bob', 'brendon', 'bobby', 'robert'];
-      v.climbers = TH.Factory.createList(4, 'createClimber', function (index, options) {
+    test("search", ()=>{
+      const names = ['Bob', 'brendon', 'bobby', 'robert'];
+      const climbers = Factory.createList(4, 'createClimber', (index, options)=>{
         options.name = names[index];
       });
 
@@ -87,10 +82,8 @@ define(function (require, exports, module) {
                     ['Bob', 'brendon']);
 
       assert.equals(
-        util.mapField(Climber.search('b',2, function (climber) {
-          return climber.name !== 'Bob';
-        }), 'name'),
+        util.mapField(Climber.search('b',2, climber => climber.name !== 'Bob'), 'name'),
         ['bobby', 'brendon']);
-    },
+    });
   });
 });

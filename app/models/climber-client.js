@@ -1,16 +1,16 @@
-define(function(require, exports, module) {
-  const Model      = require('koru/model');
-  const session    = require('koru/session');
-  const util       = require('koru/util');
-  const Team       = require('models/team');
+define((require, exports, module)=>{
+  const Model           = require('koru/model');
+  const session         = require('koru/session');
+  const util            = require('koru/util');
+  const Team            = require('models/team');
 
-  return function (Climber) {
+  return Climber =>{
     util.merge(Climber, {
       search(text, limit, tester) {
         const regex = new RegExp(".*"+util.regexEscape(text)+".*", "i");
         const results = [];
         const docs = Climber.docs;
-        for(let id in docs) {
+        for(const id in docs) {
           const doc = docs[id];
           if (regex.test(doc.name) && (! tester || tester(doc))) {
             results.push(doc);

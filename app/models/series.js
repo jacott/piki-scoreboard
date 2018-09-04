@@ -1,12 +1,13 @@
-define(function(require, exports, module) {
-  const {BaseModel} = require('model');
-  const Org         = require('models/org');
-  const TeamType    = require('models/team-type');
+define((require, exports, module)=>{
+  const Model           = require('model');
+  const Org             = require('models/org');
+  const TeamType        = require('models/team-type');
 
-  class Series extends BaseModel {
+  class Series extends Model.BaseModel {
     get displayName() {return this.name;}
   }
-  module.exports = Series.define({
+
+  Series.define({
     module,
     fields: {
       name: {type:  'text', trim: true, required: true, maxLength: 200, unique: {scope: 'org_id'}},
@@ -19,4 +20,5 @@ define(function(require, exports, module) {
 
   require('koru/env!./series')(Series);
 
+  return Series;
 });

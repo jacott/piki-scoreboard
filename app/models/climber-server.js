@@ -1,4 +1,4 @@
-define(function(require) {
+define((require)=>{
   const Val             = require('koru/model/validation');
   const session         = require('koru/session');
   const util            = require('koru/util');
@@ -20,7 +20,7 @@ define(function(require) {
     org_id: 'id',
   };
 
-  return function (Climber) {
+  return Climber =>{
     ChangeLog.logChanges(Climber);
 
     Climber.registerObserveField('org_id');

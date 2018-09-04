@@ -1,35 +1,30 @@
-define(function (require, exports, module) {
-  var test, v;
-  var TH = require('test-helper');
-  var Org = require('./org');
-  var User = require('./user');
-  var koru = require('koru');
+define((require, exports, module)=>{
+  const TH              = require('test-helper');
+  const User            = require('./user');
 
-  TH.testCase(module, {
-    setUp: function () {
-      test = this;
-      v = {};
-    },
+  const {stub, spy, onEnd} = TH;
 
-    tearDown: function () {
+  const Org = require('./org');
+
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    afterEach(()=>{
       TH.clearDB();
-      v = null;
-    },
-    "test authorize": function () {
+    });
+    test("authorize", ()=>{
       var org = TH.Factory.createOrg();
       var user = TH.Factory.createUser('su');
 
-      refute.accessDenied(function () {
+      refute.accessDenied(()=>{
         org.authorize(user._id);
       });
 
       user = TH.Factory.createUser();
 
-      test.stub(koru, 'info');
+      TH.noInfo();
 
-      assert.accessDenied(function () {
+      assert.accessDenied(()=>{
         org.authorize(user._id);
       });
-    },
+    });
   });
 });
