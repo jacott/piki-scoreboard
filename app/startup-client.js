@@ -1,10 +1,10 @@
-define(function(require, exports, module) {
-  const koru            = require('koru');
+define((require, exports, module)=>{
   const client          = require('koru/client');
   const session         = require('koru/session');
   require('koru/ui/helpers');
   const Route           = require('koru/ui/route');
   const userAccount     = require('koru/user-account');
+  const IDB             = require('lib/idb');
   const App             = require('ui/app');
   require('ui/category');
   require('ui/choose-org');
@@ -13,6 +13,7 @@ define(function(require, exports, module) {
   require('ui/event-register');
   require('ui/help');
   const Loading         = require('ui/loading');
+
   require('ui/profile');
   require('ui/reg-upload');
   require('ui/reset-password');
@@ -26,15 +27,18 @@ define(function(require, exports, module) {
   const start = extras =>{
     _extras = extras || _extras;
     if (_extras != null) {
-      _extras.forEach(extra =>{koru.onunload(module.get(extra), restart)});
+      _extras.forEach(extra =>{module.get(extra).onUnload(restart)});
     }
     userAccount.init();
-    session.connect();
-    App.start();
-    Loading.start();
+    IDB.start().then(()=>{
+      session.connect();
+      App.start();
+      Loading.start();
+    });
   };
 
   const stop = ()=>{
+    IDB.stop();
     App.stop();
     session.stop();
     userAccount.stop();
@@ -51,7 +55,7 @@ define(function(require, exports, module) {
     window.requestAnimationFrame(()=>{require(mod.id, sc => sc.start && sc.start(_extras))});
   };
 
-  koru.onunload(module, restart);
+  module.onUnload(restart);
 
   return {
     start,
