@@ -48,7 +48,7 @@ isClient && define((require, exports, module)=>{
         assert.dom('#AddCategory', ()=>{
           TH.input('[name=name]', 'Dynomites Wellington');
           TH.input('[name=shortName]', 'YB M');
-          TH.change('[name=type]', 'L');
+          TH.selectMenu('[name=type]', 'L');
           TH.input('[name=heatFormat]', 'QQF26F8');
           TH.input('[name=group]', 'A');
           TH.selectMenu('[name=gender]', 'm');
@@ -64,6 +64,31 @@ isClient && define((require, exports, module)=>{
         gender: 'm', group: 'A', minAge: 14, maxAge: 15, heatFormat: 'QQF26F8'}));
 
       assert.dom('#Category [name=addCategory]');
+    });
+
+    test("adding speed", ()=>{
+      Route.gotoPage(sut.Index);
+
+      assert.dom('#Category', ()=>{
+        TH.click('[name=addCategory]');
+        assert.dom('#AddCategory', ()=>{
+          TH.input('[name=name]', 'Dynomites Wellington');
+          TH.input('[name=shortName]', 'YB M');
+          TH.selectMenu('[name=type]', 'S');
+          TH.input('[name=heatFormat]', 'QQF26F8');
+          TH.input('[name=group]', 'A');
+          TH.selectMenu('[name=gender]', 'm');
+          TH.input('[name=minAge]', '14');
+          TH.change('[name=maxAge]', '15');
+          TH.click('[type=submit]');
+          assert.same(Category.query.count(), 0);
+          assert.dom('error', 'must be blank');
+          TH.input('[name=heatFormat]', '');
+          TH.click('[type=submit]');
+        });
+      });
+
+      assert(Category.exists({type: 'S', heatFormat: null}));
     });
 
     group("edit", ()=>{

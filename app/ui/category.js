@@ -22,7 +22,7 @@ define((require, exports, module)=>{
   };
 
   Tpl.Form.$helpers({
-    typeList: ()=> [['', ''], ["L", "Lead"], ["B", "Boulder"]],
+    typeList: ()=> [["L", "Lead"], ["B", "Boulder"], ["S", "Speed"]],
   });
 
   Tpl.Add.$events({
@@ -33,7 +33,7 @@ define((require, exports, module)=>{
   Tpl.Edit.$events({
     'click [name=cancel]': cancel,
     'click [name=delete]'(event) {
-      var doc = $.data();
+      const doc = $.data();
 
       Dom.stopEvent();
       Dom.Dialog.confirm({
@@ -41,7 +41,7 @@ define((require, exports, module)=>{
         classes: 'warn',
         okay: 'Delete',
         content: Tpl.ConfirmDelete,
-        callback: function(confirmed) {
+        callback(confirmed) {
           if (confirmed) {
             doc.$remove();
             Route.gotoPage(Tpl);

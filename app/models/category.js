@@ -1,4 +1,6 @@
 define((require, exports, module)=>{
+  const Changes         = require('koru/changes');
+  const Val             = require('koru/model/validation');
   const Model           = require('model');
   const Org             = require('./org');
 
@@ -13,8 +15,21 @@ define((require, exports, module)=>{
     group: {type:  'text', trim: true, required: true, maxLength: 30},
     shortName: {type: 'text', trim: true, required: true, maxLength: 10, normalize: 'upcase'},
     gender: {type: 'text', inclusion: {allowBlank: true, matches: /^[mf]$/ }},
-    type: {type: 'text', inclusion: {matches: /^[BL]$/}},
-    heatFormat: {type: 'text', inclusion: {matches: HEAT_FORMAT_REGEX}},
+    type: {type: 'text', inclusion: {matches: /^[BLS]$/}},
+    heatFormat: {type: 'text', validate() {
+      if (this.$hasChanged('heatFormat') || this.$hasChanged('type')) {
+        const value = this.heatFormat;
+        if (this.type !== 'S') {
+          if (! value || ! HEAT_FORMAT_REGEX.test(value))
+            Val.addError(this, 'heatFormat', 'is_invalid');
+        } else {
+          if (value)  {
+            Val.addError(this, 'heatFormat', 'not_allowed');
+          } else if (value !== undefined)
+            this.heatFormat = undefined;
+        }
+      }
+    }},
     minAge: {type: 'integer', number: {integer: true, $gt: 0, $lt: 100}},
     maxAge: {type: 'integer', number: {integer: true, $gt: 0, $lt: 100}},
   }});

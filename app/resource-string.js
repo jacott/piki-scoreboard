@@ -17,5 +17,9 @@ define((require)=>{
     return base.en[text] || text;
   };
 
+  Object.assign(base.en, {
+    not_allowed: "must be blank",
+  });
+
   return base;
 });
