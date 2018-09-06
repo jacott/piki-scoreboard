@@ -240,7 +240,7 @@ define(function(require, exports, module) {
 
   Tpl.Row.$extend({
     $created(ctx) {
-      Dom.autoUpdate(ctx, {subject: ctx.data.climber});
+      ctx.autoUpdate({subject: ctx.data.climber});
     },
   });
 

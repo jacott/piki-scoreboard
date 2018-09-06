@@ -263,10 +263,7 @@ define((require, exports, module)=>{
       });
       data.showingResults = showingResults; // set canInput
 
-      Dom.autoUpdate(ctx, {
-        subject: data.category,
-        removed() {Route.replacePath(eventTpl)},
-      });
+      ctx.autoUpdate({subject: data.category});
       ctx.onDestroy(Result.onChange((doc, was)=>{
        const result = doc || was;
         if (result.event_id !== eventTpl.event._id ||
@@ -401,7 +398,7 @@ define((require, exports, module)=>{
 
   Tpl.Result.$extend({
     $created(ctx) {
-      Dom.autoUpdate(ctx, {subject: ctx.data.climber});
+      ctx.autoUpdate({subject: ctx.data.climber});
     },
   });
 

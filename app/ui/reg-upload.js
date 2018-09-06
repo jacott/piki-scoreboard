@@ -27,7 +27,7 @@ define(function(require, exports, module) {
 
   Tpl.$extend({
     $created(ctx) {
-      Dom.autoUpdate(ctx);
+      ctx.autoUpdate();
     },
   });
 

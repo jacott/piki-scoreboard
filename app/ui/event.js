@@ -529,7 +529,7 @@ define((require, exports, module)=>{
   Tpl.Show.$extend({
     $created(ctx) {
       Tpl.Show.titleSuffix = Tpl.Show.results ? 'Results' : 'Start lists';
-      Dom.autoUpdate(ctx);
+      ctx.autoUpdate();
     },
   });
 
