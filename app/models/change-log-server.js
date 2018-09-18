@@ -10,59 +10,51 @@ define((require, exports, module)=>{
       return this.constructor._parentIdField && this[this.constructor._parentIdField];
     };
 
-    const observeChanges = (subject, aux, callback)=>{
-      subject.onChange((doc, undo)=>{
+    const observeChanges = (subject, callback)=>{
+      subject.afterLocalChange(dc =>{
         const userId = koru.userId();
         if (userId == null) return;
         const user = User.findById(userId);
         if (user === undefined) return;
 
-        const sub = doc || undo;
+        const {doc, _id} = dc;
         const params = {
           model: subject.modelName,
-          model_id: sub.attributes._id,
+          model_id: _id,
           parent: subject._parent ? subject._parent.modelName : subject.modelName,
-          parent_id: subject._parent ? sub.$parentId() : sub.attributes._id,
+          parent_id: subject._parent ? doc.$parentId() : _id,
           user_id: userId,
-          org_id: sub.org_id,
+          org_id: doc.org_id,
         };
         let cl;
-        if (! doc) {
+        if (dc.isDelete) {
           params.type= 'remove';
-          params.before = JSON.stringify(undo.attributes);
+          params.before = JSON.stringify(doc.attributes);
           cl = ChangeLog.create(params);
         } else {
-          cl = createChangeLog(params, subject, aux, doc, undo);
+          cl = createChangeLog(params, subject, dc);
         }
-        callback && callback(cl, doc, undo);
+        callback && callback(cl, doc, dc.undo);
       });
     };
 
-    const createChangeLog = (params, subject, aux, doc, was)=>{
-      const {attributes} = doc;
+    const createChangeLog = (params, subject, dc)=>{
+      const {doc} = dc, {attributes} = doc;
 
-      params.type = was ? 'update' : 'create';
+      params.type = dc.isChange ? 'update' : 'create';
 
-      if (was) {
-        const after = {};
-        let count = 0;
-        for(const key in was) {
-          ++count;
-          const val = key.match(/\./)
-                ? util.lookupDottedValue(key, attributes) :  attributes[key];
+      if (dc.isChange) {
+        const after = dc.changes;
 
-          if (val !== undefined)
-            after[key] = val;
+        for (const _ in after) {
+          params.before = JSON.stringify(dc.was.changes);
+          params.after = JSON.stringify(after);
+          break;
         }
-        if (count === 0) return;
-
-        params.before = JSON.stringify(was);
-        params.after = JSON.stringify(after);
       } else {
         params.after = JSON.stringify(attributes);
       }
 
-      aux && aux(params, doc, was);
       if (typeof params.aux === 'object')
         params.aux = JSON.stringify(params.aux);
 
@@ -70,12 +62,11 @@ define((require, exports, module)=>{
     };
 
     util.merge(ChangeLog, {
-      logChanges(subject, options) {
-        options = options || {};
+      logChanges(subject, options={}) {
         subject._parent = options.parent;
         subject._parentIdField = options.parent && (options.parentIdField || util.uncapitalize(options.parent.modelName)+'_id');
 
-        observeChanges(subject, options.aux, options.callback);
+        observeChanges(subject, options.callback);
       },
 
       create(attributes) {

@@ -64,9 +64,9 @@ define((require, exports, module)=>{
           teamType_ids: ['id'],
           date: 'string',
           closed: TH.match(arg => {
-            return arg.$test(undefined)
-              && arg.$test(false) && ! arg.$test([])
-              && arg.$test("f") && ! arg.$test(1);
+            return arg.test(undefined)
+              && arg.test(false) && ! arg.test([])
+              && arg.test("f") && ! arg.test(1);
           }),
           heats: 'baseObject',
           series_id: 'id',

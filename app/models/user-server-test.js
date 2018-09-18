@@ -20,23 +20,27 @@ define((require, exports, module)=>{
     });
 
     group("observeOrg_id", ()=>{
+      let dc;
       beforeEach(()=>{
-        intercept(UserAccount, 'sendResetPasswordEmail', ()=>{});
         v.org = Factory.createOrg();
-        const cb = (doc, undo) => {v.doc = doc; v.undo = undo};
+        const cb = v => {dc = v.clone()};
         onEnd(User.observeOrg_id([v.org._id], cb));
         v.user = User.create({
           email: 'foo@bar.com', name: 'foo', initials: 'F'});
       });
 
+      afterEach(()=>{
+        dc = undefined;
+      });
+
       test("role", ()=>{
         const org_id = v.org._id;
         const {user} = v;
-        assert.same(v.doc, undefined);
+        assert.same(dc, undefined);
 
         const role = Role.create({user_id: user._id, org_id, role: 'a'});
 
-        assert.equals(v.doc.attributes, {
+        assert.equals(dc.doc.attributes, {
           org_id, role: 'a',
           email: user.email, name: user.name, initials: user.initials,
           _id: user._id
@@ -45,12 +49,12 @@ define((require, exports, module)=>{
 
         role.$update('role', 'j');
 
-        assert.equals(v.doc.attributes.role, 'j');
-        assert.equals(v.undo, {role: 'a'});
+        assert.equals(dc.doc.attributes.role, 'j');
+        assert.equals(dc.undo, {role: 'a'});
 
         role.$remove();
-        assert.equals(v.doc, null);
-        assert.equals(v.undo.attributes, {
+        assert(dc.isDelete);
+        assert.equals(dc.doc.attributes, {
           org_id, role: 'j',
           email: user.email, name: user.name, initials: user.initials,
           _id: user._id
@@ -61,7 +65,8 @@ define((require, exports, module)=>{
         const {user} = v;
         const org1 = v.org;
         const org2 = Factory.createOrg();
-        const cb2 = (doc, undo) => {v.doc2 = doc; v.undo2 = undo};
+        let dc2;
+        const cb2 = dc => {dc2 = dc.clone()};
         onEnd(User.observeOrg_id([org2._id], cb2));
 
         const role1 = Role.create({user_id: user._id, org_id: org1._id, role: 'j'});
@@ -69,10 +74,10 @@ define((require, exports, module)=>{
 
         user.$update('name', 'new name');
 
-        assert.equals(v.doc.name, 'new name');
-        assert.equals(v.doc.attributes.org_id, org1._id);
-        assert.equals(v.doc2.name, 'new name');
-        assert.equals(v.doc2.attributes.org_id, org2._id);
+        assert.equals(dc.doc.name, 'new name');
+        assert.equals(dc.doc.attributes.org_id, org1._id);
+        assert.equals(dc2.doc.name, 'new name');
+        assert.equals(dc2.doc.attributes.org_id, org2._id);
       });
     });
 
@@ -342,7 +347,8 @@ define((require, exports, module)=>{
       });
 
       test("user without userAccount", ()=>{
-        const user = Factory.createUser({email: 'foo@bar.com'});
+        const user = Factory.buildUser({email: 'foo@bar.com'});
+        User._insertAttrs(user.changes);
         const res = v.rpc('User.forgotPassword', 'foo@bar.com  ');
 
         assert.equals(res, {success: true});

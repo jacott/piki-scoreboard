@@ -15,9 +15,12 @@
 
   &[name="failure"] {
     position: relative;
+    color: #f94;
     &:before {
-      color: #f94;
       content: "sync_problem";
+    }
+    &:after {
+      content: attr(title);
     }
   }
 }

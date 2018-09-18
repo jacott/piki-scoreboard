@@ -18,16 +18,15 @@ define((require, exports, module)=>{
       delete groupOrgs[doc.org_id];
     };
 
-    model.onChange((doc, was)=>{
-      if (doc != null) {
-        if (was != null) {
-          if (was.hasOwnProperty('org_id') || was.hasOwnProperty('group')) {
-            groupRemove(doc.$withChanges(was));
-          }
+    model.onChange(dc =>{
+      const {doc} = dc;
+      if (dc.isDelete) {
+        groupRemove(doc);
+      } else {
+        if (dc.isChange && dc.hasSomeFields('org_id', 'group')) {
+          groupRemove(dc.was);
         }
         getGroup(doc.org_id, doc.group)[doc._id] = true;
-      } else {
-        groupRemove(was);
       }
     });
   };

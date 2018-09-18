@@ -264,10 +264,9 @@ define((require, exports, module)=>{
       data.showingResults = showingResults; // set canInput
 
       ctx.autoUpdate({subject: data.category});
-      ctx.onDestroy(Result.onChange((doc, was)=>{
-       const result = doc || was;
-        if (result.event_id !== eventTpl.event._id ||
-            result.category_id !== ctx.data.category._id)
+      ctx.onDestroy(Result.onChange(({doc}) =>{
+        if (doc.event_id !== eventTpl.event._id ||
+            doc.category_id !== ctx.data.category._id)
           return;
 
         updateResults(ctx);

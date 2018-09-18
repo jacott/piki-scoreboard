@@ -161,36 +161,36 @@ define((require, exports, module)=>{
     });
   };
 
-  Result.beforeCreate(Result, doc =>{
+  module.onUnload(Result.beforeCreate(doc =>{
     const event = Event.findById(doc.event_id);
     if (event.heats && doc.category_id in event.heats) return;
     Event.query.onId(doc.event_id).updatePartial('heats', buildHeat(doc, ! event.heats));
-  });
+  }));
 
-  Result.beforeRemove(Result, doc =>{
+  module.onUnload(Result.beforeRemove(doc =>{
     if (Result.query.where({
       event_id: doc.event_id, category_id: doc.category_id}).whereNot('_id', doc._id).count(1))
       return;
 
     Event.query.onId(doc.event_id).updatePartial('heats', [doc.category_id]);
-  });
+  }));
 
   const buildHeat = (doc, newHeats)=>{
     const category  = Category.findById(doc.category_id);
     return [doc.category_id, category.type + category.heatFormat];
   };
 
-  Result.beforeCreate(Competitor, doc =>{addResults(doc.category_ids || [], doc)});
+  module.onUnload(Competitor.beforeCreate(doc =>{addResults(doc.category_ids || [], doc)}));
 
-  Result.beforeUpdate(Competitor, doc =>{
+  module.onUnload(Competitor.beforeUpdate(doc =>{
     const added = util.diff(doc.changes.category_ids || [], doc.attributes.category_ids || []);
     addResults(added, doc);
 
     const removed = util.diff(doc.attributes.category_ids || [], doc.changes.category_ids || []);
     removeResults(removed, doc);
-  });
+  }));
 
-  Result.beforeRemove(Competitor, doc =>{removeResults(doc.category_ids || [], doc)});
+  module.onUnload(Competitor.beforeRemove(doc =>{removeResults(doc.category_ids || [], doc)}));
 
   require('koru/env!./result')(Result);
 

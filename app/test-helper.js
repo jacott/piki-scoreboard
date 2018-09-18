@@ -7,6 +7,7 @@ define((require, exports, module)=>{
   const session         = require('koru/session');
   const sessionTH       = require('koru/session/test-helper');
   const Stubber         = require('koru/test/stubber');
+  const UserAccount     = require('koru/user-account');
   const util            = require('koru/util');
   const Factory         = require('test/factory');
 
@@ -252,6 +253,7 @@ define((require, exports, module)=>{
   });
 
   if (isServer) {
+    UserAccount.sendResetPasswordEmail = ()=>{};
     TH.Core.onTestStart(() => {
       dbBroker.db = txClient;
       txSave && txClient.query('BEGIN');

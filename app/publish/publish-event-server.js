@@ -22,10 +22,13 @@ define((require, exports, module)=>{
 
     const sendUpdate = this.sendUpdate.bind(this);
 
+    const {conn} = this;
+
     orgChildren.forEach(name => {
       const model = Model[name];
       handles.push(model.observeEvent_id([eventId], sendUpdate));
-      model.query.where('event_id', eventId).forEach(sendUpdate);
+      model.query.where('event_id', eventId).forEach(
+        doc => conn.added(name, doc._id, doc.attributes));
     });
   }});
 });

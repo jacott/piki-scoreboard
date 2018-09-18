@@ -32,40 +32,39 @@ define((require, exports, module)=>{
     {
       require(['./change-log'], ChangeLog =>{ChangeLog.logChanges(User)});
 
-      User.onChange((now, undo)=>{
-        if (undo === null) {
-          createLogin(now);
+      User.onChange(dc =>{
+        if (dc.isAdd) {
+          createLogin(dc.doc);
         } else {
-          if (undo && undo.email) {
-            UserAccount.updateOrCreateUserLogin({userId: now._id, email: now.email});
+          if (dc.hasField('email')) {
+            UserAccount.updateOrCreateUserLogin({userId: dc._id, email: dc.doc.email});
           }
-          if (now != null) {
-            if (now._id === 'guest') return;
-            Role.db.query(`select org_id, role from "Role" where user_id = '${now._id}'`)
+          if (! dc.isDelete) {
+            if (dc._id === 'guest') return;
+            Role.db.query(`select org_id, role from "Role" where user_id = '${dc._id}'`)
               .forEach((role) => {
                 const obs = orgObs[role.org_id];
-                obs === undefined ||
-                  urNotify(obs, now, role, undo, now == null);
+                if (obs !== undefined) {
+                  obs.notify(dc.clone()._set(mergeRole(dc.doc, role), dc.undo));
+                }
               });
           }
         }
       });
 
-      koru.onunload(module, Role.onChange((now, undo)=>{
-        const role = now || undo;
-        const obs = orgObs[role.org_id];
-        obs === undefined ||
-          urNotify(obs, User.findById(role.user_id), role, undo, now == null);
+      koru.onunload(module, Role.onChange(dc =>{
+        const {doc} = dc;
+        const obs = orgObs[doc.org_id];
+        if (obs !== undefined) {
+          const user = User.findById(doc.user_id);
+          user !== undefined && obs.notify(dc.clone()._set(mergeRole(user, doc), dc.undo));
+        }
       }));
 
-      const urNotify = (obs, realUser, role, undo, isRem)=>{
-        const user = new User(Object.assign({
-          role: role.role, org_id: role.org_id}, realUser.attributes));
+      const mergeRole = (user, role)=> new User(Object.assign({
+        role: role.role, org_id: role.org_id}, user.attributes));
 
-        obs.notify(isRem ? null : user, isRem ? user : undo);
-      };
-
-      User.beforeSave(User, doc => {
+      module.onUnload(User.beforeSave(doc => {
         const {changes} = doc;
         if ('org_id' in changes) {
           const {org_id, role} = changes;
@@ -109,22 +108,22 @@ define((require, exports, module)=>{
             }
           }
         }
+      }));
+
+      util.merge(User, {
+        guestUser() {
+          return User.findById('guest') || (
+            User.docs.insert({_id: 'guest'}),
+            User.findById('guest'));
+        },
+
+        observeOrg_id([org_id], callback) {
+          return (orgObs[org_id] || (orgObs[org_id] = new Observable(()=>{
+            delete orgObs[org_id];
+          }))).add(callback);
+        }
       });
     }
-
-    util.merge(User, {
-      guestUser() {
-        return User.findById('guest') || (
-          User.docs.insert({_id: 'guest'}),
-          User.findById('guest'));
-      },
-
-      observeOrg_id([org_id], callback) {
-        return (orgObs[org_id] || (orgObs[org_id] = new Observable(()=>{
-          delete orgObs[org_id];
-        }))).add(callback);
-      }
-    });
 
     const {ROLE} = User;
 
@@ -184,9 +183,9 @@ define((require, exports, module)=>{
 
       email = email.addresses[0].toLowerCase();
 
-      var user = User.findBy('email', email);
-      if (user) {
-        var accUser = UserAccount.model.findBy('userId', user._id);
+      const user = User.findBy('email', email);
+      if (user !== undefined) {
+        const accUser = UserAccount.model.findBy('userId', user._id);
         accUser && UserAccount.sendResetPasswordEmail(user);
       }
       return {success: true};

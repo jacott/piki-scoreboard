@@ -39,13 +39,14 @@ define((require, exports, module)=>{
   });
 
   Competitor.registerObserveField('event_id');
-  Competitor.afterLocalChange(Competitor, function (doc, changes) {
-    if (! doc) return;
+  module.onUnload(Competitor.afterLocalChange(dc =>{
+    if (dc.isDelete) return;
 
-    const team_idsChanged = (! changes || doc.$hasChanged('team_ids', changes));
-    const numberChanged = (! changes || changes.hasOwnProperty('number'));
+    const team_idsChanged = (dc.hasField('team_ids'));
+    const numberChanged = (dc.hasField('number'));
 
     if (team_idsChanged || numberChanged) {
+      const {doc} = dc;
       doc.$cache.teamMap = null;
       let climber = Climber.findById(doc.climber_id);
       let updates = {};
@@ -72,7 +73,7 @@ define((require, exports, module)=>{
 
       climber.$update(updates);
     }
-  });
+  }));
 
   require('koru/env!./competitor')(Competitor);
 

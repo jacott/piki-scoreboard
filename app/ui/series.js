@@ -81,7 +81,7 @@ define(function(require, exports, module) {
       const elm = Tpl.$autoRender();
       const ctx = Dom.myCtx(elm);
       document.body.appendChild(elm);
-      ctx.onDestroy(Series.observeId(series._id, doc => Dom.setTitle(doc && doc.name)));
+      ctx.onDestroy(Series.observeId(series._id, dc => Dom.setTitle(dc.doc.name)));
     },
 
     onBaseExit() {

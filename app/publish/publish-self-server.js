@@ -1,5 +1,6 @@
 define((require, exports, module)=>{
   const koru            = require('koru');
+  const DocChange       = require('koru/model/doc-change');
   const Query           = require('koru/model/query');
   const publish         = require('koru/session/publish');
   const Org             = require('models/org');
@@ -34,20 +35,15 @@ define((require, exports, module)=>{
 
     const sendUpdate = this.sendUpdate.bind(this);
 
-    const orgSendUpdate = (doc, undo)=>{
-      this.sendUpdate(
-        doc, undo,
-        doc != null && canAdministerOrg(user, doc)
-          ? undefined : noEmail
-      );
-    };
+    const filter = doc => doc != null && canAdministerOrg(user, doc)
+          ? undefined : noEmail;
 
     // Publish self
     handles.push(User.observeId(user._id, sendUpdate));
-    sendUpdate(user);
+    sendUpdate(DocChange.add(user));
 
     // Publish all orgs
-    handles.push(Org.onChange(orgSendUpdate));
-    Org.query.forEach(orgSendUpdate);
+    handles.push(Org.onChange(dc =>{this.sendUpdate(dc, filter(dc.doc))}));
+    Org.query.forEach(doc =>{this.conn.added("Org", doc._id, doc.attributes, filter(doc))});
   }});
 });

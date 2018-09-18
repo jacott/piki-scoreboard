@@ -1,5 +1,6 @@
 define((require, exports, module)=>{
   const Dom             = require('koru/dom');
+  const DocChange       = require('koru/model/doc-change');
   const Val             = require('koru/model/validation');
   const Observable      = require('koru/observable');
   const Form            = require('koru/ui/form');
@@ -108,15 +109,16 @@ define((require, exports, module)=>{
 
     const counts = Tpl.scoreCounts = new Observable();
 
-    const calcScores = (doc, was)=>{
-      const res = doc || was;
-      if (res.event_id !== (Tpl.event && Tpl.event._id)) return;
+    const calcScores = dc =>{
+      const {doc, was} = dc;
+      if (doc.event_id !== (Tpl.event && Tpl.event._id)) return;
 
-      const oldScores = (was && (doc ? doc.$withChanges(was) : was).scores) || [];
-      const newScores = (doc && doc.scores) || [];
+      const oldScores = (! dc.isAdd && was.scores) || [];
+      const newScores = (! dc.isDelete && doc.scores) || [];
 
       const len = Math.max(oldScores.length, newScores.length);
-      const scores = counts[res.category_id] || (counts[res.category_id]  = []);
+      const {category_id} = doc;
+      const scores = counts[category_id] || (counts[category_id]  = []);
       let changed = false;
 
       for(let i = 0; i < len; ++i) {
@@ -130,7 +132,7 @@ define((require, exports, module)=>{
       }
 
       if (changed) {
-        counts.notify(res.category_id);
+        counts.notify(category_id);
       }
     };
 
@@ -138,7 +140,7 @@ define((require, exports, module)=>{
 
     const docs = Result.docs;
     for (let id in docs)
-      calcScores(docs[id], null);
+      calcScores(DocChange.add(docs[id]));
   };
 
   Tpl.$extend({
@@ -147,7 +149,7 @@ define((require, exports, module)=>{
       const elm = Tpl.$autoRender({});
       pageRoute.eventId &&
         Dom.myCtx(elm).onDestroy(Event.observeId(
-          pageRoute.eventId, doc => Dom.setTitle(doc && doc.displayName)));
+          pageRoute.eventId, dc => Dom.setTitle(dc.doc.displayName)));
 
       document.body.appendChild(elm);
       const currentSub = eventSub;
@@ -356,7 +358,7 @@ define((require, exports, module)=>{
       const {ctx} = $;
 
       ctx.onEventChange == null || ctx.onEventChange.stop();
-      ctx.onEventChange = Event.observeId(this._id, (doc, undo)=>{
+      ctx.onEventChange = Event.observeId(this._id, ()=>{
         each.list.changeOptions({updateAllTags: true});
       });
 
@@ -368,9 +370,9 @@ define((require, exports, module)=>{
             }
           },
           onChange: body => {
-            return Result.onChange((doc, was)=>{
-              if (doc && was) return;
-              body(doc && cats[doc.category_id], was && cats[was.category_id]);
+            return Result.onChange(dc =>{
+              if (dc.isChange) return;
+              body(dc.clone()._set(cats[dc.doc.category_id]));
             });
           },
           compare: compareCategories,
@@ -471,9 +473,8 @@ define((require, exports, module)=>{
 
       buildTable(table);
 
-      $.ctx.onDestroy(Result.onChange((doc, was)=>{
-        if (doc && was) return; // already showing this row
-        buildTable(table);
+      $.ctx.onDestroy(Result.onChange(dc =>{
+        dc.isChange || buildTable(table); // else already showing this row
       }));
 
       $.ctx.onDestroy(Tpl.scoreCounts.onChange((cat_id)=>{

@@ -18,7 +18,7 @@ define((require, exports, module)=>{
   koru.onunload(module, () => {publish._destroy('Org')});
 
   publish({name: 'Org', init(shortName) {
-    const {userId} = this;
+    const {userId, conn} = this;
     Val.ensureString(shortName);
     const org = Org.findBy('shortName', shortName);
     if (! org) return this.error(new koru.Error(404, 'Org not found'));
@@ -26,7 +26,7 @@ define((require, exports, module)=>{
     const org_id = org._id;
     const handles = [];
 
-    this.conn.org_id = org_id;
+    conn.org_id = org_id;
 
     this.onStop(() => {handles.forEach(handle => {handle.stop()})});
 
@@ -35,13 +35,12 @@ define((require, exports, module)=>{
     handles.push(User.observeOrg_id([org_id], sendUpdate));
     User.db.query(`select u.*,r.role, r.org_id from "User" as u, "Role" as r
 where (r.org_id is null or r.org_id = {$org_id}) and r.user_id = u._id
-`, {org_id, userId}).forEach(d => {this.sendUpdate(new User(d))});
+`, {org_id, userId}).forEach(d => {conn.added('User', d._id, d)});
 
     orgChildren.forEach(name => {
       const model = Model[name];
       handles.push(model.observeOrg_id([org_id], sendUpdate));
-      model.query.where({org_id}).forEach(sendUpdate);
+      model.query.where({org_id}).forEach(d => {conn.added(name, d._id, d.attributes)});
     });
-
   }});
 });
