@@ -1,7 +1,10 @@
 define((require, exports, module)=>{
   const publish         = require('koru/session/publish');
+  const Category        = require('models/category');
   const Factory         = require('test/factory');
   const TH              = require('./test-helper');
+
+  const {stub, spy, onEnd} = TH;
 
   require('./publish-org-client');
 
@@ -21,7 +24,7 @@ define((require, exports, module)=>{
     test("user not in org", ()=>{
       TH.loginAs(v.user = Factory.createUser('admin'));
       const org = Factory.createOrg({shortName: 'o1'});
-      sut.call(v.sub, 'o1');
+      sut.init.call(v.sub, 'o1');
 
       assert.same(v.user.org, org);
       assert.same(v.user.role, 'g');
@@ -29,20 +32,23 @@ define((require, exports, module)=>{
 
     test("user not logged in", ()=>{
       const org = Factory.createOrg({shortName: 'o1'});
-      refute.exception(()=>{sut.call(v.sub, 'o1')});
+      refute.exception(()=>{sut.init.call(v.sub, 'o1')});
     });
 
     test("publish", ()=>{
-      const matchUser = v.sub.match.withArgs('User', TH.match.func);
-      const matchEvent = v.sub.match.withArgs('Event', TH.match.func);
+      const {sub} = v;
+      const matchUser = sub.match.withArgs('User', TH.match.func);
+      const matchEvent = sub.match.withArgs('Event', TH.match.func);
 
       const org = Factory.createOrg({shortName: 'o1'});
-      TH.loginAs(v.user = Factory.createUser('admin'));
+      const user = Factory.createUser('admin');
+      const cat = Factory.createCategory();
+      TH.loginAs(user);
 
-      sut.call(v.sub, 'o1');
+      sut.init.call(sub, 'o1');
 
-      assert.same(v.user.org, org);
-      assert.same(v.user.role, 'a');
+      assert.same(user.org, org);
+      assert.same(user.role, 'a');
 
       {
         assert.calledOnce(matchUser);
@@ -63,8 +69,14 @@ define((require, exports, module)=>{
         assert.isFalse(m({org_id: 'x'+org._id}));
 
         'Climber Event Series Category Team TeamType'.split(' ')
-          .forEach(name =>{assert.calledWith(v.sub.match, name, m)});
+          .forEach(name =>{assert.calledWith(sub.match, name, m)});
       }
+
+      const unmatch = stub();
+      sub._onStop(sub, unmatch);
+
+      assert.calledWith(unmatch, user);
+      assert.calledWith(unmatch, cat);
     });
   });
 });

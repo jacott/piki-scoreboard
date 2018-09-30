@@ -1,6 +1,7 @@
 define((require, exports, module)=>{
   const koru            = require('koru');
   const publish         = require('koru/session/publish');
+  const Model           = require('model');
   const Category        = require('models/category');
   const Climber         = require('models/climber');
   const Event           = require('models/event');
@@ -30,5 +31,16 @@ define((require, exports, module)=>{
     const matchOrg = doc => org._id === doc.org_id;
     orgChildren.forEach(name => {this.match(name, matchOrg)});
 
+    this.onStop((sub, unmatch)=>{
+      const unmatchOrg = ({docs})=>{
+        for (const id in docs) {
+          const doc = docs[id];
+          matchOrg(doc) && unmatch(doc);
+        };
+      };
+
+      unmatchOrg(User);
+      for (const name of orgChildren) unmatchOrg(Model[name]);
+    });
   }});
 });

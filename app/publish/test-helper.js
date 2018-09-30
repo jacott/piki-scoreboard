@@ -15,7 +15,8 @@ define((require)=>{
       const sub = {
         match: TH.stub(),
         onStop (func) {
-          TH.onEnd(func);
+          this._onStop = func;
+          TH.onEnd(()=>{func(sub, ()=>{})});
         },
       };
 

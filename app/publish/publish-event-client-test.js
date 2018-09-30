@@ -1,6 +1,9 @@
 define((require, exports, module)=>{
   const publish         = require('koru/session/publish');
+  const Factory         = require('test/factory');
   const TH              = require('./test-helper');
+
+  const {stub, spy, onEnd} = TH;
 
   require('./publish-event-client');
 
@@ -17,10 +20,12 @@ define((require, exports, module)=>{
 
     test("publish", ()=>{
       const sut = publish._pubs.Event;
-      const event = TH.Factory.createEvent();
-      const matchUser = v.sub.match.withArgs('Competitor', TH.match.func);
+      const {sub} = v;
+      const event = Factory.createEvent();
+      const comp = Factory.createCompetitor();
+      const matchUser = sub.match.withArgs('Competitor', TH.match.func);
 
-      sut.call(v.sub, event._id);
+      sut.init.call(sub, event._id);
 
       assert.calledOnce(matchUser);
 
@@ -29,9 +34,15 @@ define((require, exports, module)=>{
       assert.isTrue(m({event_id: event._id}));
       assert.isFalse(m({event_id: 'x'+event._id}));
 
-      'Result'.split(' ').forEach(name =>{
-        assert.calledWith(v.sub.match, name, m);
+      'Competitor Result'.split(' ').forEach(name =>{
+        assert.calledWith(sub.match, name, m);
       });
+
+      const unmatch = stub();
+      sub._onStop(sub, unmatch);
+
+      assert.calledWith(unmatch, comp);
+
     });
   });
 });
