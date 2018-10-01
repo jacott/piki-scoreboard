@@ -8,6 +8,8 @@ define((require, exports, module)=>{
   const Team            = require('models/team');
   const eventTpl        = require('./event');
 
+  const orig$ = Symbol();
+
   const Tpl = Dom.newTemplate(require('koru/html!./event-category'));
   const $ = Dom.current;
   const {HeatHeader, Score, BoulderScore} = Tpl;
@@ -20,8 +22,7 @@ define((require, exports, module)=>{
     if (canInput) {
       elm = document.createElement('input');
       elm.tabIndex = number+1;
-      if (attempts)
-        elm.value = attempts;
+      elm[orig$] = elm.value = attempts || '';
     } else {
       elm = document.createElement('span');
       if (attempts) elm.textContent = attempts;
@@ -45,16 +46,6 @@ define((require, exports, module)=>{
 
   const updateResults = (ctx)=>{
     let input, value, start, end;
-    if (focusField !== null) {
-      input = getFocusElm();
-      if (input === document.activeElement) {
-        start = input.selectionStart;
-        end = input.selectionEnd;
-        value = input.value;
-      } else {
-        input = null;
-      }
-    }
 
     ctx.updateAllTags();
 
@@ -63,7 +54,7 @@ define((require, exports, module)=>{
       if (elm) {
         elm.focus();
         if (input) {
-          elm.value = value;
+          elm[orig$] = elm.value = value;
           elm.setSelectionRange(start, end);
         } else {
           elm.select();
@@ -75,14 +66,15 @@ define((require, exports, module)=>{
   };
 
   const getFocusElm = ()=>{
-    return document.querySelector(
+    return focusField && document.querySelector(
       '#' + focusField.id + ' td.score input[tabIndex="'+focusField.tabIndex+'"].'+focusField.name);
   };
 
   const saveScore = (elm)=>{
+    if (elm.value === elm[orig$]) return true;
     const ctx = Dom.ctx(elm);
     const data = ctx.data;
-    if (! data.result || data.score === elm.value) return true;
+    if (! data.result) return true;
 
     const heat = Tpl.$ctx(ctx).data.heat;
 
@@ -103,7 +95,8 @@ define((require, exports, module)=>{
     let top = parent.querySelector('input.top');
     const onTop = top === elm;
     top = top.value.trim();
-    let bonus = parent.querySelector('input.bonus').value.trim();
+    const bonusElm = parent.querySelector('input.bonus');
+    let bonus = bonusElm.value.trim();
     if (top === "-") top = "0";
     if (bonus === "-") bonus = "0";
     const tabIndex = +elm.getAttribute('tabIndex');
@@ -117,16 +110,21 @@ define((require, exports, module)=>{
     }
     top = +(top || 0);
     bonus = +(bonus || 0);
-    if (! isNaN(top) && ! isNaN(bonus) && top >=0 && bonus >= 0) {
-      if (top && ! bonus) return null;
+    const isNumber = ! (isNaN(top) || isNaN(bonus));
+    if (isNumber && top >=0 && bonus >= 0) {
+      if (top && ! bonus) {
+        parent.classList.add('incomplete');
+        parent.classList.remove('error');
+        return true;
+      }
       if (! top || (bonus && bonus <= top)) {
-        Dom.removeClass(parent, 'error');
+        parent.classList.remove('error', 'incomplete');
         data.result.setBoulderScore(data.heat.number, tabIndex, bonus, top);
         return true;
       }
     }
-    Dom.addClass(parent, 'error');
-    return false;
+    parent.classList.add('error');
+    return isNumber;
   };
 
   const setFocusField = (input)=>{
@@ -295,7 +293,7 @@ define((require, exports, module)=>{
     'change td.score input'(event) {
       if (! saveScore(this)) {
         Dom.stopEvent();
-        getFocusElm().focus();
+        (getFocusElm()||this).focus();
         return;
       }
     },
@@ -305,11 +303,12 @@ define((require, exports, module)=>{
     },
 
     'keydown td.score input'(event) {
+      const elm = event.target;
       switch(event.which) {
       case 27:
         focusField = null;
         if (Dom.hasClass(this, 'score')) {
-          event.target.value = $.data(this).score || '';
+          elm.value = elm[orig$];
           Dom.remove(this.parentNode.querySelector('.errorMsg'));
         } else {
           Dom.ctx(this).updateAllTags();
@@ -319,7 +318,7 @@ define((require, exports, module)=>{
 
       case 13:
         Dom.stopEvent();
-        if (saveScore(event.target)) {
+        if (saveScore(elm)) {
           focusField = null;
           document.activeElement.blur();
         }
@@ -328,7 +327,7 @@ define((require, exports, module)=>{
         const oldFocus = focusField;
         focusField = nextField(document.activeElement, event.shiftKey ? -1 : 1);
 
-        const res  = saveScore(event.target);
+        const res  = saveScore(elm);
         if (! res) {
           if (res === null && oldFocus.id === focusField.id) {
             return;
@@ -339,7 +338,7 @@ define((require, exports, module)=>{
           document.activeElement.select();
           return;
         }
-        if (document.activeElement === event.target) {
+        if (document.activeElement === elm) {
           Dom.remove(this.parentNode.querySelector('.errorMsg'));
           return;
         }
@@ -350,14 +349,15 @@ define((require, exports, module)=>{
 
 
     'pointerdown td.score'(event) {
-      if (event.target === document.activeElement ||
+      const elm = event.target;
+      if (elm === document.activeElement ||
           ! Dom.hasClass(document.body, 'jAccess'))
         return;
 
       Dom.stopEvent();
 
-      let input = event.target.tagName === 'INPUT'
-          ? event.target : event.target.querySelector('input') || this.querySelector('input');
+      let input = elm.tagName === 'INPUT'
+          ? elm : elm.querySelector('input') || this.querySelector('input');
       if (input != null) {
         input.focus();
         input.select();
@@ -488,7 +488,7 @@ define((require, exports, module)=>{
         elm.tabIndex = this.heat;
         elm.className = 'score';
         if (this.score != null)
-          elm.value = this.score.toString();
+          elm[orig$] = elm.value = this.score.toString();
       } else {
         const {score} = this;
         const parts = typeof score === 'number' ? null : this.score.split(/([TZA]+)(?!o)/);

@@ -114,9 +114,12 @@
         &.bonus {
           background-image: linear-gradient(-45deg,  #0aa 0%, #0aa 50%, #fff 50%, #fff 100%);
         }
-        &.error {
+        &.error, &.incomplete:not(:focus-within) {
           background-color: @colorInputErrorBG;
           background-image: none;
+        }
+        &.incomplete>.bonus:not(:focus) {
+          background-color: @colorInputErrorBG;
         }
 
         >* {
