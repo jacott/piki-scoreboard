@@ -1,5 +1,6 @@
 isClient && define((require, exports, module)=>{
   const Route           = require('koru/ui/route');
+  const Factory         = require('test/factory');
   const App             = require('ui/app');
   const EventRegister   = require('ui/event-register');
   const sut             = require('./event-category');
@@ -10,18 +11,18 @@ isClient && define((require, exports, module)=>{
   let v = {};
   TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
     beforeEach(()=>{
-      v.org = TH.Factory.createOrg();
-      v.category = TH.Factory.createCategory();
+      v.org = Factory.createOrg();
+      v.category = Factory.createCategory();
       TH.login();
-      v.tt1 = TH.Factory.createTeamType();
-      v.t1 = TH.Factory.createTeam();
-      v.tt2 = TH.Factory.createTeamType();
-      v.t2 = TH.Factory.createTeam();
-      v.event = TH.Factory.createEvent({teamType_ids: [v.tt1._id, v.tt2._id]});
-      v.result = TH.Factory.createResult({scores: [0.1]});
-      TH.Factory.createClimber();
-      TH.Factory.createCompetitor({team_ids: [v.t1._id, v.t2._id], number: 123});
-      v.result2 = TH.Factory.createResult({scores: [0.3]});
+      v.tt1 = Factory.createTeamType();
+      v.t1 = Factory.createTeam();
+      v.tt2 = Factory.createTeamType();
+      v.t2 = Factory.createTeam();
+      v.event = Factory.createEvent({teamType_ids: [v.tt1._id, v.tt2._id]});
+      v.result = Factory.createResult({scores: [0.1]});
+      Factory.createClimber();
+      Factory.createCompetitor({team_ids: [v.t1._id, v.t2._id], number: 123});
+      v.result2 = Factory.createResult({scores: [0.3]});
       TH.setOrg(v.org);
       v.eventSub = stub(App, 'subscribe').withArgs('Event')
         .returns({stop: v.stop = stub()});
@@ -138,9 +139,9 @@ isClient && define((require, exports, module)=>{
 
     group("boulder category", ()=>{
       beforeEach(()=>{
-        v.category = TH.Factory.createCategory({type: 'B', heatFormat: 'QF6'});
-        v.event = TH.Factory.createEvent();
-        v.result = TH.Factory.createResult({
+        v.category = Factory.createCategory({type: 'B', heatFormat: 'QF6'});
+        v.event = Factory.createEvent();
+        v.result = Factory.createResult({
           scores: [0.1, 3048385], problems: [[302, 0, 1, 101, 1210]],
         });
 
@@ -273,7 +274,7 @@ isClient && define((require, exports, module)=>{
       });
 
       test("entering finals", ()=>{
-        TH.loginAs(TH.Factory.createUser('admin'));
+        TH.loginAs(Factory.createUser('admin'));
 
         assert.dom('#Event .Category', ()=>{
           assert.dom('tr#Result_'+ v.result._id, ()=>{

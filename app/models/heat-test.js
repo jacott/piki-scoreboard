@@ -164,16 +164,16 @@ define((require, exports, module)=>{
           r1 = {scores: [0.21, 300, 300]}, r2 = {scores: [0.42, 400, 300]},
           r3 = {scores: [0.33, 300, 300]}, r4 = {scores: [0.14, 50, 300, 500]}];
 
-        r4 = heat.sortByStartOrder(results.slice(0));
+        let ans = heat.sortByStartOrder(results.slice(0));
 
-        assert.same(r4.length, 3);
-        assert.equals(r4, [r1, r3, r2]);
+        assert.same(ans.length, 3);
+        assert.equals(ans, [r1, r3, r2]);
 
         r1.scores[0] = 0.22;
 
-        r4 = heat.sortByStartOrder(results.slice(0));
+        ans = heat.sortByStartOrder(results.slice(0));
 
-        assert.equals(r4, [r3, r1, r2]);
+        assert.equals(ans, [r3, r1, r2]);
       });
 
       test("final no tie", ()=>{

@@ -28,6 +28,14 @@ define((require, exports, module)=>{
 
   TH.Factory = Factory;
 
+  const runRpc = (self, method, args) => {
+    const func = session._rpcs[method];
+    if (typeof func !== 'function')
+      throw new Error(`"${method}" is not an rpc`);
+    return func.apply(self, args);
+  };
+
+
   util.mergeOwnDescriptors(TH, sessionTH);
   util.merge(TH, {
     showErrors (doc) {return () => Val.inspectErrors(doc)},
@@ -76,17 +84,14 @@ define((require, exports, module)=>{
             util.thread.userId = conn.userId;
             util.thread.connection = conn;
 
-            if (! session._rpcs[method]) throw new Error('RPC: "' + method + '" is undefined');
-            return session._rpcs[method].apply(conn, args);
+            return runRpc(conn, method, args);
           } finally {
             util.thread.userId = prevUserId;
             util.thread.connection = prevConnection;
           }
         });
       } else {
-        return TH.intercept(session, 'rpc', (method, ...args) => {
-          return session._rpcs[method].apply(util.thread, args);
-        });
+        return TH.intercept(session, 'rpc', (method, ...args)=>runRpc(util.thread, method, args));
       }
     },
 

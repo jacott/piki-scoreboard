@@ -8,6 +8,35 @@ define(function(require, exports, module) {
   const Tpl = module.exports = Dom.newTemplate(module, require('koru/html!./flash'));
   const {Message} = Tpl;
 
+  const close = elm =>{
+    const flash = elm.parentNode;
+    Dom.hideAndRemove(elm);
+    if (! flash.querySelector('.m:not(.remElm)'))
+      Dom.hideAndRemove(flash);
+  };
+
+  const display = ({message, transient, type='notice'})=>{
+    message = ResourceString.text(message);
+    let flash = document.getElementById('Flash');
+    if (flash) {
+
+      Dom.removeClass(flash, 'remElm');
+
+      Dom.forEach(flash, '#Flash>.m.transient:not(.remElm)',
+                  elm => {Dom.hideAndRemove(elm)});
+    } else {
+      flash = Tpl.$autoRender();
+      document.body.appendChild(flash);
+    }
+
+    const classes = `m ${type}${transient ? ' transient' : ''}`;
+    const elm = Message.$autoRender({classes, message});
+    const ctx = Dom.myCtx(elm);
+    flash.appendChild(elm);
+    transient && ctx.onDestroy(koru.afTimeout(() => {close(elm)}, 7000));
+    return elm;
+  };
+
   Tpl.$events({
     'click .m'(event) {
       Dom.stopEvent();
@@ -30,42 +59,13 @@ define(function(require, exports, module) {
     },
   });
 
-  function display({message, transient, type='notice'}) {
-    message = ResourceString.text(message);
-    let flash = document.getElementById('Flash');
-    if (flash) {
-
-      Dom.removeClass(flash, 'remElm');
-
-      Dom.forEach(flash, '#Flash>.m.transient:not(.remElm)',
-                  elm => {Dom.hideAndRemove(elm)});
-    } else {
-      flash = Tpl.$autoRender();
-      document.body.appendChild(flash);
-    }
-
-    const classes = `m ${type}${transient ? ' transient' : ''}`;
-    const elm = Message.$autoRender({classes, message});
-    const ctx = Dom.myCtx(elm);
-    flash.appendChild(elm);
-    transient && ctx.onDestroy(koru.afTimeout(() => {close(elm)}, 7000));
-    return elm;
-  }
-
-  function close(elm) {
-    const flash = elm.parentNode;
-    Dom.hideAndRemove(elm);
-    if (! flash.querySelector('.m:not(.remElm)'))
-      Dom.hideAndRemove(flash);
-  }
-
-  koru.unexpectedError = function (userMsg, logMsg) {
+  koru.unexpectedError = (userMsg, logMsg)=>{
     Tpl.error('unexpected_error:'+(userMsg||logMsg));
     koru.error('Unexpected error', (logMsg||userMsg));
   };
 
 
-  koru.globalErrorCatch = koru.globalCallback = function (e) {
+  koru.globalErrorCatch = koru.globalCallback = e =>{
     if (! e) return;
     let reason = e.reason || e.toString();
     if (typeof reason === 'object') {
@@ -79,8 +79,11 @@ define(function(require, exports, module) {
     if (typeof e.error !== "number" || e.error >= 500) {
       e.stack && koru.error(util.extractError(e));
       Tpl.error(reason);
-    } else
+    } else {
+      koru._TEST_ !== undefined &&
+        e.stack && koru.error(util.extractError(e));
       Tpl.notice(reason);
+    }
     return true;
   };
 });
