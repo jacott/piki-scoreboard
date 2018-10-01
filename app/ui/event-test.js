@@ -1,17 +1,19 @@
 isClient && define((require, exports, module)=>{
+  const Dom             = require('koru/dom');
   const Route           = require('koru/ui/route');
   const util            = require('koru/util');
   const Climber         = require('models/climber');
   const Event           = require('models/event');
   const Result          = require('models/result');
   const Series          = require('models/series');
+  const Factory         = require('test/factory');
   const App             = require('ui/app');
   const TeamHelper      = require('ui/team-helper');
   require('./event-category');
   require('./event-register');
   const TH              = require('./test-helper');
 
-  const {stub, spy, onEnd} = TH;
+  const {stub, spy, onEnd, intercept} = TH;
 
   const sut = require('./event');
 
@@ -198,6 +200,154 @@ isClient && define((require, exports, module)=>{
       let series = Series.findBy("name", 'National Cup Series 2015');
       assert(series);
       assert.same(series.org, v.org);
+    });
+
+    group("speed", ()=>{
+      test("rendering start list", ()=>{
+        const cat = Factory.createCategory({type: 'S'});
+        const event = TH.Factory.createEvent();
+        const res = Factory.createResult();
+
+        Route.gotoPage(sut.Show, {eventId: event._id, search: '?type=startlists'});
+
+        v.eventSub.yield();
+
+        assert.dom('#Show', ()=>{
+          assert.dom('.categories .fmt.S td', 'Format: Qualifiers; Finals');
+          stub(Route, 'gotoPage');
+          TH.click('tr:not(.fmt).S td .link', 'Quals');
+          assert.calledWith(Route.gotoPage, sut.Category, {
+            append: cat._id, search: '?type=startlists&heat=0'});
+        });
+      });
+
+      test("qual rerun", ()=>{
+        const cat = Factory.createCategory({type: 'S'});
+        const event = TH.Factory.createEvent({heats: {[cat._id]: 'SR'}});
+        const res = Factory.createResult();
+
+        Route.gotoPage(sut.Show, {eventId: event._id, search: '?type=results'});
+        v.eventSub.yield();
+
+        assert.dom('#Show tr:not(.fmt).S', ()=>{
+          assert.dom('td', {count: 5});
+          assert.dom('td:nth-child(3)', 'Quals');
+          assert.dom('td:last-child[colspan="4"]');
+          stub(Route, 'gotoPage');
+          assert.dom('td:nth-child(4)', 'Final', ()=>{
+            TH.click('.link');
+          });
+
+          assert.calledWith(Route.gotoPage, Dom.Event.Category, {
+            append: cat._id, search: '?type=results&heat=1'});
+        });
+      });
+
+      test("print", ()=>{
+        const cat1 = Factory.createCategory({type: 'S'});
+        const cat2 = Factory.createCategory({type: 'S'});
+        const event = TH.Factory.createEvent({heats: {[cat1._id]: 'S4321', [cat2._id]: 'SR'}});
+        const res1 = Factory.createResult({category_id: cat1._id});
+        const res2 = Factory.createResult({category_id: cat2._id});
+
+        Route.gotoPage(sut.Show, {eventId: event._id, search: '?type=results'});
+        v.eventSub.yield();
+
+        stub(window, 'print', ()=>{
+          assert.dom(document.body, ()=>{
+            assert.dom('#Event .body>.no-print');
+            assert.dom('.print-only', ()=>{
+              assert.dom('h1', "Category 1");
+              assert.dom('.GeneralList', {count: 2});
+              assert.dom('h1', "Category 2");
+            });
+          });
+        });
+
+        assert.dom('#Show', ()=>{
+          assert.dom('tr.S .select', {count: 2});
+          TH.click('tr.S:nth-child(3) .select');
+
+          assert.dom('.action [data-heat="0"]', "Quals");
+          assert.dom('.action [data-heat="1"]', "Final");
+
+          TH.click('tr.S:nth-child(2) .select');
+
+          assert.dom('.action', action =>{
+            assert.dom('span', 'Print');
+            assert.dom('[data-heat="-1"]', 'General');
+            assert.dom('[data-heat="4"]', 'Round of 16');
+            TH.click('[data-heat="-1"]');
+          });
+        });
+
+        assert.called(window.print);
+      });
+
+
+
+      test("finals available", ()=>{
+        const cat = Factory.createCategory({type: 'S'});
+        const event = TH.Factory.createEvent();
+        const res = Factory.createResult();
+
+        Route.gotoPage(sut.Show, {eventId: event._id, search: '?type=results'});
+
+        v.eventSub.yield();
+
+        assert.dom('#Show tr:not(.fmt).S', ()=>{
+          assert.dom('td', {count: 4});
+          assert.dom('td:nth-child(3) .link', 'Quals');
+          assert.dom('td:last-child[colspan="5"]');
+        });
+
+        event.$updatePartial('heats', [cat._id, 'S21']);
+
+        assert.dom('#Show tr:not(.fmt).S', ()=>{
+          assert.dom('td', {count: 6});
+          assert.dom('td:nth-child(3)', 'Quals');
+          assert.dom('td:nth-child(4)', 'Semi-final');
+          assert.dom('td:nth-child(5)', 'Final');
+          assert.dom('td:last-child[colspan="3"]');
+        });
+
+        event.$updatePartial('heats', [cat._id, 'SC4321']);
+
+        assert.dom('#Show tr:not(.fmt).S', ()=>{
+          assert.dom('td', {count: 8});
+          assert.dom('td', 'Quals');
+          assert.dom('td', 'Round of 16');
+          assert.dom('td', 'Semi-final');
+          assert.dom('td:nth-child(7)', 'Final');
+          assert.dom('td:last-child[colspan="1"]');
+          assert.dom('td', '1/4-final', td =>{
+            stub(Route, 'gotoPage');
+            TH.click('.link');
+            assert.calledWith(Route.gotoPage, sut.Category, {
+              append: cat._id, search: '?type=results&heat=3'});
+          });
+        });
+      });
+
+      test("rendering results", ()=>{
+        const cat = Factory.createCategory({type: 'S'});
+        const event = TH.Factory.createEvent();
+        const res = Factory.createResult();
+
+        Route.gotoPage(sut.Show, {eventId: event._id, search: '?type=results'});
+
+        v.eventSub.yield();
+
+        res.$update('scores', [0.12, ['fall']]);
+
+        assert.dom('#Show', ()=>{
+          assert.dom('.categories .fmt.S td', 'Format: Qualifiers; Finals');
+          stub(Route, 'gotoPage');
+          TH.click('tr:not(.fmt).S td .link', 'Quals');
+          assert.calledWith(Route.gotoPage, sut.Category, {
+            append: cat._id, search: '?type=results&heat=0'});
+        });
+      });
     });
 
     group("select", ()=>{

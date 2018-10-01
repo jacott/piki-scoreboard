@@ -67,6 +67,8 @@ define(function(require, exports, module) {
 
   koru.globalErrorCatch = koru.globalCallback = e =>{
     if (! e) return;
+    if (koru._TEST_ !== undefined && (e instanceof Error))
+      koru.error(util.extractError(e));
     let reason = e.reason || e.toString();
     if (typeof reason === 'object') {
       try {

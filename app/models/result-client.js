@@ -24,6 +24,10 @@ define((require)=>{
         }
         session.rpc('Result.setBoulderScore', this._id, index, problem, bonus, top);
       },
+
+      setSpeedScore(options) {
+        session.rpc("Result.setSpeedScore", this._id, options);
+      },
     });
 
   };

@@ -5,7 +5,9 @@ define((require, exports, module)=>{
   const Category        = require('models/category');
   const Heat            = require('models/heat');
   const Result          = require('models/result');
-  const Team            = require('models/team');
+  const ClimberCell     = require('ui/climber-cell');
+  const EventHelper     = require('ui/event-helper');
+  const SpeedEvent      = require('ui/speed-event');
   const eventTpl        = require('./event');
 
   const orig$ = Symbol();
@@ -29,19 +31,6 @@ define((require, exports, module)=>{
     }
     elm.className = name;
     return elm;
-  };
-
-  const setHeatNumber = (ctx, value)=>{
-    const data = ctx.data;
-    data.heat.number = data.selectHeat =  +value;
-    if (data.selectHeat === -1)
-      data.showingResults = true;
-    updateResults(ctx);
-
-    const pageRoute = util.shallowCopy(Route.currentPageRoute);
-    pageRoute.search =
-      `?type=${data.showingResults ? 'results' : 'startlists'}&heat=${data.heat.number}`;
-    Route.replaceHistory(pageRoute);
   };
 
   const updateResults = (ctx)=>{
@@ -237,26 +226,12 @@ define((require, exports, module)=>{
     (getFocusElm()||elm).focus();
   };
 
-  eventTpl.route.addTemplate(module, Tpl, {
-    focus: '.Category [name=selectHeat]',
-    data: (page,pageRoute)=>{
-      if (! eventTpl.event) Route.abortPage();
-      const params = Route.searchParams(pageRoute);
-      return {showingResults: params.type === 'results',
-              category_id: pageRoute.append, heatNumber: +(params.heat || -1)};
-    }
-  });
+  eventTpl.route.addTemplate(module, Tpl);
 
   Tpl.$helpers({
     classes() {
       return (this.showingResults ? "Category rank " : "Category start ") +
         this.heat.className() + ' ' + this.heat.type;
-    },
-    modeSwitchLabel() {
-      return this.showingResults ? "Show start order" : "Show results";
-    },
-    mode() {
-      return this.showingResults ? "Results" : "Start order";
     },
     heats() {
       return this.heat.list();
@@ -298,12 +273,42 @@ define((require, exports, module)=>{
   });
 
   Tpl.$extend({
+    onEntry: (page, pageRoute)=>{
+      if (! eventTpl.event) Route.abortPage();
+      const params = Route.searchParams(pageRoute);
+      const category = Category.findById(pageRoute.append);
+
+      const {route} = page;
+
+      const showingResults = params.type === 'results';
+      const heatNumber = +(params.heat || -1);
+
+      if (! showingResults && heatNumber == -1) {
+        return Route.abortPage(page, {
+          eventId: eventTpl.event._id, append: pageRoute.append, search: '?type=results&heat=-1'});
+      }
+
+      const data = {
+        showingResults,
+        event_id: eventTpl.event._id,
+        category, heatNumber};
+      Dom('#Event .body').appendChild(
+        category.type === 'S'
+          ? SpeedEvent.$autoRender(data) : page.$autoRender(data)
+      );
+
+      Dom('.Category [name=selectHeat]').focus();
+    },
+
+    onExit: ()=>{
+      Dom.removeChildren(Dom('#Event .body'));
+    },
+
     $created(ctx, elm) {
       const {data} = ctx;
       let {showingResults} = data;
       util.merge(data, {
-        category: Category.findById(data.category_id),
-        heat: new Heat(data.heatNumber,  eventTpl.event.heats[data.category_id]),
+        heat: new Heat(data.heatNumber,  eventTpl.event.heats[data.category._id]),
         get selectHeat() {return this.heat.number},
         set selectHeat(value) {return this.heat.number = value},
         get showingResults() {return showingResults},
@@ -333,20 +338,9 @@ define((require, exports, module)=>{
     },
   });
 
+  EventHelper.extendResultTemplate(Tpl);
+
   Tpl.$events({
-    'click [name=toggleStartOrder]'(event) {
-      Dom.stopEvent();
-      const data = $.data();
-      data.showingResults = ! data.showingResults;
-      updateResults($.ctx);
-    },
-
-    'change [name=selectHeat]'(event) {
-      Dom.stopEvent();
-
-      setHeatNumber($.ctx, this.value);
-    },
-
     'change td.score input'(event) {
       if (! saveScore(this)) {
         Dom.stopEvent();
@@ -366,7 +360,7 @@ define((require, exports, module)=>{
       if (which >= 37 && which <= 40) {
         saveAndMove(elm, which);
         return;
-        }
+      }
       switch(which) {
       case 27: // escape
         focusField = null;
@@ -447,21 +441,6 @@ define((require, exports, module)=>{
   });
 
   Tpl.Result.$helpers({
-    teams() {
-      let frag = document.createDocumentFragment();
-      let teamMap = {};
-      for (let tid of this.competitor.team_ids) {
-        let team = Team.findById(tid);
-        teamMap[team.teamType_id] = team;
-      }
-
-      this.event.sortedTeamTypes.forEach(tt => {
-        let team = teamMap[tt._id];
-        frag.appendChild(Dom.h({span: team ? team.shortName : ""}));
-      });
-      return frag;
-    },
-
     scores() {
       const frag = document.createDocumentFragment();
       const parentCtx = Dom.ctx($.element.parentNode);

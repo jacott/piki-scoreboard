@@ -1,0 +1,71 @@
+<template name="SpeedEvent">
+  <div class="Category Speed">
+    <h1>{{category.name}}</h1>
+    <nav class="viewMenu">
+      <button name="toggleStartOrder" class="on">{{modeSwitchLabel}}</button>
+      {{field "selectHeat" selectList=heats type="selectMenu"}}
+    </nav>
+    <h1 class="selectedHeat">{{heatName}} - {{mode}}</h1>
+  </div>
+  <template name="GeneralList">
+    <table class="select results GeneralList">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Climber</th>
+          {{finalHeadings}}
+          <th>Qual</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </template>
+  <template name="GeneralRow">
+    <tr>
+      <td class="rank">{{rank}}</td>
+      {{climber}}
+      {{finalScores}}
+      <td class="score">{{qualScore}}</td>
+    </tr>
+  </template>
+  <template name="QualResults">
+    <table class="select results quals">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Climber</th>
+          <th>Lane A</th>
+          <th>Lane B</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </template>
+  <template name="RankRow">
+    <tr {{markWinner}}>
+      <td class="rank">{{rank}}</td>
+      {{climber}}
+      <td class="score" {{scoreA}}></td>
+      <td class="score" {{scoreB}}></td>
+    </tr>
+  </template>
+  <template name="ABList">
+    <table class="select results ABList">
+      <thead>
+        <tr>
+          <th colspan="2">Lane A</th>
+          <th colspan="2">Lane B</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </template>
+  <template name="ABRow">
+    <tr {{markWinner}}>
+      {{climberA}}
+      <td class="score" {{scoreA}}></td>
+      <td class="score" {{scoreB}}></td>
+      {{climberB}}
+    </tr>
+  </template>
+</template>

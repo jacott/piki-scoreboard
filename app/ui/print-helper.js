@@ -34,7 +34,7 @@ define((require)=>{
         Dom.toggleClass(me, 'selected');
       }
 
-      me = (Dom.hasClass(me, 'selected') ? me : selected[0]);
+      me = Dom.hasClass(me, 'selected') ? me : selected[0];
 
       onChange && onChange(me, selected, parent);
     },

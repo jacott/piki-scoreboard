@@ -12,8 +12,10 @@ define((require, exports, module)=>{
   const Result          = require('models/result');
   const Series          = require('models/series');
   const TeamType        = require('models/team-type');
+  const EventHelper     = require('ui/event-helper');
   const PrintHelper     = require('ui/print-helper');
   const SeriesTpl       = require('ui/series');
+  const SpeedEvent      = require('ui/speed-event');
   const App             = require('./app');
 
   const Tpl   = Dom.newTemplate(require('koru/html!./event'));
@@ -23,11 +25,18 @@ define((require, exports, module)=>{
 
   Route.root.defaultPage = Index;
 
+  const heatOrderType = (catId)=>{
+    const type = Tpl.event.heats[catId];
+    return type === undefined
+      ? undefined
+      : type[0] === 'S' ? 'S' : type;
+  };
+
   const compareCategories = (a, b)=>{
     const ai = a._id, bi = b._id;
     if (ai === bi) return 0;
     var ac, bc;
-    if (((ac = Tpl.event.heatTypes(ai)) === (bc = Tpl.event.heatTypes(bi))) &&
+    if (((ac = heatOrderType(ai)) === (bc = heatOrderType(bi))) &&
         ((ac = a.group) === (bc = b.group)) &&
         ((ac = a.name) === (bc = b.name))) {
       return ai < bi ? -1 : 1;
@@ -43,6 +52,7 @@ define((require, exports, module)=>{
   const base = Route.root.addBase(module, Tpl, 'eventId');
   base.async = true;
   module.onUnload(()=>{
+    Tpl.event = null;
     Route.root.defaultPage = null;
     Route.root.removeBase(Tpl);
   });
@@ -62,7 +72,7 @@ define((require, exports, module)=>{
         : null;
 
     if (! button) {
-      if (Dom.Event.Register.$contains(page))
+      if (Dom.Event.Register !== undefined && Dom.Event.Register.$contains(page))
         button =  tabList.querySelector('[name="Register"]');
     }
 
@@ -84,7 +94,7 @@ define((require, exports, module)=>{
       .map(cat_id => cats[cat_id]).sort(compareCategories)
       .forEach(doc =>{
         if (doc == null) return;
-        const thisType = Tpl.event.heatTypes(doc._id);
+        const thisType = heatOrderType(doc._id);
         if (lastType !== thisType) {
           lastType = thisType;
           const fr = FORMAT_ROW.cloneNode(true);
@@ -411,6 +421,39 @@ define((require, exports, module)=>{
     }
   });
 
+  const {SPEED_FINAL_NAME} = EventHelper;
+
+  const renderSpeedHeats = (cat, type) =>{
+    const frag = document.createDocumentFragment();
+    const isResults = Tpl.Show.results;
+
+    const format = Tpl.event.attributes.heats[cat._id];
+    const start = format[1] === 'C' ? 2 : 1;
+
+    frag.appendChild(createHeatTD('Quals', cat, type, 0));
+
+    for (let i = start; i < format.length; ++i) {
+      const heat = format[i];
+      frag.appendChild(createHeatTD(SPEED_FINAL_NAME[heat], cat, type, heat));
+    }
+
+    const elm = document.createElement('td');
+    elm.setAttribute('colspan', 5 - format.length + start);
+    frag.appendChild(elm);
+
+
+    return frag;
+  };
+
+  const createHeatTD = (name, cat, type, heatNumber)=>{
+    const elm = document.createElement('td');
+    elm.appendChild(Form.pageLink({
+      value: name, template: "Event.Category", append: cat._id,
+      search: type + "&heat="+(heatNumber === 'R' ? 1 : heatNumber),
+    }));
+    return elm;
+  };
+
   Tpl.CatList.$helpers({
     catID() {
       return "cat_"+this._id;
@@ -418,6 +461,10 @@ define((require, exports, module)=>{
 
     heats() {
       const cat = this;
+      const type = listType();
+      if (cat.type === 'S') {
+        return renderSpeedHeats(cat, type);
+      }
       const frag = document.createDocumentFragment();
       const counts = Tpl.scoreCounts[cat._id] || [];
       const format = Tpl.event.heats[cat._id] || cat.type + cat.heatFormat;
@@ -425,14 +472,7 @@ define((require, exports, module)=>{
       let total = heat.total;
       if (Tpl.Show.results) ++total;
 
-      const addHeat = (i)=>{
-        const elm = document.createElement('td');
-        elm.appendChild(Form.pageLink({
-          value: heat.getName(i), template: "Event.Category", append: cat._id,
-          search: listType() + "&heat="+i,
-        }));
-        frag.appendChild(elm);
-      };
+      const addHeat = (i)=>{frag.appendChild(createHeatTD(heat.getName(i), cat, type, i))};
 
       let i = 1;
       for(; i < total && counts[i]; ++i) {
@@ -490,17 +530,17 @@ define((require, exports, module)=>{
     'click .select': PrintHelper.clickSelect((me, selected, parent)=>{
       const action = parent.getElementsByClassName('action')[0];
 
-      const firstFormat = me && Tpl.event.heatTypes($.data(me)._id);
+      const fmt = me && heatOrderType($.data(me)._id);
 
-      if (firstFormat) {
+      if (fmt != null) {
         for(let i = 0; i < selected.length; ) {
-          if (Tpl.event.heatTypes($.data(selected[i])._id) !== firstFormat)
+          if (heatOrderType($.data(selected[i])._id) !== fmt)
             Dom.removeClass(selected[i], 'selected');
           else
             ++i;
         }
       }
-      Dom.ctx(action).updateAllTags({fmt: firstFormat});
+      Dom.ctx(action).updateAllTags({fmt, selected});
     }),
 
     'click .printResults'(event) {
@@ -509,13 +549,29 @@ define((require, exports, module)=>{
       const parent = event.currentTarget;
       const selected = parent.getElementsByClassName('selected');
 
-
       const elm = document.createElement('section');
       elm.className = 'print-only';
+      const ev = Tpl.event;
+      const {heats} = ev;
       for(let i = 0; i < selected.length; ++i) {
-        elm.appendChild(Tpl.Category.$render({
+        const category = $.data(selected[i]);
+
+        if (category.type === 'S' && heatNumber > 0) {
+          const fmt = heats[category._id];
+          let found = false;
+          for(let i = fmt.length; i > 0; --i) {
+            const code = fmt[i];
+            if (code === 'R' && heatNumber == 1 || +code == heatNumber) {
+              found = true; break;
+            }
+          }
+          if (! found) continue;
+        }
+        const template = category.type === 'S' ? SpeedEvent : Tpl.Category;
+        elm.appendChild(template.$render({
+          event_id: ev._id,
           showingResults: Tpl.Show.results, heatNumber: heatNumber,
-          category_id: $.data(selected[i])._id}));
+          category}));
       }
       parent.parentNode.appendChild(elm);
       Dom.addClass(parent, 'no-print');
@@ -536,13 +592,13 @@ define((require, exports, module)=>{
 
   Tpl.Show.Action.$helpers({
     content() {
-      if (this.fmt) {
+      if (this.fmt != null) {
         const frag = document.createDocumentFragment();
         const elm = document.createElement('span');
         elm.textContent = "Print ";
         frag.appendChild(elm);
 
-        const heat = (number, name)=>{
+        const addButton = (number, name)=>{
           if (number < -1 || number === 99) return;
           const elm = document.createElement('button');
           elm.textContent = name;
@@ -551,9 +607,25 @@ define((require, exports, module)=>{
           frag.appendChild(elm);
         };
 
-        Tpl.Show.results && heat(-1, 'General');
 
-        new Heat(-1, this.fmt).headers(heat);
+        Tpl.Show.results && addButton(-1, 'General');
+        if (this.fmt === 'S') {
+          addButton(0, 'Quals');
+          const formats = [];
+          for (const elm of this.selected) {
+            const fmt = Tpl.event.heats[$.data(elm)._id];
+            for(let i = fmt.length - 1; i > 0; --i) {
+              const code = fmt[i] === 'R' ? 1 : +fmt[i];
+              formats[code] = true;
+            }
+          }
+          for (let i = formats.length; i >= 0 ; --i) {
+            formats[i] && addButton(i, SPEED_FINAL_NAME[i]);
+          }
+
+        } else {
+          new Heat(-1, this.fmt).headers(addButton);
+        }
 
         return frag;
       } else

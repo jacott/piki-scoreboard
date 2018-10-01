@@ -124,7 +124,7 @@ define((require)=>{
     }
 
     scoreToNumber(score, index) {
-      if (score.trim() === '')
+      if (score == null || score.trim() === '')
         return;
 
       if (index === 99) {

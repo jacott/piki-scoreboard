@@ -60,7 +60,7 @@ define((require)=>{
     Category(options) {
       return new Factory.Builder('Category', options).genName()
         .addRef('org')
-        .addField('heatFormat', 'QQF8')
+        .addField('heatFormat', options.type === 'S' ? undefined : 'QQF8')
         .addField('group', 'A male')
         .addField('type', 'L')
         .addField('gender', 'm')
@@ -118,7 +118,7 @@ define((require)=>{
         const heats = {};
         options.heats.forEach(heat =>{
           const category = Model.Category.findById(heat);
-          heats[heat] = category.type + category.heatFormat;
+          heats[heat] = category.type + (category.heatFormat||'');
         });
         options.heats = heats;
       }

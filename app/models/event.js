@@ -5,6 +5,7 @@ define((require, exports, module)=>{
   const Model           = require('model');
   const Series          = require('models/series');
   const TeamType        = require('models/team-type');
+  const User            = require('models/user');
   const Category        = require('./category');
   const Org             = require('./org');
 
@@ -57,10 +58,14 @@ define((require, exports, module)=>{
       while ((m = re.exec(compFormat)) !== null) {
         compFormatList.push(m[0]);
       }
-      if (format[0] === 'L')
+      switch(format[0]) {
+      case 'L':
         return describeLeadFormat(compFormatList);
-      else
+      case 'B':
         return describeBoulderFormat(compFormatList);
+      case 'S':
+        return "Qualifiers; Finals";
+      }
     }
 
     validate() {
@@ -69,20 +74,22 @@ define((require, exports, module)=>{
         const cat = Category.findById(id);
         Val.allowAccessIf(cat.org_id === this.org_id);
         const format = heats[id];
-        if (format[0] !== cat.type || ! format.slice(1).match(Category.HEAT_FORMAT_REGEX)) {
+        if (format[0] !== cat.type || ! cat.heatFormatRegex.test(format.slice(1))) {
           Val.addError(this, 'heats', 'is_invalid');
         }
       }
-    }
-
-    heatTypes(cat_id) {
-      return this.attributes.heats[cat_id];
     }
 
     get displayName() {
       const series = this.series;
       if (series) return `${series.name} - ${this.name}`;
       return this.name;
+    }
+
+    canJudge(userOrId=User.me()) {
+      const user = typeof userOrId === 'string' ? User.findById(userOrId) : userOrId;
+      return user != null &&
+      ! this.closed && user.canJudge(this);
     }
   }
 

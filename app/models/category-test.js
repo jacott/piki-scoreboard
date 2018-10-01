@@ -60,6 +60,8 @@ define((require, exports, module)=>{
       assertInvalid('QF2', 'not_allowed');
       assertValid('');
       assert.same(cat.heatFormat, undefined);
+
+      assert.equals(cat.heatFormatRegex, m.equal(/^C?[R1-4]*$/));
     });
   });
 });

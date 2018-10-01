@@ -5,8 +5,14 @@ define((require, exports, module)=>{
   const Org             = require('./org');
 
   const HEAT_FORMAT_REGEX = /^Q{0,10}(:\d+)?(F\d+(:\d+)?){0,3}$/;
+  const HEAT_FORMAT_REGEXS = {
+    L: HEAT_FORMAT_REGEX,
+    B: HEAT_FORMAT_REGEX,
+    S: /^C?[R1-4]*$/,
+  };
 
   class Category extends Model.BaseModel {
+    get heatFormatRegex() {return HEAT_FORMAT_REGEXS[this.type]}
   }
 
   Category.define({module, fields: {

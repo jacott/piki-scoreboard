@@ -16,11 +16,21 @@
 
   >#PageTitle {
     position: absolute;
-    left: 50%; bottom: 0;
+    left: 50%;
     height: 2.5em;
     line-height: 1.2em;
-    background-color: @colorHeaderBackground;
-    color: #fff;
+    @media screen {
+      & {
+        bottom: 0;
+        background-color: @colorHeaderBackground;
+        color: #fff;
+      }
+    }
+    @media print {
+      & {
+        top: 0;
+      }
+    }
     text-decoration: none;
     padding: 5px;
     transform: translate(-50%, 0%);

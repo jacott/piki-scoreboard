@@ -10,6 +10,29 @@ define((require, exports, module)=>{
   const Heat            = require('./heat');
   const User            = require('./user');
 
+  const ALT_TIMES = {
+    fall: true,
+    fs: true,
+    '-': true,
+    'wc': true,
+    'tie': true,
+  };
+
+  const SPEED_OPTIONS_SPEC = Val.matchFields({
+    time: {type: 'any', validate() {
+      const {time} = this || undefined;
+      if (typeof time === 'number') {
+        if (time === Math.floor(time) && time > 0 && time <= 6*60*1000) return;
+      } else {
+        if (time === undefined || ALT_TIMES[time] !== undefined) return;
+      }
+      Val.addError(this, 'time', 'is_invalid');
+    }},
+    attempt: {type: 'number', required: true, number: {integer: true, $gt: 0, $lt: 50}},
+    stage: {type: 'number', number: {integer: true, $gte: 0, $lte: 4}},
+    opponent_id: {type: 'id'}
+  });
+
   class Result extends Model.BaseModel {
     unscoredHeat() {
       return this.scores.length;
@@ -42,16 +65,18 @@ define((require, exports, module)=>{
 
   Result.registerObserveField('event_id');
 
+  const assertCanJudge = (event, userId)=>{
+    Val.allowAccessIf(event != null && event.canJudge(userId));
+  };
+
   Result.remote({
     setScore(id, index, score) {
       Val.ensureString(id, score);
       Val.ensureNumber(index);
 
-      var user = User.findById(this.userId);
-      var result = Result.findById(id);
-      var event = result.event;
-
-      Val.allowAccessIf(! event.closed && user && user.canJudge(event));
+      const result = Result.findById(id);
+      const {event} = result;
+      assertCanJudge(event, this.userId);
 
       var heat = new Heat(index, event.heats[result.category_id]);
 
@@ -69,6 +94,53 @@ define((require, exports, module)=>{
         [`${index}.$partial`, ['$replace', heat.scoreToNumber(score) || null]]);
     },
 
+    setSpeedScore(id, options) {
+      const result = Result.findById(id);
+      const {event} = result;
+      assertCanJudge(event, this.userId);
+
+
+      Val.assertCheck(options, SPEED_OPTIONS_SPEC);
+
+      const scores = util.deepCopy(result.scores);
+      const attemptIdx = options.attempt - 1;
+      const {time} = options;
+      const stage = options.stage || 0;
+
+      if (stage !== 0) {
+        // finals
+        const {opponent_id} = options;
+        if (opponent_id === undefined) {
+          Val.allowIfValid(stage === 1);
+          const score = scores[2] || (scores[2] = []);
+          score[attemptIdx] = time;
+        } else {
+          Val.allowIfValid(opponent_id !== undefined && opponent_id !== result._id);
+          const opponent = Result.findById(opponent_id);
+          Val.allowIfValid(
+            opponent !== undefined && opponent.event_id === result.event_id &&
+              opponent.category_id === result.category_id);
+
+          const stageIdx = stage + 1;
+          const score = scores[stageIdx] || (scores[stageIdx] = {});
+          if (attemptIdx == 0) {
+            if (time === undefined)
+              scores[stageIdx] = null;
+            else
+              score.time = time;
+          } else
+            (score.tiebreak || (score.tiebreak = []))[attemptIdx-1] = time;
+          score.opponent_id = options.opponent_id;
+        }
+      } else {
+        //qualifiers
+        const score = scores[1] || (scores[1] = []);
+        score[attemptIdx] = time;
+      }
+
+      result.$update({scores});
+    },
+
     setBoulderScore(id, index, problem, bonus, top) {
       Val.ensureString(id);
       if (bonus === "dnc" || bonus == null)
@@ -76,13 +148,11 @@ define((require, exports, module)=>{
       else
         Val.ensureNumber(index, problem, bonus, top);
 
-      var user = User.findById(this.userId);
-      var result = Result.findById(id);
-      var event = result.event;
+      const result = Result.findById(id);
+      const {event} = result;
+      assertCanJudge(event, this.userId);
 
-      Val.allowAccessIf(user && user.canJudge(event));
-
-      var heat = new Heat(index, event.heats[result.category_id]);
+      const heat = new Heat(index, event.heats[result.category_id]);
 
       --problem;
       var changes = {};
@@ -177,7 +247,7 @@ define((require, exports, module)=>{
 
   const buildHeat = (doc, newHeats)=>{
     const category  = Category.findById(doc.category_id);
-    return [doc.category_id, category.type + category.heatFormat];
+    return [doc.category_id, category.type + (category.heatFormat || '')];
   };
 
   module.onUnload(Competitor.beforeCreate(doc =>{addResults(doc.category_ids || [], doc)}));

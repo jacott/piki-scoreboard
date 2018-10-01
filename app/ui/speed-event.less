@@ -1,0 +1,49 @@
+@import "global.lessimport";
+
+#Event .Speed {
+  td.score {
+    min-width: 4em;
+    text-align: right;
+  }
+
+  td.score [data-attempt] {
+    display: block;
+  }
+  td.score input:invalid[data-attempt] {
+    border: 1px solid #aaa;
+    border-radius: 4px;
+  }
+
+  .ABList {
+    th {
+      text-align: center;
+    }
+    th:last-child, td:nth-child(3) {
+      border-left: 3px solid #444;
+    }
+    tr>td.score input {
+      padding: 4px;
+    }
+    tr:hover input {
+       background-color: #fff;
+    }
+  }
+
+  tr.winner,
+  tr[winner=a]>td.climber:first-child,
+  tr[winner=b]>td.climber:last-child {
+    background-color: #a0ffa0 !important;
+    .box-shadow-level(2);
+  }
+
+  .nextStage, .reopen {
+    margin: 20px;
+    .info {
+      font-size: 1.2em;
+      margin-top: 20px;
+      padding: 20px;
+      border: 1px solid #a00;
+      border-radius: 8px;
+    }
+  }
+}
