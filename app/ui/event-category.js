@@ -180,6 +180,21 @@ define((require, exports, module)=>{
     if (row) return {id: row.id, tabIndex, name};
   };
 
+  const saveAndMove = (elm, which) => {
+    Dom.stopEvent();
+    const oldFocus = focusField;
+    switch(which) {
+    case 38: // up arrow / shift tab
+      focusField = nextField(document.activeElement, -1);
+      break;
+    case 40: // down arrow / tab
+      focusField = nextField(document.activeElement, 1);
+      break;
+    }
+    saveScore(elm);
+    (getFocusElm()||elm).focus();
+  };
+
   eventTpl.route.addTemplate(module, Tpl, {
     focus: '.Category [name=selectHeat]',
     data: (page,pageRoute)=>{
@@ -304,8 +319,14 @@ define((require, exports, module)=>{
 
     'keydown td.score input'(event) {
       const elm = event.target;
-      switch(event.which) {
-      case 27:
+      const {which} = event;
+      // arrow keys
+      if (which >= 37 && which <= 40) {
+        saveAndMove(elm, which);
+        return;
+        }
+      switch(which) {
+      case 27: // escape
         focusField = null;
         if (Dom.hasClass(this, 'score')) {
           elm.value = elm[orig$];
@@ -316,37 +337,19 @@ define((require, exports, module)=>{
         document.activeElement.blur();
         break;
 
-      case 13:
+      case 13: // return
         Dom.stopEvent();
         if (saveScore(elm)) {
           focusField = null;
           document.activeElement.blur();
         }
         break;
-      case 9:
-        const oldFocus = focusField;
-        focusField = nextField(document.activeElement, event.shiftKey ? -1 : 1);
-
-        const res  = saveScore(elm);
-        if (! res) {
-          if (res === null && oldFocus.id === focusField.id) {
-            return;
-          }
-
-          focusField = oldFocus;
-          Dom.stopEvent();
-          document.activeElement.select();
-          return;
-        }
-        if (document.activeElement === elm) {
-          Dom.remove(this.parentNode.querySelector('.errorMsg'));
-          return;
-        }
-        Dom.stopEvent();
+      case 9: { // tab
+        saveAndMove(elm, event.shiftKey ? 38 : 40);
         break;
       }
+      }
     },
-
 
     'pointerdown td.score'(event) {
       const elm = event.target;
