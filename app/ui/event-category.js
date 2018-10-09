@@ -140,6 +140,7 @@ define((require, exports, module)=>{
     let name, row = elm.parentNode.parentNode;
 
     if (Dom.hasClass(row, 'BoulderScore')) {
+      // row = current tr
       row = row.parentNode;
 
       name = Dom.hasClass(elm, 'top') ? 'bonus' : 'top';
@@ -148,19 +149,23 @@ define((require, exports, module)=>{
       else if (direction < 0 && name === 'bonus')
         row = row.previousElementSibling;
 
+      // if there is no next row, move to next column
       if (row === null) {
         elm = document.querySelector('.results tr:'+
                                      (direction > 0 ? 'first' : 'last')+'-child>td.score input'+
                                      '[tabIndex="'+(tabIndex+direction)+'"]');
+        // if there is no next column
         if (elm === null) return null;
 
         tabIndex = +elm.getAttribute('tabIndex');
 
+        // row = new tr
         row = elm.parentNode.parentNode.parentNode;
       }
 
     } else {
       name = 'score';
+      // not invoked in boulder?
       row = direction > 0 ? row.nextElementSibling : row.previousElementSibling;
 
       if (row === null) {
@@ -180,6 +185,37 @@ define((require, exports, module)=>{
     if (row) return {id: row.id, tabIndex, name};
   };
 
+  const nextHorizField = (elm, direction)=>{
+    let tabIndex = +elm.getAttribute('tabIndex');
+    let cell = elm.parentNode;
+    let name, row = cell.parentNode;
+
+    if (Dom.hasClass(row, 'BoulderScore')) {
+      // row = the current tr
+      row = row.parentNode;
+      // name = the next input field
+      name = Dom.hasClass(elm, 'top') ? 'bonus' : 'top';
+
+      if (direction > 0 && name === 'top') {
+        cell = cell.nextElementSibling;
+        tabIndex += direction;
+      } else if (direction < 0 && name === 'bonus') {
+        cell = cell.previousElementSibling;
+        tabIndex += direction;
+      }
+
+      // if at end of row
+      if (cell === null) {
+        tabIndex = (direction > 0) ? 1 : +row.children[1].lastElementChild.firstElementChild.getAttribute('tabIndex');
+        row = (direction > 0) ? row.nextElementSibling : row.previousElementSibling;
+        // if at end of table
+        if (row === null) return null;
+      }
+    }
+
+    if (row) return {id: row.id, tabIndex, name};
+  };
+
   const saveAndMove = (elm, which) => {
     Dom.stopEvent();
     const oldFocus = focusField;
@@ -189,6 +225,12 @@ define((require, exports, module)=>{
       break;
     case 40: // down arrow / tab
       focusField = nextField(document.activeElement, 1);
+      break;
+    case 37: // left arrow
+      focusField = nextHorizField(document.activeElement, -1);
+      break;
+    case 39: // right arrow
+      focusField = nextHorizField(document.activeElement, 1);
       break;
     }
     saveScore(elm);
