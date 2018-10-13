@@ -1,8 +1,9 @@
 define(function(require, exports, module) {
-  const koru          = require('koru');
-  const Dom           = require('koru/dom');
-  const session       = require('koru/session');
-  const NetworkSync   = require('ui/network-sync');
+  const koru            = require('koru');
+  const Dom             = require('koru/dom');
+  const session         = require('koru/session');
+  const IDB             = require('lib/idb');
+  const NetworkSync     = require('ui/network-sync');
 
   let onChangeHandle, stopPending;
 
@@ -87,7 +88,8 @@ define(function(require, exports, module) {
   }
 
   function confirmLeave(ev) {
-    if (session.state.pendingUpdateCount() > 0) {
+    const {idb} = IDB;
+    if (idb == null ? session.state.pendingUpdateCount() > 0 : ! idb.isReady) {
       ev.returnValue = "You have unsaved changes.";
     }
   }
