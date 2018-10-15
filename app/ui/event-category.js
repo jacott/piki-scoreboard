@@ -148,7 +148,7 @@ define((require, exports, module)=>{
 
         tabIndex = +elm.getAttribute('tabIndex');
 
-        // row = new tr
+        // row = tr
         row = elm.parentNode.parentNode.parentNode;
       }
 
@@ -207,7 +207,6 @@ define((require, exports, module)=>{
 
   const saveAndMove = (elm, which) => {
     Dom.stopEvent();
-    const oldFocus = focusField;
     switch(which) {
     case 38: // up arrow / shift tab
       focusField = nextField(document.activeElement, -1);
@@ -223,7 +222,9 @@ define((require, exports, module)=>{
       break;
     }
     saveScore(elm);
-    (getFocusElm()||elm).focus();
+    const focusElm = getFocusElm() || elm;
+    focusElm.focus();
+    focusElm.select();
   };
 
   eventTpl.route.addTemplate(module, Tpl);
