@@ -15,7 +15,110 @@ isClient && define((require, exports, module)=>{
   const $ = Dom.current;
 
   TH.testCase(module, ({before, after, beforeEach, afterEach, group, test})=>{
-    let org, user, cat, event;
+    let org, user, cat, event, climbers;
+
+    const gotoNextStage = (stageName, tiebreak)=>{
+      TH.click('.nextStage');
+      if (tiebreak) {
+        assert.dom('.nextStage>.info', /Ties need to be broken/);
+      } else {
+        TH.confirm();
+        assert.dom('#Event .Speed .selectedHeat', stageName+' - Results');
+        const format = event.heats[cat._id];
+        goto('startlists', format[format.length-1]);
+      }
+    };
+
+
+    const withStartlist = (text)=>{
+      let so = 0.1234;
+      climbers = [];
+      for(const name of text.split(/\s+/)) {
+        if (name === '') continue;
+        climbers.push(Factory.createClimber({name}));
+        const competitor = Factory.createCompetitor();
+        so += 0.0001;
+        Factory.createResult({_id: 'r'+name, scores: [so]});
+      }
+      TH.loginAs(Factory.createUser('admin'));
+      goto('startlists', 0);
+      assert.dom('#Event .Speed table.results>tbody', tbody =>{
+        assert.dom('tr', {count: climbers.length});
+        const rows = tbody.querySelectorAll("tr");
+        for(let i = 0; i < climbers.length; ++i) {
+          assert.dom(`tr:nth-child(${i+1})`, tr =>{
+            assert.dom('td:first-child.climber .name', climbers[i].name);
+          });
+        }
+      });
+    };
+
+    const resultsAre = (stageName, results, tiebreak)=>{
+      assert.dom('#Event .Speed', ()=>{
+        assert.dom('.selectedHeat', stageName+' - Start list');
+        let i = 0;
+        for (const row of results.split('\n')) {
+          if (row === '') continue;
+          const parts = row.split(/\s+/);
+          assert.dom(`tbody tr:nth-child(${++i})`, tr =>{
+            assert.dom('td:first-child.climber .name', parts[0]);
+            TH.change('td:nth-child(2) input', parts[1]);
+            assert.dom('td:last-child.climber .name', parts[2]);
+            TH.change('td:nth-child(3) input', parts[3]);
+          });
+        }
+      });
+
+      gotoNextStage(stageName, tiebreak);
+    };
+
+    const tiebreaksAre = (stageName, attempt, results, tiebreak)=>{
+      assert.dom('#Event .Speed', ()=>{
+        assert.dom('.selectedHeat', stageName+' - Start list');
+        for (const row of results.split('\n')) {
+          if (row === '') continue;
+          const parts = row.split(/\s+/);
+          assert.dom('td:first-child.climber .name', {text: parts[0], parent: p =>{
+            assert.domParent(`td:nth-child(2) input[data-attempt="${attempt}"]`, input =>{
+              TH.change(input,parts[1]);
+            });
+          }});
+        }
+      });
+
+      gotoNextStage(stageName, tiebreak);
+    };
+
+    const generalResultsAre = (results)=>{
+      goto('results', -1);
+      assert.dom('#Event .Speed', ()=>{
+        let i = -1;
+        for (const row of results.split('\n')) {
+          if (row === '') continue;
+          if (++i == 0) {
+            assert.dom('thead', ()=>{
+              let j = 0;
+              for (const heading of row.split(/\s+/)) {
+                ++j;
+                assert.dom(`th:nth-child(${j})`, heading);
+              }
+            });
+          } else {
+            assert.dom(`tbody tr:nth-child(${i})`, tr =>{
+              let j = 0;
+              for (let v of row.split(/\s+/)) {
+                if (v === '_') v = '';
+                ++j;
+                if (j == 2)
+                  assert.dom(`td:nth-child(${j}).climber .name`, v);
+                else
+                  assert.dom(`td:nth-child(${j})`, v);
+              }
+            });
+          }
+        }
+      });
+    };
 
     const goto = (type, heatNumber)=>{
       Route.replacePage(EventCategory, {
@@ -54,6 +157,85 @@ isClient && define((require, exports, module)=>{
 
     afterEach(()=>{
       TH.tearDown();
+    });
+
+    group("scenarios", ()=>{
+      test("small field", ()=>{
+        withStartlist(`
+Ron
+Hermione
+Ginny
+Luna
+Harry
+`);
+        resultsAre('Qualifiers', `
+Ron 9.876 Luna 9.764
+Hermione 10.342 Harry 11.654
+Ginny 8.900 Ron 9.511
+Luna 9.999 Hermione 10.566
+Harry 10.256 Ginny 10.000
+`);
+
+        resultsAre('Semi final', `
+Ginny 7.900 Harry 8.511
+Ron 7.900 Luna 8.933
+`);
+
+        resultsAre('Final', `
+Ginny 6.899 Ron 7.122
+Harry 7.122 Luna 7.121
+`);
+
+        generalResultsAre(`
+Rank Climber  Final Semi-final Qual
+1    Ginny    6.89  7.90       8.90
+2    Ron      7.12  7.90       9.51
+3    Luna     7.12  8.93       9.76
+4    Harry    7.12  8.51       10.25
+5    Hermione    _     _       10.34
+`);
+      });
+
+      test("tiebreak", ()=>{
+        withStartlist(`
+Ron
+Hermione
+Ginny
+Luna
+Harry
+`);
+
+        resultsAre('Qualifiers', `
+Ron 9.876 Luna 9.876
+Hermione 9.876 Harry 9.876
+Ginny 9.876 Ron 9.876
+Luna 9.876 Hermione 9.876
+Harry 9.876 Ginny 9.876
+`, 'tiebreak');
+
+        tiebreaksAre('Qualifiers', 1, `
+Ron 9.8
+Hermione 9.8
+Ginny 9.7
+Luna 9.6
+Harry 9.7
+`, 'tiebreak');
+
+        tiebreaksAre('Qualifiers', 2, `
+Ron 9.8
+Hermione 9.7
+`);
+
+        generalResultsAre(`
+Rank Climber   Semi-final Qual
+1    Ginny        _       9.87
+1    Hermione     _       9.87
+1    Luna         _       9.87
+1    Harry        _       9.87
+5    Ron          _       9.87
+`);
+
+      });
     });
 
     test("render qual startlist", ()=>{
