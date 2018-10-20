@@ -17,7 +17,7 @@
   "author": "Geoff Jacobsen <geoffjacobsen@gmail.com>",
   "dependencies": {
     "csv-parse": "^2.5.0",
-    "koru": "^0.26.1",
+    "koru": "^0.27.0",
     "pg-libpq": "^2.2.3"
   },
   "engines": {

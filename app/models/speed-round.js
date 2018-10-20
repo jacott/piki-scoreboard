@@ -479,22 +479,17 @@ define((require, exports, module)=>{
       const {entries} = this;
       const {size} = entries;
       const step = (3+size)>>1;
-      let nodeB;
 
-      let cursorB = entries.cursor();
-      for(let i = 0; i < step; ++i) nodeB = cursorB.next();
+      let iterB = entries.values(), ansB;
+      for(let i = 0; i < step; ++i) ansB = iterB.next();
 
-      const cursorA = entries.cursor();
-      const half = cursorB;
-      let nodeA = cursorA.next();
-      while (nodeA !== null)  {
-        if (nodeB === null) {
-          cursorB = entries.cursor(); nodeB = cursorB.next();
+      for (const resA of entries) {
+        if (ansB.done) {
+          iterB = entries.values(); ansB = iterB.next();
         }
-        nodeA.value[laneB$] = nodeB.value;
-        nodeB.value[laneA$] = nodeA.value;
-        nodeA = cursorA.next();
-        nodeB = cursorB.next();
+        resA[laneB$] = ansB.value;
+        ansB.value[laneA$] = resA;
+        ansB = iterB.next();
       }
     }
 
