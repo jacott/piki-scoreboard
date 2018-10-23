@@ -22,13 +22,16 @@ isClient && define((require, exports, module)=>{
       if (tiebreak) {
         assert.dom('.nextStage>.info', /Ties need to be broken/);
       } else {
+        refute.dom('.nextStage>.info');
         TH.confirm();
-        assert.dom('#Event .Speed .selectedHeat', stageName+' - Results');
+        assert.dom(document.body, ()=>{
+          assert.dom('#Event .Speed .selectedHeat', stageName+' - Results');
+        });
         const format = event.heats[cat._id];
-        goto('startlists', format[format.length-1]);
+        const ns = format[format.length-1];
+        goto('startlists', ns === 'R' ? 1 : +ns);
       }
     };
-
 
     const withStartlist = (text)=>{
       let so = 0.1234;
@@ -67,9 +70,9 @@ isClient && define((require, exports, module)=>{
             TH.change('td:nth-child(3) input', parts[3]);
           });
         }
+        gotoNextStage(stageName, tiebreak);
       });
 
-      gotoNextStage(stageName, tiebreak);
     };
 
     const tiebreaksAre = (stageName, attempt, results, tiebreak)=>{
@@ -84,9 +87,8 @@ isClient && define((require, exports, module)=>{
             });
           }});
         }
+        gotoNextStage(stageName, tiebreak);
       });
-
-      gotoNextStage(stageName, tiebreak);
     };
 
     const generalResultsAre = (results)=>{
@@ -177,19 +179,23 @@ G
 H
 I
 J
+K
+L
 `);
         resultsAre('Qualifiers', `
-A 3.333 F fall
-B 4.444 G -
-C 2.222 H -
-D -     I fs
-E 5.555 J fs
+A 3.333 G -
+B 4.444 H -
+C 2.222 I fs
+D -     J fs
+E 5.555 K 6.666
+F fall  L 8.888
 
-F fall A 8.888
-G fall B 1.111
-H -    C fall
-I fall D 5.555
-J fs   E fs
+G fall  A 8.888
+H -     B 1.111
+I fall  C fall
+J fs    D 5.555
+K 9.999 E fs
+L 6.661 F fall
 `);
         generalResultsAre(`
 Rank Climber Semi-final Qual
@@ -197,12 +203,14 @@ Rank Climber Semi-final Qual
 2    C       _          2.22
 3    A       _          3.33
 4    D       _          5.55
-5    J       _          false_start
-5    G       _          fall
-5    I       _          false_start
-5    F       _          fall
-5    E       _          false_start
-10   H       _          _
+5    K       _          6.66
+5    L       _          6.66
+7    J       _          false_start
+7    G       _          fall
+7    I       _          false_start
+7    F       _          fall
+7    E       _          false_start
+12   H       _          _
 `);
             });
 
@@ -406,7 +414,53 @@ Rank Climber Semi-final 1/4-final  Round_of_16  Qual
 `);
       });
 
-      // test("repeat Qual", ()=>{});
+      test("repeat Qual", ()=>{
+        withStartlist(`
+A
+B
+C
+D
+E
+F
+G
+`);
+
+        resultsAre('Qualifiers', `
+A fs   E 1.11
+B fall F 3.33
+C fs   G 8.88
+D 1.11 A -
+E fall B fall
+F 8.88 C -
+G 3.34 D fs
+`); // TODO make G 3.33
+
+        resultsAre('Final', `
+A fall E 1.11
+B 2.22 F fs
+C 1.11 G fall
+D 8.88 A fall
+E 8.88 B 8.88
+F -    C 8.88
+G fall D 2.22
+`, 'tiebreak');
+
+        tiebreaksAre('Final', 1, `
+B 8.88
+D 1.11
+`);
+
+        generalResultsAre(`
+Rank Climber Final       Qual
+1    E       1.11        1.11
+2    C       1.11        false_start
+3    D       2.22        false_start
+4    B       2.22        fall
+5    F       false_start 3.33
+5    G       fall        3.33
+7    A       fall        false_start
+`);
+      });
 
       // test rankings in Qual when there is a tie for the quota for final
       test("quota tie ms precision", ()=>{
