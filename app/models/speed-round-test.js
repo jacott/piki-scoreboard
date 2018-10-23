@@ -123,7 +123,7 @@ isClient && define((require, exports, module)=>{
           res['r'+i].scores[2][2] = 6754+(i%4);
         }
 
-        assert.equals(round.complete(), {isComplete: true, hasTies: false, nextStage: -2});
+        assert.equals(round.complete(), {isComplete: true, hasTies: false, nextStage: -3});
 
         assert.equals(Array.from(round.query).map(r => r.scores[2]), [
           [6500, 6600, 6755], [6500, 6600, 6756], [6500, 6600, 6757],
@@ -496,8 +496,8 @@ isClient && define((require, exports, module)=>{
 
         round.rankResults();
 
-        assert.equals(toRanking(round), [1, 2, 3, 4, 4, 4, 4]);
         assert.equals(toResId(round), [7, 1, 2, 3, 4, 5, 6]);
+        assert.equals(toRanking(round), [1, 2, 3, 4, 5, 5, 5]);
       });
 
       test("petit final", ()=>{

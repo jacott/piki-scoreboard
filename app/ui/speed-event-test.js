@@ -2,6 +2,7 @@ isClient && define((require, exports, module)=>{
   const Dom             = require('koru/dom');
   const Route           = require('koru/ui/route');
   const util            = require('koru/util');
+  const Result          = require('models/result');
   const User            = require('models/user');
   const Factory         = require('test/factory');
   const App             = require('ui/app');
@@ -432,8 +433,8 @@ C fs   G 8.88
 D 1.11 A -
 E fall B fall
 F 8.88 C -
-G 3.34 D fs
-`); // TODO make G 3.33
+G 3.33 D fs
+`);
 
         resultsAre('Final', `
 A fall E 1.11
@@ -444,6 +445,8 @@ E 8.88 B 8.88
 F -    C 8.88
 G fall D 2.22
 `, 'tiebreak');
+
+        const resB = Result.findById('resB');
 
         tiebreaksAre('Final', 1, `
 B 8.88

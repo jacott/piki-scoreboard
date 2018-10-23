@@ -12,6 +12,8 @@ define((require, exports, module)=>{
   const NO_TIME = 1000000;
   const COMPARE = 'compare', SORT = 'sort', TIEBREAK = 'tiebreak';
 
+  const isQualFormat = stage => stage == 0 || stage == -2;
+
   const CONVERT_TIME = {
     wc: -1,
     fall: NO_TIME,
@@ -94,8 +96,12 @@ define((require, exports, module)=>{
   const compareQualResultCOMPARE = compareQualResult(1, COMPARE);
   const compareQualResultTIEBREAK = compareQualResult(1, TIEBREAK);
 
-  const compareQualRerunCOMPARE = compareQualResult(2, COMPARE);
   const compareQualRerunTIEBREAK = compareQualResult(2, TIEBREAK);
+  const compareQualRerunCOMPARE = (a,b)=>{
+    const ans = compareQualRerunTIEBREAK(a, b);
+    return ans == 0
+      ? compareQualResultCOMPARE(a, b) : ans;
+  };
   const compareQualRerunSORT = (a,b)=>{
     const ans = compareQualRerunTIEBREAK(a, b);
     return ans == 0
@@ -351,7 +357,7 @@ define((require, exports, module)=>{
       res.setSpeedScore({time: 'tie', stage, opponent_id: scores.opponent_id, attempt});
       return;
     }
-    const scores = res.scores[stage == -2 ? 2 : stage+1];
+    const scores = round.stageScores(res);
     const start = 2;
 
     let last = scores.length-1;
@@ -408,7 +414,7 @@ define((require, exports, module)=>{
 
     isComplete(res) {
       const {stage} = this;
-      if (stage == 0 || stage == -2) {
+      if (isQualFormat(stage)) {
         const quals = res.scores[stage == 0 ? 1 : 2];
         return quals !== undefined && quals[0] != null && quals[1] != null;
       }
@@ -433,7 +439,7 @@ define((require, exports, module)=>{
 
     calcStartList() {
       const {stage} = this;
-      if (stage == 0 || stage == -2)
+      if (isQualFormat(stage))
         return calcQualStartList(this);
 
       const len = Math.max(1<<stage, 4), hlen = len>>1;
@@ -495,7 +501,7 @@ define((require, exports, module)=>{
 
     rankResults() {
       const {stage} = this;
-      if (stage == 0 || stage == -2) return rankQualResults(this);
+      if (isQualFormat(stage)) return rankQualResults(this);
       if (stage == -1) return rankGeneralResults(this);
 
       this.calcStartList();
@@ -512,7 +518,21 @@ define((require, exports, module)=>{
         this.isTimeValid(res) && ++validCount;
       }
       if (isComplete) {
-        if (stage > 0) {
+        if (isQualFormat(stage)) {
+          const cutoff = stage == 0 ? 1<<countToStage(validCount) : 3;
+
+          if (stage == -2 || (validCount > 3 && validCount > cutoff)) {
+            for (const res of tiesOf(this, cutoff)) {
+              hasTies = true;
+              addTieAttempt(this, res);
+            }
+          }
+          if (! hasTies && isQualFormat(stage)) {
+            nextStage = stage == 0
+              ? validCount >= 4 ? countToStage(validCount) : -2
+            : -3;
+          }
+        } else {
           for (const res of this) {
             if (compareKnockout(res, res[laneB$], stage) == 0) {
               addTieAttempt(this, res);
@@ -524,25 +544,19 @@ define((require, exports, module)=>{
             if (stage > 1) --nextStage;
             else nextStage = -3;
           }
-        } else {
-          const cutoff = stage == 0 ? 1<<countToStage(validCount) : 3;
-
-          if (validCount > cutoff) {
-            for (const res of tiesOf(this, cutoff)) {
-              hasTies = true;
-              addTieAttempt(this, res);
-            }
-          }
-          if (! hasTies && stage == 0)
-            nextStage = validCount >= 4 ? countToStage(validCount) : -2;
         }
       }
       return {isComplete: isComplete && ! hasTies, hasTies, nextStage};
     }
 
+    stageScores(res) {
+      const {stage} = this;
+      return res.scores[stage == -2 ? 2 : stage+1];
+    }
+
     *attempts(res) {
       const {stage} = this;
-      const scores = res.scores[stage+1];
+      const scores = this.stageScores(res);
       if (scores == null) return;
       if (stage < 1) {
         const start = 2;

@@ -189,6 +189,9 @@ define((require, exports, module)=>{
 
   const calcSpeedFormat = ({stage}, fmt, nextStage)=>{
     let mx, mn;
+    if (stage == -2) {
+      return "SCR";
+    }
     if (stage == 0) {
       if (nextStage == -2)
         return "SR";
@@ -341,6 +344,7 @@ data.heatNumber}`});
     }
 
     elm = elm.nextSibling;
+
 
     if (index != 1 || round.stage > 0) {
       let attempt = 0;
