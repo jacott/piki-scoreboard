@@ -38,7 +38,7 @@ isClient && define((require, exports, module)=>{
         climbers.push(Factory.createClimber({name}));
         const competitor = Factory.createCompetitor();
         so += 0.0001;
-        Factory.createResult({_id: 'r'+name, scores: [so]});
+        Factory.createResult({_id: 'res'+name, scores: [so]});
       }
       TH.loginAs(Factory.createUser('admin'));
       goto('startlists', 0);
@@ -100,14 +100,14 @@ isClient && define((require, exports, module)=>{
               let j = 0;
               for (const heading of row.split(/\s+/)) {
                 ++j;
-                assert.dom(`th:nth-child(${j})`, heading);
+                assert.dom(`th:nth-child(${j})`, heading.replace(/_/g, ' ').trim());
               }
             });
           } else {
             assert.dom(`tbody tr:nth-child(${i})`, tr =>{
               let j = 0;
               for (let v of row.split(/\s+/)) {
-                if (v === '_') v = '';
+                v = v.replace(/_/g, ' ').trim();
                 ++j;
                 if (j == 2)
                   assert.dom(`td:nth-child(${j}).climber .name`, v);
@@ -160,43 +160,320 @@ isClient && define((require, exports, module)=>{
     });
 
     group("scenarios", ()=>{
-      test("small field", ()=>{
+
+      // TODO IFSC Rules do not address what rank to give to H, a registered competitor
+      // who does not climb at all. Lisia interprets this silence as meaning that H should have no
+      // rank in the competition - exactly as if H was not registered. Currently Piki gives H
+      // a rank lower than all other competitors.
+      test("qual rank", ()=>{
         withStartlist(`
-Ron
-Hermione
-Ginny
-Luna
-Harry
+A
+B
+C
+D
+E
+F
+G
+H
+I
+J
 `);
         resultsAre('Qualifiers', `
-Ron 9.876 Luna 9.764
-Hermione 10.342 Harry 11.654
-Ginny 8.900 Ron 9.511
-Luna 9.999 Hermione 10.566
-Harry 10.256 Ginny 10.000
+A 3.333 F fall
+B 4.444 G -
+C 2.222 H -
+D -     I fs
+E 5.555 J fs
+
+F fall A 8.888
+G fall B 1.111
+H -    C fall
+I fall D 5.555
+J fs   E fs
+`);
+        generalResultsAre(`
+Rank Climber Semi-final Qual
+1    B       _          1.11
+2    C       _          2.22
+3    A       _          3.33
+4    D       _          5.55
+5    J       _          false_start
+5    G       _          fall
+5    I       _          false_start
+5    F       _          fall
+5    E       _          false_start
+10   H       _          _
+`);
+            });
+
+      // test placement in stages of final
+      test("quota of 4", ()=>{
+                withStartlist(`
+A
+B
+C
+D
+E
+F
+G
+`);
+
+        resultsAre('Qualifiers', `
+A 3.333 E fall
+B 8.888 F 4.444
+C 2.222 G -
+D -     A fs
+E 5.555 B 8.888
+F fall  C 8.888
+G fall  D 1.111
 `);
 
         resultsAre('Semi final', `
-Ginny 7.900 Harry 8.511
-Ron 7.900 Luna 8.933
+D 9.999 E 1.111
+C 7.777 F 9.999
 `);
 
         resultsAre('Final', `
-Ginny 6.899 Ron 7.122
-Harry 7.122 Luna 7.121
+D 8.888 F 1.111
+E 9.999 C 2.222
 `);
 
         generalResultsAre(`
-Rank Climber  Final Semi-final Qual
-1    Ginny    6.89  7.90       8.90
-2    Ron      7.12  7.90       9.51
-3    Luna     7.12  8.93       9.76
-4    Harry    7.12  8.51       10.25
-5    Hermione    _     _       10.34
+Rank Climber Final Semi-final Qual
+1    C       2.22  7.77       2.22
+2    E       9.99  1.11       5.55
+3    F       1.11  9.99       4.44
+4    D       8.88  9.99       1.11
+5    B       _     _          8.88
+6    G       _     _          fall
+6    A       _     _          false_start
 `);
       });
 
-      test("tiebreak", ()=>{
+      test("quota of 8", ()=>{
+        withStartlist(`
+A
+B
+C
+D
+E
+F
+G
+H
+I
+J
+K
+L
+M
+N
+O
+P
+`);
+        resultsAre('Qualifiers', `
+A 9.9 I 9
+B 8.8 J fs
+C 7.7 K 9
+D 6.6 L 9
+E 5.5 M 9
+F 4.4 N 9
+G 3.3 O 9
+H 2.2 P 9
+I 1.1 A 9
+J -   B 9
+K 8.1 C 9
+L 7.1 D 9
+M 6.1 E 9
+N 5.1 F 9
+O 4.1 G 9
+P 3.1 H 9
+`);
+
+        resultsAre('Quarter final', `
+I 9.9 E 8.8
+G 1.1 O 8.8
+H fs  N wc
+P 8.8 F fall
+`);
+
+        resultsAre('Semi final', `
+E 1.1 G 3.3
+N 3.3 P 4.4
+`);
+
+        // TODO replace all "wc" in general results with "wildcard" for clarity
+        generalResultsAre(`
+Rank Climber Final Semi-final 1/4-final    Qual
+1    N       _     3.30       wc           5.10
+2    E       _     1.10       8.80         5.50
+3    G       _     3.30       1.10         3.30
+4    P       _     4.40       8.80         3.10
+5    O       _     _          8.80         4.10
+6    I       _     _          9.90         1.10
+7    H       _     _          fs           2.20
+8    F       _     _          fall         4.40
+9    M       _     _          _            6.10
+10   D       _     _          _            6.60
+11   L       _     _          _            7.10
+12   C       _     _          _            7.70
+13   K       _     _          _            8.10
+14   B       _     _          _            8.80
+15   A       _     _          _            9.00
+16   J       _     _          _            false_start
+
+`);
+      });
+
+      // test placement in stages of final
+      // test competitors eliminated and tied in 1/4-final, one of whom has time/fall in
+      // previous stage, the other of whom has wildcard in prev stage ... test that
+      // their relative overall rank in the event is based on their relative rank in Qual
+      test("quota of 16", ()=>{
+        withStartlist(`
+A
+B
+C
+D
+E
+F
+G
+H
+I
+J
+K
+L
+M
+N
+O
+P
+`);
+        resultsAre('Qualifiers', `
+A 9.9 I 9.9
+B 8.8 J 9.9
+C 7.7 K 9.9
+D 6.6 L 9.9
+E 5.5 M 9.9
+F 4.4 N 9.9
+G 3.3 O 9.9
+H 2.2 P 9.9
+I 1.1 A 9.9
+J 9.1 B 9.9
+K 8.1 C 9.9
+L 7.1 D 9.9
+M 6.1 E 9.9
+N 5.1 F 9.9
+O 4.1 G 9.9
+P 3.1 H 9.9
+`);
+
+        // TODO replace "Round of 16" with "Stage of 16" because IFSC Rules use "round" only to
+        // refer to the Qual Round and the Final Round not to the separate stages of the Final Round
+        resultsAre('Round of 16', `
+I fall A fall
+E 7.7  M 6.6
+G wc   K fs
+O 3.3  C 2.2
+H 1.1  J fall
+N fs   D wc
+P 8.8  B 9.9
+F 6.6  L 5.5
+`);
+
+        resultsAre('Quarter final', `
+I 9.9 M 3.3
+G 9.9 C 1.1
+H 2.2 D 9.9
+P 4.4 L 9.9
+`);
+
+        generalResultsAre(`
+Rank Climber Semi-final 1/4-final  Round_of_16  Qual
+1    H       _          2.20       1.10         2.20
+2    P       _          4.40       8.80         3.10
+3    M       _          3.30       6.60         6.10
+4    C       _          1.10       2.20         7.70
+5    I       _          9.90       fall         1.10
+6    G       _          9.90       wc           3.30
+7    D       _          9.90       wc           6.60
+8    L       _          9.90       5.50         7.10
+9    O       _          _          3.30         4.10
+10   F       _          _          6.60         4.40
+11   E       _          _          7.70         5.50
+12   B       _          _          9.90         8.80
+13   N       _          _          fs           5.10
+14   K       _          _          fs           8.10
+15   J       _          _          fall         9.10
+16   A       _          _          fall         9.90
+`);
+      });
+
+      // test("repeat Qual", ()=>{});
+
+      // test rankings in Qual when there is a tie for the quota for final
+      test("quota tie ms precision", ()=>{
+        withStartlist(`
+A
+B
+C
+D
+E
+F
+G
+`);
+        resultsAre('Qualifiers', `
+A 3.333 E fall
+B 5.551 F 4.444
+C 2.222 G -
+D -     A fs
+E 5.555 B 8.888
+F fall  C 8.888
+G fall  D 1.111
+`);
+
+        generalResultsAre(`
+Rank Climber Semi-final Qual
+1    D       _          1.11
+2    C       _          2.22
+3    F       _          4.44
+4    B       _          5.55
+5    E       _          5.55
+6    G       _          fall
+6    A       _          false_start
+`);
+      });
+
+      test("quota tie slower time", ()=>{
+        withStartlist(`
+A
+B
+C
+D
+E
+F
+G
+`);
+        resultsAre('Qualifiers', `
+A 3.333 E 8.889
+B 5.555 F 4.444
+C 2.222 G -
+D -     A fs
+E 5.555 B 8.888
+F fall  C 8.888
+G 5.559 D 1.111
+`);
+
+        generalResultsAre(`
+Rank Climber Semi-final Qual
+1    D       _          1.11
+2    C       _          2.22
+3    F       _          4.44
+4    B       _          5.55
+5    G       _          5.55
+5    E       _          5.55
+7    A       _          false_start
+`);
+      });
+
+      test("quota tie add attempts", ()=>{
         withStartlist(`
 Ron
 Hermione
@@ -234,8 +511,78 @@ Rank Climber   Semi-final Qual
 1    Harry        _       9.87
 5    Ron          _       9.87
 `);
-
       });
+
+      // test random placement in 1st stage of final of competitors tied in Qual
+      test("rand placement", ()=>{
+        withStartlist(`
+A
+B
+C
+D
+E
+`);
+        resultsAre('Qualifiers', `
+A 3.334 D 3.333
+B 3.333 E 3.331
+C 3.332 A 8.888
+D fs    B 8.888
+E 8.888 C 8.888
+`);
+
+        resultsAre('Semi final', `
+B 4.444 E 1.111
+C 4.444 A 1.111
+`);
+
+        generalResultsAre(`
+Rank Climber Final Semi-final Qual
+1    A       _     1.11       3.33
+1    E       _     1.11       3.33
+3    C       _     4.44       3.33
+3    B       _     4.44       3.33
+5    D       _      _         false_start
+`);
+      });
+
+
+
+      test("small field", ()=>{
+        withStartlist(`
+Ron
+Hermione
+Ginny
+Luna
+Harry
+`);
+        resultsAre('Qualifiers', `
+Ron 9.876 Luna 9.764
+Hermione 10.342 Harry 11.654
+Ginny 8.900 Ron 9.511
+Luna 9.999 Hermione 10.566
+Harry 10.256 Ginny 10.000
+`);
+
+        resultsAre('Semi final', `
+Ginny 7.900 Harry 8.511
+Ron 7.900 Luna 8.933
+`);
+
+        resultsAre('Final', `
+Ginny 6.899 Ron 7.122
+Harry 7.122 Luna 7.121
+`);
+
+        generalResultsAre(`
+Rank Climber  Final Semi-final Qual
+1    Ginny    6.89  7.90       8.90
+2    Ron      7.12  7.90       9.51
+3    Luna     7.12  8.93       9.76
+4    Harry    7.12  8.51       10.25
+5    Hermione    _     _       10.34
+`);
+      });
+
     });
 
     test("render qual startlist", ()=>{

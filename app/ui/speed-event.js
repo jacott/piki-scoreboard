@@ -296,7 +296,7 @@ data.heatNumber}`});
     0: 'Qualifiers',
     1: 'Final',
     2: 'Semi final',
-    3: 'Quater final',
+    3: 'Quarter final',
     4: 'Round of 16',
   };
 
