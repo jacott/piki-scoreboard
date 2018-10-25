@@ -77,7 +77,7 @@ isClient && define((require, exports, module)=>{
     };
 
     const tiebreaksAre = (stageName, attempt, results, tiebreak)=>{
-      assert.dom('#Event .Speed', ()=>{
+      assert.dom('#Event .Speed', elm =>{
         assert.dom('.selectedHeat', stageName+' - Start list');
         for (const row of results.split('\n')) {
           if (row === '') continue;
@@ -87,6 +87,13 @@ isClient && define((require, exports, module)=>{
               TH.change(input,parts[1]);
             });
           }});
+          if (parts.length > 2) {
+            assert.dom('td:last-child.climber .name', {text: parts[2], parent: p =>{
+              assert.domParent(`td:nth-child(3) input[data-attempt="${attempt}"]`, input =>{
+                TH.change(input,parts[3]);
+              });
+            }});
+          }
         }
         gotoNextStage(stageName, tiebreak);
       });
@@ -333,9 +340,9 @@ Rank Climber Final Semi-final 1/4-final    Qual
       });
 
       // test placement in stages of final
-      // test competitors eliminated and tied in 1/4-final, one of whom has time/fall in
-      // previous stage, the other of whom has wildcard in prev stage ... test that
-      // their relative overall rank in the event is based on their relative rank in Qual
+      // test that the relative overall rank of competitors eliminated and tied in 1/4-final, one of
+      // whom has time/fall in previous stage, the other of whom has wildcard in prev stage, is based
+      // on their relative rank in Qual
       test("quota of 16", ()=>{
         withStartlist(`
 A
@@ -445,8 +452,6 @@ E 8.88 B 8.88
 F -    C 8.88
 G fall D 2.22
 `, 'tiebreak');
-
-        const resB = Result.findById('resB');
 
         tiebreaksAre('Final', 1, `
 B 8.88
@@ -601,6 +606,118 @@ Rank Climber Final Semi-final Qual
 5    D       _      _         false_start
 `);
       });
+
+      // test Final Round race results:
+      // test wildcard beats false start
+      // test faster time beats slower time
+      // test time beats -
+      // test time beats fall
+      // TODO test fall beats - (faller gets a wildcard)
+      test("race results", ()=>{
+        withStartlist(`
+A
+B
+C
+D
+`);
+
+        resultsAre('Qualifiers', `
+A 2.222 C 9.999
+B 4.444 D 9.999
+C 1.111 A 9.999
+D 3.333 B 9.999
+`);
+        resultsAre('Semi final', `
+C fs    B wc
+A 7.779 D 7.771
+`);
+
+        resultsAre('Final', `
+C 5.555 A -
+B fall  D 5.555
+`);
+
+        generalResultsAre(`
+Rank Climber Final Semi-final Qual
+1    D       5.55  7.77       3.33
+2    B       fall  wc         4.44
+3    C       5.55  fs         1.11
+4    A       -     7.77       2.22
+`);
+      });
+
+      // test Final Round race results:
+      // test equal time ties with equal time
+      // test fall ties with fall
+      // test - ties with -
+      // test false start ties with false start
+      // test ties are broken by Qual valid faster time, then Qual slower time,
+      // then additional attempts
+      test("//race ties", ()=>{
+        withStartlist(`
+A
+B
+C
+D
+E
+F
+G
+H
+`);
+
+        resultsAre('Qualifiers', `
+A 5.555 E 9.991
+B 5.555 F 9.991
+C 5.555 G 9.991
+D 5.555 H 9.991
+E 5.555 A 9.999
+F 5.555 B 9.991
+G 5.559 C 9.991
+H 5.555 D 9.991
+`);
+
+        resultsAre('Quarter final', `
+H 5.555 E 1.111
+G 5.555 B 5.555
+D fall  A fall
+F 1.111 C 5.555
+`);
+
+        resultsAre('Semi final', `
+E fs    B fs
+D -     F -
+`, 'tiebreak');
+
+        tiebreaksAre('Semi final', 1, `
+E fall  B fall
+D 5.551 F 5.559
+`, 'tiebreak');
+
+        tiebreaksAre('Semi final', 2, `
+E 5.555 B fall
+`);
+        assert.dom('body', ()=>{assert.dom('x');});
+
+        resultsAre('Final', `
+B 5.555 F 1.111
+E fall  D 5.555
+        `);
+
+        generalResultsAre(`
+Rank Climber Final Semi-final 1/4-final Qual
+1    D       5.55  -          fall      5.55
+2    E       fall  fs         1.11      5.55
+3    F       1.11  -          1.11      5.55
+4    B       5.55  fs         5.55      5.55
+5    H       _     _          5.55      5.55
+5    G       _     _          5.55      5.55
+5    C       _     _          5.55      5.55
+8    A       _     _          fall      5.55
+`);
+      });
+
+
+      // TODO test relative ranking of competitors eliminated in Final Round
 
 
 
