@@ -178,7 +178,7 @@ isClient && define((require, exports, module)=>{
       // who does not climb at all. Lisia interprets this silence as meaning that H should have no
       // rank in the competition - exactly as if H was not registered. Currently Piki gives H
       // a rank lower than all other competitors.
-      test("qual rank", ()=>{
+      test("qual scores", ()=>{
         withStartlist(`
 A
 B
@@ -192,36 +192,42 @@ I
 J
 K
 L
+M
+N
 `);
         resultsAre('Qualifiers', `
-A 3.333 G -
-B 4.444 H -
-C 2.222 I fs
-D -     J fs
-E 5.555 K 6.666
-F fall  L 8.888
+A 3.333 H -
+B 4.444 I fs
+C 2.222 J fs
+D -     K 6.666
+E 5.555 L 8.888
+F fall  M 4.444
+G fall  N -
 
-G fall  A 8.888
-H -     B 1.111
-I fall  C fall
-J fs    D 5.555
-K 9.999 E fs
-L 6.661 F fall
+H -     A 8.888
+I fall  B 1.111
+J fs    C fall
+K 9.999 D 5.555
+L 6.661 E fs
+M 4.444 F fall
+N fs    G -
 `);
         generalResultsAre(`
 Rank Climber Semi-final Qual
 1    B       _          1.11
 2    C       _          2.22
 3    A       _          3.33
-4    D       _          5.55
-5    K       _          6.66
-5    L       _          6.66
-7    J       _          false_start
-7    G       _          fall
-7    I       _          false_start
-7    F       _          fall
-7    E       _          false_start
-12   H       _          _
+4    M       _          4.44
+5    D       _          5.55
+6    K       _          6.66
+6    L       _          6.66
+8    J       _          false_start
+8    N       _          false_start
+8    G       _          fall
+8    I       _          false_start
+8    F       _          fall
+8    E       _          false_start
+14   H       _          _
 `);
             });
 
@@ -319,7 +325,6 @@ E 1.1 G 3.3
 N 3.3 P 4.4
 `);
 
-        // TODO replace all "wc" in general results with "wildcard" for clarity
         generalResultsAre(`
 Rank Climber Final Semi-final 1/4-final    Qual
 1    N       _     3.30       wc           5.10
@@ -343,9 +348,8 @@ Rank Climber Final Semi-final 1/4-final    Qual
       });
 
       // test placement in stages of final
-      // test that the relative overall rank of competitors eliminated and tied in 1/4-final, one of
-      // whom has time/fall in previous stage, the other of whom has wildcard in prev stage, is based
-      // on their relative rank in Qual
+      // test the relative overall rank of competitors eliminated and tied in 1/4-final,
+      // at least one of whom has wildcard in prev stage
       test("quota of 16", ()=>{
         withStartlist(`
 A
@@ -384,8 +388,6 @@ O 4.1 G 9.9
 P 3.1 H 9.9
 `);
 
-        // TODO replace "Round of 16" with "Stage of 16" because IFSC Rules use "round" only to
-        // refer to the Qual Round and the Final Round not to the separate stages of the Final Round
         resultsAre('Round of 16', `
 I fall A fall
 E 7.7  M 6.6
@@ -425,7 +427,64 @@ Rank Climber Semi-final 1/4-final  Round_of_16  Qual
 `);
       });
 
-      test("repeat Qual", ()=>{
+
+      // TODO: WRT repeat Qual, find out from IFSC whether and how slower times should be used
+      // to break ties; whether and how 1/1000th precision should be used
+      // to break ties.
+
+      // test repeat Qual, including:
+      // Rank in event decided by competitor's fastest time in Repeat to 1/1000th second.
+      // Tiebreak procedure for competitors tied for medal place:
+      // 1. Compare slower times in repeat to 1/1000th second;
+      // 2. Compare faster times in first Qual to 1/1000th second;
+      // 3. Compare slower times in first Qual to 1/1000th second;
+      // 4. Tiebreak attempts on Lane A.
+
+      // TODO: figure out why steps 1 and 2 above are not happening in "repeat Quals ties" test (competitors
+      // B and C) but are happening in "repeat Quals more ties" test (competitors G and B)
+
+      // Tiebreak procedure for competitors tied for non-medal place:
+      // 1. Compare slower times in repeat to 1/1000th second.
+      // 2. Compare faster times in first Qual to 1/100th second.
+      // 3. Remaining ties remain.
+      test("// repeat Qual ties", ()=>{
+        withStartlist(`
+A
+B
+C
+D
+`);
+
+        resultsAre('Qualifiers', `
+A fall   C 9.99
+B 5.551  D fall
+C 5.555  A fall
+D fall   B 9.99
+`);
+
+        resultsAre('Final', `
+A 5.551  C 9.999
+B 5.555  D 9.991
+C 5.555  A 9.999
+D 5.555  B 9.999
+`);
+
+//         tiebreaksAre('Final', 1, `
+// B 1.11
+// C 9.99
+// `);
+
+        generalResultsAre(`
+Rank Climber Final       Qual
+1    A       5.55        fall
+2    D       5.55        fall
+3    B       5.55        5.55
+4    C       5.55        5.55
+`);
+      });
+
+
+      test("repeat Qual more ties", ()=>{
         withStartlist(`
 A
 B
@@ -437,41 +496,86 @@ G
 `);
 
         resultsAre('Qualifiers', `
-A fs   E 1.11
-B fall F 3.33
-C fs   G 8.88
-D 1.11 A -
-E fall B fall
-F 8.88 C -
-G 3.33 D fs
+A fall  E fall
+B 5.555 F fall
+C fall  G 9.991
+D fall  A fall
+E fall  B 9.999
+F fall  C fall
+G 5.555 D fall
 `);
 
         resultsAre('Final', `
-A fall E 1.11
-B 2.22 F fs
-C 1.11 G fall
-D 8.88 A fall
-E 8.88 B 8.88
-F -    C 8.88
-G fall D 2.22
+A 3.331 E 9.99
+B 1.11  F 9.99
+C 3.333 G 9.99
+D 3.333 A 9.99
+E 2.222 B 9.99
+F 2.222 C 8.881
+G 1.11  D 8.888
 `, 'tiebreak');
 
         tiebreaksAre('Final', 1, `
-B 8.88
-D 1.11
+E 5.555
+F 5.551
 `);
 
         generalResultsAre(`
 Rank Climber Final       Qual
-1    E       1.11        1.11
-2    C       1.11        false_start
-3    D       2.22        false_start
-4    B       2.22        fall
-5    F       false_start 3.33
-5    G       fall        3.33
-7    A       fall        false_start
+1    G       1.11        5.55
+2    B       1.11        5.55
+3    F       2.22        fall
+4    E       2.22        fall
+5    A       3.33        fall
+6    C       3.33        fall
+7    D       3.33        fall
 `);
       });
+
+
+      test("repeat Qual even more ties", ()=>{
+        withStartlist(`
+A
+B
+C
+D
+E
+F
+G
+`);
+
+        resultsAre('Qualifiers', `
+A 5.555 E fall
+B fall  F 8.88
+C 5.51  G fall
+D fall  A 6.66
+E fall  B fall
+F 5.551 C 9.99
+G fall  D fall
+`);
+
+        resultsAre('Final', `
+A fall  E fall
+B 3.33  F fall
+C fall  G fall
+D 2.22  A fall
+E 4.44  B fall
+F fall  C fall
+G 1.11  D fall
+`);
+
+        generalResultsAre(`
+Rank Climber Final       Qual
+1    G       1.11        fall
+2    D       2.22        fall
+3    B       3.33        fall
+4    E       4.44        fall
+5    C       fall        5.51
+6    A       fall        5.55
+6    F       fall        5.55
+`);
+      });
+
 
       // test rankings in Qual when there is a tie for the quota for final
       test("quota tie ms precision", ()=>{
@@ -578,6 +682,7 @@ Rank Climber   Semi-final Qual
 `);
       });
 
+
       // test random placement in 1st stage of final of competitors tied in Qual
       test("rand placement", ()=>{
         withStartlist(`
@@ -610,12 +715,247 @@ Rank Climber Final Semi-final Qual
 `);
       });
 
+
+      // test relative overall rank of competitors eliminated and not tied
+      // in a stage of Final Round
+      // faster beats slower beats {fall/fs} beats -
+      test("eliminated not tied in Final", ()=>{
+        withStartlist(`
+A
+B
+C
+D
+E
+F
+G
+H
+I
+J
+K
+L
+M
+N
+O
+P
+`);
+        resultsAre('Qualifiers', `
+A 9.9 I 9.9
+B 8.8 J 9.9
+C 7.7 K 9.9
+D 6.6 L 9.9
+E 5.5 M 9.9
+F 4.4 N 9.9
+G 3.3 O 9.9
+H 2.2 P 9.9
+I 1.1 A 9.9
+J 9.1 B 9.9
+K 8.1 C 9.9
+L 7.1 D 9.9
+M 6.1 E 9.9
+N 5.1 F 9.9
+O 4.1 G 9.9
+P 3.1 H 9.9
+`);
+
+        resultsAre('Round of 16', `
+I 1.1    A 2.222
+E 2.229  M 1.1
+G 2.221  K 1.1
+O wc     C -
+H 1.1    J fall
+N fall   D 1.1
+P 2.222  B 1.1
+F wc     L fs
+`);
+
+        generalResultsAre(`
+Rank Climber 1/4-final  Round_of_16  Qual
+1    I       _          1.10         1.10
+2    H       _          1.10         2.20
+3    O       _          wc           4.10
+4    F       _          wc           4.40
+5    M       _          1.10         6.10
+6    D       _          1.10         6.60
+7    K       _          1.10         8.10
+8    B       _          1.10         8.80
+9    G       _          2.22         3.30
+10   P       _          2.22         3.10
+11   A       _          2.22         9.90
+12   E       _          2.22         5.50
+13   N       _          fall         5.10
+14   L       _          fs           7.10
+15   J       _          fall         9.10
+16   C       _          -            7.70
+`);
+      });
+
+
+
+      // test relative overall rank of competitors eliminated and tied in 1/4-final,
+      // with previous stage scores of fall, fall, false start, false start
+      test("eliminated and tied in Final", ()=>{
+        withStartlist(`
+A
+B
+C
+D
+E
+F
+G
+H
+I
+J
+K
+L
+M
+N
+O
+P
+`);
+        resultsAre('Qualifiers', `
+A 9.9 I 9.9
+B 8.8 J 9.9
+C 7.7 K 9.9
+D 6.6 L 9.9
+E 5.5 M 9.9
+F 4.4 N 9.9
+G 3.3 O 9.9
+H 2.2 P 9.9
+I 1.1 A 9.9
+J 9.1 B 9.9
+K 8.1 C 9.9
+L 7.1 D 9.9
+M 6.1 E 9.9
+N 5.1 F 9.9
+O 4.1 G 9.9
+P 3.1 H 9.9
+`);
+
+        resultsAre('Round of 16', `
+I fall A fall
+E 4.4  M fall
+G fs   K fs
+O 3.3  C 2.2
+H 1.1  J fall
+N fs   D fs
+P 8.8  B 9.9
+F fall L fall
+`);
+
+        resultsAre('Quarter final', `
+I 9.9 E 3.3
+G 9.9 C 1.1
+H 2.2 N 9.9
+P 4.4 F 9.9
+`);
+
+        generalResultsAre(`
+Rank Climber Semi-final 1/4-final  Round_of_16  Qual
+1    H       _          2.20       1.10         2.20
+2    P       _          4.40       8.80         3.10
+3    E       _          3.30       4.40         5.50
+4    C       _          1.10       2.20         7.70
+5    I       _          9.90       fall         1.10
+6    G       _          9.90       fs           3.30
+7    F       _          9.90       fall         4.40
+8    N       _          9.90       fs           5.10
+9    O       _          _          3.30         4.10
+10   B       _          _          9.90         8.80
+11   M       _          _          fall         6.10
+12   D       _          _          fs           6.60
+13   L       _          _          fall         7.10
+14   K       _          _          fs           8.10
+15   J       _          _          fall         9.10
+16   A       _          _          fall         9.90
+`);
+      });
+
+
+      // FIXME: failing test relative overall rank of competitors eliminated and tied in 1/4-final,
+      // with previous stage scores of faster time, slower time, equal times
+       test("//eliminated and tied times in Final", ()=>{
+        withStartlist(`
+A
+B
+C
+D
+E
+F
+G
+H
+I
+J
+K
+L
+M
+N
+O
+P
+`);
+        resultsAre('Qualifiers', `
+A 9.9 I 9.9
+B 8.8 J 9.9
+C 7.7 K 9.9
+D 6.6 L 9.9
+E 5.5 M 9.9
+F 4.4 N 9.9
+G 3.3 O 9.9
+H 2.2 P 9.9
+I 1.1 A 9.9
+J 9.1 B 9.9
+K 8.1 C 9.9
+L 7.1 D 9.9
+M 6.1 E 9.9
+N 5.1 F 9.9
+O 4.1 G 9.9
+P 3.1 H 9.9
+`);
+
+        resultsAre('Round of 16', `
+I 8.8  A 8.8
+E 4.4  M fall
+G 1.1  K 1.1
+O 3.3  C 2.2
+H 1.1  J fall
+N 5.5  D 5.5
+P 8.8  B 9.9
+F 5.5  L 5.5
+`);
+
+        resultsAre('Quarter final', `
+I 9.9 E 3.3
+G 9.9 C 1.1
+H 2.2 N 9.9
+P 4.4 F 9.9
+`);
+
+        generalResultsAre(`
+Rank Climber Semi-final 1/4-final  Round_of_16  Qual
+1    H       _          2.20       1.10         2.20
+2    P       _          4.40       8.80         3.10
+3    E       _          3.30       4.40         5.50
+4    C       _          1.10       2.20         7.70
+5    G       _          9.90       1.10         3.30
+6    N       _          9.90       5.50         5.10
+7    F       _          9.90       5.50         4.40
+8    I       _          9.90       8.80         1.10
+9    K       _          _          1.10         8.10
+10   O       _          _          3.30         4.10
+11   D       _          _          5.50         6.60
+12   L       _          _          5.50         7.10
+13   A       _          _          8.80         9.90
+14   B       _          _          9.90         8.80
+15   M       _          _          fall         6.10
+16   J       _          _          fall         9.10
+`);
+      });
+
+
       // test Final Round race results:
       // test wildcard beats false start
-      // test faster time beats slower time
+      // test fall beats - (faller gets a wildcard)
       // test time beats -
       // test time beats fall
-      // TODO test fall beats - (faller gets a wildcard)
       test("race results", ()=>{
         withStartlist(`
 A
@@ -632,7 +972,7 @@ D 3.333 B 9.999
 `);
         resultsAre('Semi final', `
 C fs    B wc
-A 7.779 D 7.771
+A -     D fall
 `);
 
         resultsAre('Final', `
@@ -642,18 +982,21 @@ B fall  D 5.555
 
         generalResultsAre(`
 Rank Climber Final Semi-final Qual
-1    D       5.55  7.77       3.33
+1    D       5.55  fall       3.33
 2    B       fall  wc         4.44
 3    C       5.55  fs         1.11
-4    A       -     7.77       2.22
+4    A       -     -       2.22
 `);
       });
 
       // test Final Round race results:
+      // test faster time beats slower time
       // test equal time ties with equal time
       // test fall ties with fall
-      // test - ties with -
+      // test wc beats -
+      // test false start beats - (false starter gets a wildcard)
       // test false start ties with false start
+      // test - ties with -
       // test ties are broken by Qual valid faster time, then Qual slower time,
       // then additional attempts
       test("race ties", ()=>{
@@ -680,10 +1023,10 @@ H 5.555 D 9.991
 `);
 
         resultsAre('Quarter final', `
-H 5.555 E 1.111
+H 5.555 E 5.551
 G 5.555 B 5.555
 D fall  A fall
-F 1.111 C 5.555
+F wc    C -
 `);
 
         resultsAre('Semi final', `
@@ -701,26 +1044,107 @@ E 5.555 B fall
 `);
 
         resultsAre('Final', `
-B 5.555 F 1.111
+B -     F fs
 E fall  D 5.555
         `);
 
         generalResultsAre(`
 Rank Climber Final Semi-final 1/4-final Qual
 1    D       5.55  -          fall      5.55
-2    E       fall  fs         1.11      5.55
-3    F       1.11  -          1.11      5.55
-4    B       5.55  fs         5.55      5.55
+2    E       fall  fs         5.55      5.55
+3    F       fs    -          wc        5.55
+4    B       -     fs         5.55      5.55
 5    H       _     _          5.55      5.55
 5    G       _     _          5.55      5.55
-5    C       _     _          5.55      5.55
-8    A       _     _          fall      5.55
+7    A       _     _          fall      5.55
+8    C       _     _          -         5.55
 `);
       });
 
 
-      // TODO test relative ranking of competitors eliminated in Final Round
+      // test final race (race for 1st and 2nd)
+      test("final race time vs fs", ()=>{
+        withStartlist(`
+A
+B
+C
+D
+`);
 
+        resultsAre('Qualifiers',`
+A 1.1   C 9.9
+B 2.2   D 9.9
+C 3.3   A 9.9
+D 4.4   B 9.9
+`);
+
+        resultsAre('Semi final', `
+A 4.4   D 2.2
+B 3.3   C 1.1
+`);
+
+        resultsAre('Final', `
+A 1.1   B 2.2
+D 5.5   C fs
+`);
+
+        generalResultsAre(`
+Rank Climber Final  Semi-final  Qual
+1    D       5.50   2.20        4.40
+2    C       fs     1.10        3.30
+3    A       1.10   4.40        1.10
+4    B       2.20   3.30        2.20
+`);
+      });
+
+
+      // FIXME failing test
+      test("// final race fall vs fs", ()=>{
+        withStartlist(`
+A
+B
+C
+D
+`);
+
+        resultsAre('Qualifiers',`
+A 1.1   C 9.9
+B 2.2   D 9.9
+C 3.3   A 9.9
+D 4.4   B 9.9
+`);
+
+        resultsAre('Semi final', `
+A 4.4   D 2.2
+B 3.3   C 1.1
+`);
+
+        resultsAre('Final', `
+A 1.1   B 2.2
+D fall  C fs
+`);
+
+        generalResultsAre(`
+Rank Climber Final  Semi-final  Qual
+1    D       fall   2.20        4.40
+2    C       fs     1.10        3.30
+3    A       1.10   4.40        1.10
+4    B       2.20   3.30        2.20
+`);
+      });
+
+
+      // TODO test invalid score combinations
+      // In Final Round except final race:
+      // time vs false start
+      // fall vs false start
+      // In Final race:
+      // wildcard vs false start
+      // wildcard vs -
+      // In any race in Final Round:
+      // wildcard vs time
+      // wildcard vs fall
+      // wildcard vs wildcard
 
 
       test("small field", ()=>{
