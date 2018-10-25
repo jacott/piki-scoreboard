@@ -61,16 +61,19 @@ isClient && define((require, exports, module)=>{
       assert.dom('#Event .Speed', ()=>{
         assert.dom('.selectedHeat', stageName+' - Start list');
         let i = 0;
-        for (const row of results.split('\n')) {
-          if (row === '') continue;
-          const parts = row.split(/\s+/);
-          assert.dom(`tbody tr:nth-child(${++i})`, tr =>{
-            assert.dom('td:first-child.climber .name', parts[0]);
-            TH.change('td:nth-child(2) input', parts[1]);
-            assert.dom('td:last-child.climber .name', parts[2]);
-            TH.change('td:nth-child(3) input', parts[3]);
-          });
-        }
+        assert.dom('table.results>tbody', ()=>{
+          for (let row of results.split('\n')) {
+            row = row.trim();
+            if (row === '') continue;
+            const parts = row.split(/\s+/);
+            assert.dom(`tr:nth-child(${++i})`, tr =>{
+              assert.dom('td:first-child.climber .name', parts[0]);
+              TH.change('td:nth-child(2) input', parts[1]);
+              assert.dom('td:last-child.climber .name', parts[2]);
+              TH.change('td:nth-child(3) input', parts[3]);
+            });
+          }
+        });
         gotoNextStage(stageName, tiebreak);
       });
 
@@ -653,7 +656,7 @@ Rank Climber Final Semi-final Qual
       // test false start ties with false start
       // test ties are broken by Qual valid faster time, then Qual slower time,
       // then additional attempts
-      test("//race ties", ()=>{
+      test("race ties", ()=>{
         withStartlist(`
 A
 B
@@ -696,7 +699,6 @@ D 5.551 F 5.559
         tiebreaksAre('Semi final', 2, `
 E 5.555 B fall
 `);
-        assert.dom('body', ()=>{assert.dom('x');});
 
         resultsAre('Final', `
 B 5.555 F 1.111

@@ -174,12 +174,14 @@ define((require, exports, module)=>{
     return 0;
   };
 
-  const winnerLooser = (res, stage)=>{
-    for (; stage < 5; ++stage) {
+  const winnerLooser = (res, previous)=>{
+    for (let stage = previous; stage < 5; ++stage) {
       const rs = res.scores[stage+1];
       if (rs != null) {
         const o = Result.findById(rs.opponent_id);
-        return isWinner(res, o, stage) ? [res, o] : [o, res];
+        if (isWinner(res, o, stage)) return [res, o];
+        stage = previous-1;
+        res = o;
       }
     }
     return [res];
@@ -457,8 +459,9 @@ define((require, exports, module)=>{
       const iter = quals[Symbol.iterator]();
 
       if (stage == 1) {
-        const [fA, pA] = winnerLooser(iter.next().value, previous);
-        const [fB, pB] = winnerLooser(iter.next().value, previous);
+        const v1 = iter.next().value, v2 = iter.next().value;
+        const [fA, pA] = winnerLooser(v1, previous);
+        const [fB, pB] = winnerLooser(v2, previous);
 
         assignLanes(fA, fB);
         entries[0] = fA;
