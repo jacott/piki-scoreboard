@@ -1189,7 +1189,7 @@ Rank Climber Final  Semi-final  Qual
     });
 
     test("render qual results", ()=>{
-      user = Factory.createUser('guest');
+      user = Factory.createUser('admin');
       TH.loginAs(user);
 
       const res = [];
@@ -1227,6 +1227,14 @@ Rank Climber Final  Semi-final  Qual
         assert.dom('tbody>tr:last-child', tr =>{
           assert.dom('td.rank', '');
           assert.dom('td.climber .name', 'Climber 3');
+        });
+
+        res[2].setSpeedScore({time: 5000, attempt: 1});
+
+        assert.dom('tbody>tr:first-child', tr =>{
+          assert.dom('td.rank', '1');
+          assert.dom('td.climber .name', 'Climber 3');
+          assert.dom('td.score', '5.000');
         });
       });
 
@@ -1752,13 +1760,13 @@ Rank Climber Final  Semi-final  Qual
         });
 
         assert.dom('tbody>tr:first-child', tr =>{
-          assert.dom('td.climber:first-child .name', 'Climber 4');
-          assert.dom('td.climber:last-child .name', 'Climber 1');
+          assert.dom('td.climber:first-child .name', 'Climber 2');
+          assert.dom('td.climber:last-child .name', 'Climber 3');
         });
 
         assert.dom('tbody>tr:last-child', tr =>{
           assert.dom('td.climber:first-child .name', 'Climber 3');
-          assert.dom('td.climber:last-child .name', 'Climber 2');
+          assert.dom('td.climber:last-child .name', 'Climber 1');
         });
 
         res[3].$remove();

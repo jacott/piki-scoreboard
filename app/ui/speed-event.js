@@ -47,25 +47,22 @@ define((require, exports, module)=>{
       }
     });
 
-    myCtx(table).onDestroy(round.onChange(dc =>{
-      if (! dc.isChange) {
-        recalc(dc);
-        list.changeOptions({updateAllTags: true});
-      } else {
-        list.updateEntry(dc.doc);
-        list.updateEntry(laneA(dc.doc));
-      }
-    }));
+    myCtx(table).onDestroy(round.onChange(dc =>{recalc(dc, list)}));
 
     pn.appendChild(table);
   };
 
-  const renderFinals = (data, pn)=>{
+  const renderFinals = (data, pn, showingResults)=>{
+    const {round} = data;
+
+    if (showingResults)
+      round.rankResults();
+    else
+      round.calcStartList();
+
     const table = ABList.$autoRender(data, Dom.ctx(pn));
 
     const ctx = myCtx(table);
-
-    const {round} = data;
 
     const len = 1<<round.stage;
 
@@ -78,7 +75,17 @@ define((require, exports, module)=>{
       }
     });
 
-    ctx.onDestroy(round.onChange(dc =>{dc.isChange && list.updateEntry(laneA(dc.doc))}));
+    ctx.onDestroy(round.onChange(dc =>{
+      if (showingResults) {
+        round.rankResults();
+        list.changeOptions({updateAllTags: true});
+      } else if (dc.isChange) {
+        list.updateEntry(laneA(dc.doc));
+      } else {
+        round.calcStartList();
+        list.changeOptions({updateAllTags: true});
+      }
+    }));
 
     pn.appendChild(table);
     data.showingResults || appendNextStage(data, pn);
@@ -159,10 +166,17 @@ define((require, exports, module)=>{
       if (heatNumber == 0 || heatNumber == -2) {
         if (showingResults) {
           round.rankResults();
-          renderQuals(data, elm, QualResults, RankRow, ()=>{round.rankResults()});
+          renderQuals(data, elm, QualResults, RankRow, (dc, list)=>{
+            round.rankResults();
+            list.changeOptions({updateAllTags: true});
+          });
         } else {
           round.calcStartList();
-          renderQuals(data, elm, ABList, ABRow, dc =>{
+          renderQuals(data, elm, ABList, ABRow, (dc,list) =>{
+            if (dc.isChange) {
+              list.updateEntry(dc.doc);
+              list.updateEntry(laneA(dc.doc));
+            }
             if (dc.isDelete)
               round.entries.delete(dc.doc);
             else if (dc.isAdd)
@@ -175,12 +189,7 @@ define((require, exports, module)=>{
         elm.classList.add('general');
         renderGeneralResults(data, elm);
       } else {
-        if (showingResults)
-          round.rankResults();
-        else
-          round.calcStartList();
-
-        renderFinals(data, elm);
+        renderFinals(data, elm, showingResults);
       }
     },
   });
