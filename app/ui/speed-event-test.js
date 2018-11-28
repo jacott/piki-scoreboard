@@ -792,7 +792,7 @@ Rank Climber 1/4-final  Round_of_16  Qual
 
 
       // test relative overall rank of competitors eliminated and tied in 1/4-final,
-      // with previous stage scores of fall, fall, false start, false start
+      // with previous stage scores also tied: fall, fall, false start, false start
       test("eliminated and tied in Final", ()=>{
         withStartlist(`
 A
@@ -872,7 +872,7 @@ Rank Climber Semi-final 1/4-final  Round_of_16  Qual
 
 
       // FIXME: failing test relative overall rank of competitors eliminated and tied in 1/4-final,
-      // with previous stage scores of faster time, slower time, equal times
+      // with previous stage scores not all tied: faster time, slower time, equal times
        test("//eliminated and tied times in Final", ()=>{
         withStartlist(`
 A
@@ -1062,8 +1062,11 @@ Rank Climber Final Semi-final 1/4-final Qual
       });
 
 
-      // test final race (race for 1st and 2nd)
-      test("final race time vs fs", ()=>{
+      // test final race (race for 1st and 2nd): time beats fs
+      // test Final Round race results:
+      // wildcard beats time
+      // wildcard beats fall
+      test("final race time beats fs", ()=>{
         withStartlist(`
 A
 B
@@ -1079,8 +1082,8 @@ D 4.4   B 9.9
 `);
 
         resultsAre('Semi final', `
-A 4.4   D 2.2
-B 3.3   C 1.1
+A 4.4   D wc
+B fall  C wc
 `);
 
         resultsAre('Final', `
@@ -1090,16 +1093,16 @@ D 5.5   C fs
 
         generalResultsAre(`
 Rank Climber Final  Semi-final  Qual
-1    D       5.50   2.20        4.40
-2    C       fs     1.10        3.30
+1    D       5.50   wc          4.40
+2    C       fs     wc          3.30
 3    A       1.10   4.40        1.10
-4    B       2.20   3.30        2.20
+4    B       2.20   fall        2.20
 `);
       });
 
 
       // FIXME failing test
-      test("// final race fall vs fs", ()=>{
+      test("// final race fall beats fs", ()=>{
         withStartlist(`
 A
 B
@@ -1132,57 +1135,6 @@ Rank Climber Final  Semi-final  Qual
 4    B       2.20   3.30        2.20
 `);
       });
-
-
-      // TODO test invalid score combinations
-      // In Final Round except final race:
-      // time vs false start
-      // fall vs false start
-      // In Final race:
-      // wildcard vs false start
-      // wildcard vs -
-      // In any race in Final Round:
-      // wildcard vs time
-      // wildcard vs fall
-      // wildcard vs wildcard
-
-
-      test("small field", ()=>{
-        withStartlist(`
-Ron
-Hermione
-Ginny
-Luna
-Harry
-`);
-        resultsAre('Qualifiers', `
-Ron 9.876 Luna 9.764
-Hermione 10.342 Harry 11.654
-Ginny 8.900 Ron 9.511
-Luna 9.999 Hermione 10.566
-Harry 10.256 Ginny 10.000
-`);
-
-        resultsAre('Semi final', `
-Ginny 7.900 Harry 8.511
-Ron 7.900 Luna 8.933
-`);
-
-        resultsAre('Final', `
-Ginny 6.899 Ron 7.122
-Harry 7.122 Luna 7.121
-`);
-
-        generalResultsAre(`
-Rank Climber  Final Semi-final Qual
-1    Ginny    6.89  7.90       8.90
-2    Ron      7.12  7.90       9.51
-3    Luna     7.12  8.93       9.76
-4    Harry    7.12  8.51       10.25
-5    Hermione    _     _       10.34
-`);
-      });
-
     });
 
     test("render qual startlist", ()=>{
