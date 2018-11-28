@@ -32,7 +32,7 @@ define((require, exports, module)=>{
 
     const future = new Future();
 
-    parse(new Buffer(data).toString(), {
+    parse(Buffer.from(data).toString(), {
       columns: function () {return ['Fee level', 'First Name', 'Last Name', 'Birth Date', 'Participant ID']}
     }, function(err, rows){
       if (err) return future.throw(err);

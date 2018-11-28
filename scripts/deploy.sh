@@ -51,7 +51,7 @@ sed <build/index.html >app/index.html "s/CACHE_BUST_HASH/$MD5SUM/g"
 
 echo "$version,$MD5SUM" >build/version
 
-printf "window.KORU_APP_VERSION='%s,%s';" $version $MD5SUM |
+printf "window.KORU_APP_VERSION='%s,%s';\n" $version $MD5SUM |
     cat - build/index.js >app/index.js
 
 mv build/index.css app
