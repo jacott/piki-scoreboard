@@ -1,4 +1,8 @@
 <template name="Help">
+  <!-- #############################################################
+       TEMPLATES
+       ############################################################# -->
+
   <template name="ContentLine">
     <li><a class="link topics" href="{{tag}}">{{desc}}</a></li>
   </template>
@@ -117,13 +121,18 @@
     </section>
   </template>
 
+
+  <!-- #############################################################
+       CONTENT
+       ############################################################# -->
+
   <div id="Help" class="document">
     <button name="close">Close help</button>
     <h1>Piki Help</h1>
 
     <abstract>
       <p>
-        Results-management system for climbing competitions.
+        Results management for climbing competitions.
       </p>
     </abstract>
 
@@ -135,11 +144,11 @@
     <section name="general-info">
       <h1>General Information</h1>
       <ul>
-        <li>Piki is a results-management system for <a href="https://www.ifsc-climbing.org">IFSC</a>-format climbing competitions. Piki allows some customization of the <i>competition format</i>: Admins can designate the number of rounds in the competition, the quota of competitors for each round, and the number of boulders for each round in a boulder competition. Piki's <i>scoring system</i> follows the IFSC rules and is not customizable.</li>
-        <li>Piki is in <b>beta</b>:
+        <li>Piki is a web application for managing the results of <a href="https://www.ifsc-climbing.org">IFSC</a>-format climbing competitions. Piki allows some customization of the <i>competition format</i>: for Lead and Boulder competitions, Admins can designate the number of rounds in the competition, the quota of competitors for each round, and for boulder competitions the number of boulders for each round. Piki's <i>scoring system</i> follows the IFSC rules and is not customizable.</li>
+        <li>Piki is in beta:
           <ul>
             <li>New features are being added which may change the way Piki works.</li>
-            <li>You can expect defects and issues to arise as you use the system.</li>
+            <li>Please expect defects and issues to arise as you use the system.</li>
           </ul>
         </li>
         <li>Piki is developed and tested only for use with the <a href="https://www.google.com/intl/en/chrome/browser/">Google Chrome</a> web browser. Piki may or may not work with other web browsers.</li>
@@ -163,78 +172,6 @@
       </p>
     </section>
 
-    <section name="user-add">
-      <h1>Add users</h1>
-      <p>
-        Org Admins only.
-      </p>
-      {{> SignedIn}}
-      <p>
-        Click <i>Org settings</i> in the menu, and then click <i>Add new user</i>.
-      </p>
-      <p>
-        Once the new user is added, a <i>Reset password</i> email will be sent to the email address entered for the new user.
-      </p>
-    </section>
-
-    <section name="user-edit">
-      <h1>Edit users' details and delete users</h1>
-      <p>
-        Org Admins only.
-      </p>
-      {{> SignedIn}}
-      <ol>
-        <li>Click <i>Org settings</i> in the menu.</li>
-        <li>Click the user's name.</li>
-        <li>Edit the user's details and click <i>Save</i>.<br>
-          Or, to delete the user, click <i>Delete</i>, and confirm in the popup box.</li>
-      </ol>
-    </section>
-
-    <section name="teams">
-      <h1>Add and edit teams and team types</h1>
-      <p>
-        Admins only.
-      </p>
-      {{> SignedIn}}
-      <ol>
-        <li>Click <i>Teams</i> in the menu.</li>
-        <li>Add and edit team types (e.g. Club, School, Nation).<br>
-          Add and edit teams for each team type.</li>
-      </ol>
-      <p>
-        If your organization will be <a href="#upload-registrations">uploading registrations from file</a> then the team name or code ("short name") used here must be the same as the team name or code used in the upload file.
-      </p>
-      <p>
-        Editing a team's details changes those details in all past, current and future events.
-      </p>
-      <p>
-        To designate which team types competitors may represent at a given event,
-        <inlinehelp>
-          go to the <i>Edit event</i> page<popup>{{> NavEditEvent}}</popup>
-        </inlinehelp>
-        for that event.
-      </p>
-    </section>
-
-    <section name="climbers">
-      <h1>Add and edit climbers on your organization's <i>Climbers</i> list</h1>
-      <p>
-        Admins only.
-      </p>
-      {{> SignedIn}}
-      <ol>
-        <li>Click <i>Climbers</i> in the menu.</li>
-        <li>Add and edit climbers.</li>
-      </ol>
-      <p>
-        Once added, a climber can be registered for events. Climbers who are not on the organization's <i>Climbers</i> list are automatically added to the list when they are registered for an event.
-      </p>
-      <p>
-        Editing a climber's details changes those details in all past, current and future events.
-      </p>
-    </section>
-
     <section name="comp-cat">
       <h1>Add and edit competitor categories</h1>
       <p>
@@ -254,7 +191,7 @@
           for that event.<br>
           Instructions:<br>
           <ol>
-            <li>Enter the <b>category name</b>, e.g. <i>Female Youth A Lead</i>.</li>
+            <li>Enter the <b>category name</b>, e.g. <i>Youth A Female Lead</i>.</li>
 
             <li>Enter the <b>category code</b> ("short name"),
               e.g. <i>FYAL</i>. If your organization will
@@ -262,24 +199,22 @@
                 from file</a> then the category code used here must be the
               same as the category code used in the upload file.</li>
 
-            <li>Enter the <b>group</b> name, e.g. <i>Youth
-                Lead</i>. Where individual climbers may compete in more
-              than one category at an event, those categories must be
-              allocated to separate groups. For example, if climbers may
-              compete in a Lead category and a Boulder category, then
-              you might choose to have two groups: <i>Lead</i>
-              and <i>Boulder</i>. If some competitors are permitted to
-              enter a Youth category and an Open category in both Lead
-              and Boulder, then you might have four groups: <i>Youth
-                Lead</i>, <i>Youth Boulder</i>, <i>Open Lead</i>
-              and <i>Open Boulder</i>.</li>
+            <li>Enter the <b>group</b> name, e.g. <i>Boulder Open</i>. Where individual climbers may
+              compete in more than one category at an event, those categories must be allocated to
+              separate groups. For example, if climbers may compete in a Lead category and a Boulder
+              category, then you might choose to have two groups: <i>Lead</i> and <i>Boulder</i>. If
+              some competitors are permitted to enter a Youth category and an Open category in both
+              Lead and Boulder, then you might have four groups: <i>Youth Lead</i>, <i>Youth
+                Boulder</i>, <i>Open Lead</i> and <i>Open Boulder</i>. Minimizing your organization's
+              total number of groups keeps your <i>Registrations</i> page tidy, which aids fast and
+              easy registration of competitors.</li>
 
             <li>Select the <b>type</b> from the dropdown menu.</li>
 
             <li>Enter the
               <inlinehelp>
                 <a href="#comp-format-lead"><b>comp format</b></a><popup>{{> CompFormatLead}}{{> CompFormatBoulder}}</popup>
-              </inlinehelp>.
+              </inlinehelp> (Lead and Boulder only).
             </li>
 
             <li>Select the <b>gender</b> from the dropdown menu.</li>
@@ -315,8 +250,10 @@
       </p>
       <span name="comp-format-lead">
         {{> CompFormatLead}}
-        <span name="comp-format-boulder">
-          {{> CompFormatBoulder}}
+      </span>
+      <span name="comp-format-boulder">
+        {{> CompFormatBoulder}}
+      </span>
     </section>
 
     <section name="series-add">
@@ -346,94 +283,12 @@
       </p>
     </section>
 
-    <section name="event-add">
-      <h1>Add, edit and delete events</h1>
-      <p>
-        Admins only.
-      </p>
-      {{> SignedIn}}
-      <ol>
-        <li>Click <i>Calendar</i> in the menu.</li>
-        <li>Click <i>Add new event</i>.<br>
-          Or, to edit or delete an existing event,
-          <inlinehelp>
-            go to the <i>Edit event</i> page<popup>{{> NavEditEvent}}</popup>
-          </inlinehelp>
-          for the event.
-        </li>
-      </ol>
-    </section>
-
     <section name="registration">
-      <h1>Register climbers for an event</h1>
-      <p>
-        Admins only.
-      </p>
-      {{> SignedIn}}
-
-      <section>
-        <span name="upload-registrations">
-          <h1>Upload multiple registrations from file</h1>
-          <p>The current <i>Upload registrations</i> feature is a hack designed for use with Climbing NZ's registration system. Climbing NZ users, please contact your Org Admin for instructions. Other organizations, please <a href="mailto:piki@vimaly.com?subject=requesting%20Piki%20upload%20reg%20instructions%20and%20sample">email Piki</a> to request instructions and a sample CSV file showing the format you will need to use in your upload file.
-          </p>
-      </section>
-
-      <section>
-        <h1>Register an individual climber for an event</h1>
-        <ol>
-          <li>
-            <inlinehelp>
-              Go to the <i>Registrations</i> page<popup>{{> NavReg}}</popup>
-            </inlinehelp>
-            for the event.
-          </li>
-          <li>On the <i>Registrations</i> page, begin entering the climber’s name in the cell provided.</li>
-          <li>Select the climber’s name from the dropdown list.<br>
-            Or, if the climber's name is not in the dropdown list (that is, the climber has not been added to your organization's <i>Climbers</i> list), continue typing the climber's name until <i>Add [climber's name]</i> shows in the dropdown list. Select this and enter the climber's details in the popup form. Click <i>Create</i> to confirm the climber's details. This adds the climber to your organization's <i>Climbers</i> list; the climber can now be registered for the event.
-          </li>
-          <li>Enter a competitor number if desired, and select the competitor's categories from the dropdown lists.</li>
-          <li>Click <i>Register</i> to confirm registration.</li>
-        </ol>
-      </section>
-    </section>
-
-    <section name="reg-change">
-      <h1>Change or remove a competitor’s registration</h1>
-      <p>
-        Admins only.
-      </p>
-      {{> SignedIn}}
-      <ol>
-        <li>
-          <inlinehelp>
-            Go to the <i>Registrations</i> page<popup>{{> NavReg}}</popup>
-          </inlinehelp>
-          for the event.
-        </li>
-        <li>On the <i>Registrations</i> page, click on the competitor’s name.</li>
-        <li>Change the competitor's registration, and click <i>Save</i> to confirm.<br>
-          Or deregister the competitor and confirm in the popup box.</li>
-      </ol>
-    </section>
-
-    <section name="comp-number">
-      <h1>Designate or change a competitor number</h1>
-      <p>
-        Admins only.
-      </p>
-      {{> SignedIn}}
-      <ol>
-        <li>
-          Click <i>Climbers</i> in the menu, or
-          <inlinehelp>
-            go to the <i>Registrations</i> page<popup>{{> NavReg}}</popup>
-          </inlinehelp>
-          for an event in which the competitor is registered.
-        </li>
-        <li>Select the climber from the list.</li>
-        <li>Enter the competitor number in the cell provided.</li>
-        <li>Click <i>Save</i> to confirm.</li>
-      </ol>
+      <h1>Upload multiple registrations from file</h1>
+      <span name="upload-registrations">
+        <p>The current <i>Upload registrations</i> feature is a hack designed for use with Climbing NZ's registration system. Climbing NZ users, please contact your Org Admin for instructions. Other organizations, please <a href="mailto:piki@vimaly.com?subject=requesting%20Piki%20upload%20reg%20instructions%20and%20sample">email Piki</a> to request instructions and a sample CSV file showing the format you will need to use in your upload file.
+        </p>
+      </span>
     </section>
 
     <section name="view-and-print">
@@ -443,7 +298,7 @@
         <inlinehelp>
           start lists<popup>{{> NavStartLists}}</popup>
         </inlinehelp>
-         {{> Judgingsheets}}
+        {{> Judgingsheets}}
       </p>
     </section>
 
@@ -463,67 +318,73 @@
           Alternatively, from the <i>Results</i> page for the desired round or route, click <i>Show start order</i> at the top right of the page, or click in one of the <i>score</i> cells.
         </li>
         <li>At the start list, click in the appropriate cell in the
-          table and type the score (see <i>Lead scores</i> and <i>Boulder scores</i> below for details).</li>
+          table and type the score (see <i>Lead scores</i>, <i>Boulder scores</i> and <i>Speed scores</i> below for details).</li>
         <li>Press <i>Tab</i> to move to the next cell.</li>
       </ol>
 
       <section>
+        <h1>Lead scores</h1>
         <p>
-          <h1>Lead scores</h1>
+          Valid scores:
           <ul>
-            <li><tt><b>n</b></tt> (e.g. 23)</li>
-            <li><tt><b>n+</b></tt> (e.g. 23+)</li>
+            <li><tt><b><i>n</i></b></tt> (<i>n</i> = the number associated with the furthest hold the competitor controlled, e.g. 23)</li>
+            <li><tt><b><i>n</i>+</b></tt> (e.g. 23+)</li>
             <li><tt><b>t</b></tt> (indicates "top")</li>
             <li><tt><b>dnc</b></tt> (indicates "did not climb")</li>
           </ul>
+        </p>
+        <p>
           To record time taken in a Lead final (to use in scoring in case
           of a tie after countback), enter the time taken:
           <ul>
             <li><tt><b>m:ss</b> (e.g. 7:33)</li>
           </ul>
         </p>
+
+        <h1>Boulder scores</h1>
         <p>
-          <h1>Boulder scores</h1>
           Beside each competitor's name, in the <i>Result</i> column, is a score box for each boulder in the course. There are two cells in each score box:
           <ol>
             <li>At the <b>top left</b>: <img src="/images/boulder-score-attempts-to-top.png" alt="Enter attempts to complete"  width="32" height="32" style="padding:3px; vertical-align: middle; margin-bottom: 3px; margin-left: 1px;"></li>
             <li>At the <b>lower right</b>: <img src="/images/boulder-score-attempts-to-bonus.png" alt="Enter attempts to bonus" width="32" height="32" style="padding:3px; vertical-align: middle; margin-bottom: 3px; margin-left: 1px;"></li>
           </ol>
-          <br>
-          <table>
-            <tr>
-              <th>To show:</th>
-              <th>Enter:</th>
-              <th>In:</th>
-            </tr>
-            <tr>
-              <td>The number of attempts in which the <b>competitor completed the boulder</b></td>
-              <td>The number of attempts it took the competitor to complete the boulder</td>
-              <td>The <b>top left cell</b> in the score box</td>
-            </tr>
-            <tr>
-              <td>The number of attempts in which the <b>competitor achieved the zone hold</b></td>
-              <td>The number of attempts it took the competitor to achieve the zone hold</td>
-              <td>The <b>lower right cell</b> in the score box</td>
-            </tr>
-            <tr>
-              <td>The competitor attempted and <b>did not complete the boulder</b></td>
-              <td>"<b>-</b>" (dash) (Optional)</td>
-              <td>The <b>top left cell</b> in the score box</td>
-            </tr>
-            <tr>
-              <td>The competitor attempted the boulder and <b>did not achieve the zone hold</b></td>
-              <td>"<b>-</b>" (dash)</td>
-              <td>Either cell in the score box</td>
-            </tr>
-            <tr>
-              <td>The competitor <b>did not attempt the boulder</b></td>
-              <td>"<b>nc</b>" (did not climb)</td>
-              <td>Either cell in the score box</td>
-            <tr>
-          </table>
-          <br>
-          <b>Note:</b> If a number for attempts to achieve the zone hold is entered which is greater than the attempts to complete the boulder, the score will not be saved and the cell will be highlighted to indicate an invalid score, because it is not possible for a competitor to take more attempts to achieve the zone hold than to complete the boulder.<br><br>
+        </p>
+        <table>
+          <tr>
+            <th>To show:</th>
+            <th>Enter:</th>
+            <th>In:</th>
+          </tr>
+          <tr>
+            <td>The number of attempts in which the <b>competitor completed the boulder</b></td>
+            <td>The number of attempts it took the competitor to complete the boulder</td>
+            <td>The <b>top left cell</b> in the score box</td>
+          </tr>
+          <tr>
+            <td>The number of attempts in which the <b>competitor achieved the zone hold</b></td>
+            <td>The number of attempts it took the competitor to achieve the zone hold</td>
+            <td>The <b>lower right cell</b> in the score box</td>
+          </tr>
+          <tr>
+            <td>The competitor attempted and <b>did not complete the boulder</b></td>
+            <td>"<b>-</b>" (dash) (Optional)</td>
+            <td>The <b>top left cell</b> in the score box</td>
+          </tr>
+          <tr>
+            <td>The competitor attempted the boulder and <b>did not achieve the zone hold</b></td>
+            <td>"<b>-</b>" (dash)</td>
+            <td>Either cell in the score box</td>
+          </tr>
+          <tr>
+            <td>The competitor <b>did not attempt the boulder</b></td>
+            <td>"<b>nc</b>" (did not climb)</td>
+            <td>Either cell in the score box</td>
+          <tr>
+        </table>
+        <p>
+          <b>Note:</b> If a number for attempts to achieve the zone hold is entered which is greater than the attempts to complete the boulder, the score will not be saved and the cell will be highlighted to indicate an invalid score, because it is not possible for a competitor to take more attempts to achieve the zone hold than to complete the boulder.
+        </p>
+        <p>
           <b>Piki totals the boulder scores entered and displays the sum</b> in the format:
           <ul>
             <li><tt><b><i>n</i>T <i>n</i>Z <i>a</i>AT <i>a</i>AZ</b></tt> (<i>n</i> = the number of tops or zone holds achieved; <i>a</i>
@@ -533,6 +394,7 @@
               attempts)</li>
             <li><tt>0T 0Z</tt> (no tops or zone holds achieved)</li>
           </ul>
+        </p>
         <p>
           Or prior to 2018 in the format:
           <ul>
@@ -545,11 +407,33 @@
             <li><tt>0t 0b</tt> (no tops or bonus holds achieved)</li>
           </ul>
         </p>
+
+        <h1>Speed scores</h1>
+        <p>
+          Valid scores:
+          <ul>
+            <li>a time in seconds, e.g. 9.876</li>
+            <li><b>fall</b></li>
+            <li><b>fs</b> (false start)</li>
+            <li><b>wc</b> (wildcard; given to a competitor in a race in the Final Round whose opponent makes a false start)</li>
+            <li><b>-</b> (did not race)</li>
+          </ul>
+        </p>
+        <p>
+          <b>Note:</b> if a competitor wins the final race (the race for 1st and 2nd) because their opponent makes a false start, that winning competitor is granted one attempt to try to break records. If that winning competitor makes a false start in their attempt to break records, Piki users should not enter a score of <i>fs</i> (false start) for that winning competitor (because that gives the appearance of a tie, and Piki will automatically apply tiebreak prodedures). Instead, Piki users should enter a score of <i>wc</i> (wildcard) for the winning competitor.
+        </p>
       </section>
     </section>
 
     <section name="navigate">
       <h1>Navigate Piki</h1>
+      <span name="user-sign-in">
+        <p>To <b><i>sign in</i></b> as a user:</p>
+        <ul>
+          <li>Click <i>Sign in</i> in the menu.</li>
+          <li>If you do not know your password, click <i>Sign in</i>, then click <i>Forgot password</i>.</li>
+        </ul>
+      </span>
       <span name="go-to-results-start-lists">
         <p>
           To go to <b><i>Results</i></b> or <b><i>Start lists</i></b> for an event:
@@ -561,13 +445,6 @@
       </span>
       <span name="go-to-series-results">
         {{> NavSeriesResults}}
-      </span>
-      <span name="user-sign-in">
-        <p>To <b><i>sign in</i></b> as a user:</p>
-        <ul>
-          <li>Click <i>Sign in</i> in the menu.</li>
-          <li>If you do not know your password, click <i>Sign in</i>, then click <i>Forgot password</i>.</li>
-        </ul>
       </span>
       <span name="go-to-edit-event">
         To go to the <b><i>Edit event</i></b> page for an event:
@@ -592,14 +469,14 @@
           <li>To fix known defects.</li>
           <li>That Piki will function as described in this <i>Help</i> document or in other communications.</li>
           <li>That Piki organizations and users will continue to have access to their Piki accounts.</li>
-          <li>That data entered into the Piki system will be kept private. We will endeavour to ensure, but do not undertake, that only Piki's developers and the organization's users with admin status can access users' email addresses.</li>
-          <li>That data entered into Piki will be saved and will continue to be available to the organization. We will endeavour to ensure, but do not undertake, that data stored in Piki is backed up.</li>
+          <li>That data entered into the Piki system will be kept private. We will endeavour to ensure, but do not undertake, that only Piki's developers and an organization's users with admin status can access that organization's user email addresses.</li>
+          <li>That data entered into Piki will be saved and will continue to be available to the organization. We will endeavour to ensure, but do not undertake, that data stored in Piki is backed up, and made available to user organizations on request.</li>
           <li>To accept applications to register as an organization.</li>
           <li>To provide training, help or support.</li>
         </ul>
       </p>
       <p>
-        Piki's developers take no responsibility for Piki's content, entered by themselves or by users. In particular, Piki takes no responsibility for the accuracy or offensiveness of any content. At the developers' discretion, offensive content may be removed without warning.
+        Piki's developers take no responsibility for Piki's content. In particular, Piki takes no responsibility for the accuracy or offensiveness of any content. At the developers' discretion, offensive content may be removed without warning.
       </p>
     </section>
 
@@ -623,7 +500,7 @@
         <h1>The page doesn't look good</h1>
         <p>Piki is developed and tested only for use with the <a href="https://www.google.com/intl/en/chrome/browser/">Google Chrome web browser</a>. Piki may or may not work with other web browsers.
         </p>
-        <p>Some pages currently do not display well on tablet or phone. Piki's developers intend to address this issue.
+        <p>Some pages might not display well on tablet or phone.
         </p>
 
         <h1>Where are the judging sheets for entering scores by hand during climbing?</h1>
@@ -632,7 +509,7 @@
           <inlinehelp>
             start lists<popup>{{> NavStartLists}}</popup>
           </inlinehelp>
-           {{> Judgingsheets}}
+          {{> Judgingsheets}}
         </p>
 
         <h1>What does a score of <i>DNC</i> or <i>nc</i> mean?</h1>
@@ -640,7 +517,9 @@
         </p>
 
         <h1>What does a score of "<b>-</b>" (dash) mean?</h1>
-        <p>The competitor attempted the boulder and did not achieve the zone hold.
+        <p>Boulder: the competitor attempted the boulder and did not achieve the zone hold.
+        </p>
+        <p>Speed: the competitor did not race.
         </p>
 
         <h1>How are the rankings, series results or team results calculated?</h1>
