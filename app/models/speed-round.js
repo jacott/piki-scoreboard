@@ -12,6 +12,12 @@ define((require, exports, module)=>{
   const NO_TIME = 1000000;
   const COMPARE = 'compare', SORT = 'sort', TIEBREAK = 'tiebreak';
 
+  const ERROR = {
+    hasTies: 'Ties need to be broken by extra runs in lane A',
+    missingScore: 'All scores need to be entered',
+    timeVsFS: 'Invalid score combination: time vs "fs". Enter "wc" (wildcard) instead of time',
+  };
+
   const isQualFormat = stage => stage == 0 || stage == -2;
 
   const CONVERT_TIME = {
@@ -378,6 +384,8 @@ define((require, exports, module)=>{
         ? {time: 'tie', attempt: last+1, stage: 1} : {time: 'tie', attempt: last+1});
   };
 
+  const fallOrTime = (score)=> score === 'fall' || typeof score === 'number';
+
   class SpeedRound {
     constructor(opts) {
       Object.assign(this, opts);
@@ -414,14 +422,22 @@ define((require, exports, module)=>{
       }
     }
 
-    isComplete(res) {
+    checkValid(resA) {
       const {stage} = this;
       if (isQualFormat(stage)) {
-        const quals = res.scores[stage == 0 ? 1 : 2];
-        return quals !== undefined && quals[0] != null && quals[1] != null;
+        const quals = resA.scores[stage == 0 ? 1 : 2];
+        return (quals !== undefined && quals[0] != null && quals[1] != null)
+          ? '' : ERROR.missingScore;
       }
-      const score = res.scores[stage+1];
-      return score == null ? false : score.time != null;
+      const scoreA = resA.scores[stage+1];
+      if (scoreA == null || scoreA.time == null) return ERROR.missingScore;
+      const scoreB = resA[laneB$].scores[stage+1];
+      if (scoreB == null || scoreB.time == null) return ERROR.missingScore;
+      if (stage != 1 &&
+          ((scoreA.time === 'fs' && fallOrTime(scoreB.time)) ||
+           (scoreB.time === 'fs' && fallOrTime(scoreA.time))))
+        return ERROR.timeVsFS;
+      return '';
     }
 
     whoWonFinals(resA) {
@@ -512,25 +528,24 @@ define((require, exports, module)=>{
 
     complete() {
       const {stage} = this;
-      let isComplete = true, hasTies = false, nextStage = stage;
+      let error = '', nextStage = stage;
       let validCount = 0;
       for (const res of this) {
-        if (! this.isComplete(res, 0)) {
-          isComplete = false; break;
-        }
+        error = this.checkValid(res);
+        if (error !== '') break;
         this.isTimeValid(res) && ++validCount;
       }
-      if (isComplete) {
+      if (error === '') {
         if (isQualFormat(stage)) {
           const cutoff = stage == 0 ? 1<<countToStage(validCount) : 3;
 
           if (stage == -2 || (validCount > 3 && validCount > cutoff)) {
             for (const res of tiesOf(this, cutoff)) {
-              hasTies = true;
+              error = ERROR.hasTies;
               addTieAttempt(this, res);
             }
           }
-          if (! hasTies && isQualFormat(stage)) {
+          if (error === '' && isQualFormat(stage)) {
             nextStage = stage == 0
               ? validCount >= 4 ? countToStage(validCount) : -2
             : -3;
@@ -540,16 +555,16 @@ define((require, exports, module)=>{
             if (compareKnockout(res, res[laneB$], stage) == 0) {
               addTieAttempt(this, res);
               addTieAttempt(this, res[laneB$]);
-              hasTies = true;
+              error = ERROR.hasTies;
             }
           }
-          if (! hasTies) {
+          if (error === '') {
             if (stage > 1) --nextStage;
             else nextStage = -3;
           }
         }
       }
-      return {isComplete: isComplete && ! hasTies, hasTies, nextStage};
+      return {error, nextStage};
     }
 
     stageScores(res) {
@@ -577,6 +592,7 @@ define((require, exports, module)=>{
     }
   }
 
+  SpeedRound.ERROR = ERROR;
   SpeedRound.laneA = res => res[laneA$];
   SpeedRound.laneB = res => res[laneB$];
   SpeedRound.ranking = res => res[ranking$];

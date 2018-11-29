@@ -265,13 +265,12 @@ define((require, exports, module)=>{
       const {data} = $.ctx;
       const {round} = $.ctx.data;
 
-      const {isComplete, hasTies, nextStage} = round.complete();
+      const {error, nextStage} = round.complete();
 
-      if (! isComplete) {
+      if (error !== '') {
         this.appendChild(Dom.h({
           class: 'info',
-          div: hasTies
-            ? 'Ties need to be broken by extra runs in lane A' : 'All scores need to be entered'}));
+          div: error}));
       } else {
         Dialog.confirm({
           content: `Do you wish to proceed from the "${HEAT_NAME[data.heatNumber]

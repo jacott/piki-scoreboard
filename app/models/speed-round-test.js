@@ -14,6 +14,8 @@ isClient && define((require, exports, module)=>{
 
   const private = SpeedRound[private$];
 
+  const {hasTies, missingScore, timeVsFS} = SpeedRound.ERROR;
+
   const createResults = (ans, opts)=>{
     for (const id in opts) {
       Factory.createClimber({name: 'climber_'+id});
@@ -56,6 +58,87 @@ isClient && define((require, exports, module)=>{
     });
 
     group("complete", ()=>{
+      test("missing times", ()=>{
+        TH.login();
+        const res = {};
+        createResults(res, {
+          r01: [0.31, [6000, 7000], , {time: 8655, opponent_id: 'r02'}],
+          r02: [0.21, [6000, 7000], , {time: 'fs', opponent_id: 'r01'}],
+          r03: [0.41, [6000, 7000], , {time: 6655, opponent_id: 'r04'}],
+          r04: [0.51, [6000, 7000], , {time: null, opponent_id: 'r03'}],
+        });
+
+        const round = new SpeedRound({
+          stage: 2, previous: 0, query: Enumerable.propertyValues(res)});
+        round.calcStartList();
+
+        assert.equals(round.complete(), {
+          error: 'All scores need to be entered',
+          nextStage: 2});
+      });
+
+      test("checkValid", ()=>{
+        TH.login();
+        const res = {};
+        createResults(res, {
+          r01: [0.31, [6000, 7000], , {time: 8655, opponent_id: 'r02'}],
+          r02: [0.21, [6000, 7000], , {time: 'fs', opponent_id: 'r01'}],
+          r03: [0.41, [6000, 7000], , {time: 6655, opponent_id: 'r04'}],
+          r04: [0.51, [6000, 7000], , {time: 5655, opponent_id: 'r03'}],
+        });
+
+        const round = new SpeedRound({
+          stage: 2, previous: 0, query: Enumerable.propertyValues(res)});
+        round.calcStartList();
+
+        assert.equals(round.complete(), {
+          error: 'Invalid score combination: time vs "fs". Enter "wc" (wildcard) instead of time',
+          nextStage: 2});
+
+        res.r01.scores[3].time = 'fall';
+
+        assert.equals(round.complete(), {
+          error: timeVsFS,
+          nextStage: 2});
+
+        res.r01.scores[3].time = null;
+
+        assert.equals(round.complete(), {
+          error: missingScore,
+          nextStage: 2});
+
+        res.r01.scores[3].time = '-';
+
+        assert.equals(round.complete(), {
+          error: '',
+          nextStage: 1});
+
+        res.r01.scores[3].time = 'fs';
+        res.r02.scores[3].time = 6789;
+
+        assert.equals(round.complete(), {
+          error: timeVsFS,
+          nextStage: 2});
+
+        res.r02.scores[3].time = 'fall';
+
+        assert.equals(round.complete(), {
+          error: timeVsFS,
+          nextStage: 2});
+
+        res.r02.scores[3].time = null;
+
+        assert.equals(round.complete(), {
+          error: missingScore,
+          nextStage: 2});
+
+        res.r02.scores[3] = null;
+
+        assert.equals(round.complete(), {
+          error: missingScore,
+          nextStage: 2});
+      });
+
       test("quals", ()=>{
         TH.login();
         const res = {};
@@ -72,7 +155,8 @@ isClient && define((require, exports, module)=>{
           stage: 0, previous: 0, query: Enumerable.propertyValues(res)});
         round.calcStartList();
 
-        assert.equals(round.complete(), {isComplete: false, hasTies: true, nextStage: 0});
+        assert.equals(round.complete(), {
+          error: 'Ties need to be broken by extra runs in lane A', nextStage: 0});
 
         assert.equals(Array.from(round.query).map(r => r.scores[1]), [
           [6001, 7000], [6102, 7000],
@@ -83,8 +167,7 @@ isClient && define((require, exports, module)=>{
           res['r'+i].scores[1][2] = 6754;
         }
 
-
-        assert.equals(round.complete(), {isComplete: false, hasTies: true, nextStage: 0});
+        assert.equals(round.complete(), {error: hasTies, nextStage: 0});
 
         assert.equals(Array.from(round.query).map(r => r.scores[1]), [
           [6001, 7000], [6102, 7000],
@@ -95,7 +178,7 @@ isClient && define((require, exports, module)=>{
           res['r'+i].scores[1][3] = 6744-i;
         }
 
-        assert.equals(round.complete(), {isComplete: true, hasTies: false, nextStage: 2});
+        assert.equals(round.complete(), {error: '', nextStage: 2});
       });
 
       test("qual re-run", ()=>{
@@ -113,7 +196,7 @@ isClient && define((require, exports, module)=>{
           stage: -2, previous: 0, query: Enumerable.propertyValues(res)});
         round.calcStartList();
 
-        assert.equals(round.complete(), {isComplete: false, hasTies: true, nextStage: -2});
+        assert.equals(round.complete(), {error: hasTies, nextStage: -2});
 
         assert.equals(Array.from(round.query).map(r => r.scores[2]), [
           [6500, 6600, 'tie'], [6500, 6600, 'tie'], [6500, 6600, 'tie'],
@@ -123,7 +206,7 @@ isClient && define((require, exports, module)=>{
           res['r'+i].scores[2][2] = 6754+(i%4);
         }
 
-        assert.equals(round.complete(), {isComplete: true, hasTies: false, nextStage: -3});
+        assert.equals(round.complete(), {error: '', nextStage: -3});
 
         assert.equals(Array.from(round.query).map(r => r.scores[2]), [
           [6500, 6600, 6755], [6500, 6600, 6756], [6500, 6600, 6757],
@@ -144,7 +227,7 @@ isClient && define((require, exports, module)=>{
           stage: 2, previous: 0, query: Enumerable.propertyValues(res)});
         round.calcStartList();
 
-        assert.equals(round.complete(), {isComplete: false, hasTies: true, nextStage: 2});
+        assert.equals(round.complete(), {error: hasTies, nextStage: 2});
 
         assert.equals(Array.from(round.query).map(r => r.scores[3]), [
           {time: 6655, opponent_id: 'r02', tiebreak: ['tie']},
@@ -155,7 +238,7 @@ isClient && define((require, exports, module)=>{
         for(let i = 1; i <= 4 ; ++i) res['r0'+i].scores[3].tiebreak[0] = 6754;
 
 
-        assert.equals(round.complete(), {isComplete: false, hasTies: true, nextStage: 2});
+        assert.equals(round.complete(), {error: hasTies, nextStage: 2});
 
         assert.equals(Array.from(round.query).map(r => r.scores[3]), [
           {time: 6655, opponent_id: 'r02', tiebreak: [6754, 'tie']},
@@ -165,7 +248,7 @@ isClient && define((require, exports, module)=>{
 
         for(let i = 1; i <= 4 ; ++i) res['r0'+i].scores[3].tiebreak[1] = i % 2 == 0 ? 6800 : 6900;
 
-        assert.equals(round.complete(), {isComplete: true, hasTies: false, nextStage: 1});
+        assert.equals(round.complete(), {error: '', nextStage: 1});
       });
 
       test("final", ()=>{
@@ -182,7 +265,7 @@ isClient && define((require, exports, module)=>{
           stage: 1, previous: 2, query: Enumerable.propertyValues(res)});
         round.calcStartList();
 
-        assert.equals(round.complete(), {isComplete: false, hasTies: true, nextStage: 1});
+        assert.equals(round.complete(), {error: hasTies, nextStage: 1});
 
         assert.equals(Array.from(round.query).map(r => r.scores[2]), [
           {time: 6555, opponent_id: 'r04', tiebreak: ['tie']},
@@ -192,7 +275,7 @@ isClient && define((require, exports, module)=>{
 
         for(let i = 1; i <= 4 ; ++i) res['r0'+i].scores[2].tiebreak[0] = 6754;
 
-        assert.equals(round.complete(), {isComplete: false, hasTies: true, nextStage: 1});
+        assert.equals(round.complete(), {error: hasTies, nextStage: 1});
 
         assert.equals(Array.from(round.query).map(r => r.scores[2]), [
           {time: 6555, opponent_id: 'r04', tiebreak: [6754, 'tie']},
@@ -202,7 +285,7 @@ isClient && define((require, exports, module)=>{
 
         for(let i = 1; i <= 4 ; ++i) res['r0'+i].scores[2].tiebreak[1] = i % 2 == 0 ? 6800 : 6900;
 
-        assert.equals(round.complete(), {isComplete: true, hasTies: false, nextStage: -3});
+        assert.equals(round.complete(), {error: '', nextStage: -3});
       });
     });
 
@@ -284,15 +367,15 @@ isClient && define((require, exports, module)=>{
         assert.isTrue(round.hasClimbed({scores: [0.4, [6532, 'fall', 10144]]}));
       });
 
-      test("isComplete", ()=>{
+      test("checkValid missingScore", ()=>{
         const round = new SpeedRound({stage: 0});
 
-        assert.isTrue(round.isComplete({scores: [0.4, [1234, 5678]]}));
-        assert.isTrue(round.isComplete({scores: [0.4, ['fall', 5678]]}));
-        assert.isFalse(round.isComplete({scores: [0.4, ['fall', null]]}));
-        assert.isFalse(round.isComplete({scores: [0.4]}));
-        assert.isFalse(round.isComplete({scores: [0.4, ['fs']]}));
-        assert.isFalse(round.isComplete({scores: [0.4, [1234]]}));
+        assert.same(round.checkValid({scores: [0.4, [1234, 5678]]}), '');
+        assert.same(round.checkValid({scores: [0.4, ['fall', 5678]]}), '');
+        assert.same(round.checkValid({scores: [0.4, ['fall', null]]}), missingScore);
+        assert.same(round.checkValid({scores: [0.4]}), missingScore);
+        assert.same(round.checkValid({scores: [0.4, ['fs']]}), missingScore);
+        assert.same(round.checkValid({scores: [0.4, [1234]]}), missingScore);
       });
 
       test("getTime", ()=>{
@@ -565,13 +648,12 @@ isClient && define((require, exports, module)=>{
         assert.isFalse(round.hasClimbed({scores: [0.4, [6532, 1234], {time: null}]}));
       });
 
-      test("isComplete", ()=>{
+      test("checkValid missingScore", ()=>{
         const round = new SpeedRound({stage: 1});
 
-        assert.isFalse(round.isComplete({scores: [0.4, [1234, 5678]]}));
-        assert.isFalse(round.isComplete({scores: [0.4]}));
-        assert.isFalse(round.isComplete({scores: [0.4, , {time: null}]}));
-        assert.isTrue(round.isComplete({scores: [0.4, , {time: 1234}]}));
+        assert.same(round.checkValid({scores: [0.4, [1234, 5678]]}), missingScore);
+        assert.same(round.checkValid({scores: [0.4]}), missingScore);
+        assert.same(round.checkValid({scores: [0.4, , {time: null}]}), missingScore);
       });
 
       test("getTime", ()=>{
