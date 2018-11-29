@@ -28,6 +28,8 @@ define((require, exports, module)=>{
   };
 
   const toNumber = time => typeof time === 'number' ? time : CONVERT_TIME[time] || NOT_CLIMBED_SCORE;
+  const stage1ToNumber = time => typeof time === 'number'
+        ? time : (time == 'fs' ? NO_TIME+1 : CONVERT_TIME[time]) || NOT_CLIMBED_SCORE;
 
   const randomOrder = ({scores}, random) => {
     let x = Math.floor(scores[0]*random);
@@ -201,7 +203,8 @@ define((require, exports, module)=>{
     const sb = b.scores[stage+1];
     if (sb == null) return sa == null ? 0 : -1;
     if (sa == null) return 1;
-    let ans = toNumber(sa.time) - toNumber(sb.time);
+    let ans = stage == 1
+        ? stage1ToNumber(sa.time) - stage1ToNumber(sb.time) : toNumber(sa.time) - toNumber(sb.time);
     if (ans != 0) return ans;
     ans = compareQualResultTIEBREAK(a, b);
     if (ans != 0) return ans;

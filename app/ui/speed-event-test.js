@@ -1101,8 +1101,7 @@ Rank Climber Final  Semi-final  Qual
       });
 
 
-      // FIXME failing test
-      test("// final race fall beats fs", ()=>{
+      test("final race fall beats fs", ()=>{
         withStartlist(`
 A
 B
