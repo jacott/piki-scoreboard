@@ -186,8 +186,8 @@ isClient && define((require, exports, module)=>{
         const res = {};
         createResults(res, {
           r1: [0.31, [6001, 7000], [6500, 6600]],
-          r2: [0.21, [6102, 7000], [6500, 6600]],
-          r3: [0.41, [6500, 7000], [6500, 6600]],
+          r2: [0.21, [6001, 7000], [6500, 6600]],
+          r3: [0.41, [6001, 7000], [6500, 6600]],
           r4: [0.61, ['fs', 6500], [6500, 6600]],
           r5: [0.61, ['fs', 6500], [6500, 6600]],
         });
@@ -200,9 +200,9 @@ isClient && define((require, exports, module)=>{
 
         assert.equals(Array.from(round.query).map(r => r.scores[2]), [
           [6500, 6600, 'tie'], [6500, 6600, 'tie'], [6500, 6600, 'tie'],
-          [6500, 6600, 'tie'], [6500, 6600, 'tie']]);
+          [6500, 6600], [6500, 6600]]);
 
-        for(let i = 1; i <= 5 ; ++i) {
+        for(let i = 1; i <= 3; ++i) {
           res['r'+i].scores[2][2] = 6754+(i%4);
         }
 
@@ -210,7 +210,8 @@ isClient && define((require, exports, module)=>{
 
         assert.equals(Array.from(round.query).map(r => r.scores[2]), [
           [6500, 6600, 6755], [6500, 6600, 6756], [6500, 6600, 6757],
-          [6500, 6600, 6754], [6500, 6600, 6755]]);
+          [6500, 6600], [6500, 6600]]);
+
       });
 
       test("semi final", ()=>{

@@ -104,16 +104,22 @@ define((require, exports, module)=>{
   const compareQualResultCOMPARE = compareQualResult(1, COMPARE);
   const compareQualResultTIEBREAK = compareQualResult(1, TIEBREAK);
 
-  const compareQualRerunTIEBREAK = compareQualResult(2, TIEBREAK);
-  const compareQualRerunCOMPARE = (a,b)=>{
-    const ans = compareQualRerunTIEBREAK(a, b);
-    return ans == 0
-      ? compareQualResultCOMPARE(a, b) : ans;
-  };
+  const _compareQualRerunTIES = compareQualResult(2, TIEBREAK);
+
   const compareQualRerunSORT = (a,b)=>{
-    const ans = compareQualRerunTIEBREAK(a, b);
-    return ans == 0
-      ? compareQualResultSORT(a, b) : ans;
+    if (a === b) return 0;
+    return _compareQualRerunTIES(a, b) || compareQualResultSORT(a, b);
+  };
+
+  const compareQualRerunCOMPARE = (a,b)=>{
+    if (a === b) return 0;
+    return _compareQualRerunTIES(a, b) || compareQualResultCOMPARE(a, b);
+  };
+
+
+  const compareQualRerunTIEBREAK = (a,b)=>{
+    if (a === b) return 0;
+    return _compareQualRerunTIES(a, b) || compareQualResultTIEBREAK(a, b);
   };
 
   const timeFor = (scores, stage)=>{
@@ -358,13 +364,25 @@ define((require, exports, module)=>{
   const INV_LOG2 = 1/Math.log(2);
   const countToStage = (count)=>Math.max(1, Math.floor(Math.log(.2+Math.min(16, count))*INV_LOG2));
 
-  const getCompare = ({stage})=>{
-    if (stage == 0) return compareQualResultTIEBREAK;
-    if (stage == -2) return compareQualRerunTIEBREAK;
-  };
+  function *tiesOfRerun(round) {
+    const compare = compareQualRerunTIEBREAK;
+    const nr = Array.from(round).sort(compare);
+    const last = nr.length-1;
+    if (last == -1) return;
+    let prev = nr[0], prevTie = null;
+    for(let i = 1; i <= last; ++i) {
+      const res = nr[i];
+      if (compare(prev, res) == 0) {
+        if (prevTie !== prev) yield prev;
+        yield res;
+        prevTie = res;
+      } else if (i > 2) break;
+      prev = res;
+    }
+  }
 
-  function *tiesOf(round, cutoff) {
-    const compare = getCompare(round);
+  function *tiesOfQual(round, cutoff) {
+    const compare = compareQualResultTIEBREAK;
     const nr = Array.from(round).sort(compare);
     const coRes = nr[cutoff-1];
     let tiesFound = false;
@@ -584,13 +602,18 @@ define((require, exports, module)=>{
         if (isQualFormat(stage)) {
           const cutoff = stage == 0 ? 1<<countToStage(validCount) : 3;
 
-          if (stage == -2 || (validCount > 3 && validCount > cutoff)) {
-            for (const res of tiesOf(this, cutoff)) {
+          if (stage == -2) {
+            for (const res of tiesOfRerun(this)) {
+              error = ERROR.hasTies;
+              addTieAttempt(this, res);
+            }
+          } else if (validCount > 3 && validCount > cutoff) {
+            for (const res of tiesOfQual(this, cutoff)) {
               error = ERROR.hasTies;
               addTieAttempt(this, res);
             }
           }
-          if (error === '' && isQualFormat(stage)) {
+          if (error === '') {
             nextStage = stage == 0
               ? validCount >= 4 ? countToStage(validCount) : -2
             : -3;

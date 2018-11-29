@@ -447,7 +447,7 @@ Rank Climber Semi-final 1/4-final  Round_of_16  Qual
       // 1. Compare slower times in repeat to 1/1000th second.
       // 2. Compare faster times in first Qual to 1/100th second.
       // 3. Remaining ties remain.
-      test("// repeat Qual ties", ()=>{
+      test("repeat Qual ties", ()=>{
         withStartlist(`
 A
 B
