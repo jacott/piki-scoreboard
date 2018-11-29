@@ -69,7 +69,7 @@ define((require, exports, module)=>{
     const list = new AutoList({
       template: ABRow,
       container: table.lastElementChild,
-      compare: SpeedRound.compareRanking,
+      compare: SpeedRound.compareRankingSORT,
       query: {
         forEach: add =>{for (const res of round) res && add(res)}
       }
@@ -107,7 +107,7 @@ define((require, exports, module)=>{
     const list = new AutoList({
       template: GeneralRow,
       container: table.lastElementChild,
-      compare: SpeedRound.compareRanking,
+      compare: SpeedRound.compareRankingSORT,
       query: {
         forEach: add =>{for (const res of round) add(res)}
       }

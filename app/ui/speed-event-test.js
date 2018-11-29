@@ -871,9 +871,11 @@ Rank Climber Semi-final 1/4-final  Round_of_16  Qual
       });
 
 
-      // FIXME: failing test relative overall rank of competitors eliminated and tied in 1/4-final,
-      // with previous stage scores not all tied: faster time, slower time, equal times
-       test("//eliminated and tied times in Final", ()=>{
+      test("eliminated and tied times in Final", ()=>{
+        /**
+         * relative overall rank of competitors eliminated and tied in 1/4-final, with previous
+         * stage scores not all tied: faster time, slower time, equal times
+         **/
         withStartlist(`
 A
 B
@@ -936,8 +938,8 @@ Rank Climber Semi-final 1/4-final  Round_of_16  Qual
 3    E       _          3.30       4.40         5.50
 4    C       _          1.10       2.20         7.70
 5    G       _          9.90       1.10         3.30
-6    N       _          9.90       5.50         5.10
-7    F       _          9.90       5.50         4.40
+6    F       _          9.90       5.50         4.40
+7    N       _          9.90       5.50         5.10
 8    I       _          9.90       8.80         1.10
 9    K       _          _          1.10         8.10
 10   O       _          _          3.30         4.10

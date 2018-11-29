@@ -152,7 +152,7 @@ define((require, exports, module)=>{
     let prev = null;
 
     const random = round[random$];
-    const entries = round.entries = new BTree(compareRanking);
+    const entries = round.entries = new BTree(compareRankingSORT);
     for (const res of list) {
       ++count;
 
@@ -227,8 +227,7 @@ define((require, exports, module)=>{
     round.recalcQualsStartList();
   };
 
-  const compareRanking = (a, b)=>{
-    const sa = a.scores, sb = b.scores;
+  const compareRankingSORT = (a, b)=>{
     const ans = a[ranking$] - b[ranking$];
     if (ans != 0)
       return ans;
@@ -238,7 +237,22 @@ define((require, exports, module)=>{
         ? a._id === b._id ? 0 : a._id < b._id ? -1 : 1 : ans;
     }
   };
-  compareRanking.compareKeys = [ranking$, random$, '_id'];
+  compareRankingSORT.compareKeys = [ranking$, random$, '_id'];
+
+  const compareRankingCOMPARE = (a, b)=> a[ranking$] - b[ranking$];
+
+  const compareKnockoutTimes = (a, b, level)=>{
+    if (level != 4 || (compareLevel(a, b, 4) == 0))
+      return compareRankingCOMPARE(a, b);
+    const mas = a.scores[level+1], mbs = b.scores[level+1];
+    if (mas == null)
+      return 1;
+    else if (mbs == null)
+      return -1;
+
+    const ans = toNumber(mas.time) - toNumber(mbs.time);
+    return ans != 0 ? ans : compareKnockoutTimes(a, b, level+1);
+  };
 
   const compareFinals = (a, b)=>{
     if (a === b) return 0;
@@ -261,16 +275,29 @@ define((require, exports, module)=>{
 
       const aw = isWinner(a, aOpp, level), bw = isWinner(b, bOpp, level);
       if (aw) {
-        return bw ? compareQualResultCOMPARE(a, b) : -1;
+        return bw ? compareRankingCOMPARE(a, b) : -1;
       } else if (bw) {
         return 1;
       } else {
         const ans = toNumber(mas.time) - toNumber(mbs.time);
-        return ans != 0 ? ans : compareQualResultCOMPARE(a, b);
+        return ans != 0 ? ans : compareKnockoutTimes(a, b, level+1);
       }
     }
   };
 
+  const breakElimWC = (a, b)=>{
+    const mas = a.scores[4], mbs = b.scores[4];
+    const ans = toNumber(mas.time) - toNumber(mbs.time);
+    return ans != 0 ? ans : compareRankingCOMPARE(a, b);
+  };
+
+  const reAddGeneralResult = (entries, res, ranking)=>{
+    if (res === null) return;
+    entries.delete(res);
+    res[ranking$] = ranking;
+    res[random$] = randomOrder(res, GENERAL_RESULTS_PRIME);
+    entries.add(res);
+  };
 
   const rankGeneralResults = (round)=>{
     rankQualResults(round);
@@ -287,19 +314,34 @@ define((require, exports, module)=>{
 
     finalists.sort(compareFinals);
 
+    let isWcIn16Elim = false;
+
+    if (finalists.length >= 16 && finalists[0].scores.length == 6) {
+      for(let i = 4; i < 8; ++i) {
+        const {scores} = finalists[i];
+        if (scores.length == 6 && scores[5].time == 'wc') {
+          finalists.splice(4, 4, ...finalists.slice(4,8).sort(breakElimWC));
+          isWcIn16Elim = true;
+          break;
+        }
+      }
+    }
+
     let prev = null, ranking;
-    const random = GENERAL_RESULTS_PRIME;
     for(let count = 0; count < cutoff; ++count) {
       const res = finalists[count];
-      if (prev === null || compareFinals(prev, res) != 0) {
+      const pRanking = ranking;
+      if (isWcIn16Elim && count > 4 && count < 8) {
+        if (breakElimWC(prev, res) != 0) {
+          ranking = count+1;
+        }
+      } else if (prev === null || compareFinals(prev, res) != 0) {
         ranking = count+1;
       }
-      entries.delete(res);
-      res[ranking$] = ranking;
-      res[random$] = randomOrder(res, random);
-      entries.add(res);
+      reAddGeneralResult(entries, prev, pRanking);
       prev = res;
     }
+    reAddGeneralResult(entries, prev, ranking);
   };
 
   const assignLanes = (resA=null, resB=null)=>{
@@ -610,7 +652,7 @@ define((require, exports, module)=>{
     if (time == NOT_CLIMBED_SCORE)  return '';
     return 'fall';
   };
-  SpeedRound.compareRanking = compareRanking;
+  SpeedRound.compareRankingSORT = compareRankingSORT;
 
   SpeedRound[private$] = {
     compareQualStartOrder,
