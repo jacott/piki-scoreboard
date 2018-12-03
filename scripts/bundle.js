@@ -13,7 +13,7 @@ bundleAll.bundle({
 
   console.log(`minifying`);
 
-  const { code, error } = compiler.terser.minify(ast, {
+  const { code, error, map } = compiler.terser.minify(ast, {
     compress: {
       dead_code: true,
       global_defs: {
@@ -24,6 +24,10 @@ bundleAll.bundle({
     },
     mangle: true,
     safari10: true,
+    sourceMap: {
+      filename: "index.js",
+      url: "index.js.map"
+    },
     output: {
       // beautify: true,
       // indent_level: 2,
@@ -38,6 +42,6 @@ bundleAll.bundle({
 
   fs.writeFileSync(Path.join("build", 'index.css'), css);
   fs.writeFileSync(Path.join("build", 'index.js'), code);
-//  fs.writeFileSync(Path.join("build", 'config.js'), configCode);
-//  fs.writeFileSync(indexPrefix+"js.map", JSON.stringify(map));
+  //  fs.writeFileSync(Path.join("build", 'config.js'), configCode);
+  fs.writeFileSync(Path.join("build", 'index.js.map'), map);
 });
