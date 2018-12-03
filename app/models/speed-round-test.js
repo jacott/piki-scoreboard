@@ -596,6 +596,31 @@ isClient && define((require, exports, module)=>{
         assert.equals(toResId(round), [2, 5, 6, 8, 7, 1, 4, 3, 9, 10, 11, 12, 13, 14, 15, 16]);
       });
 
+      test("qual ranking", ()=>{
+        TH.login();
+        const res = {};
+        createResults(res, {
+          r1: [0.31, [6001, 7000]],
+          r2: [0.21, [6001, 7000]],
+          r3: [0.41, [6004, 7000]],
+          r4: [0.61, ['fs', 'fs']],
+          r5: [0.20, [6501, 'fs']],
+          r6: [0.30, ['fall', 'fall']],
+          r7: [0.90, ['fs', 5234]],
+
+        });
+
+
+
+        const round = new SpeedRound({
+          stage: 0, query: Enumerable.propertyValues(res)});
+
+        round.rankResults();
+
+        assert.equals(toRanking(round), [1, 1, 1, 4, 4, 4, 4]);
+        assert.equals(toResId(round), [3, 1, 2, 5, 4, 6, 7]);
+      });
+
       test("qual rerun", ()=>{
         TH.login();
         const res = {};

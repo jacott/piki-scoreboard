@@ -1565,7 +1565,7 @@ Rank Climber Final  Semi-final  Qual
             assert.dom('.score', '6.00');
           });
           assert.dom('tr:nth-child(16)', tr =>{
-            assert.dom('.climber .name', 'climber_r8');
+            assert.dom('.climber .name', 'climber_r18');
             assert.dom('.score', '6.80');
           });
           assert.dom('tr:nth-child(19)', tr =>{

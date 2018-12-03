@@ -132,7 +132,8 @@ define((require, exports, module)=>{
 
   const rankQualResults = round =>{
     const {stage} = round;
-    const rank = stage == -2 ?  compareQualRerunCOMPARE : compareQualResultCOMPARE;
+    const cmp = stage == -2 ?  compareQualRerunCOMPARE : compareQualResultCOMPARE;
+    const tb = stage == -2 ? compareQualRerunTIEBREAK : compareQualResultTIEBREAK;
     const list = new BTree(stage == -2 ? compareQualRerunSORT : compareQualResultSORT);
 
     let invalid = 0;
@@ -162,7 +163,7 @@ define((require, exports, module)=>{
     for (const res of list) {
       ++count;
 
-      if (prev === null || rank(prev, res) != 0 || (count-1 == cutoff)) {
+      if (prev === null || (count-1 == cutoff ? tb(prev, res) : cmp(prev, res)) != 0) {
         ranking = count;
       } else if (stage == -2 && count < 5)
         ranking = count;
