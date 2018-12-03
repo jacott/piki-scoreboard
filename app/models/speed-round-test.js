@@ -586,6 +586,14 @@ isClient && define((require, exports, module)=>{
 
         assert.equals(toRanking(round), [1, 2, 3, 4, 5, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]);
         assert.equals(toResId(round), [2, 5, 6, 8, 7, 1, 3, 4, 9, 10, 11, 12, 13, 14, 15, 16]);
+
+        /** test incomplete scores **/
+        res.r03.scores[4] = null;
+
+        round.rankResults();
+
+        assert.equals(toRanking(round), [1, 2, 3, 4, 5, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]);
+        assert.equals(toResId(round), [2, 5, 6, 8, 7, 1, 4, 3, 9, 10, 11, 12, 13, 14, 15, 16]);
       });
 
       test("qual rerun", ()=>{

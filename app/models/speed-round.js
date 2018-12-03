@@ -293,7 +293,7 @@ define((require, exports, module)=>{
 
   const breakElimWC = (a, b)=>{
     const mas = a.scores[4], mbs = b.scores[4];
-    const ans = toNumber(mas.time) - toNumber(mbs.time);
+    const ans = toNumber(mas && mas.time) - toNumber(mbs && mbs.time);
     return ans != 0 ? ans : compareRankingCOMPARE(a, b);
   };
 
