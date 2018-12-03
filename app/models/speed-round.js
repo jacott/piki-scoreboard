@@ -13,9 +13,9 @@ define((require, exports, module)=>{
   const COMPARE = 'compare', SORT = 'sort', TIEBREAK = 'tiebreak';
 
   const ERROR = {
-    hasTies: 'Ties need to be broken by extra runs in lane A',
-    missingScore: 'All scores need to be entered',
-    timeVsFS: 'Invalid score combination: time vs "fs". Enter "wc" (wildcard) instead of time',
+    hasTies: 'Break ties by further attempts on Lane A.',
+    missingScore: 'All scores must be entered.',
+    timeVsFS: 'Invalid score combination: time/fall vs false start. Enter "wc" (wildcard) instead of time/fall.',
   };
 
   const isQualFormat = stage => stage == 0 || stage == -2;

@@ -73,7 +73,7 @@ isClient && define((require, exports, module)=>{
         round.calcStartList();
 
         assert.equals(round.complete(), {
-          error: 'All scores need to be entered',
+          error: 'All scores must be entered.',
           nextStage: 2});
       });
 
@@ -92,7 +92,7 @@ isClient && define((require, exports, module)=>{
         round.calcStartList();
 
         assert.equals(round.complete(), {
-          error: 'Invalid score combination: time vs "fs". Enter "wc" (wildcard) instead of time',
+          error: 'Invalid score combination: time/fall vs false start. Enter "wc" (wildcard) instead of time/fall.',
           nextStage: 2});
 
         res.r01.scores[3].time = 'fall';
@@ -156,7 +156,7 @@ isClient && define((require, exports, module)=>{
         round.calcStartList();
 
         assert.equals(round.complete(), {
-          error: 'Ties need to be broken by extra runs in lane A', nextStage: 0});
+          error: 'Break ties by further attempts on Lane A.', nextStage: 0});
 
         assert.equals(Array.from(round.query).map(r => r.scores[1]), [
           [6001, 7000], [6102, 7000],

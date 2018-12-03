@@ -21,7 +21,7 @@ isClient && define((require, exports, module)=>{
     const gotoNextStage = (stageName, tiebreak)=>{
       TH.click('.nextStage');
       if (tiebreak) {
-        assert.dom('.nextStage>.info', /Ties need to be broken/);
+        assert.dom('.nextStage>.info', /Break ties by further attempts on Lane A./);
       } else {
         refute.dom('.nextStage>.info');
         TH.confirm();
@@ -1268,7 +1268,7 @@ Rank Climber Final  Semi-final  Qual
         refute.called(Route.gotoPage);
 
         assert.equals(event.heats, {[cat._id]: 'S'});
-        assert.dom('.nextStage>.info', 'Ties need to be broken by extra runs in lane A');
+        assert.dom('.nextStage>.info', 'Break ties by further attempts on Lane A.');
 
         assert.dom('tr', {data: res.r1}, tr =>{
           refute.dom('td:nth-child(2).score>input+input');
@@ -1349,7 +1349,7 @@ Rank Climber Final  Semi-final  Qual
         TH.click('.nextStage>button');
 
         assert.equals(res.r03.scores[3], {time: 5892, opponent_id: 'r02', tiebreak: ['tie']});
-        assert.dom('.nextStage>.info', 'Ties need to be broken by extra runs in lane A');
+        assert.dom('.nextStage>.info', 'Break ties by further attempts on Lane A.');
 
 
         assert.dom('tr', {data: res.r01}, tr =>{
@@ -1448,7 +1448,7 @@ Rank Climber Final  Semi-final  Qual
         TH.click('.nextStage>button');
         refute.called(Route.gotoPage);
 
-        assert.dom('.nextStage>.info', 'All scores need to be entered');
+        assert.dom('.nextStage>.info', 'All scores must be entered.');
 
         assert.equals(event.heats, {[cat._id]: 'S'});
 
