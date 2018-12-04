@@ -203,6 +203,19 @@ isClient && define((require, exports, module)=>{
     });
 
     group("speed", ()=>{
+      test("speed cat disabled in edit", ()=>{
+        const cat = Factory.createCategory({type: 'S', name: 'Speed'});
+        const event = TH.Factory.createEvent();
+        const res = Factory.createResult();
+        Route.gotoPage(sut.Show, {eventId: event._id});
+        TH.click('[name=Edit]');
+
+        assert.dom('#EditEvent .categories', ()=>{
+          assert.dom('input[name="changeFormat"][disabled="disabled"]');
+        });
+
+      });
+
       test("rendering start list", ()=>{
         const cat = Factory.createCategory({type: 'S'});
         const event = TH.Factory.createEvent();

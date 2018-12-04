@@ -106,7 +106,7 @@
         <template name="Cat">
           <label>
             <span class="name">{{name}}</span>
-            <input name="changeFormat" value="{{eventFormat}}">
+            <input name="changeFormat" value="{{eventFormat}}" {{disableSpeed}}>
             <inlinehelp>
               <info></info>
               <popup>{{> /Help.CompFormatLead}}{{> /Help.CompFormatBoulder}}</popup>

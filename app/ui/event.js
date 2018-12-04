@@ -408,13 +408,18 @@ define((require, exports, module)=>{
 
   Tpl.Edit.Cat.$helpers({
     eventFormat() {
-    const event = $.ctx.parentCtx.data;
-    const format = event.heats[this._id];
-    if (format)
-      return format.slice(1);
-    else
-      return this.heatFormat; // not yet copied to event
-    } ,
+      const event = $.ctx.parentCtx.data;
+      const format = event.heats[this._id];
+      if (format)
+        return format.slice(1);
+      else
+        return this.heatFormat; // not yet copied to event
+    },
+
+    disableSpeed() {
+      Dom.setBoolean('disabled', this.type === 'S');
+    },
+
     describeFormat() {
       const event = $.ctx.parentCtx.data;
       return Event.describeFormat(event.heats[this._id] || this.type+this.heatFormat);
