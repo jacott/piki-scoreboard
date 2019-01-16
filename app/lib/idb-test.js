@@ -31,16 +31,10 @@ isClient && define((require, exports, module)=>{
       assert.isFalse(sut.isStarted());
     });
 
-    test("new", ()=>{
-      const queueChange = stub(QueryIDB.prototype, 'queueChange');
-      const whenReady = stub(QueryIDB.prototype, 'whenReady', body => {
-        v.indexedDB.yield();
-        body();
-      });
-
+    test("new", async ()=>{
       const isRpcPending = spy(RPCIDBQueue.prototype, 'isRpcPending');
 
-      sut.start();
+      await sut.start();
       const {idb} = sut;
 
       assert(v.indexedDB._dbs['db-piki']._store);

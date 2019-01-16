@@ -37,7 +37,7 @@ define((require)=>{
       idb = new IDB();
       const rpcQueue = new RPCIDBQueue(idb);
       ClientRpcBase(session, {rpcQueue});
-      return idb.whenReady(() => {
+      return idb.whenReady().then(() => {
         rpcQueue.reload(session);
       });
     }

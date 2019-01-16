@@ -53,7 +53,7 @@ define((require)=>{
 
     mockSubscribe (v, id, name, ...args) {
       if (! v.conn) {
-        v.conn = this.mockConnection(null, v.session);
+        v.conn = this.mockConnection(null, v.session || session);
         v.send = v.conn.ws.send;
       }
       const pub = session._commands.P;

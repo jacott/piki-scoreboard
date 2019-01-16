@@ -70,9 +70,8 @@ define((require, exports, module)=>{
         if (v && v.conn)
           conn = v.conn;
         else {
-          const id = 'koru/session/server-connection-factory';
-          conn = new (require(id)({
-            globalDict: session.globalDict}))(ws, ws._upgradeReq, sessId, () => {});
+          const id = 'koru/session/server-connection';
+          conn = new (require(id))(session, ws, ws._upgradeReq, sessId, () => {});
           conn.dbId = 'sch00';
           if (v) v.conn = conn;
         }
