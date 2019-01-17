@@ -6,6 +6,9 @@ define((require, exports, module)=>{
   return User =>{
     const {pretendRole} = module.config();
 
+    User.guestUser = ()=> User.docs.guest || (
+      User.docs.guest = new User({_id: 'guest'}));
+
     User.defineFields({
       org_id: {type: 'belongs_to'},
       role: {type: 'text', inclusion: {in: util.values(User.ROLE), allowBlank: true}},
@@ -23,7 +26,7 @@ define((require, exports, module)=>{
 
     util.merge(User.prototype, {
       accessClasses(orgId) {
-        if (! this.isSuperUser() && this.org_id !== orgId)
+        if (this._id === 'guest' || (! this.isSuperUser() && this.org_id !== orgId))
           return "readOnly";
 
         let classes = "";

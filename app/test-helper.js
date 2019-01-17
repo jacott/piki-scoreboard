@@ -24,7 +24,7 @@ define((require, exports, module)=>{
   let koruAfTimeout, koruSetTimeout, koruClearTimeout;
   let kst = 0;
 
-  let sendP, _sendM;
+  let sendBinary = null, _sendM = null;
 
   TH.Factory = Factory;
 
@@ -216,10 +216,9 @@ define((require, exports, module)=>{
     koru.afTimeout = () => () => {};
     koru.clearTimeout = () => {};
     if (isClient) {
-      if (hasOwn(session, 'sendP')) {
-        sendP = session.sendP;
-        session.sendP = koru.nullFunc;
-        session.interceptSubscribe = overrideSub; // don't queue subscribes
+      if (hasOwn(session, 'sendBinary')) {
+        sendBinary = session.sendBinary;
+        session.sendBinary = koru.nullFunc;
       }
       if (hasOwn(session, '_sendM')) {
         _sendM = session._sendM;
@@ -244,12 +243,10 @@ define((require, exports, module)=>{
     koru.clearTimeout = koruClearTimeout;
     koru.afTimeout = koruAfTimeout;
     if (isClient) {
-      if (sendP) {
-        session.interceptSubscribe = null;
-        session.sendP = sendP;
-        sendP = null;
+      if (sendBinary !== null) {
+        sendBinary = null;
       }
-      if (_sendM) {
+      if (_sendM !== null) {
         session._sendM = _sendM;
         _sendM = null;
       }

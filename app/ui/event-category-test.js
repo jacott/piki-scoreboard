@@ -1,5 +1,6 @@
 isClient && define((require, exports, module)=>{
   const Route           = require('koru/ui/route');
+  const EventSub        = require('pubsub/event-sub');
   const Factory         = require('test/factory');
   const App             = require('ui/app');
   const EventRegister   = require('ui/event-register');
@@ -26,7 +27,7 @@ isClient && define((require, exports, module)=>{
         Factory.createCompetitor({team_ids: [v.t1._id, v.t2._id], number: 123});
         v.result2 = Factory.createResult({scores: [0.3]});
         TH.setOrg(v.org);
-        v.eventSub = stub(App, 'subscribe').withArgs('Event')
+        v.eventSub = stub(EventSub, 'subscribe')
           .returns({stop: v.stop = stub()});
         Route.gotoPage(sut, {eventId: v.event._id, append: v.category._id, search: '&type=results'});
         v.eventSub.yield();

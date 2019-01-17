@@ -23,6 +23,10 @@ define((require, exports, module)=>{
       _id: 'id',
     };
 
+    User.guestUser = ()=> User.findById('guest') || (
+      User.docs.insert({_id: 'guest'}),
+      User.findById('guest'));
+
     const createLogin = user=>{
       UserAccount.updateOrCreateUserLogin({email: user.email, userId: user._id});
       UserAccount.sendResetPasswordEmail(user);
@@ -110,19 +114,11 @@ define((require, exports, module)=>{
         }
       }));
 
-      util.merge(User, {
-        guestUser() {
-          return User.findById('guest') || (
-            User.docs.insert({_id: 'guest'}),
-            User.findById('guest'));
-        },
-
-        observeOrg_id([org_id], callback) {
-          return (orgObs[org_id] || (orgObs[org_id] = new Observable(()=>{
-            delete orgObs[org_id];
-          }))).add(callback);
-        }
-      });
+      User.observeOrg_id = ([org_id], callback)=>{
+        return (orgObs[org_id] || (orgObs[org_id] = new Observable(()=>{
+          delete orgObs[org_id];
+        }))).add(callback);
+      };
     }
 
     const {ROLE} = User;

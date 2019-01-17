@@ -1,17 +1,17 @@
-isClient && define(function (require, exports, module) {
-  var test, v;
-  const Route       = require('koru/ui/route');
-  const Ranking = require('models/ranking');
-  const App         = require('ui/app');
-  const EventTpl    = require('ui/event');
-  const TeamHelper  = require('ui/team-helper');
-  const sut         = require('./team-results');
-  const TH          = require('./test-helper');
+isClient && define((require, exports, module)=>{
+  const Route           = require('koru/ui/route');
+  const Ranking         = require('models/ranking');
+  const EventSub        = require('pubsub/event-sub');
+  const EventTpl        = require('ui/event');
+  const TeamHelper      = require('ui/team-helper');
+  const sut             = require('./team-results');
+  const TH              = require('./test-helper');
 
-  TH.testCase(module, {
-    setUp() {
-      test = this;
-      v = {};
+  const {stub, spy, onEnd} = TH;
+
+  let v = {};
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    beforeEach(()=>{
       v.org =  TH.Factory.createOrg();
       TH.login();
       TH.setOrg(v.org);
@@ -24,18 +24,18 @@ isClient && define(function (require, exports, module) {
       v.event = TH.Factory.createEvent({teamType_ids: ['tt1', 'tt2']});
       v.tt3 = TH.Factory.createTeamType({_id: 'tt3'});
 
-      v.eventSub = test.stub(App, 'subscribe').withArgs('Event').returns({stop: v.stop = test.stub()});
+      v.eventSub = stub(EventSub, 'subscribe').returns({stop: v.stop = stub()});
       v.results = {tt1: {team1: 260, team2: 300}, tt2: {team3: 160}};
-      test.stub(Ranking, 'getTeamScores').withArgs(v.event).returns(v.results);
-    },
+      stub(Ranking, 'getTeamScores').withArgs(v.event).returns(v.results);
+    });
 
-    tearDown() {
+    afterEach(()=>{
       TeamHelper.teamType_id = null;
       TH.tearDown();
-      v = null;
-    },
+      v = {};
+    });
 
-    "test show event team results"() {
+    test("show event team results", ()=>{
       Route.gotoPage(EventTpl.Show, {eventId: v.event._id});
 
       assert.dom('#Event', function () {
@@ -77,6 +77,6 @@ isClient && define(function (require, exports, module) {
           });
         });
       });
-    },
+    });
   });
 });

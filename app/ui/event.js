@@ -12,6 +12,7 @@ define((require, exports, module)=>{
   const Result          = require('models/result');
   const Series          = require('models/series');
   const TeamType        = require('models/team-type');
+  const EventSub        = require('pubsub/event-sub');
   const EventHelper     = require('ui/event-helper');
   const PrintHelper     = require('ui/print-helper');
   const SeriesTpl       = require('ui/series');
@@ -174,7 +175,7 @@ define((require, exports, module)=>{
             observeScores();
 
             eventSub && eventSub.stop();
-            eventSub = App.subscribe('Event', pageRoute.eventId, ()=>{callback()});
+            eventSub = EventSub.subscribe(pageRoute.eventId, ()=>{callback()});
           }
         }
       }

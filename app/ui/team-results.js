@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define((require, exports, module)=>{
   const Dom        = require('koru/dom');
   const Route      = require('koru/ui/route');
   const util       = require('koru/util');
@@ -35,13 +35,11 @@ define(function(require, exports, module) {
     },
   });
 
+  const teamTypeList = ctx => TeamType.where({_id: ctx.data.teamType_ids}).fetch();
+
   Tpl.$events({
     'menustart [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent(teamTypeList),
   });
-
-  function teamTypeList(ctx) {
-    return TeamType.where({_id: ctx.data.teamType_ids}).fetch();
-  }
 
   return Tpl;
 });

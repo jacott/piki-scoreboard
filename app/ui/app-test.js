@@ -2,24 +2,27 @@ isClient && define((require, exports, module)=>{
   const koru            = require('koru');
   const Dom             = require('koru/dom');
   const localStorage    = require('koru/local-storage');
+  const Subscription    = require('koru/pubsub/subscription');
+  const SubscriptionSession = require('koru/pubsub/subscription-session');
   const session         = require('koru/session');
-  const publish         = require('koru/session/publish');
   const Route           = require('koru/ui/route');
+  const OrgSub          = require('pubsub/org-sub');
+  const SelfSub         = require('pubsub/self-sub');
   const Factory         = require('test/factory');
   const Event           = require('ui/event');
   const EventTpl        = require('ui/event');
   const TH              = require('ui/test-helper');
   const App             = require('./app');
 
-  const {stub, spy, onEnd} = TH;
+  const {stub, spy, onEnd, match: m} = TH;
 
   let v = {};
   TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    let ssConnect;
     beforeEach(()=>{
       stub(Route, 'replacePath');
       stub(window, 'addEventListener');
-      stub(session, 'sendP');
-      v.subSelf = spy(session, 'interceptSubscribe').withArgs('Self');
+      ssConnect = stub(SubscriptionSession.prototype, 'connect');
       TH.loginAs(TH.Factory.createUser('guest'));
     });
 
@@ -80,9 +83,9 @@ isClient && define((require, exports, module)=>{
 
       App.start();
 
-      var sub = v.subSelf.args(0, 1);
-
-      sub.callback();
+      let selfSub;
+      assert.calledWith(ssConnect, m(v => (selfSub = v) instanceof SelfSub));
+      selfSub._connected({});
 
       assert.calledOnceWith(window.addEventListener, 'popstate');
       window.addEventListener.args(0, 1)();
@@ -92,22 +95,21 @@ isClient && define((require, exports, module)=>{
 
     test("uses localStorage orgSN", ()=>{
       localStorage.setItem('orgSN', 'FUZ');
-      stub(publish._pubs, 'Org');
       Route.replacePath.restore();
       stub(koru, 'getLocation').returns({pathname: '/'});
-      stub(App, 'subscribe');
-
-      const selfSub = App.subscribe.withArgs('Self').returns({waiting: true, stop: stub()});
-      const orgSub = App.subscribe.withArgs('Org');
 
       App.start();
 
-      selfSub.yield();
-
+      let selfSub;
+      assert.calledWith(ssConnect, m(v => (selfSub = v) instanceof SelfSub));
+      ssConnect.reset();
       v.org = TH.Factory.createOrg({shortName: 'FUZ'});
+      selfSub._connected({});
 
-      assert.calledWith(orgSub, 'Org');
-      orgSub.yield();
+      let orgSub;
+      assert.calledWith(ssConnect, m(v => (orgSub = v) instanceof OrgSub));
+
+      orgSub._connected({});
 
       assert.same(App.orgId, v.org._id);
 
@@ -117,49 +119,48 @@ isClient && define((require, exports, module)=>{
     test("Route.root.onBaseEntry", ()=>{
       assert.same(Route.root.routeVar, 'orgSN');
       assert.same(Route.root.async, true);
-      stub (App, 'subscribe');
-
-      const selfSub = App.subscribe.withArgs('Self').returns({stop: stub()});
-      const orgSub = App.subscribe.withArgs('Org');
 
       App.start();
-      selfSub.yield();
+      let selfSub;
+      assert.calledWith(ssConnect, m(v => (selfSub = v) instanceof SelfSub));
+      ssConnect.reset();
+      const org2 = Factory.createOrg({shortName: 'org2'});
+      selfSub._connected({});
 
       /** test diff orgSN */
       Route.root.onBaseEntry('x', {orgSN: 'org2'}, v.callback = stub());
       refute.called(v.callback);
-      assert.calledWith(App.subscribe, 'Org', 'org2');
+      let orgSub;
+      assert.calledWith(ssConnect, m(v => (orgSub = v) instanceof OrgSub));
+      assert.equals(orgSub.args, org2._id);
 
-      Factory.createOrg({shortName: 'org2'});
-      orgSub.yield();
+      orgSub._connected({});
       assert.called(v.callback);
     });
 
     test("subscribing to Org", ()=>{
-      stub(publish._pubs, 'Org');
       Route.replacePath.restore();
       stub(koru, 'getLocation').returns({pathname: '/FOO'});
-
-      stub(App, 'subscribe');
-      v.subSelf = App.subscribe.withArgs('Self').returns({stop() {}});
-      v.subOrg = App.subscribe.withArgs('Org').returns({stop: v.orgStop = stub()});
 
       assert.same(Route.root.routeVar, 'orgSN');
 
       App.start();
 
-      assert.called(v.subSelf);
-      v.subSelf.yield();
+      let selfSub;
+      assert.calledWith(ssConnect, m(v => (selfSub = v) instanceof SelfSub));
+      ssConnect.reset();
+      const org = TH.Factory.createOrg({shortName: 'FOO'});
+      selfSub._connected({});
 
-      assert.called(v.subOrg);
+      let orgSub;
+      assert.calledWith(ssConnect, m(v => (orgSub = v) instanceof OrgSub));
 
       // simulate org added by subscribe
-      v.org = TH.Factory.createOrg({shortName: 'FOO'});
       Dom.ctxById('Header').updateAllTags();
-      v.subOrg.yield();
+      orgSub._connected({});
 
-      assert.same(App.orgId, v.org._id);
-      assert.equals(App.org().attributes, v.org.attributes);
+      assert.same(App.orgId, org._id);
+      assert.equals(App.org().attributes, org.attributes);
 
       assert.dom('#Event');
       assert.className(document.body, 'inOrg');
@@ -168,9 +169,11 @@ isClient && define((require, exports, module)=>{
 
       localStorage.setItem('orgSN', '');
 
+      spy(orgSub, 'stop');
+
       Route.root.onBaseEntry(null, {}, v.callback = stub());
 
-      assert.called(v.orgStop);
+      assert.called(orgSub.stop);
 
       assert.same(App.orgId, null);
       assert.called(v.callback);

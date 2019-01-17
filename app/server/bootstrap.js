@@ -25,7 +25,5 @@ define((require)=>{
     DBDriver.isPG && new Migration(DBDriver.defaultDb)
       .migrateTo(path.resolve(koru.appDir, '../db/migrate'), '~');
     initNewInstall();
-
-    Model.ensureIndexes();
   };
 });

@@ -1,8 +1,8 @@
 isClient && define((require, exports, module)=>{
   const koru            = require('koru');
   const Route           = require('koru/ui/route');
+  const EventSub        = require('pubsub/event-sub');
   const Factory         = require('test/factory');
-  const App             = require('ui/app');
   const Tpl             = require('./reg-upload');
   const TH              = require('./test-helper');
 
@@ -20,7 +20,7 @@ isClient && define((require, exports, module)=>{
       TH.loginAs(v.user);
 
       TH.setOrg(v.org);
-      v.eventSub = stub(App, 'subscribe').withArgs('Event').returns({stop: v.stop = stub()});
+      v.eventSub = stub(EventSub, 'subscribe').returns({stop: v.stop = stub()});
       Route.gotoPage(Tpl, {eventId: v.event._id});
       v.eventSub.yield();
     });

@@ -1,11 +1,12 @@
 isClient && define((require, exports, module)=>{
   const Dom             = require('koru/dom');
+  const Subscription    = require('koru/pubsub/subscription');
   const Route           = require('koru/ui/route');
   const util            = require('koru/util');
   const Result          = require('models/result');
   const User            = require('models/user');
+  const EventSub        = require('pubsub/event-sub');
   const Factory         = require('test/factory');
-  const App             = require('ui/app');
   const EventCategory   = require('ui/event-category');
   const TH              = require('./test-helper');
 
@@ -157,15 +158,17 @@ isClient && define((require, exports, module)=>{
       }
     };
 
+    const stubSub = (...args) =>{
+      const last = args[args.length-1];
+      if (typeof last === 'function') last();
+      return {stop: ()=>{}};
+    };
+
     beforeEach(()=>{
       org = Factory.createOrg();
       cat = Factory.createCategory({type: 'S'});
       event = Factory.createEvent();
-      intercept(App, 'subscribe', (...args) =>{
-        const last = args[args.length-1];
-        if (typeof last === 'function') last();
-        return {stop: ()=>{}};
-      });
+      intercept(Subscription, 'subscribe', stubSub);
     });
 
     afterEach(()=>{

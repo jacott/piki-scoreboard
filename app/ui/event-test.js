@@ -6,8 +6,8 @@ isClient && define((require, exports, module)=>{
   const Event           = require('models/event');
   const Result          = require('models/result');
   const Series          = require('models/series');
+  const EventSub        = require('pubsub/event-sub');
   const Factory         = require('test/factory');
-  const App             = require('ui/app');
   const TeamHelper      = require('ui/team-helper');
   require('./event-category');
   require('./event-register');
@@ -23,7 +23,7 @@ isClient && define((require, exports, module)=>{
       v.org =  TH.Factory.createOrg();
       TH.login();
       TH.setOrg(v.org);
-      v.eventSub = stub(App, 'subscribe').withArgs('Event').returns({stop: v.stop = stub()});
+      v.eventSub = stub(EventSub, 'subscribe').returns({stop: v.stop = stub()});
     });
 
     afterEach(()=>{
@@ -40,19 +40,19 @@ isClient && define((require, exports, module)=>{
       Route.gotoPage(sut.Show, {eventId: events[0]._id});
       v.eventSub.yield();
 
-      assert.calledWith(App.subscribe, 'Event', events[0]._id);
+      assert.calledWith(EventSub.subscribe, events[0]._id);
 
       Route.gotoPage(sut.Edit);
 
       refute.called(v.stop);
 
-      App.subscribe.reset();
+      EventSub.subscribe.reset();
 
       Route.gotoPage(sut.Edit, {eventId: events[1]._id});
 
       assert.called(v.stop);
 
-      assert.calledWith(App.subscribe, 'Event', events[1]._id);
+      assert.calledWith(EventSub.subscribe, events[1]._id);
     });
 
     test("rendering", ()=>{

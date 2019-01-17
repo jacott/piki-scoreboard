@@ -1,20 +1,21 @@
 isClient && define(function (require, exports, module) {
-  const Dom        = require('koru/dom');
-  const Route      = require('koru/ui/route');
-  const Climber    = require('models/climber');
-  const Competitor = require('models/competitor');
-  const Team       = require('models/team');
-  const App        = require('ui/app');
-  const TeamHelper = require('ui/team-helper');
-  const TH         = require('./test-helper');
+  const Dom             = require('koru/dom');
+  const Route           = require('koru/ui/route');
+  const Climber         = require('models/climber');
+  const Competitor      = require('models/competitor');
+  const Team            = require('models/team');
+  const EventSub        = require('pubsub/event-sub');
+  const App             = require('ui/app');
+  const TeamHelper      = require('ui/team-helper');
+  const TH              = require('./test-helper');
+
+  const {stub, spy, onEnd} = TH;
 
   const sut = require('./event-register');
-  var test, v;
 
-  TH.testCase(module, {
-    setUp() {
-      test = this;
-      v = {};
+  let v = {};
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    beforeEach(()=>{
       v.org =  TH.Factory.createOrg({_id: App.orgId = "org123"});
       v.tt = TH.Factory.createList(3, 'createTeamType', (index, options) => {
         options.name = ['Club', 'School', 'Country'][index];
@@ -42,26 +43,25 @@ isClient && define(function (require, exports, module) {
       v.open = TH.Factory.createCategory({group: '2 Open Lead'});
 
       TH.setOrg(v.org);
-      this.stub(App, 'subscribe').yields();
-      v.eventSub = App.subscribe.withArgs('Event').returns({stop: v.stop = test.stub()});
+      v.eventSub = stub(EventSub, 'subscribe').yields().returns({stop: v.stop = stub()});
       TH.login();
-    },
+    });
 
-    tearDown() {
+    afterEach(()=>{
       TH.tearDown();
       TeamHelper.teamType_id = null;
-      v = null;
-    },
+      v = {};
+    });
 
-    "test closed"() {
+    test("closed", ()=>{
       v.event.$update({closed: true});
 
       gotoPage();
 
       assert.dom('#Register.closed');
-    },
+    });
 
-    "test registering"() {
+    test("registering", ()=>{
       gotoPage();
 
       assert.dom('#Event [name=Register].selected');
@@ -169,9 +169,9 @@ isClient && define(function (require, exports, module) {
 
       });
 
-    },
+    });
 
-    "test adding new climber"() {
+    test("adding new climber", ()=>{
       gotoPage();
 
       assert.dom('#Register', function () {
@@ -191,9 +191,9 @@ isClient && define(function (require, exports, module) {
 
       refute.dom('#AddClimber');
       assert.dom('.Groups');
-    },
+    });
 
-    "test can't add twice"() {
+    test("can't add twice", ()=>{
       var oComp = TH.Factory.createCompetitor({climber_id: v.climbers[1]._id});
 
       gotoPage();
@@ -202,25 +202,25 @@ isClient && define(function (require, exports, module) {
         TH.input('[name=name]', v.climbers[1].name);
       });
       assert.dom('body>ul>li', {count: 1, text: 'Already registered'});
-    },
+    });
 
-    "test cancel add"() {
+    test("cancel add", ()=>{
       gotoPage();
 
       assert.dom('#Event #Register', function () {
         TH.input('[name=name]', v.climbers[1].name);
         TH.click(Dom('body>ul>li'));
 
-        test.stub(Route, 'replacePath');
+        stub(Route, 'replacePath');
 
         TH.click('[name=cancel]');
 
         assert.calledWith(Route.replacePath, Dom.Event.Register);
       });
-    },
+    });
 
-    "edit": {
-      setUp() {
+    group("edit", ()=>{
+      beforeEach(()=>{
         v.oComp = TH.Factory.createCompetitor({climber_id: v.climbers[1]._id, team_ids: [v.teams1[0]._id]});
 
         gotoPage();
@@ -228,9 +228,9 @@ isClient && define(function (require, exports, module) {
         assert.dom('#Register td', {text: v.climbers[1].name, parent() {
           TH.click(this);
         }});
-      },
+      });
 
-      "test editClimber"() {
+      test("editClimber", ()=>{
         assert.dom('#Register form.edit', function () {
           TH.click('[name=editClimber]');
         });
@@ -240,9 +240,9 @@ isClient && define(function (require, exports, module) {
             assert.dom('[name=name]', {value: v.climbers[1].name});
           });
         });
-      },
+      });
 
-      "test change team"() {
+      test("change team", ()=>{
         assert.dom('#Register form.edit', function () {
           assert.dom('.Teams', function () {
             assert.dom('label:first-child', function () {
@@ -277,9 +277,9 @@ isClient && define(function (require, exports, module) {
         refute.dom('#AddTeam');
         assert.dom('button.select:not(.none)', 'Dynomites Wellington');
         assert.same(Team.findBy('name', 'Dynomites Wellington').teamType_id, v.tt[0]._id);
-      },
+      });
 
-      "test change category"() {
+      test("change category", ()=>{
         assert.dom('#Register form.edit', function () {
           assert.dom('.Groups', function () {
             assert.dom('button.select.category:not(.none)', 'Category 4', function () {
@@ -291,17 +291,17 @@ isClient && define(function (require, exports, module) {
         });
         assert.dom('form.add');
         assert.equals(v.oComp.$reload().category_ids,[]);
-      },
+      });
 
-      "test cancel"() {
-        test.stub(Route, 'replacePath');
+      test("cancel", ()=>{
+        stub(Route, 'replacePath');
 
         TH.click('#Register form [name=cancel]');
 
         assert.calledWithExactly(Route.replacePath, Dom.Event.Register);
-      },
+      });
 
-      "test delete competitor"() {
+      test("delete competitor", ()=>{
         assert.dom('#Register form.edit', function () {
           TH.click('[name=delete]');
         });
@@ -322,8 +322,8 @@ isClient && define(function (require, exports, module) {
         assert.dom('form.add');
 
         refute.dom('td', v.climbers[1].name);
-      },
-    },
+      });
+    });
   });
 
   function gotoPage() {

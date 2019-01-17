@@ -4,11 +4,11 @@ define((require, exports, module)=>{
   const StackErrorConvert = require('koru/stack-error-convert');
   const UserAccount     = require('koru/user-account');
   const Ranking         = require('models/ranking');
+  const EventPub        = require('pubsub/event-pub');
+  const OrgPub          = require('pubsub/org-pub');
+  const SelfPub         = require('pubsub/self-pub');
 
   require('models/reg-upload-server');
-  require('publish/publish-event-server');
-  require('publish/publish-org-server');
-  require('publish/publish-self-server');
 
   console.log(`org-node KORU_APP_VERSION = `+process.env.KORU_APP_VERSION);
   if (process.env.KORU_APP_VERSION !== undefined) {

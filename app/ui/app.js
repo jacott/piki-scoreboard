@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define((require, exports, module)=>{
   const koru            = require('koru');
   const Dom             = require('koru/dom');
   const localStorage    = require('koru/local-storage');
@@ -9,9 +9,8 @@ define(function(require, exports, module) {
   const uColor          = require('koru/util-color');
   const Org             = require('models/org');
   const User            = require('models/user');
-  require('publish/publish-event-client');
-  require('publish/publish-org-client');
-  require('publish/publish-self-client');
+  const OrgSub          = require('pubsub/org-sub');
+  const SelfSub         = require('pubsub/self-sub');
   const ResourceString  = require('resource-string');
   const header          = require('ui/header');
   const Loading         = require('ui/loading');
@@ -48,8 +47,6 @@ define(function(require, exports, module) {
 
     text: ResourceString.text,
 
-    subscribe: require('koru/session/subscribe'),
-
     stop() {
       orgSub && orgSub.stop();
       selfSub && selfSub.stop();
@@ -63,7 +60,8 @@ define(function(require, exports, module) {
       App.stop();
       window.addEventListener('popstate', pageChanged);
       App.setAccess();
-      selfSub = App.subscribe('Self', err =>{
+      selfSub = SelfSub.subscribe(null, err =>{
+        err !== null && ! (err.code < 500) && koru.unhandledException(err);
         Dom.removeClass(document.body, 'loading');
         Route.replacePath(koru.getLocation());
       });
@@ -71,7 +69,7 @@ define(function(require, exports, module) {
     },
 
     addColorClass(elm, color) {
-      var cc = uColor.colorClass(color);
+      const cc = uColor.colorClass(color);
 
       if (Dom.hasClass(elm, cc)) return;
 
@@ -91,30 +89,27 @@ define(function(require, exports, module) {
   Route.root.routeVar = 'orgSN';
   Route.root.async = true;
 
-  Route.root.onBaseEntry = function (page, pageRoute, callback) {
+  Route.root.onBaseEntry = (page, pageRoute, callback)=>{
     if (pageRoute.orgSN === undefined)
       pageRoute.orgSN = localStorage.getItem('orgSN') || null;
 
     if (pageRoute.orgSN == null && page !== Dom.ChooseOrg)
       Route.abortPage('choose-org');
 
-    if (pageRoute.orgSN !== orgShortName) {
+    if (pageRoute.orgSN !== orgShortName &&
+        pageRoute.orgSN !== 'choose-org') {
       subscribeOrg(pageRoute.orgSN, callback);
     } else
       callback();
   };
 
-  Route.root.onBaseExit = function () {
-    subscribeOrg(null);
-  };
+  Route.root.onBaseExit = ()=>{subscribeOrg(null)};
 
-  function pageChanged(event) {
-    Route.pageChanged();
-  }
+  const pageChanged = (event)=>{Route.pageChanged()};
 
-  function subscribeOrg(shortName, callback) {
+  const subscribeOrg = (shortName, callback)=>{
     App.setAccess();
-    if (shortName && App.orgId) {
+    if (shortName && App.orgId != null) {
       const doc = Org.findById(App.orgId);
       if (doc && doc.shortName === shortName) {
         callback && callback();
@@ -125,16 +120,22 @@ define(function(require, exports, module) {
     if (shortName) {
       orgShortName = shortName;
       App.orgId = null;
+      const org = Org.findBy('shortName', shortName);
+      if (org === void 0) {
+        koru.globalErrorCatch(new koru.Error(404, 'Org not found: '+shortName));
+        callback();
+        return;
+      }
 
-      orgSub = App.subscribe('Org', orgShortName, function (err) {
+      orgSub = OrgSub.subscribe(org._id, (err)=>{
         Loading.done();
-        if (err) {
+        if (err != null) {
           koru.globalErrorCatch(err);
           subscribeOrg();
           return;
         }
         const doc = Org.findBy('shortName', orgShortName);
-        if (! doc) {
+        if (doc === void 0) {
           subscribeOrg();
           return;
         }
@@ -150,55 +151,51 @@ define(function(require, exports, module) {
       Dom.removeClass(document.body, 'inOrg');
       callback && callback();
     }
-  }
+  };
 
-  document.addEventListener('pointerdown', ripple, true);
-  var rippleElm = Dom.h({div: {}, class: 'ripple'});
+  const rippleElm = Dom.h({div: {}, class: 'ripple'});
 
-  function ripple(event) {
-    var button = event.target;
+  const ripple = (event)=>{
+    const button = event.target;
     if (button.tagName !== 'BUTTON' && ! Dom.hasClass(button, 'ripple-button')) return;
 
     Dom.removeClass(rippleElm, 'animate');
     Dom.removeClass(rippleElm, 'ripple-finished');
-    var rect = button.getBoundingClientRect();
-    var activeElement = document.activeElement;
+    const rect = button.getBoundingClientRect();
+    const activeElement = document.activeElement;
 
-    var st = rippleElm.style;
+    let st = rippleElm.style;
     st.width = rect.width + 'px';
     st.height = rect.height + 'px';
     st = rippleElm.firstChild.style;
     if (! st) return;
-    var rippleSize = Math.sqrt(rect.width * rect.width +
+    const rippleSize = Math.sqrt(rect.width * rect.width +
                                rect.height * rect.height) * 2 + 2;
     st.width = rippleSize + 'px';
     st.height = rippleSize + 'px';
-    var translate = 'translate(-50%, -50%) ' +
+    const translate = 'translate(-50%, -50%) ' +
           'translate(' + (event.clientX - rect.left) + 'px, ' + (event.clientY - rect.top) + 'px)';
     st[Dom.vendorTransform] = translate + ' scale(0.0001, 0.0001)';
 
     button.insertBefore(rippleElm, button.firstChild);
-    Dom.nextFrame(function () {
+    Dom.nextFrame(()=>{
       Dom.addClass(rippleElm, 'animate');
       st[Dom.vendorTransform] = translate;
     });
 
-    document.addEventListener('pointerup', removeRipple, true);
-
-    function removeRipple(event) {
+    const removeRipple = (event)=>{
       document.removeEventListener('pointerup', removeRipple, true);
 
       // Allow a repaint to occur before removing this class, so the animation
       // shows for tap events, which seem to trigger a pointerup too soon after
       // pointerdown.
-      Dom.nextFrame(function() {
-        Dom.addClass(rippleElm, 'ripple-finished');
-      });
+      Dom.nextFrame(()=>{Dom.addClass(rippleElm, 'ripple-finished')});
+    };
 
-    }
-  }
+    document.addEventListener('pointerup', removeRipple, true);
 
-
+  };
+  document.addEventListener('pointerdown', ripple, true);
 
   return App;
 });

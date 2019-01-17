@@ -1,17 +1,19 @@
 isClient && define(function (require, exports, module) {
   var test, v;
-  const Dom        = require('koru/dom');
-  const session    = require('koru/session');
-  const Route      = require('koru/ui/route');
-  const Event      = require('models/event');
-  const App        = require('ui/app');
-  const EventTpl   = require('ui/event');
-  const TeamHelper = require('ui/team-helper');
-  const sut        = require('./series');
-  const TH         = require('./test-helper');
+  const Dom             = require('koru/dom');
+  const session         = require('koru/session');
+  const Route           = require('koru/ui/route');
+  const Event           = require('models/event');
+  const EventSub        = require('pubsub/event-sub');
+  const EventTpl        = require('ui/event');
+  const TeamHelper      = require('ui/team-helper');
+  const sut             = require('./series');
+  const TH              = require('./test-helper');
 
-  TH.testCase(module, {
-    setUp() {
+  const {stub, spy, onEnd} = TH;
+
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    beforeEach(()=>{
       test = this;
       v = {};
       v.org =  TH.Factory.createOrg();
@@ -21,16 +23,16 @@ isClient && define(function (require, exports, module) {
       v.ev1 = TH.Factory.createEvent({_id: 'ev1', series_id: v.series._id, date: '2015-01-01'});
       v.ev2 = TH.Factory.createEvent({_id: 'ev2', series_id: v.series._id, date: '2015-05-01'});
       v.evOther = TH.Factory.createEvent();
-    },
+    });
 
-    tearDown() {
+    afterEach(()=>{
       TeamHelper.teamType_id = null;
       EventTpl.stop();
       TH.tearDown();
       v = null;
-    },
+    });
 
-    "test edit series"() {
+    test("edit series", ()=>{
       Route.gotoPage(sut.Events, {seriesId: v.series._id});
       assert.dom('#Series', function () {
         assert.dom('.tabbed.list', function () {
@@ -40,7 +42,7 @@ isClient && define(function (require, exports, module) {
         });
         assert.dom('#Edit', function () {
           TH.input('[name=name]', 'new name');
-          test.spy(Dom, 'setTitle');
+          spy(Dom, 'setTitle');
           TH.click('[type=submit]');
           assert.calledWith(Dom.setTitle, 'new name');
         });
@@ -48,9 +50,9 @@ isClient && define(function (require, exports, module) {
 
         refute.dom('#Edit');
       });
-    },
+    });
 
-    "test add event"() {
+    test("add event", ()=>{
       const tt1 = TH.Factory.createTeamType({_id: 'tt1'});
       v.series.$update({teamType_ids: ['tt1']});
       Route.gotoPage(sut.Events, {seriesId: v.series._id});
@@ -72,9 +74,9 @@ isClient && define(function (require, exports, module) {
       assert.same(event.series_id, v.series._id);
       assert.equals(event.teamType_ids, ['tt1']);
 
-    },
+    });
 
-    "test events list"() {
+    test("events list", ()=>{
       Route.gotoPage(sut.Events, {seriesId: v.series._id});
       assert.dom('#Series', function () {
         assert.dom('.tabbed.list', function () {
@@ -88,24 +90,24 @@ isClient && define(function (require, exports, module) {
               assert.dom('thead>tr>th', 'Start Date');
               assert.dom('tbody', function () {
                 assert.dom('tr', {count: 2});
-                test.stub(App, 'subscribe');
+                stub(EventSub, 'subscribe');
                 TH.click('tr:last-child>td', v.ev1.displayName);
               });
             });
           });
         });
       });
-      assert.calledWith(App.subscribe, 'Event', 'ev1');
+      assert.calledWith(EventSub.subscribe, 'ev1');
       assert.dom('#Event');
-    },
+    });
 
-    "test switching tabs"() {
+    test("switching tabs", ()=>{
       Route.gotoPage(sut.Events, {seriesId: v.series._id});
       assert.same(Route.currentHref, `/#series/${v.series._id}/events`);
       assert.dom('#Series', function () {
         assert.dom('.tabbed.list .tabNames', function () {
 
-          test.stub(session, 'rpc').yields();
+          stub(session, 'rpc').yields();
           TH.click('.tab[name=Results]');
         });
         assert.same(Route.currentHref, `/#SN1/series/${v.series._id}/results`);
@@ -114,9 +116,9 @@ isClient && define(function (require, exports, module) {
 
       Route.gotoPage();
       refute.dom('#Series');
-    },
+    });
 
-    "test results"() {
+    test("results", ()=>{
       v.cats = [
         TH.Factory.createCategory({type: 'B'}),
         ...TH.Factory.createList(3, 'createCategory'),
@@ -130,7 +132,7 @@ isClient && define(function (require, exports, module) {
           };
         }),
       }];
-      test.stub(session, 'rpc');
+      stub(session, 'rpc');
       Route.gotoPage(sut.Results, {seriesId: v.series._id});
 
       assert.dom('#Series', function () {
@@ -161,9 +163,9 @@ isClient && define(function (require, exports, module) {
         });
         assert.dom('.CatResult:first-child');
       });
-    },
+    });
 
-    "test cat results"() {
+    test("cat results", ()=>{
       v.cl1 = TH.Factory.createClimber({_id: 'cl1'});
       v.cl2 = TH.Factory.createClimber({_id: 'cl2'});
       v.cl3 = TH.Factory.createClimber({_id: 'cl3'});
@@ -186,7 +188,7 @@ isClient && define(function (require, exports, module) {
         }],
       }];
 
-      test.stub(session, 'rpc').withArgs('Ranking.seriesResult', v.series._id).yields(null, v.results);
+      stub(session, 'rpc').withArgs('Ranking.seriesResult', v.series._id).yields(null, v.results);
 
 
 
@@ -219,9 +221,9 @@ isClient && define(function (require, exports, module) {
         Route.gotoPage(sut.CatList, {seriesId: v.series._id});
         refute.dom('.CatResult');
       });
-    },
+    });
 
-    "test team results"() {
+    test("team results", ()=>{
       const tt1 = TH.Factory.createTeamType({_id: 'tt1'});
       const tOther = TH.Factory.createTeam({_id: 'tOther'});
       const tt2 = TH.Factory.createTeamType({_id: 'tt2'});
@@ -238,9 +240,9 @@ isClient && define(function (require, exports, module) {
         scores: {tt2: {team0: 300}, tt1: {tOther: 200}}
       }];
 
-      const rpc = test.stub(session, 'rpc').withArgs('Ranking.teamResults', v.series._id);
+      const rpc = stub(session, 'rpc').withArgs('Ranking.teamResults', v.series._id);
 
-      test.spy(TeamHelper, 'setSeriesTeamType');
+      spy(TeamHelper, 'setSeriesTeamType');
       Route.gotoPage(sut, {seriesId: v.series._id});
       assert.calledWith(TeamHelper.setSeriesTeamType, TH.matchModel(v.series));
 
@@ -295,11 +297,11 @@ isClient && define(function (require, exports, module) {
             });
           });
 
-          test.stub(Route, 'gotoPage');
+          stub(Route, 'gotoPage');
           TH.click('thead>tr>th.event', v.ev2.name);
           assert.calledWith(Route.gotoPage, Dom.Event.Show, {eventId: v.ev2._id});
         });
       });
-    },
+    });
   });
 });
