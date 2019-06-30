@@ -107,19 +107,20 @@ define((require, exports, module)=>{
       changeListener === void 0 && initChangeListener();
     }
 
-    loadInitial(addDoc) {
-      for (const model of OrgModels) model.where('org_id', this.orgId).forEach(addDoc);
+    loadInitial(encoder) {
+      for (const model of OrgModels) model.where('org_id', this.orgId)
+        .forEach(doc =>{encoder.addDoc(doc)});
     }
   }
 
   class AdminUnion extends OrgUnion {
-    loadInitial(addDoc) {
-      super.loadInitial(addDoc);
+    loadInitial(encoder) {
+      super.loadInitial(encoder);
       User.db.query(
         `select u.*,r.role, r.org_id from "User" as u, "Role" as r
 where (r.org_id is null or r.org_id = {$org_id}) and r.user_id = u._id
 `, {org_id: this.orgId}
-      ).forEach(d => {addDoc(new User(d))});
+      ).forEach(d => {encoder.addDoc(new User(d))});
     }
   }
 

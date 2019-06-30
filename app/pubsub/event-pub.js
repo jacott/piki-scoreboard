@@ -23,9 +23,11 @@ define((require, exports, module)=>{
       delete unions[this.eventId];
     }
 
-    loadInitial(addDoc) {
+    loadInitial(encoder) {
       for (const model of OrgChildren) {
-        model.query.where('event_id', this.eventId).forEach(addDoc);
+        model.query.where('event_id', this.eventId).forEach(doc =>{
+          encoder.addDoc(doc);
+        });
       }
     }
 

@@ -14,7 +14,11 @@ isClient && define((require, exports, module)=>{
   const TH              = require('ui/test-helper');
   const App             = require('./app');
 
+  const {private$} = require('koru/symbols');
+
   const {stub, spy, onEnd, match: m} = TH;
+
+  const {connected$} = SubscriptionSession[private$];
 
   let v = {};
   TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
@@ -85,7 +89,7 @@ isClient && define((require, exports, module)=>{
 
       let selfSub;
       assert.calledWith(ssConnect, m(v => (selfSub = v) instanceof SelfSub));
-      selfSub._connected({});
+      selfSub[connected$]({});
 
       assert.calledOnceWith(window.addEventListener, 'popstate');
       window.addEventListener.args(0, 1)();
@@ -104,12 +108,12 @@ isClient && define((require, exports, module)=>{
       assert.calledWith(ssConnect, m(v => (selfSub = v) instanceof SelfSub));
       ssConnect.reset();
       v.org = TH.Factory.createOrg({shortName: 'FUZ'});
-      selfSub._connected({});
+      selfSub[connected$]({});
 
       let orgSub;
       assert.calledWith(ssConnect, m(v => (orgSub = v) instanceof OrgSub));
 
-      orgSub._connected({});
+      orgSub[connected$]({});
 
       assert.same(App.orgId, v.org._id);
 
@@ -125,7 +129,7 @@ isClient && define((require, exports, module)=>{
       assert.calledWith(ssConnect, m(v => (selfSub = v) instanceof SelfSub));
       ssConnect.reset();
       const org2 = Factory.createOrg({shortName: 'org2'});
-      selfSub._connected({});
+      selfSub[connected$]({});
 
       /** test diff orgSN */
       Route.root.onBaseEntry('x', {orgSN: 'org2'}, v.callback = stub());
@@ -134,7 +138,7 @@ isClient && define((require, exports, module)=>{
       assert.calledWith(ssConnect, m(v => (orgSub = v) instanceof OrgSub));
       assert.equals(orgSub.args, org2._id);
 
-      orgSub._connected({});
+      orgSub[connected$]({});
       assert.called(v.callback);
     });
 
@@ -150,14 +154,14 @@ isClient && define((require, exports, module)=>{
       assert.calledWith(ssConnect, m(v => (selfSub = v) instanceof SelfSub));
       ssConnect.reset();
       const org = TH.Factory.createOrg({shortName: 'FOO'});
-      selfSub._connected({});
+      selfSub[connected$]({});
 
       let orgSub;
       assert.calledWith(ssConnect, m(v => (orgSub = v) instanceof OrgSub));
 
       // simulate org added by subscribe
       Dom.ctxById('Header').updateAllTags();
-      orgSub._connected({});
+      orgSub[connected$]({});
 
       assert.same(App.orgId, org._id);
       assert.equals(App.org().attributes, org.attributes);

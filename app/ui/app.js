@@ -61,7 +61,7 @@ define((require, exports, module)=>{
       window.addEventListener('popstate', pageChanged);
       App.setAccess();
       selfSub = SelfSub.subscribe(null, err =>{
-        err !== null && ! (err.code < 500) && koru.unhandledException(err);
+        err !== null && ! (err.error < 500) && koru.unhandledException(err);
         Dom.removeClass(document.body, 'loading');
         Route.replacePath(koru.getLocation());
       });
@@ -129,7 +129,7 @@ define((require, exports, module)=>{
 
       orgSub = OrgSub.subscribe(org._id, (err)=>{
         Loading.done();
-        if (err != null) {
+        if (err != null && err.error !== 409) {
           koru.globalErrorCatch(err);
           subscribeOrg();
           return;

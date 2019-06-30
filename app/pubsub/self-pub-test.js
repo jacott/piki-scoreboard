@@ -1,5 +1,5 @@
 isServer && define((require, exports, module)=>{
-  const PublishTH       = require('koru/pubsub/test-helper-server');
+  const ConnTH          = require('koru/session/conn-th-server');
   const User            = require('models/user');
   const TH              = require('test-helper');
   const Factory         = require('test/factory');
@@ -12,12 +12,12 @@ isServer && define((require, exports, module)=>{
     let conn;
 
     beforeEach(()=>{
-      conn = PublishTH.mockConnection('s123');
+      conn = ConnTH.mockConnection('s123');
       User.guestUser();
     });
 
     afterEach(()=>{
-      PublishTH.stopAllSubs(conn);
+      ConnTH.stopAllSubs(conn);
       util.thread.userId = void 0;
       TH.clearDB();
     });

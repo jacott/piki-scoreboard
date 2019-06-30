@@ -39,9 +39,11 @@ define((require, exports, module)=>{
   SelfPub.includeModel('Org');
 
   SelfPub.Union = class extends AllPub.Union {
-    loadInitial(addDoc, discreteLastSubscribed) {
+    loadInitial(encoder, discreteLastSubscribed) {
       super.loadInitial(
-        doc =>{addDoc(ServerConnection.filterDoc(doc, noEmail))}, discreteLastSubscribed);
+        {addDoc: doc =>{encoder.addDoc(ServerConnection.filterDoc(doc, noEmail))}},
+        discreteLastSubscribed
+      );
     }
   };
 

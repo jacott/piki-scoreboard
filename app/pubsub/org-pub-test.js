@@ -1,6 +1,6 @@
 isServer && define((require, exports, module)=>{
   const TH              = require('koru/model/test-db-helper');
-  const PublishTH       = require('koru/pubsub/test-helper-server');
+  const ConnTH          = require('koru/session/conn-th-server');
   const UserAccount     = require('koru/user-account');
   const Org             = require('models/org');
   const Role            = require('models/role');
@@ -15,11 +15,11 @@ isServer && define((require, exports, module)=>{
     let conn;
     beforeEach(()=>{
       TH.startTransaction();
-      conn = PublishTH.mockConnection();
+      conn = ConnTH.mockConnection();
     });
 
     afterEach(()=>{
-      PublishTH.stopAllSubs(conn);
+      ConnTH.stopAllSubs(conn);
       util.thread.userId = void 0;
       TH.rollbackTransaction();
       OrgPub.shutdown();

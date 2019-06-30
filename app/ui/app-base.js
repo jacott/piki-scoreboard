@@ -1,10 +1,10 @@
-define(function(require, exports, module) {
+define((require)=>{
   const koru         = require('koru');
   const Dom          = require('koru/dom');
   const Org          = require('models/org');
   const User         = require('models/user');
 
-  var App = {
+  const App = {
     org() {
       return App.orgId && Org.findById(App.orgId);
     },
