@@ -1,63 +1,60 @@
-isClient && define(function (require, exports, module) {
-  const koru         = require('koru');
-  const Dom          = require('koru/dom');
-  const localStorage = require('koru/local-storage');
-  const session      = require('koru/session');
+isClient && define((require, exports, module)=>{
+  const koru            = require('koru');
+  const Dom             = require('koru/dom');
+  const localStorage    = require('koru/local-storage');
+  const session         = require('koru/session');
   require('koru/ui/page-link');
-  const Route        = require('koru/ui/route');
-  const UserAccount  = require('koru/user-account');
-  const login        = require('koru/user-account/client-login');
-  const User         = require('models/user');
-  const Factory      = require('test/factory');
-  const App          = require('ui/app');
-  const TH           = require('./test-helper');
+  const Route           = require('koru/ui/route');
+  const UserAccount     = require('koru/user-account');
+  const login           = require('koru/user-account/client-login');
+  const User            = require('models/user');
+  const Factory         = require('test/factory');
+  const App             = require('ui/app');
+  const TH              = require('./test-helper');
 
-  const SignIn       = require('./sign-in');
-  var test, v;
+  const {stub, spy, onEnd, match: m} = TH;
 
-  TH.testCase(module, {
-    setUp: function () {
-      test = this;
-      v = {};
-      test.stub(UserAccount,'loginWithPassword');
+  const SignIn = require('./sign-in');
+
+  let v = {};
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    beforeEach(()=>{
+      stub(UserAccount,'loginWithPassword');
       App.orgId = Factory.createOrg()._id;
-    },
+    });
 
-    tearDown: function () {
+    afterEach(()=>{
       TH.tearDown();
-      v = null;
-    },
+      v = {};
+    });
 
-    "test clicking forgot password" () {
+    test("clicking forgot password", ()=>{
       Route.gotoPage(SignIn);
       TH.input('[name=email]', 'email@address');
       TH.click('[name=forgot]');
 
       refute.dom('#SignInDialog');
 
-      assert.dom('.Dialog #ForgotPassword', function () {
+      assert.dom('.Dialog #ForgotPassword', () =>{
         assert.dom('[name=email]', {value: 'email@address'});
       });
-    },
+    });
 
-    "forgot password": {
-      setUp () {
-        v.remoteCall = test.stub(User, 'forgotPassword');
+    group("forgot password", ()=>{
+      beforeEach( ()=>{
+        v.remoteCall = stub(User, 'forgotPassword');
 
         Dom.Dialog.open(SignIn.ForgotPassword.$autoRender({email: 'foo@bar.com'}));
 
         TH.click('#ForgotPassword [name=submit]');
 
-        assert.calledWith(v.remoteCall, 'foo@bar.com', TH.match(function (callback) {
-          v.callback = callback;
-          return true;
-        }));
-      },
+        assert.calledWith(v.remoteCall, 'foo@bar.com', m(c => v.callback = c));
+      });
 
-      "test bad email" () {
+      test("bad email", ()=>{
         v.callback(null, {email: 'is_invalid'});
 
-        assert.dom('#ForgotPassword', function () {
+        assert.dom('#ForgotPassword', elm =>{
           assert.dom('input.error[name=email]');
           assert.dom('input.error[name=email]+.errorMsg', 'is not valid');
 
@@ -65,29 +62,29 @@ isClient && define(function (require, exports, module) {
 
           refute.dom('.error');
         });
-      },
+      });
 
-      "test unexpected error" () {
-        test.stub(koru, 'error');
+      test("unexpected error", ()=>{
+        stub(koru, 'error');
 
         v.callback({message: 'foo'});
 
-        assert.dom('#ForgotPassword', function () {
-          assert.dom('[name=submit].error', function () {
-            assert.same(this.style.display, 'none');
+        assert.dom('#ForgotPassword', ()=>{
+          assert.dom('[name=submit].error', elm =>{
+            assert.same(elm.style.display, 'none');
 
           });
           assert.dom('[name=submit]+.errorMsg', 'An unexpected error occured. Please reload page.');
         });
 
         assert.calledOnceWith(koru.error, 'foo');
-      },
-    },
+      });
+    });
 
-    "test signing in" () {
+    test("signing in", ()=>{
       TH.loginAs(Factory.createUser('guest'));
       Route.gotoPage(SignIn);
-      test.stub(Route.history, 'back');
+      stub(Route.history, 'back');
 
       assert.dom('#SignIn', function () {
         assert.dom('form>fieldset:first-child', function () {
@@ -103,7 +100,8 @@ isClient && define(function (require, exports, module) {
         assert.dom('#SignInProgress', '');
         TH.click('form>fieldset:nth-child(2)>[type=submit]');
 
-        assert.calledWith(UserAccount.loginWithPassword, 'test', 'bad', TH.match(function(func) {return v.loginCallback = func}));
+        assert.calledWith(UserAccount.loginWithPassword, 'test', 'bad',
+                          m(func => v.loginCallback = func));
 
         assert.dom('form.submit-state #SignInProgress', 'Signing in...');
         v.loginCallback('ex');
@@ -117,14 +115,14 @@ isClient && define(function (require, exports, module) {
         v.loginCallback();
       });
       assert.called(Route.history.back);
-    },
+    });
 
-    "test cancel" () {
+    test("cancel", ()=>{
       Route.gotoPage(SignIn);
-      test.stub(Route.history, 'back');
+      stub(Route.history, 'back');
       TH.click('[name=cancel]');
 
       assert.called(Route.history.back);
-    },
+    });
   });
 });

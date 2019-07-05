@@ -1,15 +1,15 @@
-define(function(require, exports, module) {
-  const koru          = require('koru');
-  const Dom           = require('koru/dom');
-  const Val           = require('koru/model/validation');
-  const session       = require('koru/session');
-  const Form          = require('koru/ui/form');
-  const Route         = require('koru/ui/route');
-  const UserAccount   = require('koru/user-account');
-  const login         = require('koru/user-account/client-login');
-  const util          = require('koru/util');
-  const User          = require('models/user');
-  const App           = require('./app-base');
+define((require, exports, module)=>{
+  const koru            = require('koru');
+  const Dom             = require('koru/dom');
+  const Val             = require('koru/model/validation');
+  const session         = require('koru/session');
+  const Form            = require('koru/ui/form');
+  const Route           = require('koru/ui/route');
+  const UserAccount     = require('koru/user-account');
+  const login           = require('koru/user-account/client-login');
+  const util            = require('koru/util');
+  const User            = require('models/user');
+  const App             = require('./app-base');
 
   const Tpl = Dom.newTemplate(module, require('koru/html!./sign-in'));
   const $ = Dom.current;
@@ -22,6 +22,11 @@ define(function(require, exports, module) {
   Tpl.$extend({
     title: 'Sign in',
   });
+
+  const setState = (form, state)=>{
+    Dom.setClassBySuffix(state, "-state", form);
+    Dom.ctx('#SignInProgress').updateAllTags({state: state});
+  };
 
   Tpl.$events({
     'click [name=forgot]' (event) {
@@ -44,7 +49,7 @@ define(function(require, exports, module) {
 
       setState(form, 'submit');
 
-      UserAccount.loginWithPassword(email,password,function (error) {
+      UserAccount.loginWithPassword(email,password, error =>{
         if (error)
           setState(form, 'error');
         else
@@ -52,15 +57,6 @@ define(function(require, exports, module) {
       });
     },
   });
-
-  function closeDialog() {
-    Dom.Dialog.close();
-  }
-
-  function setState(form, state) {
-    Dom.setClassBySuffix(state, "-state", form);
-    Dom.ctx('#SignInProgress').updateAllTags({state: state});
-  }
 
   Tpl.Progress.$helpers({
     message () {
@@ -76,10 +72,9 @@ define(function(require, exports, module) {
   });
 
   ForgotPassword.$events({
-    'click [name=cancel]': function () {
-      closeDialog();
-    },
-    'submit' (event) {
+    'click [name=cancel]'() {Dom.Dialog.close()},
+
+    'submit'(event) {
       Dom.stopEvent();
 
       User.forgotPassword(document.getElementById('email').value, function (error, response) {
@@ -104,5 +99,5 @@ define(function(require, exports, module) {
     },
   });
 
-  module.exports = Tpl;
+  return Tpl;
 });
