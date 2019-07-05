@@ -9,7 +9,7 @@ isClient && define((require, exports, module)=>{
 
   const OrgSub = require('./org-sub');
 
-  const models = ['Category', 'Climber', 'Event', 'Series', 'Team', 'TeamType'];
+  const models = ['Category', 'Climber', 'Event', 'Org', 'Series', 'Team', 'TeamType', 'User'];
 
   TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
     beforeEach(()=>{
@@ -28,8 +28,11 @@ isClient && define((require, exports, module)=>{
       sub.connect();
 
       assert.equals(sub.match.calls.map(c => c.args[0]).sort(), models);
-      const matcher = sub.match.firstCall.args[1];
-      for (const call of sub.match.calls) assert.same(call.args[1], matcher);
+      const matcher = sub.match.lastCall.args[1];
+      assert.isTrue(sub.match.firstCall.args[1]());
+      assert.isTrue(sub.match.calls[1].args[1]({org_id: 'org123'}));
+      assert.isFalse(sub.match.calls[1].args[1]({org_id: 'org456'}));
+      for (const call of sub.match.calls.slice(2)) assert.same(call.args[1], matcher);
       assert.isTrue(matcher({org_id: 'org123'}));
       assert.isFalse(matcher({org_id: 'org456'}));
     });
