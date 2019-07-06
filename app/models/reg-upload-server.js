@@ -33,8 +33,8 @@ define((require, exports, module)=>{
     const future = new Future();
 
     parse(Buffer.from(data).toString(), {
-      columns: function () {return ['Fee level', 'First Name', 'Last Name', 'Birth Date', 'Participant ID']}
-    }, function(err, rows){
+      columns: ()=> ['Fee level', 'First Name', 'Last Name', 'Birth Date', 'Participant ID']
+    }, (err, rows) => {
       if (err) return future.throw(err);
       data = rows;
       future.return();
