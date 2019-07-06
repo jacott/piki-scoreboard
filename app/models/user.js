@@ -27,7 +27,9 @@ define((require, exports, module)=>{
     }
 
     static me() {
-      return koru.userId() && User.findById(koru.userId());
+      const userId = koru.userId();
+      if (userId === 'guest') return User.guestUser();
+      return userId ? User.findById(userId) : void 0;
     }
 
     static fetchAdminister(userId, doc) {

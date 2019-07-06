@@ -6,8 +6,9 @@ define((require, exports, module)=>{
   return User =>{
     const {pretendRole} = module.config();
 
-    User.guestUser = ()=> User.docs.guest || (
-      User.docs.guest = new User({_id: 'guest'}));
+    const guest = new User({_id: 'guest'});
+
+    User.guestUser = ()=> User.docs.guest === void 0 ? (User.docs.guest = guest) : guest;
 
     User.defineFields({
       org_id: {type: 'belongs_to'},

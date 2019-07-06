@@ -1,16 +1,36 @@
 define((require, exports, module)=>{
+  const koru            = require('koru');
   const util            = require('koru/util');
   const Role            = require('models/role');
   const TH              = require('test-helper');
   const Factory         = require('test/factory');
 
-  const {stub, spy, onEnd} = TH;
+  const {stub, spy, onEnd, intercept} = TH;
 
   const User = require('./user');
 
   TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
     afterEach(()=>{
       TH.clearDB();
+    });
+
+    test("me", ()=>{
+      assert.same(User.me(), void 0);
+
+      let _id = 'guest';
+
+      intercept(koru, 'userId', ()=> _id);
+
+      const guest = User.me();
+
+      assert.same(guest._id, 'guest');
+
+      assert.same(User.me(), guest);
+
+      const user = Factory.createUser();
+      _id = user._id;
+
+      assert.same(User.me()._id, _id);
     });
 
     test("isGuest", ()=>{
