@@ -3,6 +3,7 @@ define((require, exports, module)=>{
   const Val             = require('koru/model/validation');
   const Publication     = require('koru/pubsub/publication');
   const Union           = require('koru/pubsub/union');
+  const util            = require('koru/util');
   const Org             = require('models/org');
   const Role            = require('models/role');
   const User            = require('models/user');
@@ -96,8 +97,12 @@ define((require, exports, module)=>{
   }
   OrgPub.module = module;
 
-  const filterChange = (cmd)=>{
-    if (cmd[0] === 'Climber') delete cmd[2].dateOfBirth;
+  const FILTER_ATTRS = {dateOfBirth: true};
+
+  const filterChange = (model, attrs)=>{
+    if (model === 'Climber') return util.mergeExclude({}, attrs, FILTER_ATTRS);
+
+    return attrs;
   };
 
   class OrgUnion extends Union {
@@ -127,7 +132,14 @@ where (r.org_id is null or r.org_id = {$org_id}) and r.user_id = u._id
   class GuestUnion extends OrgUnion {
     buildUpdate(dc) {
       const upd = super.buildUpdate(dc);
-      if (upd[0] === 'C') filterChange(upd[1]);
+      switch(upd[0]) {
+      case 'A':
+        upd[1][1] = filterChange(upd[1][0], upd[1][1]);
+        break;
+      case 'C':
+        upd[1][2] = filterChange(upd[1][0], upd[1][2]);
+        break;
+      }
       return upd;
     }
   }

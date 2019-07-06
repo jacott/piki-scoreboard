@@ -7,7 +7,7 @@ isServer && define((require, exports, module)=>{
   const User            = require('models/user');
   const Factory         = require('test/factory');
 
-  const {stub, spy, onEnd, util} = TH;
+  const {stub, spy, onEnd, util, match: m} = TH;
 
   const OrgPub = require('pubsub/org-pub');
 
@@ -45,6 +45,15 @@ isServer && define((require, exports, module)=>{
 
       climber.$update({name: 'new name', dateOfBirth: '1970-04-23'});
       assert.encodedCall(conn, 'C', ['Climber', climber._id, {name: 'new name'}]);
+
+      const cl2 = Factory.createClimber();
+
+      assert.encodedCall(conn, 'A', ['Climber', m(attrs =>{
+        assert.same(attrs.name, cl2.name);
+        assert.same(attrs.dateOfBirth, void 0);
+
+        return true;
+      })]);
     });
 
     test("publish admin", ()=>{
