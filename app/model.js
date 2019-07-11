@@ -1,6 +1,11 @@
 define((require, exports, module)=>{
   const Model           = require('koru/model');
   const Val             = require('koru/model/validation');
+  const session         = require('koru/session');
+  const util            = require('koru/util');
+
+  session.DEFAULT_USER_ID = 'guest';
+  if (isClient) util.thread.userId = session.DEFAULT_USER_ID;
 
   Val.register(module, {
     associated: require('koru/model/validators/associated-validator'),

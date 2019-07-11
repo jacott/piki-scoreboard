@@ -1,5 +1,6 @@
 define((require, exports, module)=>{
   const koru            = require('koru');
+  const session         = require('koru/session');
   const util            = require('koru/util');
   const Role            = require('models/role');
   const TH              = require('test-helper');
@@ -14,9 +15,11 @@ define((require, exports, module)=>{
       TH.clearDB();
     });
 
-    test("me", ()=>{
-      assert.same(User.me(), void 0);
+    test("DEFAULT_USER_ID", ()=>{
+      assert.same(session.DEFAULT_USER_ID, 'guest');
+    });
 
+    test("me", ()=>{
       let _id = 'guest';
 
       intercept(koru, 'userId', ()=> _id);
@@ -35,15 +38,13 @@ define((require, exports, module)=>{
 
     test("isGuest", ()=>{
       /**
-       * Current user is guest only if logged in with koru.userId() 'guest'
+       * Current user is guest only if logged in with koru.userId() 'guest' which is the default
+       * user ID
        **/
       const adminUser = Factory.createUser({role: 'a'});
       const user = Factory.createUser({role: 'j'});
       const su = Factory.createUser('su');
       const guest = isServer ? User.guestUser() : Factory.createUser({_id: 'guest'});
-
-      // not logged in
-      assert.isFalse(User.isGuest());
 
       TH.loginAs(adminUser);
       assert.isFalse(User.isGuest());
