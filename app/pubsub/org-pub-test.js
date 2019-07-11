@@ -36,8 +36,8 @@ isServer && define((require, exports, module)=>{
       const sub = conn.onSubscribe('sub1', 1, "Org", org1._id);
 
       assert.calledOnce(conn.sendEncoded);
-      assert.encodedCall(conn, 'A', ['Climber', climber.attributes]);
-      refute.encodedCall(conn, 'A', ['Climber', climber0.attributes]);
+      assert.encodedCall(conn, 'A', ['Climber', filterDateOfBirth(climber.attributes)]);
+      refute.encodedCall(conn, 'A', ['Climber', m.field('_id', climber0._id)]);
       conn.sendEncoded.reset();
 
       climber0.$update('name', 'not me');
@@ -106,5 +106,32 @@ isServer && define((require, exports, module)=>{
 
       assert.encodedCall(conn, 'R', ['User', user2._id, void 0]);
     });
+
+    test("userIdChanged", ()=>{
+      conn.userId = 'guest';
+      const org0 = Factory.createOrg();
+      const climber0 = Factory.createClimber();
+      const org1 = Factory.createOrg();
+      const admin = Factory.createUser();
+
+      const climber = Factory.createClimber({dateOfBirth: '1979-01-01'});
+
+      const sub = conn.onSubscribe('sub1', 1, "Org", org1._id);
+      conn.sendEncoded.reset();
+
+      sub.userIdChanged(admin._id, 'guest');
+
+      assert.encodedCall(conn, 'A', ['Climber', climber.attributes]);
+
+      conn.sendEncoded.reset();
+      sub.userIdChanged('guest', admin._id);
+
+
+      assert.encodedCall(conn, 'A', [
+        'Climber', filterDateOfBirth(climber.attributes)]);
+
+    });
   });
+
+  const filterDateOfBirth = (attrs)=> util.mergeExclude({}, attrs, {dateOfBirth: true});
 });

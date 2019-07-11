@@ -94,6 +94,19 @@ define((require, exports, module)=>{
       for (const i in guestUnions) guestUnions[i] = void 0;
       for (const i in adminUnions) adminUnions[i] = void 0;
     }
+
+    userIdChanged(newUID, oldUID) {
+      const {union} = this;
+      const canAdmin = canAdministerOrg(newUID, union.orgId);
+
+      if (canAdmin && (union instanceof AdminUnion))
+        return; // no change
+
+      union.removeSub(this);
+
+      canAdmin ?
+        addAdminUnion(this, union.orgId) : addGuestUnion(this, union.orgId);
+    }
   }
   OrgPub.module = module;
 
@@ -111,16 +124,13 @@ define((require, exports, module)=>{
       this.orgId = orgId;
       changeListener === void 0 && initChangeListener();
     }
-
-    loadInitial(encoder) {
-      for (const model of OrgModels) model.where('org_id', this.orgId)
-        .forEach(doc =>{encoder.addDoc(doc)});
-    }
   }
 
   class AdminUnion extends OrgUnion {
     loadInitial(encoder) {
-      super.loadInitial(encoder);
+      for (const model of OrgModels) model.where('org_id', this.orgId)
+        .forEach(doc =>{encoder.addDoc(doc)});
+
       User.db.query(
         `select u.*,r.role, r.org_id from "User" as u, "Role" as r
 where (r.org_id is null or r.org_id = {$org_id}) and r.user_id = u._id
@@ -141,6 +151,14 @@ where (r.org_id is null or r.org_id = {$org_id}) and r.user_id = u._id
         break;
       }
       return upd;
+    }
+
+    loadInitial(encoder) {
+      for (const model of OrgModels) model.where('org_id', this.orgId)
+        .forEach(doc =>{
+          const attrs = filterChange(model.modelName, doc.attributes);
+          encoder.addDoc(attrs === doc.attributes ? doc : new model(attrs));
+        });
     }
   }
 

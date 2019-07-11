@@ -9,10 +9,6 @@ define((require, exports, module)=>{
       super();
       this.match('User', doc => doc._id === koru.userId());
     }
-
-    userIdChanged(newUID, oldUID) {
-      if (oldUID != null) super.userIdChanged(newUID, oldUID);
-    }
   }
   SelfSub.module = module;
 

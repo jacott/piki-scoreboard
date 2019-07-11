@@ -1,4 +1,4 @@
-define((require, exports, module)=>{
+isClient && define((require, exports, module)=>{
   const AllSub          = require('koru/pubsub/all-sub');
   const Org             = require('models/org');
   const TH              = require('test-helper');
