@@ -181,20 +181,14 @@ isClient && define((require, exports, module)=>{
 
       /* Test qual rankings (rule 9.17-A). 1. Competitors are ranked according to their faster
        * time. 2. Competitors with the same time are ranked relative to each other according to
-       * their slower time.
-       *
-       * TODO (low priority): if a competitor's first score in qual is fs, if a score other than '-'
-       * is entered for their second attempt, that should not be accepted. E.g. a message should pop
-       * up: 'Competitor made a false start on their first attempt so is eliminated from the
-       * Qualifiction round. Please enter score "-". See IFSC rule 9.8-C.'. Or Piki could enter that
-       * score automatically and not allow it to be edited.
+       * their slower time. 3. Competitors with no valid time.
        *
        * TODO: IFSC Rules do not address what rank to give to H, a registered
        * competitor who does not climb at all. Lisia interprets this silence as meaning that H
        * should have no rank in the competition - exactly as if H was not registered. Currently Piki
        * gives H a rank lower than all other competitors.
        */
-      test("qual rankings", ()=>{
+      test("qual rankings #1", ()=>{
         withStartlist(`
 A
 B
@@ -253,6 +247,37 @@ Rank Climber 1/4-final Qual
 10   E       _          false_start
 10   X       _          fall
 17   H       _          _
+`);
+      });
+
+            test("qual rankings #2", ()=>{
+        withStartlist(`
+A
+B
+C
+D
+E
+F
+G
+`);
+        resultsAre('Qualifiers', `
+A 5.555 E 7.777
+B 4.444 F 9.999
+C fs    G fs
+D 6.666 A 5.555
+E fs    B 9.999
+F 2.222 C fs
+G fall  D 9.999
+`);
+        generalResultsAre(`
+Rank Climber Semi-final Qual
+1    F       _          2.222
+2    B       _          4.444
+3    A       _          5.555
+4    D       _          6.666
+5    C       _          fs
+5    E       _          fs
+5    G       _          fs
 `);
       });
 
