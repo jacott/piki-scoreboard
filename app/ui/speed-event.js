@@ -311,8 +311,8 @@ data.heatNumber}`});
     4: 'Round of 16',
   };
 
-  const formatTime = (time, full=true)=> typeof time === 'number'
-        ? (full ? util.toDp(time/1000,  3, true) : util.toDp(Math.floor(time/10)/100, 2, true))
+  const formatTime = (time)=> typeof time === 'number'
+        ? util.toDp(time/1000,  3, true)
         : (time === 'tie' ? '' : time || '');
 
   const timeToElm = (isInput, elm, disp)=>{
@@ -488,7 +488,7 @@ data.heatNumber}`});
           const final = this.scores[+code+1];
           time = final && final.time;
         }
-        frag.appendChild(Dom.h({class: 'score', td: formatTime(time, false)}));
+        frag.appendChild(Dom.h({class: 'score', td: formatTime(time)}));
       }
       return frag;
     },
@@ -498,7 +498,7 @@ data.heatNumber}`});
     },
 
     qualScore() {
-      return formatTime(SpeedRound.minQual(this), false);
+      return formatTime(SpeedRound.minQual(this));
     },
   });
 
