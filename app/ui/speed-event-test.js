@@ -275,9 +275,9 @@ Rank Climber Semi-final Qual
 2    B       _          4.444
 3    A       _          5.555
 4    D       _          6.666
-5    C       _          fs
-5    E       _          fs
-5    G       _          fs
+5    G       _          false_start
+5    C       _          false_start
+5    E       _          false_start
 `);
       });
 
@@ -962,27 +962,27 @@ H 5.555 D 9.991
 `);
 
         resultsAre('Quarter final', `
-B 5.555 G 5.555
+H 5.555 G 5.555
 F -     C -
 D fall  A fall
-H 5.555 E 5.551
+B 5.555 E 5.551
 `);
 
         resultsAre('Semi final', `
 D wc
-E 5.555    B 5.555
+E 5.555    H 5.555
 `, 'tiebreak');
 
         tiebreaksAre('Semi final', 1, `
-E fall  B fall
+E fall  H fall
 `, 'tiebreak');
 
         tiebreaksAre('Semi final', 2, `
-E 5.555 B fs
+E 5.555 H fs
 `);
 
         resultsAre('Final', `
-B wc
+H wc
 D fall  E fs
         `);
 
@@ -990,8 +990,8 @@ D fall  E fs
 Rank Climber Final  Semi-final 1/4-final Qual
 1    D       fall   wc         fall      5.555
 2    E       fs     5.555      5.551     5.555
-3    B       wc     5.555      5.555     5.555
-4    H       _      _          5.555     5.555
+3    H       wc     5.555      5.555     5.555
+4    B       _      _          5.555     5.555
 5    G       _      _          5.555     5.559
 6    F       _      _          -         5.555
 6    C       _      _          -         5.555
