@@ -61,7 +61,7 @@ define((require, exports, module)=>{
       assertValid('');
       assert.same(cat.heatFormat, undefined);
 
-      assert.equals(cat.heatFormatRegex, m.equal(/^C?[R1-4]*$/));
+      assert.equals(cat.heatFormatRegex, m.equal(/^C?[1-4]*$/));
     });
   });
 });

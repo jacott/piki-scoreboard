@@ -110,8 +110,8 @@ isClient && define((require, exports, module)=>{
         res.r01.scores[3].time = '-';
 
         assert.equals(round.complete(), {
-          error: '',
-          nextStage: 1});
+          error: hasTies,
+          nextStage: 2});
 
         res.r01.scores[3].time = 'fs';
         res.r02.scores[3].time = 6789;
@@ -179,39 +179,6 @@ isClient && define((require, exports, module)=>{
         }
 
         assert.equals(round.complete(), {error: '', nextStage: 2});
-      });
-
-      test("qual re-run", ()=>{
-        TH.login();
-        const res = {};
-        createResults(res, {
-          r1: [0.31, [6001, 7000], [6500, 6600]],
-          r2: [0.21, [6001, 7000], [6500, 6600]],
-          r3: [0.41, [6001, 7000], [6500, 6600]],
-          r4: [0.61, ['fs', 6500], [6500, 6600]],
-          r5: [0.61, ['fs', 6500], [6500, 6600]],
-        });
-
-        const round = new SpeedRound({
-          stage: -2, previous: 0, query: Enumerable.propertyValues(res)});
-        round.calcStartList();
-
-        assert.equals(round.complete(), {error: hasTies, nextStage: -2});
-
-        assert.equals(Array.from(round.query).map(r => r.scores[2]), [
-          [6500, 6600, 'tie'], [6500, 6600, 'tie'], [6500, 6600, 'tie'],
-          [6500, 6600], [6500, 6600]]);
-
-        for(let i = 1; i <= 3; ++i) {
-          res['r'+i].scores[2][2] = 6754+(i%4);
-        }
-
-        assert.equals(round.complete(), {error: '', nextStage: -3});
-
-        assert.equals(Array.from(round.query).map(r => r.scores[2]), [
-          [6500, 6600, 6755], [6500, 6600, 6756], [6500, 6600, 6757],
-          [6500, 6600], [6500, 6600]]);
-
       });
 
       test("semi final", ()=>{
@@ -403,8 +370,8 @@ isClient && define((require, exports, module)=>{
       group("rankResults", ()=>{
         test("tiebreak", ()=>{
           const results = [
-            {scores: [0.221, [5009, 7000]]},
-            {scores: [0.421, [5000, 6000]]},
+            {scores: [0.221, [5000, 7000]]},
+            {scores: [0.421, [5000, 7000]]},
             {scores: [0.33, [7000, 7800]]}, // 3
             {scores: [0.14, [7000, 8000, 4000]]},
 
@@ -425,12 +392,12 @@ isClient && define((require, exports, module)=>{
           assert.equals(round.entries.compare.compareKeys, [private.ranking$, private.random$, '_id']);
 
           assert.equals(
-            Array.from(round).map(o => ranking(o)),
-            [1, 1, 3, 3, 5, 5, 5, 8, 8, 8]);
-
-          assert.equals(
             Array.from(round).map(o => map.get(o)),
             [2, 1, 3, 4, 6, 5, 7, 10, 8, 9]);
+
+          assert.equals(
+            Array.from(round).map(o => ranking(o)),
+            [1, 1, 3, 4, 5, 5, 7, 8, 8, 8]);
 
           assert.equals(
             Array.from(round).map(o => map.get(o)),
@@ -440,7 +407,7 @@ isClient && define((require, exports, module)=>{
         test("random ties before cutoff", ()=>{
           const results = [
             {scores: [0.221, [6192, 7888]]},
-            {scores: [0.3411, [6532, 7123, 10222]]},
+            {scores: [0.3411, [6532, 'fall', 10222]]},
             {scores: [0.33, ['fall']]}, // 3
             {scores: [0.1421, [6532, 'fall', 10144]]},
 
@@ -459,17 +426,17 @@ isClient && define((require, exports, module)=>{
           const map = new Map(results.map((o, i) => [o, i+1]));
 
           assert.equals(
-            Array.from(round).map(o => ranking(o)),
-            [1, 1, 3, 3, 5, 6, 6, 6, 9, 9]);
-
-          assert.equals(
             Array.from(round).map(o => map.get(o)),
             [7, 1, 4, 2, 10, 8, 3, 9, 5, 6]);
+
+          assert.equals(
+            Array.from(round).map(o => ranking(o)),
+            [1, 1, 3, 3, 5, 6, 6, 6, 9, 9]);
         });
 
         test("ties after cutoff", ()=>{
           const results = [
-            {scores: [0.221, [5009, 7000]]},
+            {scores: [0.221, [5000, 6000]]},
             {scores: [0.421, [5000, 6000]]},
             {scores: [0.33, [7000, 7800]]}, // 3
             {scores: [0.14, [7000, 8000, 4000]]},
@@ -489,13 +456,8 @@ isClient && define((require, exports, module)=>{
 
           round.rankResults();
 
-          assert.equals(
-            Array.from(round).map(o => ranking(o)),
-            [1, 1, 3, 3, 5, 5, 5, 8, 8, 8]);
-
-          assert.equals(
-            Array.from(round).map(o => map.get(o)),
-            [2, 1, 3, 4, 6, 5, 7, 10, 8, 9]);
+          assert.equals(Array.from(round).map(o => map.get(o)), [2, 1, 3, 4, 6, 5, 7, 10, 8, 9]);
+          assert.equals(Array.from(round).map(o => ranking(o)), [1, 1, 3, 4, 5, 5, 7, 8, 8, 8]);
         });
       });
     });
@@ -554,7 +516,7 @@ isClient && define((require, exports, module)=>{
       test("general results elim tied in 1/4", ()=>{
         const res = {};
         createResults(res, {
-          r01: [0.3,[6001,7000],,,{opponent_id:'r08',time:7600},{opponent_id:'r16',time:7070}],
+          r01: [0.3,[6001,7100],,,{opponent_id:'r08',time:7600},{opponent_id:'r16',time:7070}],
           r02: [0.2,[6102,7000],,,{opponent_id:'r07',time:6000},{opponent_id:'r15',time:7060}],
           r03: [0.4,[6204,7000],,,{opponent_id:'r06',time:7600},{opponent_id:'r14',time:7050}],
           r04: [0.6,[6308,7000],,,{opponent_id:'r05',time:7600},{opponent_id:'r13',time:7040}],
@@ -584,8 +546,8 @@ isClient && define((require, exports, module)=>{
         res.r01.scores[5].time = 'wc';
         round.rankResults();
 
-        assert.equals(toRanking(round), [1, 2, 3, 4, 5, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]);
         assert.equals(toResId(round), [2, 5, 6, 8, 7, 1, 3, 4, 9, 10, 11, 12, 13, 14, 15, 16]);
+        assert.equals(toRanking(round), [1, 2, 3, 4, 5, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]);
 
         /** test incomplete scores **/
         res.r03.scores[4] = null;
@@ -602,7 +564,7 @@ isClient && define((require, exports, module)=>{
         createResults(res, {
           r1: [0.31, [6001, 7000]],
           r2: [0.21, [6001, 7000]],
-          r3: [0.41, [6004, 7000]],
+          r3: [0.41, [6001, 7000]],
           r4: [0.61, ['fs', 'fs']],
           r5: [0.20, [6501, 'fs']],
           r6: [0.30, ['fall', 'fall']],
@@ -621,12 +583,12 @@ isClient && define((require, exports, module)=>{
         assert.equals(toResId(round), [3, 1, 2, 5, 4, 6, 7]);
       });
 
-      test("qual rerun", ()=>{
+      test("qual < 4; no final", ()=>{
         TH.login();
         const res = {};
         createResults(res, {
-          r1: [0.31, [6001, 7000]],
-          r2: [0.21, [6102, 7000]],
+          r1: [0.31, [6101, 7000]],
+          r2: [0.21, [6002, 7000]],
           r3: [0.41, [6204, 7000]],
           r4: [0.61, ['fs', 7000]],
           r5: [0.20, [6501, 'fs']],
@@ -634,24 +596,17 @@ isClient && define((require, exports, module)=>{
           r7: [0.90, ['fs', 5234]],
         });
 
+
+
         const round = new SpeedRound({
-          stage: -2, previous: 0, query: Enumerable.propertyValues(res)});
+          stage: 0, previous: 0, query: Enumerable.propertyValues(res)});
         round.calcStartList();
 
-        assert.equals(toResId(round), [5, 2, 6, 1, 3, 4, 7]);
-        assert.same(laneB(res.r5), res.r3);
-        assert.same(laneA(res.r5), res.r1);
-
-        round.setTime(res.r1, {time: 8342, lane: 1});
-        assert.equals(round.getTime(res.r1, 1), 8342);
-
-        round.setTime(res.r7, {time: 7342, lane: 1});
-        assert.equals(round.getTime(res.r7, 1), 7342);
 
         round.rankResults();
 
-        assert.equals(toResId(round), [7, 1, 2, 3, 4, 5, 6]);
-        assert.equals(toRanking(round), [1, 2, 3, 4, 5, 5, 5]);
+        assert.equals(toRanking(round), [1, 2, 3, 4, 4, 4, 4]);
+        assert.equals(toResId(round), [2, 1, 3, 5, 4, 6, 7]);
       });
 
       test("petit final", ()=>{
@@ -798,9 +753,9 @@ isClient && define((require, exports, module)=>{
             stage: 3, previous: 0, query: Enumerable.propertyValues(res)});
           round.calcStartList();
 
+          assert.same(round.whoWonFinals(res.r3), null);
           assert.same(round.whoWonFinals(res.r1), res.r8);
           assert.same(round.whoWonFinals(res.r2), res.r2);
-          assert.same(round.whoWonFinals(res.r3), null);
           assert.same(round.whoWonFinals(res.r4), null);
 
           res.r5.scores[1][1] = 7001;

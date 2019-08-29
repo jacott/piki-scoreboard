@@ -59,7 +59,9 @@ isClient && define((require, exports, module)=>{
     };
 
     const resultsAre = (stageName, results, tiebreak)=>{
-      assert.dom('#Event .Speed', ()=>{
+      const elm = Dom('#Event .Speed');
+      elm || assert.dom('#Event .Speed');
+      try {
         assert.dom('.selectedHeat', stageName+' - Start list');
         let i = 0;
         assert.dom('table.results>tbody', ()=>{
@@ -76,8 +78,9 @@ isClient && define((require, exports, module)=>{
           }
         });
         gotoNextStage(stageName, tiebreak);
-      });
-
+      } catch(err) {
+        assert.fail(err.message + "\n" + htmlToText(elm), 1);
+      }
     };
 
     const tiebreaksAre = (stageName, attempt, results, tiebreak)=>{
@@ -103,9 +106,33 @@ isClient && define((require, exports, module)=>{
       });
     };
 
+    const htmlToText = html =>{
+      const {childNodes} = html, len = childNodes.length;
+      let result = '';
+      for(let i = 0; i < len; ++i) {
+        const elm = childNodes[i];
+        if (elm.nodeType === document.TEXT_NODE)
+          result += elm.textContent.replace(/\s+/g, ' ');
+        else {
+          switch(elm.tagName) {
+          case 'BR': case 'TR':
+            result += '\n';
+            break;
+          }
+          const ans = htmlToText(elm);
+          if (ans)
+            result += ans + ' ';
+        }
+      }
+
+      return result;
+    };
+
     const generalResultsAre = (results)=>{
       goto('results', -1);
-      assert.dom('#Event .Speed', ()=>{
+      const elm = Dom('#Event .Speed');
+      elm || assert.dom('#Event .Speed');
+      try {
         let i = -1;
         for (const row of results.split('\n')) {
           if (row === '') continue;
@@ -131,7 +158,9 @@ isClient && define((require, exports, module)=>{
             });
           }
         }
-      });
+      } catch(err) {
+        assert.fail(err.message + "\n" + htmlToText(elm), 1);
+      }
     };
 
     const goto = (type, heatNumber)=>{
@@ -236,16 +265,16 @@ Rank Climber 1/4-final Qual
 4    L       _          4.444
 5    M       _          4.444
 5    Y       _          4.444
-7    D       _          4.444
 7    K       _          4.444
-9    Y       _          9.999
-10   J       _          false_start
-10   N       _          false_start
-10   G       _          fall
+7    D       _          4.444
+9    Z       _          9.999
+10   X       _          fall
 10   I       _          false_start
+10   G       _          fall
+10   N       _          false_start
+10   J       _          false_start
 10   F       _          fall
 10   E       _          false_start
-10   X       _          fall
 17   H       _          _
 `);
       });
@@ -491,8 +520,8 @@ Rank Climber Semi-final 1/4-final   Round_of_16   Qual
 
 
       // Where fewer than 4 competitors record a valid time in the qual, there is no final round
-      // (rule 9.5). The rules do not state that ties for 1st, 2nd or 3rd should be broken so Lisia
-      // proposes that Piki leave them unbroken.
+      // (rule 9.1B2, 9.5). The rules do not state that ties for 1st, 2nd or 3rd should be broken so
+      // Lisia proposes that Piki leave them unbroken.
 
       // TODO: test that Piki shows the competition as complete after the Qual - no option to run a
       // final.
@@ -516,8 +545,8 @@ D fall   B 9.99
 Rank Climber     Qual
 1    B           5.551
 2    C           5.555
-3    A           fall
 3    D           fall
+3    A           fall
 `);
       });
 
@@ -546,11 +575,11 @@ G 5.555 D fall
 Rank Climber     Qual
 1    G           5.555
 2    B           5.555
-3    A           fs
-3    E           fall
-3    F           fall
 3    C           fall
 3    D           fall
+3    A           false_start
+3    F           fall
+3    E           fall
 `);
       });
 
@@ -597,20 +626,22 @@ Rank Climber   Semi-final Qual
 2    Hermione     _       9.876
 2    Luna         _       9.876
 2    Harry        _       9.876
-2    Ron          _       9.876
+5    Ron          _       9.876
 `);
 
+        goto('startlists', 2);
+
         resultsAre('Semi final', `
-Ginny    5.555  Luna  4.444
-Hermione 6.666  Harry 7.777
+Ginny    5.555  Harry    4.444
+Luna     6.666  Hermione 7.777
 `);
 
         generalResultsAre(`
 Rank Climber   Final Semi-final Qual
-1    Luna      _     4.444      9.876
-1    Hermione  _     6.666      9.876
+1    Luna      _     6.666      9.876
+1    Harry     _     4.444      9.876
 3    Ginny     _     5.555      1.111
-4    Harry     _     7.777      9.876
+4    Hermione  _     7.777      9.876
 5    Ron       _     _          9.876
 `);
       });
@@ -632,15 +663,15 @@ E 8.888 C 8.888
 `);
 
         resultsAre('Semi final', `
-E 6.666 C 1.111
-B 4.444 A 5.555
+E 6.666 A 1.111
+B 4.444 C 5.555
 `);
 
         generalResultsAre(`
 Rank Climber Final Semi-final Qual
 1    B       _     4.444       3.333
-2    C       _     1.111       3.334
-3    A       _     5.555       3.334
+2    A       _     1.111       3.334
+3    C       _     5.555       3.334
 4    E       _     6.666       3.331
 5    D       _      _         false_start
 `);
@@ -963,38 +994,39 @@ H 5.555 D 9.991
 
         resultsAre('Quarter final', `
 H 5.555 G 5.555
-F -     C -
+B 5.551 C 5.555
 D fall  A fall
-B 5.555 E 5.551
+F wc    E -
 `);
 
         resultsAre('Semi final', `
-D wc
-E 5.555    H 5.555
+H fs    B fs
+D -     F -
 `, 'tiebreak');
 
         tiebreaksAre('Semi final', 1, `
-E fall  H fall
+H fall  B fall
+D 5.551 F 5.559
 `, 'tiebreak');
 
         tiebreaksAre('Semi final', 2, `
-E 5.555 H fs
+H 5.555 B fall
 `);
 
         resultsAre('Final', `
-H wc
-D fall  E fs
+H fall  D 5.555
+B -     F fs
         `);
 
         generalResultsAre(`
 Rank Climber Final  Semi-final 1/4-final Qual
-1    D       fall   wc         fall      5.555
-2    E       fs     5.555      5.551     5.555
-3    H       wc     5.555      5.555     5.555
-4    B       _      _          5.555     5.555
-5    G       _      _          5.555     5.559
-6    F       _      _          -         5.555
-6    C       _      _          -         5.555
+1    D       5.555  -          fall      5.555
+2    H       fall   fs         5.555     5.555
+3    F       fs     -          wc        5.555
+4    B       -      fs         5.551     5.555
+5    C       _      _          5.555     5.555
+6    G       _      _          5.555     5.559
+7    E       _      _          -         5.555
 8    A       _      _          fall      5.555
 `);
       });
@@ -1301,7 +1333,7 @@ Rank Climber Final  Semi-final  Qual
         assert.equals(event.heats[cat._id], 'S21');
       });
 
-      test("qual rerun", ()=>{
+      test("qual no final", ()=>{
         const res = []; createResults(res, 3);
 
         goto('startlists', 0);
@@ -1309,7 +1341,7 @@ Rank Climber Final  Semi-final  Qual
         TH.click('.nextStage>button');
         TH.confirm();
 
-        assert.equals(event.heats, {[cat._id]: 'SR'});
+        assert.equals(event.heats, {[cat._id]: 'SC'});
       });
 
       test("semi to final", ()=>{
@@ -1372,7 +1404,7 @@ Rank Climber Final  Semi-final  Qual
           o => assert.specificAttributes(o, {
             eventId: event._id, append: cat._id, search: '?type=results&heat=0'})));
 
-        assert.equals(event.heats, {[cat._id]: 'SR'});
+        assert.equals(event.heats, {[cat._id]: 'SC'});
 
         createResults(res, 8);
         TH.click('.nextStage>button');
@@ -1383,59 +1415,6 @@ Rank Climber Final  Semi-final  Qual
         TH.click('.nextStage>button');
         TH.confirm();
         assert.equals(event.heats, {[cat._id]: 'S4'});
-      });
-    });
-
-    test("general result qual rerun", ()=>{
-      event.$updatePartial('heats', [cat._id, 'SCR']);
-      const res = {};
-      createResults(res, {
-        r1: [0.31, [6001, 7000], [6301, 7000]],
-        r2: [0.21, [6102, 7000], [7000, 6201]],
-        r3: [0.41, [6204, 7000], [6201, 7000]],
-        r4: [0.61, ['fs', 7000], [6001, 7000]],
-        r5: [0.2, [6501, 'fs'], [6001, 'fs']],
-      });
-
-      TH.loginAs(Factory.createUser('judge'));
-      goto('results', -1);
-
-      assert.dom('#Event .Speed .GeneralList', list =>{
-        assert.dom('thead th', {count: 4});
-        assert.dom('tbody', body =>{
-          assert.dom('tr', {count: 5});
-          assert.dom('tr:nth-child(1)', tr =>{
-            assert.dom('.rank', '1');
-            assert.dom('.climber .name', 'climber_r4');
-            assert.dom(':nth-last-child(2).score', '6.00');
-            assert.dom(':last-child.score', 'false start');
-          });
-          assert.dom('tr:nth-child(2)', tr =>{
-            assert.dom('.rank', '2');
-            assert.dom('.climber .name', 'climber_r2');
-            assert.dom(':nth-last-child(2).score', '6.20');
-            assert.dom(':last-child.score', '6.10');
-          });
-          assert.dom('tr:nth-child(3)', tr =>{
-            assert.dom('.rank', '3');
-            assert.dom('.climber .name', 'climber_r3');
-            assert.dom(':nth-last-child(2).score', '6.20');
-            assert.dom(':last-child.score', '6.20');
-          });
-
-          assert.dom('tr:nth-child(4)', tr =>{
-            assert.dom('.rank', '4');
-            assert.dom('.climber .name', 'climber_r1');
-            assert.dom(':nth-last-child(2).score', '6.30');
-            assert.dom(':last-child.score', '6.00');
-          });
-          assert.dom('tr:nth-child(5)', tr =>{
-            assert.dom('.rank', '5');
-            assert.dom('.climber .name', 'climber_r5');
-            assert.dom(':nth-last-child(2).score', 'false start');
-            assert.dom(':last-child.score', 'false start');
-          });
-        });
       });
     });
 
@@ -1473,15 +1452,15 @@ Rank Climber Final  Semi-final  Qual
           assert.dom('tr', {count: 19});
           assert.dom('tr:nth-child(1)', tr =>{
             assert.dom('.climber .name', 'climber_r10');
-            assert.dom('.score', '6.00');
+            assert.dom('.score', '6.001');
           });
           assert.dom('tr:nth-child(16)', tr =>{
             assert.dom('.climber .name', 'climber_r18');
-            assert.dom('.score', '6.80');
+            assert.dom('.score', '6.808');
           });
           assert.dom('tr:nth-child(19)', tr =>{
             assert.dom('.climber .name', 'climber_r19');
-            assert.dom('.score', '7.01');
+            assert.dom('.score', '7.016');
           });
         });
 
@@ -1493,13 +1472,13 @@ Rank Climber Final  Semi-final  Qual
 
         assert.dom('tbody>tr:nth-child(1)', tr =>{
           assert.dom('.climber .name', 'climber_r8');
-          assert.dom('.score:nth-child(3)', '6.24');
-          assert.dom('.score:last-child', '6.80');
+          assert.dom('.score:nth-child(3)', '6.247');
+          assert.dom('.score:last-child', '6.808');
         });
         assert.dom('tbody>tr:nth-child(2)', tr =>{
           assert.dom('.climber .name', 'climber_r10');
-          assert.dom('.score:nth-child(3)', '6.89');
-          assert.dom('.score:last-child', '6.00');
+          assert.dom('.score:nth-child(3)', '6.891');
+          assert.dom('.score:last-child', '6.001');
         });
       });
     });
@@ -1533,39 +1512,6 @@ Rank Climber Final  Semi-final  Qual
         goto('startlists', 1);
 
         assert.dom('#Event .Speed .ABList', list =>{
-        });
-      });
-
-      test("qual final", ()=>{
-        TH.loginAs(Factory.createUser('judge'));
-
-        event.$updatePartial('heats', [cat._id, 'SR']);
-
-        const res = {};
-        createResults(res, {
-          r1: [0.31, [6001, 7000]],
-          r2: [0.21, [6102, 7000]],
-          r3: [0.41, [6204, 7000]],
-          r4: [0.61, ['fs', 7000]],
-          r5: [0.20, [6501, 'fs']],
-          r6: [0.30, ['fall', 'fall']],
-        });
-
-        goto('startlists', 1);
-
-        assert.dom('#Event .Speed .ABList', list =>{
-          assert.dom('tbody>tr', {count: 6});
-          assert.dom('tbody>tr:first-child', tr =>{
-            assert.dom('td.climber:first-child .name', 'climber_r5');
-            assert.dom('td.climber:last-child .name', 'climber_r1');
-            assert.dom('td:nth-child(2)>input', {value: ''}, input =>{
-              input.focus();
-              TH.change(input, '5673');
-              assert.equals(res.r5.scores[2], [5673]);
-              assert.equals(input.value, '5.673');
-              assert.same(document.activeElement, input);
-            });
-          });
         });
       });
 

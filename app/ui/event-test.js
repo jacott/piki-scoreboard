@@ -236,30 +236,29 @@ isClient && define((require, exports, module)=>{
 
       test("qual rerun", ()=>{
         const cat = Factory.createCategory({type: 'S'});
-        const event = TH.Factory.createEvent({heats: {[cat._id]: 'SR'}});
+        const event = TH.Factory.createEvent({heats: {[cat._id]: 'SC'}});
         const res = Factory.createResult();
 
         Route.gotoPage(sut.Show, {eventId: event._id, search: '?type=results'});
         v.eventSub.yield();
 
         assert.dom('#Show tr:not(.fmt).S', ()=>{
-          assert.dom('td', {count: 5});
-          assert.dom('td:nth-child(3)', 'Quals');
-          assert.dom('td:last-child[colspan="4"]');
+          assert.dom('td', {count: 4});
+          assert.dom('td:last-child[colspan="5"]');
           stub(Route, 'gotoPage');
-          assert.dom('td:nth-child(4)', 'Final', ()=>{
+          assert.dom('td:nth-child(3)', 'Quals', ()=>{
             TH.click('.link');
           });
 
           assert.calledWith(Route.gotoPage, Dom.Event.Category, {
-            append: cat._id, search: '?type=results&heat=1'});
+            append: cat._id, search: '?type=results&heat=0'});
         });
       });
 
       test("print", ()=>{
         const cat1 = Factory.createCategory({type: 'S'});
         const cat2 = Factory.createCategory({type: 'S'});
-        const event = TH.Factory.createEvent({heats: {[cat1._id]: 'S4321', [cat2._id]: 'SR'}});
+        const event = TH.Factory.createEvent({heats: {[cat1._id]: 'S4321', [cat2._id]: 'SC'}});
         const res1 = Factory.createResult({category_id: cat1._id});
         const res2 = Factory.createResult({category_id: cat2._id});
 
@@ -282,7 +281,6 @@ isClient && define((require, exports, module)=>{
           TH.click('tr.S:nth-child(3) .select');
 
           assert.dom('.action [data-heat="0"]', "Quals");
-          assert.dom('.action [data-heat="1"]', "Final");
 
           TH.click('tr.S:nth-child(2) .select');
 

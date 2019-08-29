@@ -10,7 +10,7 @@ define((require, exports, module)=>{
   const GENERAL_RESULTS_PRIME = 3628273133;
   const NOT_CLIMBED_SCORE = 10000000;
   const NO_TIME = 1000000;
-  const COMPARE = 'compare', SORT = 'sort', TIEBREAK = 'tiebreak';
+  const COMPARE = 0, SORT = 1, TIEBREAK = 2;
 
   const ERROR = {
     hasTies: 'Break ties by further attempts on Lane A.',
@@ -18,16 +18,17 @@ define((require, exports, module)=>{
     timeVsFS: 'Invalid score combination: time/fall vs false start. Enter "wc" (wildcard) instead of time/fall.',
   };
 
-  const isQualFormat = stage => stage == 0 || stage == -2;
+  const isQualFormat = stage => stage == 0;
 
   const CONVERT_TIME = {
     wc: -1,
     fall: NO_TIME,
     fs: NO_TIME,
-    tie: NOT_CLIMBED_SCORE,
+    tie: NO_TIME,
   };
 
-  const toNumber = time => typeof time === 'number' ? time : CONVERT_TIME[time] || NOT_CLIMBED_SCORE;
+  const toNumber = time => typeof time === 'number' ? time : CONVERT_TIME[time] || NO_TIME;
+  const isNotClimbed = time => typeof time !== 'number' && CONVERT_TIME[time] === void 0;
   const stage1ToNumber = time => typeof time === 'number'
         ? time : (time == 'fs' ? NO_TIME+1 : CONVERT_TIME[time]) || NOT_CLIMBED_SCORE;
 
@@ -44,20 +45,24 @@ define((require, exports, module)=>{
   };
   compareQualStartOrder.compareKeys = ['scores', '_id'];
 
-  const scoreAB = (idx, scores) =>{
+  const scoreAB = (idx, scores, minQual) =>{
     const qualScore = scores[idx];
     if (qualScore == null || (qualScore[0] == null && qualScore[1] == null))
-      return [NOT_CLIMBED_SCORE];
+      return NOT_CLIMBED_SCORE;
 
     const laneA = qualScore[0], laneB = qualScore[1];
     if (laneA === 'fs' || laneB === 'fs')
-      return [NO_TIME];
+      return NO_TIME;
 
-    return [toNumber(laneA), toNumber(laneB)];
+    if (isNotClimbed(laneA) && isNotClimbed(laneB))
+      return NOT_CLIMBED_SCORE;
+
+    if (minQual) return Math.min(toNumber(laneA), toNumber(laneB));
+    return Math.max(toNumber(laneA), toNumber(laneB));
   };
 
-  const minQual = (idx, scores) => Math.min(...scoreAB(idx, scores));
-  const maxQual = (idx, scores) => Math.max(...scoreAB(idx, scores));
+  const minQual = (idx, scores) => scoreAB(idx, scores, true);
+  const maxQual = (idx, scores) => scoreAB(idx, scores, false);
 
   function *finalsOrder(a, b, l, max) {
     if (l < max) {
@@ -69,18 +74,14 @@ define((require, exports, module)=>{
   }
 
   const compareQualResult = (idx, usage=COMPARE) =>{
-    const isCompare = usage === COMPARE;
     return (a, b)=>{
       if (a === b) return 0;
       const ma = minQual(idx, a.scores), mb = minQual(idx, b.scores);
-      if (isCompare)
-        return Math.floor(ma/10) - Math.floor(mb/10);
-
       const ans = ma - mb;
 
-      if (ans === 0) {
+      if (ans == 0) {
         const ans = maxQual(idx, a.scores) - maxQual(idx, b.scores);
-        if (ans !== 0)
+        if (ans != 0 || usage == COMPARE)
           return ans;
 
         const aRep = a.scores[idx], bRep = b.scores[idx];
@@ -91,7 +92,7 @@ define((require, exports, module)=>{
             if (ans != 0) return ans;
           }
         }
-        if (usage === TIEBREAK) return 0;
+        if (usage == TIEBREAK) return 0;
         const rnd = a.scores[0] - b.scores[0];
         return rnd == 0
           ? (a._id < b._id ? -1 : 1) : rnd;
@@ -104,53 +105,28 @@ define((require, exports, module)=>{
   const compareQualResultCOMPARE = compareQualResult(1, COMPARE);
   const compareQualResultTIEBREAK = compareQualResult(1, TIEBREAK);
 
-  const _compareQualRerunTIES = compareQualResult(2, TIEBREAK);
-
-  const compareQualRerunSORT = (a,b)=>{
-    if (a === b) return 0;
-    return _compareQualRerunTIES(a, b) || compareQualResultSORT(a, b);
-  };
-
-  const compareQualRerunCOMPARE = (a,b)=>{
-    if (a === b) return 0;
-    return _compareQualRerunTIES(a, b) || compareQualResultCOMPARE(a, b);
-  };
-
-
-  const compareQualRerunTIEBREAK = (a,b)=>{
-    if (a === b) return 0;
-    return _compareQualRerunTIES(a, b) || compareQualResultTIEBREAK(a, b);
-  };
-
   const timeFor = (scores, stage)=>{
     if (stage == 0) return minQual(1, scores);
-    if (stage == -2) return minQual(2, scores);
     const score = scores[stage+1];
-    if (score == null) return NOT_CLIMBED_SCORE;
+    if (score == null || score.time == null) return NOT_CLIMBED_SCORE;
     return toNumber(score.time);
   };
 
   const rankQualResults = round =>{
     const {stage} = round;
-    const cmp = stage == -2 ?  compareQualRerunCOMPARE : compareQualResultCOMPARE;
-    const tb = stage == -2 ? compareQualRerunTIEBREAK : compareQualResultTIEBREAK;
-    const list = new BTree(stage == -2 ? compareQualRerunSORT : compareQualResultSORT);
+    const list = new BTree(compareQualResultSORT);
 
     let invalid = 0;
     for (const res of round.query) {
-      if (minQual(stage == -2 ? 2 : 1, res.scores) >= NO_TIME) ++invalid;
+      if (minQual(1, res.scores) >= NO_TIME) ++invalid;
       list.add(res);
     }
 
     let validSize = list.size - invalid;
 
     let cutoff;
-    if (stage == -2)
-      cutoff = 0;
-    else {
-      for (cutoff of [16, 8, 4]) if (validSize >= cutoff) break;
-      round.cutoff = cutoff;
-    }
+    for (cutoff of [16, 8, 4]) if (validSize >= cutoff) break;
+    round.cutoff = cutoff;
 
     let ranking;
     let count = -1;
@@ -163,10 +139,12 @@ define((require, exports, module)=>{
     for (const res of list) {
       ++count;
 
-      if (prev === null || (count-1 == cutoff ? tb(prev, res) : cmp(prev, res)) != 0) {
+      if (prev === null ||
+          (count-1 == cutoff
+           ? compareQualResultTIEBREAK(prev, res)
+           : compareQualResultCOMPARE(prev, res)) != 0) {
         ranking = count;
-      } else if (stage == -2 && count < 5)
-        ranking = count;
+      }
       res[ranking$] = ranking;
       res[random$] = randomOrder(res, random);
       entries.add(res);
@@ -365,23 +343,6 @@ define((require, exports, module)=>{
   const INV_LOG2 = 1/Math.log(2);
   const countToStage = (count)=>Math.max(1, Math.floor(Math.log(.2+Math.min(16, count))*INV_LOG2));
 
-  function *tiesOfRerun(round) {
-    const compare = compareQualRerunTIEBREAK;
-    const nr = Array.from(round).sort(compare);
-    const last = nr.length-1;
-    if (last == -1) return;
-    let prev = nr[0], prevTie = null;
-    for(let i = 1; i <= last; ++i) {
-      const res = nr[i];
-      if (compare(prev, res) == 0) {
-        if (prevTie !== prev) yield prev;
-        yield res;
-        prevTie = res;
-      } else if (i > 2) break;
-      prev = res;
-    }
-  }
-
   function *tiesOfQual(round, cutoff) {
     const compare = compareQualResultTIEBREAK;
     const nr = Array.from(round).sort(compare);
@@ -443,9 +404,7 @@ define((require, exports, module)=>{
     }
 
     if (last < start) last = start;
-    res.setSpeedScore(
-      stage == -2
-        ? {time: 'tie', attempt: last+1, stage: 1} : {time: 'tie', attempt: last+1});
+    res.setSpeedScore({time: 'tie', attempt: last+1});
   };
 
   const fallOrTime = (score)=> score === 'fall' || typeof score === 'number';
@@ -463,7 +422,7 @@ define((require, exports, module)=>{
 
     getTime(res, lane) {
       const {stage} = this;
-      const score = res.scores[stage == -2 ? 2 : stage+1];
+      const score = res.scores[stage+1];
       if (score == null) return null;
       if (stage < 1) return score[lane];
       return score.time;
@@ -475,8 +434,6 @@ define((require, exports, module)=>{
         lane = attempt+1;
       if (stage == 0) {
         return res.setSpeedScore({time, attempt: lane+1});
-      } else if (stage == -2) {
-        return res.setSpeedScore({time, attempt: lane+1, stage: 1});
       } else if (opponent_id === undefined) {
         ++attempt;
         return res.setSpeedScore({
@@ -524,6 +481,8 @@ define((require, exports, module)=>{
       if (isQualFormat(stage))
         return calcQualStartList(this);
 
+      if (stage < 0)
+        throw new Error("invalid stage: "+stage);
       const len = Math.max(1<<stage, 4), hlen = len>>1;
       const quals = new SpeedRound({stage: 0, query: this.query});
       rankQualResults(quals);
@@ -603,21 +562,14 @@ define((require, exports, module)=>{
         if (isQualFormat(stage)) {
           const cutoff = stage == 0 ? 1<<countToStage(validCount) : 3;
 
-          if (stage == -2) {
-            for (const res of tiesOfRerun(this)) {
-              error = ERROR.hasTies;
-              addTieAttempt(this, res);
-            }
-          } else if (validCount > 3 && validCount > cutoff) {
+          if (validCount > 3 && validCount > cutoff) {
             for (const res of tiesOfQual(this, cutoff)) {
               error = ERROR.hasTies;
               addTieAttempt(this, res);
             }
           }
           if (error === '') {
-            nextStage = stage == 0
-              ? validCount >= 4 ? countToStage(validCount) : -2
-            : -3;
+            nextStage = stage == 0 && validCount >= 4 ? countToStage(validCount) : -3;
           }
         } else {
           for (const res of this) {
@@ -638,7 +590,7 @@ define((require, exports, module)=>{
 
     stageScores(res) {
       const {stage} = this;
-      return res.scores[stage == -2 ? 2 : stage+1];
+      return res.scores[stage+1];
     }
 
     *attempts(res) {
@@ -682,7 +634,6 @@ define((require, exports, module)=>{
     compareQualStartOrder,
     compareFinals,
     compareKnockout,
-    compareQualRerunSORT,
     ranking$,
     random$,
   };

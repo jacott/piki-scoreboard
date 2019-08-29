@@ -8,7 +8,7 @@ define((require, exports, module)=>{
   const HEAT_FORMAT_REGEXS = {
     L: HEAT_FORMAT_REGEX,
     B: HEAT_FORMAT_REGEX,
-    S: /^C?[R1-4]*$/,
+    S: /^C?[1-4]*$/,
   };
 
   class Category extends Model.BaseModel {

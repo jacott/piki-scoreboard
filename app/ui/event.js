@@ -455,7 +455,7 @@ define((require, exports, module)=>{
     const elm = document.createElement('td');
     elm.appendChild(Form.pageLink({
       value: name, template: "Event.Category", append: cat._id,
-      search: type + "&heat="+(heatNumber === 'R' ? 1 : heatNumber),
+      search: type + "&heat=" + heatNumber,
     }));
     return elm;
   };
@@ -567,7 +567,7 @@ define((require, exports, module)=>{
           let found = false;
           for(let i = fmt.length; i > 0; --i) {
             const code = fmt[i];
-            if (code === 'R' && heatNumber == 1 || +code == heatNumber) {
+            if (heatNumber == 1 || +code == heatNumber) {
               found = true; break;
             }
           }
@@ -621,7 +621,7 @@ define((require, exports, module)=>{
           for (const elm of this.selected) {
             const fmt = Tpl.event.heats[$.data(elm)._id];
             for(let i = fmt.length - 1; i > 0; --i) {
-              const code = fmt[i] === 'R' ? 1 : +fmt[i];
+              const code = +fmt[i];
               formats[code] = true;
             }
           }

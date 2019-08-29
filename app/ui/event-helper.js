@@ -12,7 +12,6 @@ define((require, exports, module)=>{
 
   return {
     SPEED_FINAL_NAME: {
-      R: 'Final',
       0: 'Quals',
       1: 'Final',
       2: 'Semi-final',

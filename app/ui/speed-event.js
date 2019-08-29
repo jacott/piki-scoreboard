@@ -149,21 +149,19 @@ define((require, exports, module)=>{
       });
 
       const format = Event.findById(data.event_id).heats[data.category._id];
-      const {showingResults} = data;
-      const hasReRun = /R/.test(format);
-      const heatNumber = hasReRun && data.heatNumber == 1 ? -2 : data.heatNumber;
+      const {showingResults, heatNumber} = data;
       data.isClosed = heatNumber == 0
         ? format.length != 1
         : format.indexOf("C") !== -1 || format.indexOf(""+(heatNumber-1)) !== -1;
 
       const round = data.round = new SpeedRound({
-        stage: heatNumber == -1 && hasReRun ? -2 : heatNumber,
+        stage: heatNumber,
         previous: previousStage(format, heatNumber),
         query: Result.query.withIndex(Result.eventCatIndex, {
           event_id: data.event_id, category_id: data.category._id})
       });
 
-      if (heatNumber == 0 || heatNumber == -2) {
+      if (heatNumber == 0) {
         if (showingResults) {
           round.rankResults();
           renderQuals(data, elm, QualResults, RankRow, (dc, list)=>{
@@ -198,12 +196,9 @@ define((require, exports, module)=>{
 
   const calcSpeedFormat = ({stage}, fmt, nextStage)=>{
     let mx, mn;
-    if (stage == -2) {
-      return "SCR";
-    }
     if (stage == 0) {
-      if (nextStage == -2)
-        return "SR";
+      if (nextStage == -3)
+        return "SC";
       mx = nextStage;
       mn = mx;
       fmt.slice(2).split('').forEach(s => {
@@ -243,7 +238,7 @@ define((require, exports, module)=>{
         onConfirm: ()=>{
           const ev = Event.findById(data.event_id);
           let fmt = ev.heats[data.category._id].replace(/[C]/g, '');
-          if (heatNumber == 0 || /R/.test(fmt))
+          if (heatNumber == 0)
             fmt = 'S';
           else if (heatNumber == 1) {
             fmt = fmt.replace(/^SC/, 'S');
@@ -303,7 +298,6 @@ data.heatNumber}`});
 
   const HEAT_NAME = {
     '-3': 'Results',
-    '-2': 'Final',
     0: 'Qualifiers',
     1: 'Final',
     2: 'Semi final',
@@ -384,7 +378,7 @@ data.heatNumber}`});
       const list = [[0, 'Quals']];
       for(let i = 1; i < heatFormat.length; ++i) {
         const code = heatFormat[i];
-        list.push([code == 'R' ? 1 : +code, SPEED_FINAL_NAME[code]]);
+        list.push([+code, SPEED_FINAL_NAME[code]]);
       }
       list.push([-1, "General"]);
       return list;
@@ -447,7 +441,7 @@ data.heatNumber}`});
 
     markWinner() {
       const {round} = $.ctx.parentCtx.data;
-      if (round.stage == 0 || round.stage == -2) return null;
+      if (round.stage == 0) return null;
       const resA = this;
       const resB = laneB(this);
       const winner = round.whoWonFinals(resA, resB);
@@ -481,13 +475,8 @@ data.heatNumber}`});
       const start = heatFormat[1] === 'C' ? 1 : 0;
       for(let i = heatFormat.length - 1; i > start; --i) {
         const code = heatFormat[i];
-        let time;
-        if (code === 'R') {
-          time = SpeedRound.minQual(this, 2);
-        } else {
-          const final = this.scores[+code+1];
-          time = final && final.time;
-        }
+        const final = this.scores[+code+1];
+        const time = final && final.time;
         frag.appendChild(Dom.h({class: 'score', td: formatTime(time)}));
       }
       return frag;
