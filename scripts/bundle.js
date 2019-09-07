@@ -7,6 +7,8 @@ var rootDir = process.cwd();
 
 console.log(`bundling`);
 
+global.isTest = false;
+
 bundleAll.bundle({
 }, function ({ast, css, compiler}) {
   process.chdir(rootDir);
@@ -19,6 +21,7 @@ bundleAll.bundle({
       global_defs: {
         isClient: true,
         isServer: false,
+        isTest: false,
       },
       ecma: 6,
     },
