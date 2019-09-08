@@ -1,22 +1,39 @@
 const Path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const bundleAll = require('koru/lib/bundle-all');
 
 process.chdir(__dirname+'/..');
-var rootDir = process.cwd();
-
-console.log(`bundling`);
+const rootDir = process.cwd();
 
 global.isTest = false;
 
-bundleAll.bundle({
-}, function ({ast, css, compiler}) {
+console.log(`bundling`);
+
+const isCompress = process.argv[3] !== 'quick';
+
+let version = process.env.APP_VERSION;
+
+const hash = version ? crypto.createHash('md5') : void 0;
+
+bundleAll.bundle({hash}, ({ast, css, compiler})=>{
   process.chdir(rootDir);
+
+  if (hash !== void 0) {
+    const idx = version.indexOf(",");
+    if (idx != -1) {
+      hash.update(version.slice(idx+1));
+      version = version.slice(0,idx);
+    }
+
+    hash.update(css);
+    version = version+","+hash.digest('hex');
+  }
 
   console.log(`minifying`);
 
   const { code, error, map } = compiler.terser.minify(ast, {
-    compress: {
+    compress: isCompress && {
       dead_code: true,
       global_defs: {
         isClient: true,
@@ -25,17 +42,18 @@ bundleAll.bundle({
       },
       ecma: 6,
     },
-    mangle: true,
+    mangle: isCompress,
     safari10: true,
     sourceMap: {
       filename: "index.js",
       url: "index.js.map"
     },
     output: {
-      // beautify: true,
-      // indent_level: 2,
+      beautify: ! isCompress,
+      indent_level: isCompress ? 0 : 2,
       ast: false,
       code: true,
+      preamble: version ? `window.KORU_APP_VERSION='${version}';` : void 0,
     }
   });
 
@@ -43,8 +61,10 @@ bundleAll.bundle({
     throw error;
   }
 
+  version !== void 0 && fs.writeFileSync(Path.join("build", 'version.sh'),
+                                         "export KORU_APP_VERSION="+version);
   fs.writeFileSync(Path.join("build", 'index.css'), css);
   fs.writeFileSync(Path.join("build", 'index.js'), code);
-  //  fs.writeFileSync(Path.join("build", 'config.js'), configCode);
+//  fs.writeFileSync(Path.join("build", 'config.js'), configCode);
   fs.writeFileSync(Path.join("build", 'index.js.map'), map);
 });

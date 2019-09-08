@@ -1,0 +1,21 @@
+#!/bin/bash
+set -e
+TOP=$(readlink -f `dirname $0`/..)
+
+cd $TOP/build
+
+MD5SUM=$(md5sum -b <$TOP/app/index.html)
+MD5SUM=${MD5SUM/ */}
+version=${1-`git describe --tags --always --long --match 'v*'`}
+
+export APP_VERSION=$(printf "%s,%s" $version $MD5SUM/)
+$TOP/scripts/bundle iat
+
+set +e
+IFS="," read -ra va <version.sh
+hash="${va[1]}"
+
+sed <$TOP/app/index.html >index.html "s/CACHE_BUST_HASH/$hash/g"
+
+cat version.sh
+printf "\n"
