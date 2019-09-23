@@ -7,6 +7,9 @@
     "type": "git",
     "url": "https://github.com/jacott/piki-scoreboard.git"
   },
+  "scripts": {
+    "test": "scripts/koru test --isolated"
+  },
   "keywords": [
     "climbing",
     "koru",
@@ -16,8 +19,8 @@
   ],
   "author": "Geoff Jacobsen <geoffjacobsen@gmail.com>",
   "dependencies": {
-    "csv-parse": "^4.4.5",
-    "koru": "^0.30.4",
+    "csv-parse": "^4.4.6",
+    "koru": "^0.31.0",
     "pg-libpq": "^3.0.3"
   },
   "engines": {

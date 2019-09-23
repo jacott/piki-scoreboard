@@ -7,6 +7,8 @@ process.chdir(__dirname+'/..');
 const rootDir = process.cwd();
 
 global.isTest = false;
+global.isServer = true;
+global.isClient = false;
 
 console.log(`bundling`);
 

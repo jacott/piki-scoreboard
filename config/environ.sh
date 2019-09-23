@@ -9,12 +9,12 @@ function abort {
 
 test -e .koru || abort "First change to the toplevel directory to run this command: ($0)"
 
-export NODE=/u/node-v12.8.0-linux-x64/bin/node
+export NODE=/u/node-v12.10.0-linux-x64/bin/node
 
 export TZ=UTC
 export KORU_APP_NAME=piki
 export KORU_HOSTNAME=${HOSTNAME-$(hostname -f)}
-export KORU_PORT=3000
+export KORU_PORT=${KORU_PORT-3000}
 export KORU_HOME=$PWD
 export KORU_MODULE=$(readlink -f node_modules/koru)
 
