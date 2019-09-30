@@ -191,7 +191,7 @@ define((require, exports, module)=>{
     let ans = stage == 1
         ? stage1ToNumber(sa.time) - stage1ToNumber(sb.time) : toNumber(sa.time) - toNumber(sb.time);
     if (ans != 0) return ans;
-    ans = compareQualResultTIEBREAK(a, b);
+    ans = compareQualResultCOMPARE(a, b);
     if (ans != 0) return ans;
     const tba = sa.tiebreak, tbb = sb.tiebreak;
     if (tba == null || tbb == null) return 0;

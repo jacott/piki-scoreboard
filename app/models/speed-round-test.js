@@ -219,6 +219,44 @@ isClient && define((require, exports, module)=>{
         assert.equals(round.complete(), {error: '', nextStage: 1});
       });
 
+      test("semi final with qual ties", ()=>{
+        TH.login();
+        const res = {};
+        createResults(res, {
+          r01: [0.31, [6000, 7000, 6000], , {time: 6655, opponent_id: 'r02'}],
+          r02: [0.21, [6000, 7000, 7100], , {time: 6655, opponent_id: 'r01'}],
+          r03: [0.41, [6000, 7000, 6000], , {time: 6655, opponent_id: 'r04'}],
+          r04: [0.51, [6000, 7000, 7200], , {time: 6655, opponent_id: 'r03'}],
+
+          r05: [0.61, [6000, 7000, 7400]],
+        });
+
+        const round = new SpeedRound({
+          stage: 2, previous: 0, query: Enumerable.propertyValues(res)});
+        round.calcStartList();
+
+        assert.equals(round.complete(), {error: hasTies, nextStage: 2});
+
+        assert.equals(Array.from(round.query).map(r => r.scores[3]), [
+          {time: 6655, opponent_id: 'r02', tiebreak: ['tie']},
+          {time: 6655, opponent_id: 'r01', tiebreak: ['tie']},
+          {time: 6655, opponent_id: 'r04', tiebreak: ['tie']},
+          {time: 6655, opponent_id: 'r03', tiebreak: ['tie']},
+          void 0]);
+
+        for(let i = 1; i <= 4 ; ++i) res['r0'+i].scores[3].tiebreak[0] = i % 2 == 0 ? 6800 : 6900;
+
+        assert.equals(round.complete(), {error: '', nextStage: 1});
+
+        const gen = new SpeedRound({
+          stage: -1, previous: 4, query: Enumerable.propertyValues(res)});
+
+        gen.rankResults();
+
+        assert.equals(toRanking(gen), [1, 1, 3, 3, 5]);
+        assert.equals(toResId(gen), [4, 2, 3, 1, 5]);
+      });
+
       test("final", ()=>{
         TH.login();
         const res = {};
@@ -258,6 +296,29 @@ isClient && define((require, exports, module)=>{
     });
 
     group("quals", ()=>{
+      test("qual ranking", ()=>{
+        TH.login();
+        const res = {};
+        createResults(res, {
+          r1: [0.31, [6001, 7000]],
+          r2: [0.21, [6001, 7000]],
+          r3: [0.41, [6001, 7000]],
+          r4: [0.61, ['fs', 'fs']],
+          r5: [0.20, [6501, 'fs']],
+          r6: [0.30, ['fall', 'fall']],
+          r7: [0.90, ['fs', 5234]],
+
+        });
+
+        const round = new SpeedRound({
+          stage: 0, query: Enumerable.propertyValues(res)});
+
+        round.rankResults();
+
+        assert.equals(toRanking(round), [1, 1, 1, 4, 4, 4, 4]);
+        assert.equals(toResId(round), [3, 1, 2, 5, 4, 6, 7]);
+      });
+
       test("calcStartList", ()=>{
         let r1, r2, r3, r4, r5;
         const results = [
@@ -368,7 +429,7 @@ isClient && define((require, exports, module)=>{
       });
 
       group("rankResults", ()=>{
-        test("tiebreak", ()=>{
+        test("quals tiebreak", ()=>{
           const results = [
             {scores: [0.221, [5000, 7000]]},
             {scores: [0.421, [5000, 7000]]},
@@ -556,31 +617,6 @@ isClient && define((require, exports, module)=>{
 
         assert.equals(toRanking(round), [1, 2, 3, 4, 5, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]);
         assert.equals(toResId(round), [2, 5, 6, 8, 7, 1, 4, 3, 9, 10, 11, 12, 13, 14, 15, 16]);
-      });
-
-      test("qual ranking", ()=>{
-        TH.login();
-        const res = {};
-        createResults(res, {
-          r1: [0.31, [6001, 7000]],
-          r2: [0.21, [6001, 7000]],
-          r3: [0.41, [6001, 7000]],
-          r4: [0.61, ['fs', 'fs']],
-          r5: [0.20, [6501, 'fs']],
-          r6: [0.30, ['fall', 'fall']],
-          r7: [0.90, ['fs', 5234]],
-
-        });
-
-
-
-        const round = new SpeedRound({
-          stage: 0, query: Enumerable.propertyValues(res)});
-
-        round.rankResults();
-
-        assert.equals(toRanking(round), [1, 1, 1, 4, 4, 4, 4]);
-        assert.equals(toResId(round), [3, 1, 2, 5, 4, 6, 7]);
       });
 
       test("qual < 4; no final", ()=>{
