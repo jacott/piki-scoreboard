@@ -11,8 +11,8 @@ define((require, exports, module)=>{
   require('models/reg-upload-server');
 
   console.log(`org-node KORU_APP_VERSION = `+process.env.KORU_APP_VERSION);
-  if (process.env.KORU_APP_VERSION !== undefined) {
-    StackErrorConvert.start({sourceMapDir: '../build', lineAdjust: -1});
+  if (process.env.KORU_APP_VERSION !== void 0) {
+    StackErrorConvert.start({sourceMapDir: '../build'});
   }
 
   const emailConfig = koru.config.userAccount.emailConfig;
