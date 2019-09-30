@@ -964,10 +964,13 @@ Rank Climber Final  Semi-final  Qual
        * test faster time beats slower time
        * test equal time ties with equal time
        * test fall ties with fall
-       * test - and - are *both* eliminated (their opponent in *next* stage(s) gets wc and they are ranked according to 9.18-A2)
        * test time beats fs
        * test fall beats fs
        * test race ties are broken by Qual ranking, then additional attempts
+       *
+       * TODO: IFSC Rules do not currently state what to do if *both* competitors fail to
+       * report. Once the Rules do address this, update Piki. In the meantime, Piki treats - vs - as
+       * a tie.
        */
       test("race ties", ()=>{
         withStartlist(`
@@ -1073,8 +1076,64 @@ Rank Climber Final  Semi-final  Qual
 `);
       });
 
+      /* test Final Round race results:
+       * When climbers are tied in a race in the final and tied in
+       * the qual round but had rerun in the qual to qualify for the quota, that rerun should not be
+       * used to separate the tie in the final (9.17B)
+       *
+       */
 
-      /* TODO: invalid combinationss of scores in races in the Final round
+      test("race results #3", ()=>{
+        withStartlist(`
+A
+B
+C
+D
+E
+`);
+
+        resultsAre('Qualifiers',`
+A 3.3   D 9.9
+B 3.3   E 9.9
+C 3.3   A 9.9
+D 3.3   B 9.9
+E 3.3   C 9.9
+`, 'tiebreak');
+
+        tiebreaksAre('Qualifiers', 1, `
+A 4.4
+B 3.3
+C 1.1
+D 2.2
+E 5.5
+`);
+
+        resultsAre('Semi final', `
+D fall  A fall
+B 4.4   C 4.4
+`, 'tiebreak');
+
+        tiebreaksAre('Semi final', 1, `
+D 3.3   A 2.2
+B 2.2   C 8.8
+`);
+
+        resultsAre('Final', `
+D 3.3   C fall
+A fs    B wc
+`);
+
+        generalResultsAre(`
+Rank Climber Final  Semi-final  Qual
+1    B       wc     4.400       3.300
+2    A       fs     fall        3.300
+3    D       3.300  fall        3.300
+4    C       fall   4.400       3.300
+`);
+      });
+
+
+      /* TODO: invalid combinations of scores in races in the Final round
        * fs vs fs (race should be rerun, rule 9.12-A2b)
        * wc vs wc
        */
