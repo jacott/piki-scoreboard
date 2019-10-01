@@ -486,7 +486,7 @@ O 4.1 G 9.9
 P 3.1 H 9.9
 `);
 
-        resultsAre('Round of 16', `
+        resultsAre('1/8 final', `
 I fall A fall
 E 7.7  M 6.6
 G wc   K fs
@@ -505,7 +505,7 @@ P 4.4 L 9.9
 `);
 
         generalResultsAre(`
-Rank Climber Semi-final 1/4-final   Round_of_16   Qual
+Rank Climber Semi-final 1/4-final   1/8-final     Qual
 1    H       _          2.200       1.100         2.200
 2    P       _          4.400       8.800         3.100
 3    M       _          3.300       6.600         6.100
@@ -726,7 +726,7 @@ O 4.1 G 9.9
 P 3.1 H 9.9
 `);
 
-        resultsAre('Round of 16', `
+        resultsAre('1/8 final', `
 I 1.1    A 2.222
 E 2.229  M 1.1
 G 2.221  K 1.1
@@ -738,7 +738,7 @@ F wc     L fs
 `);
 
         generalResultsAre(`
-Rank Climber 1/4-final  Round_of_16  Qual
+Rank Climber 1/4-final  1/8-final    Qual
 1    I       _          1.100        1.100
 2    H       _          1.100        2.200
 3    O       _          wc           4.100
@@ -800,7 +800,7 @@ O 4.1 G 9.9
 P 3.1 H 9.9
 `);
 
-        resultsAre('Round of 16', `
+        resultsAre('1/8 final', `
 I fall A fall
 E 4.4  M fall
 G fs   K fs
@@ -819,7 +819,7 @@ P 4.4 F 9.9
 `);
 
         generalResultsAre(`
-Rank Climber Semi-final 1/4-final   Round_of_16   Qual
+Rank Climber Semi-final 1/4-final   1/8-final     Qual
 1    H       _          2.200       1.100         2.200
 2    P       _          4.400       8.800         3.100
 3    E       _          3.300       4.400         5.500
@@ -882,7 +882,7 @@ O 4.1 G 9.9
 P 3.1 H 9.9
 `);
 
-        resultsAre('Round of 16', `
+        resultsAre('1/8 final', `
 I 8.8  A 8.8
 E 4.4  M fall
 G 1.1  K 1.1
@@ -901,7 +901,7 @@ P 4.4 F 9.9
 `);
 
         generalResultsAre(`
-Rank Climber Semi-final 1/4-final   Round_of_16   Qual
+Rank Climber Semi-final 1/4-final   1/8-final     Qual
 1    H       _          2.200       1.100         2.200
 2    P       _          4.400       8.800         3.100
 3    E       _          3.300       4.400         5.500

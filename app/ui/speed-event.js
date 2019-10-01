@@ -310,7 +310,7 @@ data.heatNumber}`});
     1: 'Final',
     2: 'Semi final',
     3: 'Quarter final',
-    4: 'Round of 16',
+    4: '1/8 final',
   };
 
   const formatTime = (time)=> typeof time === 'number'

@@ -16,7 +16,7 @@ define((require, exports, module)=>{
       1: 'Final',
       2: 'Semi-final',
       3: '1/4-final',
-      4: 'Round of 16',
+      4: '1/8-final',
     },
 
     replacePage,

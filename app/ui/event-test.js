@@ -287,7 +287,7 @@ isClient && define((require, exports, module)=>{
           assert.dom('.action', action =>{
             assert.dom('span', 'Print');
             assert.dom('[data-heat="-1"]', 'General');
-            assert.dom('[data-heat="4"]', 'Round of 16');
+            assert.dom('[data-heat="4"]', '1/8-final');
             TH.click('[data-heat="-1"]');
           });
         });
@@ -327,7 +327,7 @@ isClient && define((require, exports, module)=>{
         assert.dom('#Show tr:not(.fmt).S', ()=>{
           assert.dom('td', {count: 8});
           assert.dom('td', 'Quals');
-          assert.dom('td', 'Round of 16');
+          assert.dom('td', '1/8-final');
           assert.dom('td', 'Semi-final');
           assert.dom('td:nth-child(7)', 'Final');
           assert.dom('td:last-child[colspan="1"]');
