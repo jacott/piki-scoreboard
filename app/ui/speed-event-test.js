@@ -70,6 +70,10 @@ isClient && define((require, exports, module)=>{
             if (row === '') continue;
             const parts = row.split(/\s+/);
             assert.dom(`tr:nth-child(${++i})`, tr =>{
+              if (row === 'Race for 1st and 2nd' || row === 'Race for 3rd and 4th') {
+                assert.dom('td[colspan="4"]:first-child:last-child', row);
+                return;
+              }
               assert.dom('td:first-child.climber .name', parts[0]);
               TH.change('td:nth-child(2) input', parts[1]);
               assert.dom('td:last-child.climber .name', parts[2]);
@@ -341,7 +345,9 @@ C 7.777 F 9.999
 `);
 
         resultsAre('Final', `
+Race for 3rd and 4th
 D 8.888 F 1.111
+Race for 1st and 2nd
 E 9.999 C 2.222
 `);
 
@@ -946,7 +952,9 @@ A -     D wc
 `);
 
         resultsAre('Final', `
+Race for 3rd and 4th
 C 5.555 A fall
+Race for 1st and 2nd
 B -     D 5.555
 `);
 
@@ -1018,7 +1026,9 @@ H 5.555 B fall
 `);
 
         resultsAre('Final', `
+Race for 3rd and 4th
 H fall  D 5.555
+Race for 1st and 2nd
 B -     F fs
         `);
 
@@ -1064,7 +1074,9 @@ B 4.4   C wc
 `);
 
         resultsAre('Final', `
+Race for 3rd and 4th
 A fs    B -
+Race for 1st and 2nd
 D fall  C -
 `);
 
@@ -1120,7 +1132,9 @@ B 2.2   C 8.8
 `);
 
         resultsAre('Final', `
+Race for 3rd and 4th
 D 3.3   C fall
+Race for 1st and 2nd
 A fs    B wc
 `);
 

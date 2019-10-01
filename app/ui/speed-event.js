@@ -87,6 +87,14 @@ define((require, exports, module)=>{
       }
     }));
 
+    if (round.stage == 1) {
+      const tbody = table.lastElementChild;
+      tbody.insertBefore(Dom.h({
+        class: 'stage1', tr: {td: ['Race for 3rd and 4th'], colspan: 4}}), tbody.firstElementChild);
+      tbody.insertBefore(Dom.h({
+        class: 'stage1', tr: {td: ['Race for 1st and 2nd'], colspan: 4}}), tbody.lastElementChild);
+    }
+
     pn.appendChild(table);
     data.showingResults || appendNextStage(data, pn);
   };
