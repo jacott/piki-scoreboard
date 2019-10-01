@@ -246,7 +246,7 @@ define((require, exports, module)=>{
   });
 
   Index.$events({
-    'click .list tr'(event) {
+    'click .list tbody>tr'(event) {
       Dom.stopEvent();
 
       const data = $.data(this);

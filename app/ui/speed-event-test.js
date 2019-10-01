@@ -1563,14 +1563,14 @@ Rank Climber Final  Semi-final  Qual
       TH.loginAs(Factory.createUser('judge'));
       goto('results', -1);
 
-      stub(Route, 'replacePage');
+      stub(Route, 'gotoPage');
       TH.selectMenu('#Event [name=selectHeat]', 0, elm =>{
         assert.domParent('li', {data: m.field('_id', -1), text: 'General'});
         assert.domParent('li', {data: m.field('_id', 2), text: 'Semi-final'});
         TH.click(elm);
       });
 
-      assert.calledWith(Route.replacePage, Dom.Event.Category, {
+      assert.calledWith(Route.gotoPage, Dom.Event.Category, {
         eventId: event._id, append: cat._id, search: '?type=results&heat=0'});
     });
 

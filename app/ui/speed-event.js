@@ -256,7 +256,7 @@ define((require, exports, module)=>{
           }
           ev.changes = {$partial: {heats: [data.category._id, fmt]}};
           ev.$$save();
-          EventHelper.replacePage(data, data.showingResults, heatNumber);
+          EventHelper.gotoPage(data, data.showingResults, heatNumber);
         }
       });
     },

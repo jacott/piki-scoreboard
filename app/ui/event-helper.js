@@ -3,8 +3,8 @@ define((require, exports, module)=>{
   const Route           = require('koru/ui/route');
   const $ = Dom.current;
 
-  const replacePage = (data, showingResults, heatNumber)=>{
-    Route.replacePage(Dom.Event.Category, {
+  const gotoPage = (data, showingResults, heatNumber)=>{
+    Route.gotoPage(Dom.Event.Category, {
       eventId: data.event_id, append: data.category._id,
       search: `?type=${showingResults ? 'results' : 'startlists'}&heat=${heatNumber}`
     });
@@ -19,20 +19,20 @@ define((require, exports, module)=>{
       4: '1/8-final',
     },
 
-    replacePage,
+    gotoPage,
 
     extendResultTemplate: tpl =>{
       tpl.$events({
         'change [name=selectHeat]'(event) {
           Dom.stopEvent();
           const {data} = $.ctx;
-          replacePage(data, data.showingResults, this.value);
+          gotoPage(data, data.showingResults, this.value);
         },
 
         'click [name=toggleStartOrder]'(event) {
           Dom.stopEvent();
           const {data} = $.ctx;
-          replacePage(data, ! data.showingResults, data.heatNumber);
+          gotoPage(data, ! data.showingResults, data.heatNumber);
         },
       });
 
