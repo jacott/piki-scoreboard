@@ -409,6 +409,8 @@ define((require, exports, module)=>{
 
   const fallOrTime = (score)=> score === 'fall' || typeof score === 'number';
 
+  const DNCRE = /d?nc/i;
+
   class SpeedRound {
     constructor(opts) {
       Object.assign(this, opts);
@@ -429,6 +431,8 @@ define((require, exports, module)=>{
     }
 
     setTime(res, {time, lane, attempt, opponent_id}) {
+      if (DNCRE.test(time))
+        time = '-';
       const {stage} = this;
       if (lane === undefined && attempt !== undefined)
         lane = attempt+1;

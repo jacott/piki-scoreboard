@@ -426,6 +426,12 @@ isClient && define((require, exports, module)=>{
 
         round.setTime({setSpeedScore}, {time: 'fs', lane: 1});
         assert.equals(opts, {time: 'fs', attempt: 2});
+
+        round.setTime({setSpeedScore}, {time: 'dnc', lane: 1});
+        assert.equals(opts, {time: '-', attempt: 2});
+
+        round.setTime({setSpeedScore}, {time: '-', lane: 1});
+        assert.equals(opts, {time: '-', attempt: 2});
       });
 
       group("rankResults", ()=>{
