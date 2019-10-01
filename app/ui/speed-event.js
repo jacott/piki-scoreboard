@@ -356,6 +356,7 @@ data.heatNumber}`});
           ae = Dom.h({span: ae});
         }
         ae.setAttribute('data-attempt', ++attempt);
+        ae.setAttribute('tabindex', 10);
 
         if (elm !== ae) {
           pn.insertBefore(ae, elm);

@@ -90,9 +90,10 @@ isClient && define((require, exports, module)=>{
           if (row === '') continue;
           const parts = row.split(/\s+/);
           assert.dom('td:first-child.climber .name', {text: parts[0], parent: p =>{
-            assert.domParent(`td:nth-child(2) input[data-attempt="${attempt}"]`, input =>{
-              TH.change(input,parts[1]);
-            });
+            assert.domParent(
+              `td:nth-child(2) input[tabindex="10"][data-attempt="${attempt}"]`, input =>{
+                TH.change(input,parts[1]);
+              });
           }});
           if (parts.length > 2) {
             assert.dom('td:last-child.climber .name', {text: parts[2], parent: p =>{
