@@ -12,7 +12,7 @@ define((require, exports, module)=>{
   const ClimberCell     = require('ui/climber-cell');
   const EventHelper     = require('ui/event-helper');
 
-  const orig$ = Symbol();
+  const orig$ = Symbol(), code$ = Symbol();
 
   const {SPEED_FINAL_NAME} = EventHelper;
 
@@ -380,6 +380,20 @@ data.heatNumber}`});
     }
   };
 
+  function clickOnScore(event) {
+    const elm = event.target;
+    if (elm === document.activeElement ||
+        ! Dom.hasClass(document.body, 'jAccess'))
+      return;
+
+    const {data} = $.ctx.parentCtx;
+    if (data.showingResults) {
+      const {round} = data;
+      Dom.stopEvent();
+      EventHelper.gotoPage(data, false, round.stage);
+    }
+  }
+
   Tpl.$helpers({
     heats() {
       const event = Event.findById(this.event_id);
@@ -434,6 +448,12 @@ data.heatNumber}`});
           time, lane: isLaneA ? 0 : 1});
       }
     },
+
+    'click .score': clickOnScore,
+  });
+
+  QualResults.$events({
+    'click .score': clickOnScore,
   });
 
   ABRow.$helpers({
@@ -470,6 +490,13 @@ data.heatNumber}`});
     }
   });
 
+  GeneralList.$events({
+    'click .score'(event) {
+      Dom.stopEvent();
+      EventHelper.gotoPage($.ctx.data, true, this[code$] || 0);
+    },
+  });
+
   GeneralRow.$helpers({
     rank() {
       const {round} = $.ctx.parentCtx.data;
@@ -483,10 +510,12 @@ data.heatNumber}`});
       const frag = document.createDocumentFragment();
       const start = heatFormat[1] === 'C' ? 1 : 0;
       for(let i = heatFormat.length - 1; i > start; --i) {
-        const code = heatFormat[i];
-        const final = this.scores[+code+1];
+        const code = +heatFormat[i];
+        const final = this.scores[code+1];
         const time = final && final.time;
-        frag.appendChild(Dom.h({class: 'score', td: formatTime(time)}));
+        const score = Dom.h({class: 'score', td: formatTime(time)});
+        score[code$] = code;
+        frag.appendChild(score);
       }
       return frag;
     },

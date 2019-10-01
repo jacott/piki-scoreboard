@@ -394,18 +394,18 @@ define((require, exports, module)=>{
           ! Dom.hasClass(document.body, 'jAccess'))
         return;
 
-      Dom.stopEvent();
-
       let input = elm.tagName === 'INPUT'
           ? elm : elm.querySelector('input') || this.querySelector('input');
       if (input != null) {
+        Dom.stopEvent();
+
         input.focus();
         input.select();
         return;
       }
 
       const ctx = $.ctx;
-      const data = ctx.data;
+      const {data} = ctx;
 
       const scoreData = $.data(this);
       let heat = scoreData.heat;
@@ -415,17 +415,25 @@ define((require, exports, module)=>{
 
 
       input = document.activeElement;
-      if (Dom.hasClass(input, 'score')) {
-        if (! saveScore(input)) return;
+      if (Dom.hasClass(input, 'score') && ! saveScore(input)) {
+        Dom.stopEvent();
+        return;
       }
+    },
 
-      if (data.showingResults) {
-        data.showingResults = false;
+    'click td.score'(event) {
+      const {data} = $.ctx;
 
-        data.selectHeat = heat === 99 ? data.heat.total : heat;
-      }
+      if (! data.showingResults) return;
 
-      updateResults(ctx);
+      const scoreData = $.data(this);
+      let heat = scoreData.heat;
+      if (typeof heat === 'object')
+        heat = heat.number;
+      if (heat < 1) return;
+
+      Dom.stopEvent();
+      EventHelper.gotoPage(data, false,  heat === 99 ? data.heat.total : heat);
     },
   });
 

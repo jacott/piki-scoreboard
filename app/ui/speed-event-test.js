@@ -1492,6 +1492,32 @@ Rank Climber Final  Semi-final  Qual
       });
     });
 
+    test("click to enter scores", ()=>{
+      TH.loginAs(Factory.createUser('admin'));
+      event.$updatePartial('heats', [cat._id, 'S']);
+      const res = {};
+      createResults(res, {
+        r1: [0.31, [6001, 7000]],
+        r2: [0.21, [6102, 7000]],
+        r3: [0.41, [6204, 7000]],
+        r4: [0.61, [6308, 7000]],
+      });
+
+      goto('results', 0);
+
+      spy(Route, 'gotoPage');
+
+      assert.dom('#Event .Speed .quals', list =>{
+        assert.dom('.score', 6.001, elm =>{
+          TH.click(elm);
+          assert.calledWith(Route.gotoPage, EventCategory);
+        });
+      });
+      assert.dom('#Event .Speed .ABList', list =>{
+        assert.dom('input', {value: "6.001"});
+      });
+    });
+
     test("general result", ()=>{
       event.$updatePartial('heats', [cat._id, 'S']);
       const res = {};
@@ -1555,6 +1581,13 @@ Rank Climber Final  Semi-final  Qual
           assert.dom('.score:last-child', '6.001');
         });
       });
+
+      TH.click('.score:last-child', '6.808');
+      assert.dom('#Event .Speed .quals');
+      goto('results', -1);
+
+      TH.click('.score', '6.891');
+      assert.dom('#Event .Speed .ABList .score', '6.891');
     });
 
     test("selectHeat", ()=>{

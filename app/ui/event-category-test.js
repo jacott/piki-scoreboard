@@ -193,8 +193,10 @@ isClient && define((require, exports, module)=>{
         test("entering finals", ()=>{
           assert.dom('#Event .Category', ()=>{
             assert.dom('tr#Result_'+ v.result._id, ()=>{
-              TH.trigger('td:nth-child(3)', 'pointerdown');
+              TH.click('td:nth-child(3)');
             });
+          });
+          assert.dom('#Event .Category', ()=>{
             assert.dom('h1', 'Final - Start list');
             assert.dom('tr#Result_'+ v.result._id, ()=>{
               assert.dom('td:nth-child(2).BoulderScore', ()=>{
@@ -235,7 +237,7 @@ isClient && define((require, exports, module)=>{
 
           TH.selectMenu('button[name=selectHeat]', 3);
           assert.dom('tr#Result_'+ v.result._id, ()=>{
-            TH.trigger('td.heat99', 'pointerdown');
+            TH.click('td.heat99');
           });
 
           assert.dom('.start table.results', ()=>{
@@ -257,8 +259,10 @@ isClient && define((require, exports, module)=>{
 
           assert.dom('#Event .Category', ()=>{
             assert.dom('tr#Result_'+ v.result._id, ()=>{
-              TH.trigger('td:nth-child(3)', 'pointerdown');
+              TH.click('td:nth-child(3)');
             });
+          });
+          assert.dom('#Event .Category', ()=>{
             assert.dom('h1', 'Final - Start list');
             assert.dom('tr#Result_'+ v.result._id, ()=>{
               assert.dom('td:nth-child(3)>input[placeholder="n+"]');
@@ -298,7 +302,7 @@ isClient && define((require, exports, module)=>{
           TH.login();
           assert.dom('#Event .Category', ()=>{
             assert.dom('tr#Result_'+ v.result._id,  ()=>{
-              TH.trigger('td:last-child', 'pointerdown');
+              TH.click('td:last-child');
             });
           });
 

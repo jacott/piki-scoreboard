@@ -260,7 +260,7 @@ define((require, exports, module)=>{
     'click button:not(.selected).tab'(event) {
       Dom.stopEvent();
 
-      Route.replacePage(Tpl.Index, {hash: '#'+this.getAttribute('name')});
+      Route.gotoPage(Tpl.Index, {hash: '#'+this.getAttribute('name')});
     },
   });
 

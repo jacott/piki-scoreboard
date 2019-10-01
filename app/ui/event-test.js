@@ -114,17 +114,17 @@ isClient && define((require, exports, module)=>{
     test("switching series tabs", ()=>{
       Route.gotoPage(sut.Index);
 
-      spy(Route, 'replacePage');
+      spy(Route, 'gotoPage');
 
       TH.click('button:not(.selected).series.tab');
       assert.dom('button.selected.series.tab');
-      assert.calledWith(Route.replacePage, sut.Index, TH.match.field('hash', '#series'));
+      assert.calledWith(Route.gotoPage, sut.Index, TH.match.field('hash', '#series'));
 
-      Route.replacePage.reset();
+      Route.gotoPage.reset();
 
       TH.click('button:not(.selected).event.tab');
       assert.dom('button.selected.event.tab');
-      assert.calledWith(Route.replacePage, sut.Index, TH.match.field('hash', '#event'));
+      assert.calledWith(Route.gotoPage, sut.Index, TH.match.field('hash', '#event'));
     });
 
     test("adding new event", ()=>{

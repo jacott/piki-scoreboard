@@ -69,7 +69,7 @@ define(function(require, exports, module) {
     'click button.tab'(event) {
       Dom.stopEvent();
 
-      Route.replacePage(Tpl[this.getAttribute('name')]);
+      Route.gotoPage(Tpl[this.getAttribute('name')]);
     },
   });
 
