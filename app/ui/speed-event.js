@@ -25,12 +25,34 @@ define((require, exports, module)=>{
   const {ABList, ABRow, RankRow, QualResults, GeneralList, GeneralRow} = Tpl;
   const $ = Dom.current;
 
+  const calcIsClosed = ({heatFormat: format, heatNumber})=> heatNumber == 0
+        ? format.length != 1
+        : format.indexOf("C") !== -1 || format.indexOf(""+(heatNumber-1)) !== -1;
+
+  const renderNextStage = data => Dom.h(
+    data.isClosed
+      ? {class: 'reopen', div: {button: ['Reopen '+HEAT_NAME[data.heatNumber]], class: 'action'}}
+    : {class: 'nextStage', div: {button: ['Next'], class: 'action'}});
+
   const appendNextStage = (data, pn)=>{
     if (User.me().isAdmin()) {
-      pn.appendChild(Dom.h(
-        data.isClosed
-          ? {class: 'reopen', div: {button: ['Reopen '+HEAT_NAME[data.heatNumber]], class: 'action'}}
-        : {class: 'nextStage', div: {button: ['Next'], class: 'action'}}));
+      let elm = renderNextStage(data);
+      pn.appendChild(elm);
+
+      Dom.ctx(pn).onDestroy(Event.observeId(data.event_id, ({doc})=>{
+        const format = doc.heats[data.category._id];
+        if (format !== data.heatFormat) {
+          data.heatFormat = format;
+          const isClosed = calcIsClosed(data);
+          if (isClosed !== data.isClosed) {
+            data.isClosed = isClosed;
+            const prev = elm;
+            elm = renderNextStage(data);
+            pn.insertBefore(elm, prev);
+            prev.remove();
+          }
+        }
+      }));
     }
   };
 
@@ -52,7 +74,11 @@ define((require, exports, module)=>{
     pn.appendChild(table);
   };
 
+  const FinalTitles = ['Race for 1st and 2nd', 'Race for 3rd and 4th'].map(
+    title => Dom.h({tr: {th: [title], colspan: 4}, class: 'finalTitle'}));
+
   const renderFinals = (data, pn, showingResults)=>{
+    const pctx = Dom.myCtx(pn);
     const {round} = data;
 
     if (showingResults)
@@ -60,49 +86,71 @@ define((require, exports, module)=>{
     else
       round.calcStartList();
 
-    const table = ABList.$autoRender(data, Dom.ctx(pn));
-
-    const ctx = myCtx(table);
-
-    const len = 1<<round.stage;
-
-    const list = new AutoList({
-      template: ABRow,
-      container: table.lastElementChild,
-      compare: SpeedRound.compareRankingSORT,
-      query: {
-        forEach: add =>{for (const res of round) res && add(res)}
-      }
-    });
-
-    ctx.onDestroy(round.onChange(dc =>{
-      if (showingResults) {
-        round.rankResults();
-        list.changeOptions({updateAllTags: true});
-      } else if (dc.isChange) {
-        list.updateEntry(laneA(dc.doc));
-      } else {
-        round.calcStartList();
-        list.changeOptions({updateAllTags: true});
-      }
-    }));
-
     if (round.stage == 1) {
-      const tbody = table.lastElementChild;
-      tbody.insertBefore(Dom.h({
-        class: 'stage1', tr: {td: ['Race for 3rd and 4th'], colspan: 4}}), tbody.firstElementChild);
-      tbody.insertBefore(Dom.h({
-        class: 'stage1', tr: {td: ['Race for 1st and 2nd'], colspan: 4}}), tbody.lastElementChild);
+      const tables = [ABList.$autoRender(data, pctx), ABList.$autoRender(data, pctx)];
+      const iter = round.entries.values();
+      const rows = tables.map(table =>{
+        const row = ABRow.$autoRender(iter.next().value, Dom.myCtx(table));
+        table.lastElementChild.appendChild(row);
+        return Dom.myCtx(row);
+      });
+
+      pctx.onDestroy(round.onChange(dc =>{
+        if (showingResults) {
+          round.rankResults();
+        } else {
+          round.calcStartList();
+        }
+
+        const iter = round.entries.values();
+        for (const row of rows) {
+          row.updateAllTags(iter.next().value);
+        }
+      }));
+
+      for(let i = 0; i < 2; ++i) {
+        const thead = tables[i].firstElementChild;
+        thead.insertBefore(FinalTitles[i], thead.firstElementChild);
+      }
+
+      pn.appendChild(tables[1]);
+      pn.appendChild(tables[0]);
+
+    } else {
+      const table = ABList.$autoRender(data, pctx);
+
+      const ctx = myCtx(table);
+
+      const len = 1<<round.stage;
+
+      const list = new AutoList({
+        template: ABRow,
+        container: table.lastElementChild,
+        compare: SpeedRound.compareRankingSORT,
+        query: {
+          forEach: add =>{for (const res of round) res && add(res)}
+        }
+      });
+
+      ctx.onDestroy(round.onChange(dc =>{
+        if (showingResults) {
+          round.rankResults();
+          list.changeOptions({updateAllTags: true});
+        } else if (dc.isChange) {
+          list.updateEntry(laneA(dc.doc));
+        } else {
+          round.calcStartList();
+          list.changeOptions({updateAllTags: true});
+        }
+      }));
+
+      pn.appendChild(table);
     }
 
-    pn.appendChild(table);
     data.showingResults || appendNextStage(data, pn);
   };
 
   const renderGeneralResults = (data, pn)=>{
-    const event = Event.findById(data.event_id);
-    data.heatFormat = event.heats[data.category._id];
-
     const table = GeneralList.$autoRender(data, Dom.ctx(pn));
 
     const ctx = myCtx(table);
@@ -127,8 +175,8 @@ define((require, exports, module)=>{
       list.changeOptions({updateAllTags: true});
     };
 
-    ctx.onDestroy(Event.observeId(data.event_id, ()=>{
-      data.heatFormat = event.heats[data.category._id];
+    ctx.onDestroy(Event.observeId(data.event_id, ({doc})=>{
+      data.heatFormat = doc.heats[data.category._id];
       ctx.updateAllTags();
       redraw();
     }));
@@ -156,11 +204,11 @@ define((require, exports, module)=>{
         set selectHeat(value) {return this.heatNumber = value},
       });
 
-      const format = Event.findById(data.event_id).heats[data.category._id];
+      const event = Event.findById(data.event_id);
+      const format = data.heatFormat = event.heats[data.category._id];
+
       const {showingResults, heatNumber} = data;
-      data.isClosed = heatNumber == 0
-        ? format.length != 1
-        : format.indexOf("C") !== -1 || format.indexOf(""+(heatNumber-1)) !== -1;
+      data.isClosed = calcIsClosed(data);
 
       const round = data.round = new SpeedRound({
         stage: heatNumber,

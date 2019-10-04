@@ -64,16 +64,24 @@ isClient && define((require, exports, module)=>{
       try {
         assert.dom('.selectedHeat', stageName+' - Start list');
         let i = 0;
-        assert.dom('table.results>tbody', ()=>{
+        if (stageName === 'Final')  {
+          const rows = results.trim().split('\n').map(r => r.trim().split(/\s+/));
+          for(let i = 0; i < 2; ++i) {
+            const parts = rows[i];
+            assert.dom(`table:${i == 0 ? 'first' : 'last'}-of-type `+
+                       'tbody>tr:first-child:last-child', ()=>{
+              assert.dom('td:first-child.climber .name', parts[0]);
+              TH.change('td:nth-child(2) input', parts[1]);
+              assert.dom('td:last-child.climber .name', parts[2]);
+              TH.change('td:nth-child(3) input', parts[3]);
+            });
+          }
+        } else assert.dom('table.results>tbody', ()=>{
           for (let row of results.split('\n')) {
             row = row.trim();
             if (row === '') continue;
             const parts = row.split(/\s+/);
             assert.dom(`tr:nth-child(${++i})`, tr =>{
-              if (row === 'Race for 1st and 2nd' || row === 'Race for 3rd and 4th') {
-                assert.dom('td[colspan="4"]:first-child:last-child', row);
-                return;
-              }
               assert.dom('td:first-child.climber .name', parts[0]);
               TH.change('td:nth-child(2) input', parts[1]);
               assert.dom('td:last-child.climber .name', parts[2]);
@@ -83,6 +91,7 @@ isClient && define((require, exports, module)=>{
         });
         gotoNextStage(stageName, tiebreak);
       } catch(err) {
+        throw err; // FIXME
         assert.fail(err.message + "\n" + htmlToText(elm), 1);
       }
     };
@@ -345,9 +354,7 @@ C 7.777 F 9.999
 `);
 
         resultsAre('Final', `
-Race for 3rd and 4th
 D 8.888 F 1.111
-Race for 1st and 2nd
 E 9.999 C 2.222
 `);
 
@@ -952,9 +959,7 @@ A -     D wc
 `);
 
         resultsAre('Final', `
-Race for 3rd and 4th
 C 5.555 A fall
-Race for 1st and 2nd
 B -     D 5.555
 `);
 
@@ -1026,10 +1031,8 @@ H 5.555 B fall
 `);
 
         resultsAre('Final', `
-Race for 3rd and 4th
-H fall  D 5.555
-Race for 1st and 2nd
 B -     F fs
+H fall  D 5.555
         `);
 
         generalResultsAre(`
@@ -1074,9 +1077,7 @@ B 4.4   C wc
 `);
 
         resultsAre('Final', `
-Race for 3rd and 4th
 A fs    B -
-Race for 1st and 2nd
 D fall  C -
 `);
 
@@ -1132,9 +1133,7 @@ B 2.2   C 8.8
 `);
 
         resultsAre('Final', `
-Race for 3rd and 4th
 D 3.3   C fall
-Race for 1st and 2nd
 A fs    B wc
 `);
 
@@ -1480,11 +1479,15 @@ Rank Climber Final  Semi-final  Qual
 
         assert.equals(event.heats, {[cat._id]: 'SC'});
 
+        TH.click('.reopen>button');
+        TH.confirm();
         createResults(res, 8);
         TH.click('.nextStage>button');
         TH.confirm();
         assert.equals(event.heats, {[cat._id]: 'S3'});
 
+        TH.click('.reopen>button');
+        TH.confirm();
         createResults(res, 8);
         TH.click('.nextStage>button');
         TH.confirm();
