@@ -81,10 +81,7 @@ define((require, exports, module)=>{
     const pctx = Dom.myCtx(pn);
     const {round} = data;
 
-    if (showingResults)
-      round.rankResults();
-    else
-      round.calcStartList();
+    round.calcStartList();
 
     if (round.stage == 1) {
       const tables = [ABList.$autoRender(data, pctx), ABList.$autoRender(data, pctx)];
