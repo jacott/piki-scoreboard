@@ -81,6 +81,7 @@ define(function(require, exports, module) {
       const elm = Tpl.$autoRender();
       const ctx = Dom.myCtx(elm);
       document.body.appendChild(elm);
+      base.childAnchor = elm.querySelector('#SeriesBody');
       ctx.onDestroy(Series.observeId(series._id, dc => Dom.setTitle(dc.doc.name)));
     },
 
@@ -193,7 +194,7 @@ define(function(require, exports, module) {
     onBaseEntry(page, pageRoute, callback) {
       const series = Series.findById(pageRoute.seriesId);
       const elm = Tpl.Results.$autoRender({});
-      const parent = document.querySelector('#Series .tabBody');
+      const parent = document.getElementById('SeriesBody');
       parent.insertBefore(elm, parent.firstChild);
       tabOpened.call(Tpl.Results, elm, pageRoute);
       const ctx = Dom.myCtx(elm);
@@ -342,7 +343,7 @@ define(function(require, exports, module) {
       ctx.data = {};
       TeamHelper.setSeriesTeamType(series);
 
-      const parent = document.querySelector('#Series .tabBody');
+      const parent = document.getElementById('SeriesBody');
       parent.insertBefore(elm, parent.firstChild);
       session.rpc("Ranking.teamResults", series._id, (err, results) => {
         if (err) {

@@ -84,7 +84,7 @@ isClient && define(function (require, exports, module) {
             assert.dom('button.selected.tab[name=Events]', 'Events');
             assert.dom('.tab.selected', {count: 1});
           });
-          assert.dom('.tabBody', function () {
+          assert.dom('#SeriesBody.tabBody', function () {
             assert.dom('.Events table.select', function () {
               assert.dom('thead>tr>th', 'Name');
               assert.dom('thead>tr>th', 'Start Date');

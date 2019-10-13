@@ -153,8 +153,8 @@ define((require)=>{
       if (isClient) {
         user.addRef('org').addField('role', 'a');
       } else {
-        const _id = user.options._id || Random.id();
-        user.options._id = _id;
+        const _id = user.attributes._id || Random.id();
+        user.attributes._id = _id;
         let org_id;
         if ('org_id' in options) {
           org_id = options.org_id;

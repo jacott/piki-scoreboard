@@ -32,7 +32,9 @@ define(function(require, exports, module) {
   Tpl.$extend({
     title: "Org settings",
     onBaseEntry() {
-      document.body.appendChild(Tpl.$autoRender({}));
+      const elm = Tpl.$autoRender({});
+      base.childAnchor = elm.querySelector('#SystemSetupBody');
+      document.body.appendChild(elm);
     },
 
     onBaseExit() {

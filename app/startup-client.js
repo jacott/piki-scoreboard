@@ -3,7 +3,7 @@ define((require, exports, module)=>{
   const session         = require('koru/session');
   require('koru/ui/helpers');
   const Route           = require('koru/ui/route');
-  const userAccount     = require('koru/user-account');
+  const UserAccount     = require('koru/user-account');
   const IDB             = require('lib/idb');
   const App             = require('ui/app');
   require('ui/category');
@@ -24,12 +24,14 @@ define((require, exports, module)=>{
 
   let _extras = null;
 
+  UserAccount.mode = 'srp';
+
   const start = extras =>{
     _extras = extras || _extras;
     if (_extras != null) {
       _extras.forEach(extra =>{module.get(extra).onUnload(restart)});
     }
-    userAccount.init();
+    UserAccount.start();
     IDB.start().then(()=>{
       session.connect();
       App.start();
@@ -41,7 +43,7 @@ define((require, exports, module)=>{
     IDB.stop();
     App.stop();
     session.stop();
-    userAccount.stop();
+    UserAccount.stop();
   };
 
   const restart = (mod, error)=>{

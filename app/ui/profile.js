@@ -68,7 +68,9 @@ define(function(require, exports, module) {
       if (! user || user._id === 'guest')
         Route.abortPage(Route.root.defaultPage);
 
-      document.body.appendChild(Tpl.$autoRender(User.me()));
+      const elm = this.$autoRender(User.me());
+      base.childAnchor = elm.querySelector('.body');
+      Route.childAnchor.appendChild(elm);
     },
 
     onBaseExit () {

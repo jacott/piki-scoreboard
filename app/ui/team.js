@@ -17,17 +17,7 @@ define(function(require, exports, module) {
   const $ = Dom.current;
   const Index = Tpl.Index;
 
-  Tpl.$extend({
-    title: "Teams",
-
-    onBaseEntry() {
-      document.body.appendChild(Tpl.$autoRender({}));
-    },
-
-    onBaseExit() {
-      Dom.removeId('Team');
-    },
-  });
+  Tpl.title = "Teams";
 
   Index.$helpers({
     rows: function (each) {

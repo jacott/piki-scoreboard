@@ -19,7 +19,7 @@ define((require, exports, module)=>{
       html.nodes = util.deepCopy(Tpl.nodes);
       const subTpl = Dom.newTemplate(subm, html);
       subTpl.model = model;
-      const base = Route.root.addBase(subm, subTpl, 'modelId');
+      const base = Route.root.addBase(subm, subTpl, {routeVar: 'modelId'});
 
       base.addTemplate(subm, subTpl.Index, {defaultPage: true, path: ''});
       base.addTemplate(subm, subTpl.Add, {
@@ -74,7 +74,9 @@ define((require, exports, module)=>{
     },
 
     onBaseEntry() {
-      document.body.appendChild(this.$autoRender({}));
+      const elm = this.$autoRender({});
+      this.route.childAnchor = elm.querySelector('.body');
+      Route.childAnchor.appendChild(elm);
     },
 
     onBaseExit() {

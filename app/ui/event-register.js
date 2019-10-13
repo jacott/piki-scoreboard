@@ -31,8 +31,6 @@ define(function(require, exports, module) {
 
   setSortFunc();
 
-  koru.onunload(module, ()=>{eventTpl.route.removeBase(Tpl)});
-
   const base = eventTpl.route.addBase(module, Tpl);
 
   base.addTemplate(module, Add, {
@@ -122,7 +120,9 @@ define(function(require, exports, module) {
   Tpl.$extend({
     onBaseEntry(page, pageRoute) {
       if (! eventTpl.event) Route.abortPage();
-      document.querySelector('#Event>div>.body').appendChild(Tpl.$autoRender(eventTpl.event));
+      const elm = Tpl.$autoRender(eventTpl.event);
+      base.childAnchor = elm.firstChild;
+      base.parent.childAnchor.appendChild(elm);
     },
 
     onBaseExit(page, pageRoute) {
@@ -419,6 +419,8 @@ define(function(require, exports, module) {
   }
 
   App.restrictAccess(Tpl);
+
+  module.onUnload(()=>{eventTpl.route.removeBase(Tpl)});
 
   return Tpl;
 });

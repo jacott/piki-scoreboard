@@ -50,7 +50,7 @@ define((require, exports, module)=>{
     lazySeriesList: () => () => Series.query.fetch().sort(util.compareByName)
   });
 
-  const base = Route.root.addBase(module, Tpl, 'eventId');
+  const base = Route.root.addBase(module, Tpl, {routeVar: 'eventId'});
   base.async = true;
   module.onUnload(()=>{
     Tpl.event = null;
@@ -162,7 +162,9 @@ define((require, exports, module)=>{
         Dom.myCtx(elm).onDestroy(Event.observeId(
           pageRoute.eventId, dc => Dom.setTitle(dc.doc.displayName)));
 
-      document.body.appendChild(elm);
+      base.childAnchor = elm.querySelector('#EventBody');
+
+      Route.childAnchor.appendChild(elm);
       const currentSub = eventSub;
 
       const pageTitle = document.getElementById('PageTitle');

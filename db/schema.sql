@@ -2,32 +2,19 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.6.7
--- Dumped by pg_dump version 9.6.7
+-- Dumped from database version 11.5 (Ubuntu 11.5-1)
+-- Dumped by pg_dump version 11.5 (Ubuntu 11.5-1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
+SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
-
---
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-
-
---
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
-
-
-SET search_path = public, pg_catalog;
 
 SET default_tablespace = '';
 
@@ -37,7 +24,7 @@ SET default_with_oids = false;
 -- Name: Category; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE "Category" (
+CREATE TABLE public."Category" (
     _id character varying(24) NOT NULL,
     org_id character varying(24),
     name text,
@@ -55,7 +42,7 @@ CREATE TABLE "Category" (
 -- Name: ChangeLog; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE "ChangeLog" (
+CREATE TABLE public."ChangeLog" (
     _id character varying(24) NOT NULL,
     "createdAt" timestamp without time zone,
     model text,
@@ -75,7 +62,7 @@ CREATE TABLE "ChangeLog" (
 -- Name: Climber; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE "Climber" (
+CREATE TABLE public."Climber" (
     _id character varying(24) NOT NULL,
     name text,
     org_id character varying(24),
@@ -93,7 +80,7 @@ CREATE TABLE "Climber" (
 -- Name: Club; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE "Club" (
+CREATE TABLE public."Club" (
     _id character varying(24) NOT NULL,
     name text,
     "shortName" text,
@@ -106,7 +93,7 @@ CREATE TABLE "Club" (
 -- Name: Competitor; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE "Competitor" (
+CREATE TABLE public."Competitor" (
     _id character varying(24) NOT NULL,
     event_id character varying(24),
     climber_id character varying(24),
@@ -121,7 +108,7 @@ CREATE TABLE "Competitor" (
 -- Name: Event; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE "Event" (
+CREATE TABLE public."Event" (
     _id character varying(24) NOT NULL,
     name text,
     org_id character varying(24),
@@ -139,7 +126,7 @@ CREATE TABLE "Event" (
 -- Name: Migration; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE "Migration" (
+CREATE TABLE public."Migration" (
     name text NOT NULL
 );
 
@@ -148,7 +135,7 @@ CREATE TABLE "Migration" (
 -- Name: Org; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE "Org" (
+CREATE TABLE public."Org" (
     _id character varying(24) NOT NULL,
     name text,
     email text,
@@ -160,7 +147,7 @@ CREATE TABLE "Org" (
 -- Name: Result; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE "Result" (
+CREATE TABLE public."Result" (
     _id character varying(24) NOT NULL,
     event_id character varying(24),
     climber_id character varying(24),
@@ -176,7 +163,7 @@ CREATE TABLE "Result" (
 -- Name: Role; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE "Role" (
+CREATE TABLE public."Role" (
     _id text COLLATE pg_catalog."C" NOT NULL,
     org_id text COLLATE pg_catalog."C",
     user_id text COLLATE pg_catalog."C",
@@ -188,7 +175,7 @@ CREATE TABLE "Role" (
 -- Name: Series; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE "Series" (
+CREATE TABLE public."Series" (
     _id character varying(24) NOT NULL,
     org_id character varying(24),
     name text,
@@ -202,7 +189,7 @@ CREATE TABLE "Series" (
 -- Name: Team; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE "Team" (
+CREATE TABLE public."Team" (
     _id character varying(24) NOT NULL,
     org_id character varying(24),
     "teamType_id" character varying(24),
@@ -215,7 +202,7 @@ CREATE TABLE "Team" (
 -- Name: TeamType; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE "TeamType" (
+CREATE TABLE public."TeamType" (
     _id character varying(24) NOT NULL,
     org_id character varying(24),
     name text,
@@ -227,7 +214,7 @@ CREATE TABLE "TeamType" (
 -- Name: User; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE "User" (
+CREATE TABLE public."User" (
     _id character varying(24) NOT NULL,
     name text,
     email text,
@@ -239,11 +226,11 @@ CREATE TABLE "User" (
 -- Name: UserLogin; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE "UserLogin" (
+CREATE TABLE public."UserLogin" (
     _id character varying(24) NOT NULL,
     "userId" text,
     email text,
-    srp jsonb,
+    password jsonb,
     tokens jsonb,
     "resetToken" text,
     "resetTokenExpire" bigint
@@ -254,7 +241,7 @@ CREATE TABLE "UserLogin" (
 -- Name: Category Category_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY "Category"
+ALTER TABLE ONLY public."Category"
     ADD CONSTRAINT "Category_pkey" PRIMARY KEY (_id);
 
 
@@ -262,7 +249,7 @@ ALTER TABLE ONLY "Category"
 -- Name: ChangeLog ChangeLog_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY "ChangeLog"
+ALTER TABLE ONLY public."ChangeLog"
     ADD CONSTRAINT "ChangeLog_pkey" PRIMARY KEY (_id);
 
 
@@ -270,7 +257,7 @@ ALTER TABLE ONLY "ChangeLog"
 -- Name: Climber Climber_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY "Climber"
+ALTER TABLE ONLY public."Climber"
     ADD CONSTRAINT "Climber_pkey" PRIMARY KEY (_id);
 
 
@@ -278,7 +265,7 @@ ALTER TABLE ONLY "Climber"
 -- Name: Club Club_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY "Club"
+ALTER TABLE ONLY public."Club"
     ADD CONSTRAINT "Club_pkey" PRIMARY KEY (_id);
 
 
@@ -286,7 +273,7 @@ ALTER TABLE ONLY "Club"
 -- Name: Competitor Competitor_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY "Competitor"
+ALTER TABLE ONLY public."Competitor"
     ADD CONSTRAINT "Competitor_pkey" PRIMARY KEY (_id);
 
 
@@ -294,7 +281,7 @@ ALTER TABLE ONLY "Competitor"
 -- Name: Event Event_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY "Event"
+ALTER TABLE ONLY public."Event"
     ADD CONSTRAINT "Event_pkey" PRIMARY KEY (_id);
 
 
@@ -302,7 +289,7 @@ ALTER TABLE ONLY "Event"
 -- Name: Migration Migration_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY "Migration"
+ALTER TABLE ONLY public."Migration"
     ADD CONSTRAINT "Migration_pkey" PRIMARY KEY (name);
 
 
@@ -310,7 +297,7 @@ ALTER TABLE ONLY "Migration"
 -- Name: Org Org_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY "Org"
+ALTER TABLE ONLY public."Org"
     ADD CONSTRAINT "Org_pkey" PRIMARY KEY (_id);
 
 
@@ -318,7 +305,7 @@ ALTER TABLE ONLY "Org"
 -- Name: Result Result_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY "Result"
+ALTER TABLE ONLY public."Result"
     ADD CONSTRAINT "Result_pkey" PRIMARY KEY (_id);
 
 
@@ -326,7 +313,7 @@ ALTER TABLE ONLY "Result"
 -- Name: Role Role_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY "Role"
+ALTER TABLE ONLY public."Role"
     ADD CONSTRAINT "Role_pkey" PRIMARY KEY (_id);
 
 
@@ -334,7 +321,7 @@ ALTER TABLE ONLY "Role"
 -- Name: Series Series_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY "Series"
+ALTER TABLE ONLY public."Series"
     ADD CONSTRAINT "Series_pkey" PRIMARY KEY (_id);
 
 
@@ -342,7 +329,7 @@ ALTER TABLE ONLY "Series"
 -- Name: TeamType TeamType_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY "TeamType"
+ALTER TABLE ONLY public."TeamType"
     ADD CONSTRAINT "TeamType_pkey" PRIMARY KEY (_id);
 
 
@@ -350,7 +337,7 @@ ALTER TABLE ONLY "TeamType"
 -- Name: Team Team_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY "Team"
+ALTER TABLE ONLY public."Team"
     ADD CONSTRAINT "Team_pkey" PRIMARY KEY (_id);
 
 
@@ -358,7 +345,7 @@ ALTER TABLE ONLY "Team"
 -- Name: UserLogin UserLogin_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY "UserLogin"
+ALTER TABLE ONLY public."UserLogin"
     ADD CONSTRAINT "UserLogin_pkey" PRIMARY KEY (_id);
 
 
@@ -366,7 +353,7 @@ ALTER TABLE ONLY "UserLogin"
 -- Name: User User_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY "User"
+ALTER TABLE ONLY public."User"
     ADD CONSTRAINT "User_pkey" PRIMARY KEY (_id);
 
 
@@ -374,16 +361,17 @@ ALTER TABLE ONLY "User"
 -- Name: ChangeLog_createdAt_parent_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX "ChangeLog_createdAt_parent_id" ON "ChangeLog" USING btree ("createdAt" DESC, parent_id);
+CREATE INDEX "ChangeLog_createdAt_parent_id" ON public."ChangeLog" USING btree ("createdAt" DESC, parent_id);
 
 
 --
 -- Name: Role_user_id_org_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX "Role_user_id_org_id" ON "Role" USING btree (user_id, org_id);
+CREATE UNIQUE INDEX "Role_user_id_org_id" ON public."Role" USING btree (user_id, org_id);
 
 
 --
 -- PostgreSQL database dump complete
 --
+
