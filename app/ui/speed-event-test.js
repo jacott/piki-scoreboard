@@ -91,7 +91,6 @@ isClient && define((require, exports, module)=>{
         });
         gotoNextStage(stageName, tiebreak);
       } catch(err) {
-        throw err; // FIXME
         assert.fail(err.message + "\n" + htmlToText(elm), 1);
       }
     };

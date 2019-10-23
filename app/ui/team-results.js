@@ -33,13 +33,9 @@ define((require, exports, module)=>{
         return {id, team, points: scores[id]};
       }).sort(util.compareByField('points', -1));
     },
+    teamTypeList: ()=> ctx => TeamType.where({_id: ctx.data.teamType_ids}),
   });
 
-  const teamTypeList = ctx => TeamType.where({_id: ctx.data.teamType_ids}).fetch();
-
-  Tpl.$events({
-    'menustart [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent(teamTypeList),
-  });
 
   return Tpl;
 });

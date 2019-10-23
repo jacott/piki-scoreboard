@@ -326,16 +326,9 @@ define(function(require, exports, module) {
           each.append(row);
       }
     },
+
+    teamTypeList: ()=> ctx => TeamType.where({_id: ctx.data.series.teamType_ids}),
   });
-
-  Tpl.TeamResults.$events({
-    'menustart [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent(teamTypeList),
-  });
-
-  function teamTypeList(ctx) {
-    return TeamType.where({_id: ctx.data.series.teamType_ids}).fetch();
-  }
-
 
   Tpl.TeamResults.$extend({
     $created(ctx, elm) {

@@ -69,6 +69,8 @@ define(function(require, exports, module) {
       Dom.addClass(elm, 'sort');
       asc === -1 &&  Dom.addClass(elm, 'desc');
     },
+
+    teamTypeList: ()=> ctx => TeamType.where({_id: ctx.data.teamType_ids}),
   });
 
   Tpl.$events({
@@ -81,8 +83,6 @@ define(function(require, exports, module) {
       Dom.stopEvent();
       Route.replacePath(Tpl);
     },
-
-    'menustart [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent(teamTypeList),
 
     'click th'(event) {
       Dom.stopEvent();
@@ -97,11 +97,6 @@ define(function(require, exports, module) {
       $.ctx.updateAllTags();
     },
   });
-
-  function teamTypeList(ctx) {
-    return TeamType.where({_id: ctx.data.teamType_ids}).fetch();
-  }
-
 
   function setSortFunc() {
     switch (sortField) {

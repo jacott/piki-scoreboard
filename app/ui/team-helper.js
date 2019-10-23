@@ -44,23 +44,6 @@ define((require, exports, module)=>{
         return Helper.teamType_id = tt._id;
     },
 
-    chooseTeamTypeEvent(listBuilder) {
-      return function () {
-        Dom.stopEvent();
-        let ctx = $.ctx;
-
-        SelectMenu.popup(this, {
-          list: listBuilder(ctx).sort(util.compareByName),
-          onSelect(elm) {
-            let id = $.data(elm)._id;
-            Helper.teamType_id = id;
-            ctx.updateAllTags();
-            return true;
-          }
-        });
-      };
-    },
-
     teamTD() {
       const team = Helper.teamType_id && this.teamMap[teamType_id];
       return team && Dom.h({span: team.shortName, $title: team.name});
@@ -111,9 +94,34 @@ define((require, exports, module)=>{
     },
   });
 
+  const selectTeamType = Dom.h({button: [], class: "icon", name: "selectTeamType", type: "button"});
+
   Dom.registerHelpers({
-    selectedTeamType() {
-      return Helper.teamTypeField('name');
+    selectedTeamType(teamTypeList) {
+      if ($.isElement())
+        $.element.textContent = Helper.teamTypeField('name');
+      else {
+        const span = Dom.h({span: Helper.teamTypeField('name')});
+        const elm = $.element;
+        const button = selectTeamType.cloneNode(false);
+        elm.parentNode.insertBefore(button, elm.nextSibling);
+        const {ctx} = $;
+        ctx.addEventListener(button, 'menustart', (event)=>{
+          Dom.stopEvent(event);
+
+          SelectMenu.popup(span, {
+            list: teamTypeList(ctx).fetch().sort(util.compareByName),
+            onSelect(elm) {
+              let id = $.data(elm)._id;
+              Helper.teamType_id = id;
+              ctx.updateAllTags();
+              return true;
+            }
+          });
+        });
+
+        return span;
+      }
     },
   });
 

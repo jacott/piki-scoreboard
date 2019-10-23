@@ -48,9 +48,11 @@ define(function(require, exports, module) {
     team: TeamHelper.teamTD,
   });
 
-  Index.$events({
-    'menustart [name=selectTeamType]': TeamHelper.chooseTeamTypeEvent(ctx => TeamType.query.fetch()),
+  Index.$helpers({
+    teamTypeList: ()=>() => TeamType.query,
+  });
 
+  Index.$events({
     'click [name=clearAllNumbers]'(event) {
       Dom.stopEvent();
       ConfirmRemove.show({
