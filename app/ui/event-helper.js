@@ -4,7 +4,7 @@ define((require, exports, module)=>{
   const $ = Dom.current;
 
   const gotoPage = (data, showingResults, heatNumber)=>{
-    Route.gotoPage(Dom.Event.Category, {
+    Route.gotoPage(Dom.tpl.Event.Category, {
       eventId: data.event_id, append: data.category._id,
       search: `?type=${showingResults ? 'results' : 'startlists'}&heat=${heatNumber}`
     });

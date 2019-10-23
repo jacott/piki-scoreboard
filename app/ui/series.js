@@ -127,7 +127,7 @@ define(function(require, exports, module) {
     'click'(event) {
       Dom.stopEvent();
 
-      Route.gotoPage(Dom.Event.Show, {eventId: $.ctx.data._id});
+      Route.gotoPage(Dom.tpl.Event.Show, {eventId: $.ctx.data._id});
     },
   });
 
@@ -388,7 +388,7 @@ define(function(require, exports, module) {
   Tpl.TeamResults.Header.$events({
     'click th.event'(event) {
       Dom.stopEvent();
-      Route.gotoPage(Dom.Event.Show, {eventId: $.ctx.data._id});
+      Route.gotoPage(Dom.tpl.Event.Show, {eventId: $.ctx.data._id});
     },
   });
 

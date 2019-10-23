@@ -77,7 +77,7 @@ define(function(require, exports, module) {
 
     'menustart [name=menu]'(event) {
       const list = [];
-      const ev = Dom.Event.event;
+      const ev = Dom.tpl.Event.event;
       if (ev) {
         list.push([`event/${ev._id}/show`, ev.displayName]);
       }

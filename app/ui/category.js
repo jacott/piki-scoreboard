@@ -36,7 +36,7 @@ define((require, exports, module)=>{
       const doc = $.data();
 
       Dom.stopEvent();
-      Dom.Dialog.confirm({
+      Dom.tpl.Dialog.confirm({
         data: doc,
         classes: 'warn',
         okay: 'Delete',

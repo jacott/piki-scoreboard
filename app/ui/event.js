@@ -73,7 +73,7 @@ define((require, exports, module)=>{
         : null;
 
     if (! button) {
-      if (Dom.Event.Register !== undefined && Dom.Event.Register.$contains(page))
+      if (Dom.tpl.Event.Register !== undefined && Dom.tpl.Event.Register.$contains(page))
         button =  tabList.querySelector('[name="Register"]');
     }
 
@@ -331,7 +331,7 @@ define((require, exports, module)=>{
       const doc = $.data();
 
       Dom.stopEvent();
-      Dom.Dialog.confirm({
+      Dom.tpl.Dialog.confirm({
         data: doc,
         classes: 'warn',
         okay: 'Delete',

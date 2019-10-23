@@ -215,7 +215,7 @@ isClient && define(function (require, exports, module) {
 
         TH.click('[name=cancel]');
 
-        assert.calledWith(Route.replacePath, Dom.Event.Register);
+        assert.calledWith(Route.replacePath, Dom.tpl.Event.Register);
       });
     });
 
@@ -298,7 +298,7 @@ isClient && define(function (require, exports, module) {
 
         TH.click('#Register form [name=cancel]');
 
-        assert.calledWithExactly(Route.replacePath, Dom.Event.Register);
+        assert.calledWithExactly(Route.replacePath, Dom.tpl.Event.Register);
       });
 
       test("delete competitor", ()=>{
@@ -327,7 +327,7 @@ isClient && define(function (require, exports, module) {
   });
 
   function gotoPage() {
-    Route.gotoPage(Dom.Event.Register, {
+    Route.gotoPage(Dom.tpl.Event.Register, {
       orgSN: v.org.shortName, eventId: v.event._id});
     v.eventSub.yield();
   }

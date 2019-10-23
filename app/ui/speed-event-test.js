@@ -1606,7 +1606,7 @@ Rank Climber Final  Semi-final  Qual
         TH.click(elm);
       });
 
-      assert.calledWith(Route.gotoPage, Dom.Event.Category, {
+      assert.calledWith(Route.gotoPage, Dom.tpl.Event.Category, {
         eventId: event._id, append: cat._id, search: '?type=results&heat=0'});
     });
 

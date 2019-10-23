@@ -10,7 +10,7 @@ define((require, exports, module)=>{
 
   const clicked = (event)=>{
     if (Dom.hasClass(event.target, 'link') && ! Dom.hasClass(event.target, 'topics'))
-      Dom.Dialog.close();
+      Dom.tpl.Dialog.close();
   };
 
   const scrollToTag = (tag)=>{
@@ -43,7 +43,7 @@ define((require, exports, module)=>{
   Tpl.$events({
     'click [name=close]'(event) {
       Dom.stopEvent();
-      Dom.Dialog.close();
+      Dom.tpl.Dialog.close();
     },
 
     'click a'(event) {

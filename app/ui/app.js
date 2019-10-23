@@ -93,7 +93,7 @@ define((require, exports, module)=>{
     if (pageRoute.orgSN === undefined)
       pageRoute.orgSN = localStorage.getItem('orgSN') || null;
 
-    if (pageRoute.orgSN == null && page !== Dom.ChooseOrg)
+    if (pageRoute.orgSN == null && page !== Dom.tpl.ChooseOrg)
       Route.abortPage('choose-org');
 
     if (pageRoute.orgSN !== orgShortName &&

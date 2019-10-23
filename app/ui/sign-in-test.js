@@ -44,7 +44,7 @@ isClient && define((require, exports, module)=>{
       beforeEach( ()=>{
         v.remoteCall = stub(User, 'forgotPassword');
 
-        Dom.Dialog.open(SignIn.ForgotPassword.$autoRender({email: 'foo@bar.com'}));
+        Dom.tpl.Dialog.open(SignIn.ForgotPassword.$autoRender({email: 'foo@bar.com'}));
 
         TH.click('#ForgotPassword [name=submit]');
 

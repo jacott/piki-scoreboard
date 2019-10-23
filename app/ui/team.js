@@ -135,7 +135,7 @@ define(function(require, exports, module) {
       var doc = $.data();
 
       Dom.stopEvent();
-      Dom.Dialog.confirm({
+      Dom.tpl.Dialog.confirm({
         data: doc,
         classes: 'warn',
         okay: 'Delete',

@@ -148,7 +148,7 @@ define(function(require, exports, module) {
       Dom.stopEvent();
       var doc = $.data();
 
-      Dom.Dialog.confirm({
+      Dom.tpl.Dialog.confirm({
         data: doc,
         classes: 'warn',
         okay: 'Deregister',
@@ -246,7 +246,7 @@ define(function(require, exports, module) {
 
   AddClimber.$events({
     'submit': Form.submitFunc('AddClimber', function (doc) {
-      Dom.Dialog.close();
+      Dom.tpl.Dialog.close();
       var form = document.querySelector('#Register form.add');
       var competitor = $.data(form);
       competitor.$clearCache();
@@ -257,7 +257,7 @@ define(function(require, exports, module) {
 
     'click [name=cancel]'(event) {
       Dom.stopEvent();
-      Dom.Dialog.close();
+      Dom.tpl.Dialog.close();
       document.querySelector('#Register [name=name].autoComplete').focus();
     },
   });
@@ -266,7 +266,7 @@ define(function(require, exports, module) {
     'click [name=editClimber]'(event) {
       Dom.stopEvent();
 
-      Route.gotoPage(Dom.Climber.Edit, {modelId: $.ctx.data.climber._id});
+      Route.gotoPage(Dom.tpl.Climber.Edit, {modelId: $.ctx.data.climber._id});
     },
   });
 
@@ -383,7 +383,7 @@ define(function(require, exports, module) {
   }
 
   function addNew(form, name) {
-    Dom.Dialog.open(AddClimber.$autoRender(Climber.build({org_id: App.orgId, name: name})), {focus: '[name=dateOfBirth]'});
+    Dom.tpl.Dialog.open(AddClimber.$autoRender(Climber.build({org_id: App.orgId, name: name})), {focus: '[name=dateOfBirth]'});
   }
 
   function addGroups(form, competitor) {

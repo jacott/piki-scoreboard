@@ -36,7 +36,7 @@ isClient && define(function (require, exports, module) {
       });
 
 
-      Dom.SystemSetup.onBaseExit();
+      Dom.tpl.SystemSetup.onBaseExit();
 
       refute.dom('#SystemSetup');
     },
@@ -44,7 +44,7 @@ isClient && define(function (require, exports, module) {
     "test renders orgs list"() {
       var orgs = Factory.createList(2, 'createOrg');
 
-      Route.gotoPage(Dom.SystemSetup);
+      Route.gotoPage(Dom.tpl.SystemSetup);
 
       assert.dom('table.orgs', function () {
         assert.dom('td', orgs[0].name);
@@ -65,7 +65,7 @@ isClient && define(function (require, exports, module) {
     },
 
     "test addOrg"() {
-      Route.gotoPage(Dom.SystemSetup);
+      Route.gotoPage(Dom.tpl.SystemSetup);
 
       assert.dom('#SystemSetup', function () {
         TH.click('[name=addOrg]');
@@ -93,7 +93,7 @@ isClient && define(function (require, exports, module) {
         v.org = Factory.createOrg();
         v.org2 = Factory.createOrg();
 
-        Route.gotoPage(Dom.SystemSetup.Index);
+        Route.gotoPage(Dom.tpl.SystemSetup.Index);
 
         TH.click('td', v.org.name);
       },

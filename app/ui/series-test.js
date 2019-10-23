@@ -299,7 +299,7 @@ isClient && define(function (require, exports, module) {
 
           stub(Route, 'gotoPage');
           TH.click('thead>tr>th.event', v.ev2.name);
-          assert.calledWith(Route.gotoPage, Dom.Event.Show, {eventId: v.ev2._id});
+          assert.calledWith(Route.gotoPage, Dom.tpl.Event.Show, {eventId: v.ev2._id});
         });
       });
     });

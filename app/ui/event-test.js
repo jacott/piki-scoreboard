@@ -250,7 +250,7 @@ isClient && define((require, exports, module)=>{
             TH.click('.link');
           });
 
-          assert.calledWith(Route.gotoPage, Dom.Event.Category, {
+          assert.calledWith(Route.gotoPage, Dom.tpl.Event.Category, {
             append: cat._id, search: '?type=results&heat=0'});
         });
       });

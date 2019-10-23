@@ -32,7 +32,7 @@ define((require, exports, module)=>{
     'click [name=forgot]' (event) {
       Dom.stopEvent();
 
-      Dom.Dialog.open(ForgotPassword.$autoRender({
+      Dom.tpl.Dialog.open(ForgotPassword.$autoRender({
         email: event.currentTarget.querySelector('[name=email]').value}));
     },
 
@@ -72,7 +72,7 @@ define((require, exports, module)=>{
   });
 
   ForgotPassword.$events({
-    'click [name=cancel]'() {Dom.Dialog.close()},
+    'click [name=cancel]'() {Dom.tpl.Dialog.close()},
 
     'submit'(event) {
       Dom.stopEvent();

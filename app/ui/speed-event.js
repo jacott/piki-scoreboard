@@ -330,7 +330,7 @@ define((require, exports, module)=>{
             ev.changes = {$partial: {
               heats: [data.category._id, calcSpeedFormat(round, fmt, nextStage)]}};
             ev.$$save();
-            Route.gotoPage(Dom.Event.Category, {
+            Route.gotoPage(Dom.tpl.Event.Category, {
               eventId: ev._id, append: data.category._id,
               search: `?type=${data.showingResults ? 'startlists' : 'results'}&heat=${
 data.heatNumber}`});

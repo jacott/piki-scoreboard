@@ -72,7 +72,7 @@ define(function(require, exports, module) {
       var doc = $.data(event.currentTarget.querySelector('form'));
 
       Dom.stopEvent();
-      Dom.Dialog.confirm({
+      Dom.tpl.Dialog.confirm({
         data: doc,
         classes: 'warn',
         okay: 'Delete',
