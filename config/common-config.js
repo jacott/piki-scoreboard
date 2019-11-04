@@ -1,7 +1,7 @@
 const path = require('path');
 const appDir = path.resolve(__dirname, '../app');
 const {
-  KORU_PORT, APP_URL, APP_DB,
+  KORU_PORT, APP_URL, KORU_DB,
   APP_MAILURL, APP_MAILDOMAIN, APP_DISPLAY_NAME,
 } = process.env;
 
@@ -28,7 +28,7 @@ exports.server = cfg =>{
       DBDriver: "koru/pg/driver",
     },
     "koru/pg/driver": {
-      url: `host=/var/run/postgresql dbname=${APP_DB}`,
+      url: `host=/var/run/postgresql dbname=${KORU_DB}`,
     },
 
     "koru/web-server": {

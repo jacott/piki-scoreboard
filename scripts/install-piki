@@ -17,7 +17,7 @@ init() {
     mkdir -p tmp $BACKUP_DIR /u/incoming
 
     if [ ! -e $appDir/current ];then
-        createdb $APP_DB || :
+        createdb $KORU_DB || :
     fi
 
     nginxConf=/etc/nginx/conf.d/$appName.conf
@@ -43,7 +43,7 @@ configNginx() {
 
     sed <$template >$srcConf \
         -e "s/{{KORU_PORT}}/$KORU_PORT/g" -e "s/{{APP_DOMAIN}}/$APP_DOMAIN/g" \
-        -e "s/{{APP_NAME}}/$appName/g"
+        -e "s/{{KORU_APP_NAME}}/$appName/g"
     if test ! -e $destConf || ! diff -q $srcConf $destConf;then
         mv -b $srcConf $destConf
         sudo /bin/systemctl reload nginx

@@ -1,14 +1,18 @@
 #!/bin/bash
 set -e
-TOP=$(readlink -f `dirname $0`/..)
+cd "${0%/*}"/../
 
-cd $TOP/build
+TOP=$PWD
+
+mkdir -p build
+
+cd build
 
 MD5SUM=$(md5sum -b <$TOP/app/index.html)
 MD5SUM=${MD5SUM/ */}
 version=${1-`git describe --tags --always --long --match 'v*'`}
 
-export APP_VERSION=$(printf "%s,%s" $version $MD5SUM/)
+export KORU_APP_VERSION=$(printf "%s,%s" $version $MD5SUM/)
 $TOP/scripts/bundle iat
 
 set +e

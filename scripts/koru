@@ -1,1 +1,6 @@
-../node_modules/.bin/koru
+#!/bin/bash
+set -e
+
+. "${0%/*}"/../config/environ.sh check
+
+exec $NODE $KORU_MODULE/bin/koru "$@"

@@ -7,3 +7,4 @@ TAG*
 /build/
 /app/test/server-ready.js
 /README.html
+/package-node.test

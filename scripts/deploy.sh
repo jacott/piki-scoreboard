@@ -1,13 +1,30 @@
 #!/bin/bash
 set -e
-cd `dirname "$0"`/..
 
-branch="$1"
+. "${0%/*}"/../config/environ.sh $1
 
-lockKey=$branch
+extraCleanup() {
+    :
+}
 
-. config/environ.sh
-. scripts/script-helper
+cleanup() {
+    extraCleanup
+    rm -f $lock
+}
+
+tmpdir=/u/build-piki/tmp
+mkdir -p $tmpdir
+
+lock="${tmpdir}/lock-piki"
+
+if [ -e $lock ];then
+    echo >&2 "deploy in progress: pid $(cat $lock)"
+    exit 1
+fi
+
+echo >${lock} $$
+
+trap cleanup 0
 
 cd /u/build-piki
 
@@ -38,7 +55,7 @@ fi
 
 echo "bundle client: css, js..."
 
-$NODE --es_staging scripts/bundle.js $branch
+$NODE --no-wasm-code-gc scripts/bundle.js $branch
 
 echo "Compressing..."
 

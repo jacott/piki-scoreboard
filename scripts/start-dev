@@ -1,27 +1,8 @@
 #!/bin/bash
 set -e
 
-. `dirname "$0"`/../config/environ.sh
-
-if [[ -e package-lock.json ]];then
-    PKG_LOCK=package-lock.json
-else
-    PKG_LOCK=npm-shrinkwrap.json
-fi
-
-
-if [[ -e tmp/${PKG_LOCK} && -e node_modules ]] && ${NODE} -v |
-           cat - ${PKG_LOCK} | diff -q - tmp/${PKG_LOCK} >/dev/null;then
-    echo 'node_modules okay'
-else
-    echo 'npm install...'
-    mkdir -p tmp
-    rm -rf node_modules
-    npm i
-    ${NODE} -v | cat - ${PKG_LOCK} >tmp/${PKG_LOCK}
-fi
-
+. "${0%/*}"/../config/environ.sh $1
 
 cd app
-echo -e "starting ${branch}...\c"
-exec ${NODE} --es_staging $KORU_MODULE/lib/koru.js "$@"
+echo -e "Starting ${KORU_ENV}...\c"
+exec_node $KORU_MODULE/lib/koru.js "$@"

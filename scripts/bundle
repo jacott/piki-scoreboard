@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-. `dirname $0`/../config/environ.sh
+. "${0%/*}"/../config/environ.sh $1
 
-#$NODE --es_staging --inspect --debug-brk scripts/bundle.js $branch
-$NODE --es_staging scripts/bundle.js $branch
+exec_node $KORU_MODULE/scripts/bundle.js $KORU_ENV
