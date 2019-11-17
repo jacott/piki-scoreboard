@@ -9,6 +9,11 @@
 html {
   .linear-gradient(#0ff, #eff);
   height: 100%;
+  display: inherit;
+}
+
+body, input, textarea, button {
+  font-family: system-ui, -apple-system, arial, sans-serif, emoji;
 }
 
 body {
@@ -19,11 +24,8 @@ body {
   padding: 0;
   min-width: @bodyWidth / 2;
   min-height: 300px;
-  font-family: Arial,Helvetica,sans-serif;
   font-size: @defaultFontSize;
   color: @colorText;
-  -webkit-font-smoothing: antialiased;
-  font-smoothing: antialiased;
   background: rgba(0,0,0,0) url(/images/jj.svg) no-repeat -1px @headerHeight - 1;
   background-size: 25%;
 

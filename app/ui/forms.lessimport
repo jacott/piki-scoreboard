@@ -71,7 +71,7 @@
       right: -1px;
       width: 20px;
       height: 20px;
-      .md-icon("arrow_drop_down"; @fontSize: 32px);
+      .app-icon("arrow_drop_down"; @fontSize: 32px);
     }
     & + ul {
       height: 0;

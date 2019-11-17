@@ -15,8 +15,8 @@
   flex-flow: @dir @wrap;
 }
 
-.md-inline-icon(@content; @fontSize: 18px; @fontFamily: 'Material Icons') {
-  font-family: @fontFamily;
+.app-inline-icon(@content; @fontSize: 18px) {
+  font-family: "App icons";
   font-weight: normal;
   font-style: normal;
   font-size: @fontSize;
@@ -32,18 +32,12 @@
   content: @content;
 }
 
-.md-icon(@content; @fontSize: 1em; @marginRight: .5em; @fontFamily: 'Material Icons') {
+.app-icon(@content; @fontSize: 1em; @marginRight: .5em) {
   &:before {
-    .md-inline-icon(@content; @fontSize: @fontSize; @fontFamily: @fontFamily);
+    .app-inline-icon(@content; @fontSize: @fontSize);
     margin-right: @marginRight;
   }
 }
-
-.oi-content(@content) {
-  font-family: 'app icons';
-  content: @content;
-}
-
 
 .content-box() {
   box-sizing: content-box;
@@ -160,7 +154,7 @@
   width: 1em;
   height: 1em;
   &:before {
-    .md-inline-icon("check_box_outline_blank"; @fontSize: 1em);
+    .app-inline-icon("check_box_outline_blank"; @fontSize: 1em);
     vertical-align: top;
   }
   &.on:before,

@@ -4,6 +4,9 @@ define((require, exports, module)=>{
   const localStorage    = require('koru/local-storage');
   const session         = require('koru/session');
   const sessState       = require('koru/session/state');
+  const KoruApp         = require('koru/ui/app');
+  const Dialog          = require('koru/ui/dialog');
+  const Ripple          = require('koru/ui/ripple');
   const Route           = require('koru/ui/route');
   const util            = require('koru/util');
   const uColor          = require('koru/util-color');
@@ -16,13 +19,20 @@ define((require, exports, module)=>{
   const Loading         = require('ui/loading');
   const App             = require('./app-base');
 
+  const pageChanged = event =>{
+    if (Dialog.isOpen()) Dialog.closeAll();
+
+    Route.pageChanged(event.state);
+  };
+
+  let running = false;
+  let restoreErrorFlash;
+
   let selfSub, orgSub, orgShortName = null, sessStateChange;
 
   const isTouch = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i
         .test(navigator.userAgent.toLowerCase());
 
-
-  koru.onunload(module, 'reload');
 
   util.merge(App, {
     restrictAccess(Tpl, rolere=/[as]/) {
@@ -48,17 +58,28 @@ define((require, exports, module)=>{
     text: ResourceString.text,
 
     stop() {
+      if (! running) return;
+      running = false;
+
       orgSub && orgSub.stop();
       selfSub && selfSub.stop();
       sessStateChange && sessStateChange.stop();
       selfSub = orgSub = orgShortName = null;
 
       window.removeEventListener('popstate', pageChanged);
+
+      restoreErrorFlash !== void 0 && restoreErrorFlash();
+      Ripple.stop();
     },
 
     start() {
-      App.stop();
+      if (running) return;
+      running = true;
       window.addEventListener('popstate', pageChanged);
+
+      Ripple.start();
+      restoreErrorFlash = KoruApp.flashUncaughtErrors();
+
       App.setAccess();
       selfSub = SelfSub.subscribe(null, err =>{
         err !== null && ! (err.error < 500) && koru.unhandledException(err);
@@ -104,8 +125,6 @@ define((require, exports, module)=>{
   };
 
   Route.root.onBaseExit = ()=>{subscribeOrg(null)};
-
-  const pageChanged = (event)=>{Route.pageChanged()};
 
   const subscribeOrg = (shortName, callback)=>{
     App.setAccess();
@@ -153,49 +172,7 @@ define((require, exports, module)=>{
     }
   };
 
-  const rippleElm = Dom.h({div: {}, class: 'ripple'});
-
-  const ripple = (event)=>{
-    const button = event.target;
-    if (button.tagName !== 'BUTTON' && ! Dom.hasClass(button, 'ripple-button')) return;
-
-    Dom.removeClass(rippleElm, 'animate');
-    Dom.removeClass(rippleElm, 'ripple-finished');
-    const rect = button.getBoundingClientRect();
-    const activeElement = document.activeElement;
-
-    let st = rippleElm.style;
-    st.width = rect.width + 'px';
-    st.height = rect.height + 'px';
-    st = rippleElm.firstChild.style;
-    if (! st) return;
-    const rippleSize = Math.sqrt(rect.width * rect.width +
-                               rect.height * rect.height) * 2 + 2;
-    st.width = rippleSize + 'px';
-    st.height = rippleSize + 'px';
-    const translate = 'translate(-50%, -50%) ' +
-          'translate(' + (event.clientX - rect.left) + 'px, ' + (event.clientY - rect.top) + 'px)';
-    st[Dom.vendorTransform] = translate + ' scale(0.0001, 0.0001)';
-
-    button.insertBefore(rippleElm, button.firstChild);
-    Dom.nextFrame(()=>{
-      Dom.addClass(rippleElm, 'animate');
-      st[Dom.vendorTransform] = translate;
-    });
-
-    const removeRipple = (event)=>{
-      document.removeEventListener('pointerup', removeRipple, true);
-
-      // Allow a repaint to occur before removing this class, so the animation
-      // shows for tap events, which seem to trigger a pointerup too soon after
-      // pointerdown.
-      Dom.nextFrame(()=>{Dom.addClass(rippleElm, 'ripple-finished')});
-    };
-
-    document.addEventListener('pointerup', removeRipple, true);
-
-  };
-  document.addEventListener('pointerdown', ripple, true);
+  module.onUnload(koru.reload);
 
   return App;
 });

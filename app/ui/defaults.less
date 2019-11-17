@@ -43,7 +43,6 @@
 
 button.on, button.input, button[type=submit], button[name=cancel], button[name=delete], select, .input, button.action {
   border-radius: @fixedBorderRadius;
-  font-family: 'Roboto', sans-serif;
   font-size: 100%;
 
   &.error {
@@ -55,7 +54,6 @@ button {
   border: none;
   background: none;
   outline: none;
-  font-family: 'Roboto', sans-serif;
   font-size: 100%;
   cursor: pointer;
   padding: 0;
@@ -144,7 +142,7 @@ label.checkboxLabel {
   input[type=checkbox] {
     opacity: 0;
     &+span:before {
-      .md-inline-icon("check_box_outline_blank");
+      .app-inline-icon("check_box_outline_blank");
       vertical-align: -25%;
       margin-left: -1.1em;
     }
@@ -189,11 +187,11 @@ select {
 
 i.bad {
   color: @cWarn;
-  .md-icon("clear");
+  .app-icon("clear");
 }
 i.good {
   color: @cGood;
-  .md-icon("check");
+  .app-icon("check");
 }
 
 a, input, textarea, select {
@@ -255,7 +253,7 @@ span.errorMsg {
       position: absolute;
       height: 0;
       width: 0;
-      .md-inline-icon("arrow_drop_down");
+      .app-inline-icon("arrow_drop_down");
       display: block;
       margin-top: -13px;
       color: #f84;
@@ -343,12 +341,12 @@ fieldset {
 
 .fab, .icon, icon, button>.downList {
   &:before {
-    .md-inline-icon("", @fontSize: 22px);
+    .app-inline-icon("", @fontSize: 22px);
   }
 }
 
 .inlineIcon {
-  .md-inline-icon("", @fontSize: 22px);
+  .app-inline-icon("", @fontSize: 22px);
 }
 
 button>.downList:before {
@@ -449,7 +447,7 @@ table {
 th.sort {
   user-select: none;
   &:after {
-    .md-inline-icon("arrow_drop_down");
+    .app-inline-icon("arrow_drop_down");
     margin-left: 4px;
   }
   &.desc:after {
@@ -580,7 +578,7 @@ table.categories {
       width: 1.2em;
       height: 1.2em;
       &:before {
-        .md-inline-icon("check_box_outline_blank"; @fontSize: 1em);
+        .app-inline-icon("check_box_outline_blank"; @fontSize: 1em);
         vertical-align: top;
       }
     }

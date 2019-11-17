@@ -1,0 +1,28 @@
+{
+  "name": "vimaly-icons",
+  "homepage": "http://vimaly.com/",
+  "description": "Icon Font for Vimaly.",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@dev.vimaly.com:vimaly.git"
+  },
+  "bugs": {
+    "url": "https://issues.vimaly.co/"
+  },
+  "keywords": [
+    "vimaly",
+    "font",
+    "icon"
+  ],
+  "author": "Vimaly Software Limited <vimaly@vimaly.com>",
+  "dependencies": {
+    "svg2ttf": "^4.3.0",
+    "svgicons2svgfont": "^9.1.1",
+    "wawoff2": "^1.0.2"
+  },
+  "engines": {
+    "node": ">=8.9.3"
+  },
+  "version": "0.0.2"
+}
