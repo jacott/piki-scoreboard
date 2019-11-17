@@ -12,6 +12,7 @@ exports.server = cfg =>{
         host: "0.0.0.0",
         indexhtml: path.resolve(appDir, '../build/index.html'),
         indexjs: path.resolve(appDir, '../build/index.js'),
+        indexjsmap: path.resolve(appDir, '../build/index.js.map'),
         indexcss: path.resolve(appDir, '../build/index.css'),
       },
 
@@ -19,22 +20,14 @@ exports.server = cfg =>{
         urlRoot,
         "userAccount" : {
           emailConfig: {
-            siteName: 'Piki demo',
+            siteName: 'Piki IAT demo',
           },
         },
       },
     },
   });
-
-  cfg.merge('extraRequires', [
-    'iat-server',
-  ]);
 };
 
 exports.client = cfg =>{
   cfg.set('requirejs.config.models/user-client.pretendRole', process.env['PIKI_ROLE']);
-
-  cfg.merge('requirejs.config.client.extraRequires', [
-    'iat-client',
-  ]);
 };

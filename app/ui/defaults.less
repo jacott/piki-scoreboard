@@ -41,6 +41,10 @@
   }
 }
 
+:focus {
+  outline: none;
+}
+
 button.on, button.input, button[type=submit], button[name=cancel], button[name=delete], select, .input, button.action {
   border-radius: @fixedBorderRadius;
   font-size: 100%;
@@ -53,7 +57,6 @@ button.on, button.input, button[type=submit], button[name=cancel], button[name=d
 button {
   border: none;
   background: none;
-  outline: none;
   font-size: 100%;
   cursor: pointer;
   padding: 0;
@@ -195,7 +198,6 @@ i.good {
 }
 
 a, input, textarea, select {
-  outline: 0;
   &.error {
     border-color: @colorErrorHighlight !important;
   }
@@ -303,11 +305,6 @@ input[type=number] {
     margin: 0;
   }
   -moz-appearance: textfield;
-}
-
-div:focus, section:focus {
-  outline: none;
-  .box-shadow-level;
 }
 
 // highlight link
