@@ -5,4 +5,4 @@ set -e
 
 cd app
 echo -e "Starting ${KORU_ENV}...\c"
-exec_node $KORU_MODULE/lib/koru.js "$@"
+exec_node $KORU_MODULE/lib/koru.js

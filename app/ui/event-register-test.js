@@ -1,4 +1,4 @@
-isClient && define(function (require, exports, module) {
+isClient && define((require, exports, module)=>{
   const Dom             = require('koru/dom');
   const Route           = require('koru/ui/route');
   const Climber         = require('models/climber');
@@ -9,7 +9,7 @@ isClient && define(function (require, exports, module) {
   const TeamHelper      = require('ui/team-helper');
   const TH              = require('./test-helper');
 
-  const {stub, spy, onEnd} = TH;
+  const {stub, spy, onEnd, match: m} = TH;
 
   const sut = require('./event-register');
 
@@ -31,7 +31,7 @@ isClient && define(function (require, exports, module) {
       });
 
       v.event = TH.Factory.createEvent({teamType_ids: [v.tt[0]._id, v.tt[1]._id]});
-      var names = ['Bob', 'brendon', 'bobby', 'robert'];
+      const names = ['Bob', 'brendon', 'bobby', 'robert'];
       v.climbers = TH.Factory.createList(4, 'createClimber', function (index, options) {
         options.name = names[index];
         options.number = '12'+index;
@@ -106,7 +106,7 @@ isClient && define(function (require, exports, module) {
           assert.dom('label .name', {text: '1 Youth Lead', parent() {
             assert.dom('button.select.category.none', '---');
             TH.selectMenu('button.select', v.u16._id);
-            TH.selectMenu('button.select', TH.match.field('_id', null));
+            TH.selectMenu('button.select', m.field('_id', null));
             assert.dom('button.select.category.none', '---');
             TH.selectMenu('button.select', v.u18._id);
             assert.dom('button.select.category:not(.none)', v.u18.name);
@@ -133,21 +133,22 @@ isClient && define(function (require, exports, module) {
         TH.input('[name=number]', '567');
 
         TH.click('fieldset.actions [type=submit]');
-        var competitor = Competitor.query.where({climber_id: v.climbers[1]._id}).fetchOne();
+        const competitor = Competitor.query.where({climber_id: v.climbers[1]._id}).fetchOne();
         assert.equals(competitor.category_ids, [v.u18._id, v.open._id]);
         assert.same(competitor.number, 567);
         assert.same(competitor.climber.number, 567);
 
-        assert.dom('table>thead', function () {
+        assert.dom('table>thead', ()=>{
           assert.dom('th[data-sort=team]', 'Club');
           TH.selectMenu(
             'th[data-sort=team]>[name=selectTeamType]',
-            TH.match.field('name', 'School'), function () {
-              assert.dom(this.parentNode, function () {
-              assert.dom('li', {count: 2});
-              assert.dom('li:first-child', 'Club');
+            m.field('name', 'School'), elm =>{
+              assert.dom(elm.parentNode, ()=>{
+                assert.dom('li', {count: 2});
+                assert.dom('li:first-child', 'Club');
+              });
+              return true;
             });
-          });
         });
 
         assert.dom('table td', {text: 'brendon', parent() {
@@ -194,7 +195,7 @@ isClient && define(function (require, exports, module) {
     });
 
     test("can't add twice", ()=>{
-      var oComp = TH.Factory.createCompetitor({climber_id: v.climbers[1]._id});
+      const oComp = TH.Factory.createCompetitor({climber_id: v.climbers[1]._id});
 
       gotoPage();
 
@@ -249,7 +250,7 @@ isClient && define(function (require, exports, module) {
               assert.dom('.name', v.tt[0].name);
 
               assert.dom('button.select:not(.none)', v.teams1[0].name);
-              TH.selectMenu('button.select', TH.match.field('_id', null), function () {
+              TH.selectMenu('button.select', m.field('_id', null), function () {
                 assert.dom(this.parentNode, function () {
                   assert.dom('li:first-child>i', 'none');
                   assert.dom('li:nth-child(2)', 'Team 4');
@@ -283,7 +284,7 @@ isClient && define(function (require, exports, module) {
         assert.dom('#Register form.edit', function () {
           assert.dom('.Groups', function () {
             assert.dom('button.select.category:not(.none)', 'Category 4', function () {
-              TH.selectMenu(this, TH.match.field('_id', null));
+              TH.selectMenu(this, m.field('_id', null));
               assert.className(this, 'none');
             });
           });

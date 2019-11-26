@@ -92,9 +92,9 @@ isClient && define((require, exports, module)=>{
       selfSub[connected$]({});
 
       assert.calledOnceWith(window.addEventListener, 'popstate');
-      window.addEventListener.args(0, 1)();
+      window.addEventListener.args(0, 1)({state: 12});
 
-      assert.calledWithExactly(Route.pageChanged);
+      assert.calledWithExactly(Route.pageChanged, 12);
     });
 
     test("uses localStorage orgSN", ()=>{

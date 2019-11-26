@@ -1,37 +1,54 @@
-isClient && define(function (require, exports, module) {
-  const Dom         = require('koru/dom');
-  const Route       = require('koru/ui/route');
-  const UserAccount = require('koru/user-account');
-  const Org         = require('models/org');
-  const User        = require('models/user');
-  const Factory     = require('test/factory');
-  const App         = require('./app');
-  const TH          = require('./test-helper');
+isClient && define((require, exports, module)=>{
+  const Dom             = require('koru/dom');
+  const Session         = require('koru/session');
+  const Route           = require('koru/ui/route');
+  const UserAccount     = require('koru/user-account');
+  const Org             = require('models/org');
+  const User            = require('models/user');
+  const Factory         = require('test/factory');
+  const App             = require('./app');
+  const TH              = require('./test-helper');
+
+  const {stub, spy, after} = TH;
 
   const SystemSetup = require('./system-setup');
-  var test, v;
+  let v = {};
 
-  TH.testCase(module, {
-    setUp() {
-      test = this;
+  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+    beforeEach(()=>{
       v = {};
-      App.orgId = Factory.createOrg()._id;
+      App.orgId = Factory.createOrg({_id: 'org001'})._id;
       v.su = Factory.createUser('su');
       TH.loginAs(v.su);
       App.setAccess();
-    },
+    });
 
-    tearDown() {
+    afterEach(()=>{
       TH.tearDown();
       v = null;
-    },
+    });
 
-    "test onEntry onExit"() {
+    test("export data", ()=>{
+      Route.gotoPage(SystemSetup);
+
+      UserAccount.token = "userId123|token456";
+      TH.stubProperty(Session, 'sessAuth', {value: "mySessAuth"});
+      stub(App, 'iframeGet');
+
+      TH.selectMenu('nav [name=export]', 'sql');
+
+      assert.calledWith(App.iframeGet, {
+        id: 'iframeExportOrg',
+        src: '/export/sql/piki.sql?org001&mySessAuth',
+        errorMsg: 'Export failed'});
+    });
+
+    test("onEntry onExit", ()=>{
       Route.gotoPage(SystemSetup);
 
       assert.dom('#SystemSetup', function () {
         assert.dom('.menu', function () {
-          assert.dom('button.link', {count: 2});
+          assert.dom('button.link', {count: 3});
         });
       });
 
@@ -39,9 +56,9 @@ isClient && define(function (require, exports, module) {
       Dom.tpl.SystemSetup.onBaseExit();
 
       refute.dom('#SystemSetup');
-    },
+    });
 
-    "test renders orgs list"() {
+    test("renders orgs list", ()=>{
       var orgs = Factory.createList(2, 'createOrg');
 
       Route.gotoPage(Dom.tpl.SystemSetup);
@@ -49,9 +66,9 @@ isClient && define(function (require, exports, module) {
       assert.dom('table.orgs', function () {
         assert.dom('td', orgs[0].name);
       });
-    },
+    });
 
-    "test renders users list"() {
+    test("renders users list", ()=>{
       v.org = Factory.createOrg({name: 'org1'});
 
       setOrg();
@@ -62,9 +79,9 @@ isClient && define(function (require, exports, module) {
       assert.dom('table.users', function () {
         assert.dom('td', users[0].name);
       });
-    },
+    });
 
-    "test addOrg"() {
+    test("addOrg", ()=>{
       Route.gotoPage(Dom.tpl.SystemSetup);
 
       assert.dom('#SystemSetup', function () {
@@ -87,18 +104,18 @@ isClient && define(function (require, exports, module) {
       assert(org);
 
       assert.attributesEqual(org, {name: 'Foo Bar', shortName: 'FB', email: 'fb@foo.com'}, ['_id']);
-    },
-    "edit org": {
-      setUp() {
+    });
+    group("edit org", ()=>{
+      beforeEach(()=>{
         v.org = Factory.createOrg();
         v.org2 = Factory.createOrg();
 
         Route.gotoPage(Dom.tpl.SystemSetup.Index);
 
         TH.click('td', v.org.name);
-      },
+      });
 
-      "test change name"() {
+      test("change name", ()=>{
         assert.dom('#OrgForm', function () {
           TH.input('[name=name]', {value: v.org.name}, 'new name');
           TH.click('[type=submit]');
@@ -107,9 +124,9 @@ isClient && define(function (require, exports, module) {
         assert.dom('#SystemSetup', function () {
           assert.dom('td', 'new name');
         });
-      },
+      });
 
-      "test delete"() {
+      test("delete", ()=>{
         assert.dom('#OrgForm', function () {
           TH.click('[name=delete]');
         });
@@ -132,10 +149,10 @@ isClient && define(function (require, exports, module) {
         refute.dom('#OrgForm');
 
         refute(Org.exists(v.org._id));
-      },
-    },
+      });
+    });
 
-    "test addUser"() {
+    test("addUser", ()=>{
       v.org = Factory.createOrg();
       setOrg();
 
@@ -162,10 +179,10 @@ isClient && define(function (require, exports, module) {
 
       refute.dom('#UserForm');
       assert.dom('#SystemSetup');
-    },
+    });
 
-    "edit user": {
-      setUp() {
+    group("edit user", ()=>{
+      beforeEach(()=>{
         v.org = Factory.createOrg();
         v.user = Factory.createUser();
         v.user2 = Factory.createUser();
@@ -173,9 +190,9 @@ isClient && define(function (require, exports, module) {
         setOrg();
 
         TH.click('td', v.user.name);
-      },
+      });
 
-      "test change name"() {
+      test("change name", ()=>{
         assert.dom('#UserForm', function () {
           TH.input('[name=name]', {value: v.user.name}, 'new name');
           TH.click('[type=submit]');
@@ -184,9 +201,9 @@ isClient && define(function (require, exports, module) {
         assert.dom('#SystemSetup', function () {
           assert.dom('td', 'new name');
         });
-      },
+      });
 
-      "test delete"() {
+      test("delete", ()=>{
         assert.dom('#UserForm', function () {
           TH.click('[name=delete]');
         });
@@ -209,8 +226,8 @@ isClient && define(function (require, exports, module) {
         refute.dom('#UserForm');
 
         assert.same(v.user.$reload().attributes.role, undefined);
-      },
-    },
+      });
+    });
   });
 
   function setOrg() {

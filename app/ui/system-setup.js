@@ -1,12 +1,15 @@
 define(function(require, exports, module) {
-  const koru  = require('koru');
-  const Dom   = require('koru/dom');
-  const Form  = require('koru/ui/form');
-  const Route = require('koru/ui/route');
-  const util  = require('koru/util');
-  const Org   = require('models/org');
-  const User  = require('models/user');
-  const App   = require('./app');
+  const koru            = require('koru');
+  const Dom             = require('koru/dom');
+  const Session         = require('koru/session');
+  const Dialog          = require('koru/ui/dialog');
+  const Form            = require('koru/ui/form');
+  const Route           = require('koru/ui/route');
+  const SelectMenu      = require('koru/ui/select-menu');
+  const util            = require('koru/util');
+  const Org             = require('models/org');
+  const User            = require('models/user');
+  const App             = require('./app');
 
   const Tpl = Dom.newTemplate(require('koru/html!./system-setup'));
 
@@ -63,6 +66,27 @@ define(function(require, exports, module) {
   });
 
   Tpl.$events({
+    'menustart [name=export]'(event) {
+      Dom.stopEvent();
+
+      SelectMenu.popup(this, {
+        list: [
+          ['sql', 'As PgSQL file'],
+        ],
+
+        onSelect: elm=>{
+          const location = koru.getLocation();
+
+          App.iframeGet({
+            id: "iframeExportOrg",
+            src: `/export/${$.data(elm)._id}/piki.sql?${App.orgId}&${Session.sessAuth}`,
+            errorMsg: "Export failed",
+          });
+          return true;
+        }
+
+      });
+    },
     'click [name=cancel]'(event) {
       Dom.stopEvent();
       Route.history.back();

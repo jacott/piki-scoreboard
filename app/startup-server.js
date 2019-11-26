@@ -7,6 +7,7 @@ define((require, exports, module)=>{
   const EventPub        = require('pubsub/event-pub');
   const OrgPub          = require('pubsub/org-pub');
   const SelfPub         = require('pubsub/self-pub');
+  const Export          = require('server/export');
 
   require('models/reg-upload-server');
 

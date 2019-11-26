@@ -33,6 +33,7 @@ define((require, exports, module)=>{
   const isTouch = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i
         .test(navigator.userAgent.toLowerCase());
 
+  const PASSIVE_CAPTURE = Dom.supportsPassiveEvents ? {capture: true, passive: true} : true;
 
   util.merge(App, {
     restrictAccess(Tpl, rolere=/[as]/) {
@@ -100,6 +101,18 @@ define((require, exports, module)=>{
       Dom.removeClass(elm, 'verylight');
 
       Dom.addClass(elm, cc);
+    },
+
+    iframeGet: (options)=>{
+      Dom.removeId(options.id);
+      options.cookie && App.setCookie(options.cookie);
+      const iframe = Dom.h({
+        iframe: [], id: options.id,
+        src: options.src,
+        style: "display:none",
+      });
+      iframe.addEventListener('load', ev =>{Dom.tpl.Flash.error(options.errorMsg)}, PASSIVE_CAPTURE);
+      document.body.appendChild(iframe);
     },
 
     _setOrgShortName(value) {

@@ -1,10 +1,8 @@
 #!/bin/bash
 set -e
 
-cd `dirname "$0"`/..
-
-. config/environ.sh piki
+. "${0%/*}"/../config/environ.sh piki
 
 cd app
-
-exec $NODE --es_staging ../node_modules/koru/lib/koru.js piki
+echo -e "Starting ${KORU_ENV}...\c"
+exec_node $KORU_MODULE/lib/koru.js
