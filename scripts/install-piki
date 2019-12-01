@@ -1,10 +1,11 @@
 #!/bin/bash
 set -e
 
-network=$1
+KORU_ENV=$1
 
 init() {
-    . config/environ.sh $network
+    mkdir -p tmp
+    . config/environ.sh $KORU_ENV
 
     appName=piki
     staging=$PWD
@@ -13,8 +14,6 @@ init() {
     # setup systemctl
     export XDG_RUNTIME_DIR="/run/user/$UID"
     export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
-
-    mkdir -p tmp $BACKUP_DIR /u/incoming
 
     if [ ! -e $appDir/current ];then
         createdb $KORU_DB || :
@@ -28,11 +27,10 @@ init() {
 
 completeConfig() {
     echo "configure for $appName..."
-    version=$(cat build/version)
-    echo "export KORU_APP_VERSION='${version}'" |
-        cat - config/$branch.sh >config/piki.sh
-    if [[ -e config/$branch-config.js ]];then
-        mv config/$branch-config.js config/piki-config.js
+    echo "" >>build/version.sh
+    cat build/version.sh config/$KORU_ENV.sh >config/piki.sh
+    if [[ -e config/$KORU_ENV-config.js ]];then
+        mv config/$KORU_ENV-config.js config/piki-config.js
     fi
 }
 
@@ -76,11 +74,12 @@ completeConfig
 echo "stoping..."
 systemctl --user stop $appName || :
 
-if [ -x ./current/backup-${network} ];then
-    ./current/backup-${network} $appName
+if [[ -d $BACKUP_DIR ]]; then
+    buApp=$BACKUP_DIR/$appName
+    [[ -e $buApp/db ]] && rm -rf $buApp/db
+    mkdir -p $buApp
+    pg_dump --compress=9 --format=d --file=$buApp/db $appName
 fi
-
-# FIXME build a restore-from-back script here
 
 configNginx
 installService

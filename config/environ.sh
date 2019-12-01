@@ -20,6 +20,7 @@ case "$1" in
         fi;;
 esac
 
+export BACKUP_DIR=/u/backup
 export APP_DOMAIN=$(hostname -f)
 export APP_DISPLAY_NAME=Piki
 

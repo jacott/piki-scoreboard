@@ -26,7 +26,8 @@ echo >${lock} $$
 
 trap cleanup 0
 
-cd /u/build-piki
+builddir=/u/build-piki
+cd $builddir
 
 mkdir -p build
 rm -f build/*
@@ -40,48 +41,48 @@ git checkout -B ${2-master} origin/${2-master}
 
 version=`git describe --tags --always --long --match 'v*'`
 
-echo $branch $version $PWD
+echo $KORU_ENV $version $PWD
 
 PKG_LOCK=npm-shrinkwrap.json
 
-if test -e tmp/${PKG_LOCK} && ${NODE} -v | cat - ${PKG_LOCK} | diff -q - tmp/${PKG_LOCK} >/dev/null;then
+if [[ -e package-node.test && -e node_modules ]] && ${NODE} -v |
+           cat - ${PKG_LOCK} | diff -q - package-node.test >/dev/null;then
     :
 else
     echo 'npm install...'
-    rm -rf node_modules
-    npm i
-    ${NODE} -v | cat - ${PKG_LOCK} >tmp/${PKG_LOCK}
+    PATH=${NODE%/*}:$PATH npm ci
+    ${NODE} -v | cat - ${PKG_LOCK} >package-node.test
 fi
 
 echo "bundle client: css, js..."
 
-$NODE --no-wasm-code-gc scripts/bundle.js $branch
+MD5SUM=$(md5sum -b <app/index.html)
+MD5SUM=${MD5SUM/ */}
+
+export KORU_APP_VERSION=$(printf "%s,%s" $version $MD5SUM/)
+
+scripts/bundle $KORU_ENV >/dev/null
 
 echo "Compressing..."
 
-MD5SUM=$(cat node_modules/yaajs/yaa.js config/$branch-config.js build/index.js \
-                 build/index.css app/index.html|md5sum -b)
-MD5SUM=${MD5SUM/ */}
+IFS="," read -ra va <build/version.sh || true
+hash="${va[1]}"
 
-cp app/index.html build/
-sed <build/index.html >app/index.html "s/CACHE_BUST_HASH/$MD5SUM/g"
+mv app/index.html build/
+sed <build/index.html >app/index.html "s/CACHE_BUST_HASH/$hash/g"
 
-echo "$version,$MD5SUM" >build/version
+cp build/version.sh config/version.sh
 
-printf "window.KORU_APP_VERSION='%s,%s';\n" $version $MD5SUM |
-    cat - build/index.js >app/index.js
+mv build/index.{css,js} app/
 
-mv build/index.css app
-
-cd app
-
+cd $builddir/app
 gzip -9 -k index.css index.html index.js
 
 echo "archiving..."
 
 cd $tmpdir
 
-tarfile=$tmpdir/piki-$branch-$version.tar.gz
+tarfile=$tmpdir/piki-$KORU_ENV-$version.tar.gz
 if [ ! -e $tarfile -a -e piki-current.tar.gz ];then
     rm -f piki-previous.tar.gz
     mv -f piki-current.tar.gz piki-previous.tar.gz
@@ -106,5 +107,5 @@ rm -rf $staging
 mkdir -p $staging
 cd $staging
 tar xf /u/tmp/piki-current.tar.gz
-exec ./scripts/install-piki $branch
+exec ./scripts/install-piki $KORU_ENV
 "
