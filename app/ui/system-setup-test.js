@@ -40,7 +40,7 @@ isClient && define((require, exports, module)=>{
       assert.calledWith(App.iframeGet, {
         id: 'iframeExportOrg',
         src: '/export/sql/piki.sql?org001&mySessAuth',
-        errorMsg: 'Export failed'});
+        errorMsg: 'Export Data failed'});
     });
 
     test("onEntry onExit", ()=>{

@@ -5,7 +5,7 @@ define(() => self =>{
 
   /*** configurable constants ***/
 
-  const staticCache = 'app-v2'; // does not expire
+  const staticCache = 'app-v3'; // does not expire
   const APP_ICONS_WOFF2 = '/public/app-icons-e4e23a2742db90efa1248eaf73efb6fc.woff2';
 
   // expire non staticCache objects when last fetch is older than MAX_AGE

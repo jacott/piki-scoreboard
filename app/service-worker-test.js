@@ -9,7 +9,7 @@ isClient && define((require, exports, module)=>{
 
   const ServiceWorker = require('./service-worker');
 
-  const staticCacheName = 'app-v2';
+  const staticCacheName = 'app-v3';
   const APP_ICONS_WOFF2 = '/public/app-icons-e4e23a2742db90efa1248eaf73efb6fc.woff2';
 
   const MAX_AGE_UNIT = 24 * 60 * 60 * 1000;
