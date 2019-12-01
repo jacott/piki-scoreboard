@@ -20,7 +20,7 @@
   "author": "Geoff Jacobsen <geoffjacobsen@gmail.com>",
   "dependencies": {
     "csv-parse": "^4.8.2",
-    "koru": "^0.32.1",
+    "koru": "^0.32.2",
     "pg-libpq": "^3.1.0"
   },
   "engines": {

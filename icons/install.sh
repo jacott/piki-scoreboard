@@ -8,7 +8,7 @@ node ./make-font.js $(cd svg && ls)
 cd ../app/public
 rm -f app-icons-*.woff2
 mv ~-/build/app-icons-*.woff2 .
-name=$(ls app-icons-*.woff2)
+name=$(echo app-icons-*.woff2)
 echo $name
 cd ../ui
 cat >app-icons-family.css <<EOF

@@ -1,5 +1,6 @@
 define((require, exports, module)=>{
   'use strict';
+  const SWManager       = require('koru/client/sw-manager');
   const Session         = require('koru/session');
   const KoruStartup     = require('koru/startup-client');
   require('koru/ui/helpers');
@@ -13,6 +14,8 @@ define((require, exports, module)=>{
   require('ui/event-register');
   require('ui/help');
   const Loading         = require('ui/loading');
+  const NewVersion      = require('ui/new-version');
+
   require('ui/profile');
   require('ui/reg-upload');
   require('ui/reset-password');
@@ -30,6 +33,8 @@ define((require, exports, module)=>{
     UserAccount,
     Session,
     IDB,
+    NewVersion,
+    SWManager,
     App,
     Loading
   );

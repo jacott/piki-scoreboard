@@ -426,9 +426,9 @@
       }
     },
     "koru": {
-      "version": "0.32.1",
-      "resolved": "https://registry.npmjs.org/koru/-/koru-0.32.1.tgz",
-      "integrity": "sha512-/SyxhAOi9C5Dl8FGP/PY1EIn4EqOOSgXDL6Mik+9mSs1FdESMAuK2oK0ngX9m2YSFbgSB+Fo+UFAWISxA6Ay+Q==",
+      "version": "0.32.2",
+      "resolved": "https://registry.npmjs.org/koru/-/koru-0.32.2.tgz",
+      "integrity": "sha512-MumfEF50Jy1MmOrJ3IUNsfCISYL6HjwGQ2nZadHsbHtoGtlcezAht0U2hQEHVEmy00oHEdIX+W0NSBUw8iRBxQ==",
       "requires": {
         "autoprefixer": "^9.7.3",
         "commander": "^4.0.1",
