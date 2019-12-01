@@ -80,7 +80,7 @@ define(function(require, exports, module) {
           App.iframeGet({
             id: "iframeExportOrg",
             src: `/export/${$.data(elm)._id}/piki.sql?${App.orgId}&${Session.sessAuth}`,
-            errorMsg: "Export failed",
+            errorMsg: "Export Data failed",
           });
           return true;
         }
