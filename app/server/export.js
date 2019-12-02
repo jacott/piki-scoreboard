@@ -107,8 +107,8 @@ where r.org_id = '${orgId}' and r.user_id = t."userId")) TO STDOUT`);
   };
 
   WebServer.registerHandler(module, 'export', (req, res)=>{
-    const [type, last] = req.url.replace(/^.*export\//, '').split('/');
-    const [filename, search] = last.split('?');
+    const [path, search] = req.url.replace(/^.*export\//, '').split('?');
+    const [type, filename] = path.split('/');
     const [orgId, auth] = search.split('&');
     const user = userFromAuth(auth);
     const role = user && Role.readRole(user._id, orgId);

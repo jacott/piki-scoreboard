@@ -56,7 +56,7 @@ define((require, exports, module)=>{
       res.writeHead = stub();
 
       const req = {
-        url: `fdsf//dsfds/export/sql/foo=Bar.json?${org._id}&mySess|mySessAuth`,
+        url: `fdsf//dsfds/export/sql/foo=Bar.json?${org._id}&mySess|mySessAuth/+abc`,
         headers: {},
       };
 
@@ -67,7 +67,7 @@ define((require, exports, module)=>{
 
       const conn = {
         userId: user._id,
-        sessAuth: 'mySess|mySessAuth',
+        sessAuth: 'mySess|mySessAuth/+abc',
       };
       stubProperty(Session.conns, 'mySess', {value: conn});
 
