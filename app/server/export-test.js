@@ -10,8 +10,9 @@ define((require, exports, module)=>{
   const Org             = require('models/org');
   const Result          = require('models/result');
   const Factory         = require('test/factory');
+  const unzipper        = requirejs.nodeRequire('unzipper');
 
-  const {Writable}      = requirejs.nodeRequire('stream');
+  const {Writable, Transform}      = requirejs.nodeRequire('stream');
 
   const {stub, spy, util, intercept, stubProperty} = TH;
 
@@ -27,6 +28,87 @@ define((require, exports, module)=>{
 
     afterEach(()=>{
       TH.rollbackTransaction();
+    });
+
+    test("export csv", async ()=>{
+      let id = 1000;
+      intercept(Random, 'id', () => 'id'+(++id));
+      const org = Factory.createOrg();
+      const user = Factory.createUser('admin');
+      Factory.createResult();
+      Factory.createResult();
+      const org2 = Factory.createOrg();
+      Factory.createResult();
+      const future = new util.Future;
+      Org.db.withConn(conn =>{future.return(conn)});
+      const pg = future.wait();
+      const {Libpq} = Driver;
+      stub(Libpq, 'connect', url => Driver.config.url === url ? pg : void 0);
+      let ended = false;
+      let output = '';
+
+      const res = new Transform({
+        transform(data, encoding, callback) {
+          this.push(data);
+          callback();
+        },
+      });
+
+      res.writeHead = stub();
+
+      const req = {
+        url: `fdsf//dsfds/export/csv/output-csv.zip?${org._id}&mySess|mySessAuth/+abc`,
+        headers: {},
+      };
+
+      const conn = {
+        userId: user._id,
+        sessAuth: 'mySess|mySessAuth/+abc',
+      };
+      stubProperty(Session.conns, 'mySess', {value: conn});
+
+      const tables = {};
+
+      const zip = new unzipper.Parse();
+
+      res
+        .pipe(zip)
+        .on('entry', entry =>{
+          const name = entry.path;
+          tables[name] = '';
+          const wr = new Writable({
+            write(data, encoding, callback) {
+              tables[name] += data;
+              callback();
+            },
+            autoDestroy: true,
+          });
+          entry.pipe(wr);
+        })
+      ;
+
+      exportOrg(req, res);
+
+      assert.calledWith(res.writeHead, 200, {
+        'Content-Type': 'application/zip',
+        'Content-disposition': 'attachment; filename=output-csv.zip',
+        'Transfer-Encoding': 'chunked'
+      });
+
+      await new Promise((resolve, reject)=>{
+        zip.on('finish', resolve);
+        res.on('error', reject);
+        zip.on('error', reject);
+      });
+
+      assert.equals(
+        tables['Org.csv'],
+        "_id,name,email,shortName\n"+
+          "id1001,Org 1,email1@vimaly.com,SN1\n");
+      assert.equals(
+        tables['Event.csv'],
+        "_id,name,org_id,heats,date,errors,closed,teamType_ids,series_id,ruleVersion\n"+
+          "id1009,Event 1,id1001,\"{\"\"id1005\"\": \"\"LQQF8\"\"}\",2014-04-01,,,{id1006},,1\n");
     });
 
     test("export sql", async ()=>{

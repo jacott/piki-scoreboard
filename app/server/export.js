@@ -8,6 +8,7 @@ define((require, exports, module)=>{
   const WebServer       = require('koru/web-server');
   const Role            = require('models/role');
   const User            = require('models/user');
+  const archiver        = requirejs.nodeRequire('archiver');
   const {spawn}         = requirejs.nodeRequire('child_process');
   const fs              = requirejs.nodeRequire('fs');
   const path            = requirejs.nodeRequire('path');
@@ -21,7 +22,7 @@ define((require, exports, module)=>{
     return conn && conn.sessAuth === auth ? User.findById(conn.userId) : void 0;
   };
 
-  const EXCLUDE = {UserLogin: true, ChangeLog: true};
+  const EXCLUDE = '{"UserLogin", "ChangeLog"}';
 
   const whereEvent = orgId => `EXISTS(select 1 from "Event" as e
 where org_id = '${orgId}' and t.event_id = e._id)`;
@@ -32,15 +33,41 @@ where org_id = '${orgId}' and t.event_id = e._id)`;
     Result: whereEvent,
     Org: orgId =>`_id = '${orgId}'`,
     User: orgId => `EXISTS(select 1 from "Role" as r
-where r.org_id = '${orgId}' and r.user_id = t._id)`
+where r.org_id = '${orgId}' and r.user_id = t._id)`,
+    UserLogin: orgId => `EXISTS(select 1 from "Role" as r
+where r.org_id = '${orgId}' and r.user_id = t."userId")`,
   };
 
   const santitizeFilename = (fn, suffix)=>{
-    fn = fn.replace(/[^a-z0-9_.]/ig, '');
+    fn = fn.replace(/[^a-z0-9_.-]/ig, '');
     if (! fn.toLowerCase().endsWith(suffix))
       fn += suffix;
 
     return fn;
+  };
+
+  const getTables = (pg)=> pg.execParams(`
+SELECT table_name as name FROM information_schema.tables
+ WHERE table_schema='public' AND table_type='BASE TABLE' AND NOT (table_name = ANY($1));`, [EXCLUDE]);
+
+  const writeHead = (res, type, filename)=>{
+    res.writeHead(200, {
+      'Content-Type': type,
+      'Content-disposition': 'attachment; filename='+filename,
+      'Transfer-Encoding': 'chunked'
+    });
+  };
+
+  const streamEnd = (stream)=> new Promise((resolve, reject)=>{
+    stream.on('end', resolve);
+    stream.on('error', reject);
+  });
+
+  const copyToStream = (pg, name, orgId, columns="*", format="")=>{
+    const whereFunc = WHERE_FUNCS[name];
+    const where = whereFunc ? whereFunc(orgId) : `org_id = '${orgId}'`;
+    return pg.copyToStream(
+      `COPY (select ${columns} from "${name}" as t where ${where}) TO STDOUT `+format);
   };
 
   const EXPORTERS = {
@@ -48,39 +75,25 @@ where r.org_id = '${orgId}' and r.user_id = t._id)`
       const writeTables = async ()=>{
         try {
           const pg = await Driver.Libpq.connect(Driver.config.url);
-          const tables = await pg.exec(`
-SELECT table_name as name
-  FROM information_schema.tables
- WHERE table_schema='public'
-   AND table_type='BASE TABLE';
-`);
 
           const writeSql = (name)=>{
             res.write(`COPY public."${name}" FROM stdin;\n`);
           };
 
-          const writeData = async (sql)=>{
-            const stream = pg.copyToStream(sql);
+          const writeData = async (name, columns="*")=>{
+            const stream = copyToStream(pg, name, orgId, columns);
             stream.pipe(res, {end: false});
-            await new Promise((resolve, reject)=>{
-              stream.on('end', resolve);
-              stream.on('error', reject);
-            });
+            await streamEnd(stream);
             res.write("\\.\n\n");
           };
 
-          for (const {name} of tables) {
-            if (EXCLUDE[name]) continue;
+          for (const {name} of await getTables(pg)) {
             writeSql(name);
-            const whereFunc = WHERE_FUNCS[name];
-            let where = whereFunc ? whereFunc(orgId) : `org_id = '${orgId}'`;
-            await writeData(`COPY (select * from "${name}" as t where ${where}) TO STDOUT`);
+            await writeData(name);
           }
 
           res.write(`COPY public."UserLogin" (_id , "userId" , email) FROM stdin;\n`);
-          await writeData(`COPY (select _id , "userId" , email from "UserLogin" as t
-where EXISTS(select 1 from "Role" as r
-where r.org_id = '${orgId}' and r.user_id = t."userId")) TO STDOUT`);
+          await writeData("UserLogin", '_id, "userId", email');
 
           res.write(`\nINSERT INTO public."User" (_id) values ('guest');\n`);
 
@@ -92,17 +105,46 @@ where r.org_id = '${orgId}' and r.user_id = t."userId")) TO STDOUT`);
         }
       };
 
-      res.writeHead(200, {
-        'Content-Type': 'application/sql',
-        'Content-disposition': 'attachment; filename='+santitizeFilename(filename, '.sql'),
-        'Transfer-Encoding': 'chunked'
-      });
+      writeHead(res, 'application/sql', santitizeFilename(filename, '.sql'));
 
       const schema = fs.createReadStream(path.join(koru.appDir, '../db/schema.sql'));
 
       schema.pipe(res, {end: false});
 
       schema.on('end', writeTables);
+    },
+
+    csv: (res, orgId, filename)=>{
+      const writeTables = async (archive)=>{
+        try {
+          const pg = await Driver.Libpq.connect(Driver.config.url);
+
+          const writeData = async (name)=>{
+            const stream = copyToStream(pg, name, orgId, void 0, '(FORMAT csv, header)');
+            archive.append(stream, {name: name+'.csv'});
+
+            await streamEnd(stream);
+          };
+
+          for (const {name} of await getTables(pg)) {
+            await writeData(name);
+          }
+
+          archive.finalize();
+
+        } catch(err) {
+          koru.unhandledException(err);
+          res.destroy(err);
+        }
+      };
+
+      writeHead(res, 'application/zip', santitizeFilename(filename, '.zip'));
+
+      const archive = archiver('zip', {zlib: {level: 9}});
+      archive.on('error', err =>{res.destroy(err)});
+      archive.pipe(res);
+
+      writeTables(archive);
     },
   };
 

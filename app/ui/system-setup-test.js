@@ -39,7 +39,17 @@ isClient && define((require, exports, module)=>{
 
       assert.calledWith(App.iframeGet, {
         id: 'iframeExportOrg',
-        src: '/export/sql/piki.sql?org001&mySessAuth',
+        src: '/export/sql/piki-pg.sql?org001&mySessAuth',
+        errorMsg: 'Export Data failed'});
+
+
+      App.iframeGet.reset();
+
+      TH.selectMenu('nav [name=export]', 'csv');
+
+      assert.calledWith(App.iframeGet, {
+        id: 'iframeExportOrg',
+        src: '/export/csv/piki-csv.zip?org001&mySessAuth',
         errorMsg: 'Export Data failed'});
     });
 

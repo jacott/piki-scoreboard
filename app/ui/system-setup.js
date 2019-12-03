@@ -65,6 +65,11 @@ define(function(require, exports, module) {
     },
   });
 
+  const EXPORT_FILENAMES = {
+    sql: 'piki-pg.sql',
+    csv: 'piki-csv.zip',
+  };
+
   Tpl.$events({
     'menustart [name=export]'(event) {
       Dom.stopEvent();
@@ -72,14 +77,17 @@ define(function(require, exports, module) {
       SelectMenu.popup(this, {
         list: [
           ['sql', 'As PgSQL file'],
+          ['csv', 'As CSV ZIP file'],
         ],
 
         onSelect: elm=>{
           const location = koru.getLocation();
 
+          const id = $.data(elm)._id;
+
           App.iframeGet({
             id: "iframeExportOrg",
-            src: `/export/${$.data(elm)._id}/piki.sql?${App.orgId}&${Session.sessAuth}`,
+            src: `/export/${id}/${EXPORT_FILENAMES[id]}?${App.orgId}&${Session.sessAuth}`,
             errorMsg: "Export Data failed",
           });
           return true;

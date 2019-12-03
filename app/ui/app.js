@@ -111,7 +111,10 @@ define((require, exports, module)=>{
         src: options.src,
         style: "display:none",
       });
-      iframe.addEventListener('load', ev =>{Dom.tpl.Flash.error(options.errorMsg)}, PASSIVE_CAPTURE);
+      iframe.addEventListener('load', ev =>{
+        console.error(ev);
+        Dom.tpl.Flash.error(options.errorMsg);
+      }, PASSIVE_CAPTURE);
       document.body.appendChild(iframe);
     },
 
