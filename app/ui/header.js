@@ -72,6 +72,7 @@ define(function(require, exports, module) {
       SelectMenu.popup(this, {
         list,
         onSelect,
+        align: 'right',
       });
     },
 
@@ -107,6 +108,7 @@ define(function(require, exports, module) {
       SelectMenu.popup(this, {
         list,
         onSelect,
+        align: 'right',
       });
     },
   });

@@ -14,15 +14,21 @@
     line-height: 1.2em;
   }
 
-  >#PageTitle {
+  >.title {
     position: absolute;
-    left: 50%;
     height: 2.5em;
     line-height: 1.2em;
+    margin: auto;
+    width: 100%;
+    text-align: center;
+    overflow: hidden;
+    padding-left: 20px;
+    padding-right: 68px;
+  }
+  #PageTitle {
     @media screen {
       & {
         bottom: 0;
-        background-color: @colorHeaderBackground;
         color: #fff;
       }
     }
@@ -33,15 +39,16 @@
     }
     text-decoration: none;
     padding: 5px;
-    transform: translate(-50%, 0%);
-    overflow: hidden;
-    white-space: nowrap;
   }
 
   >.menus {
     position: absolute;
     right: 0; top: 0;
+    height: @headerHeight;
     margin-right: 5px;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
     >[name=menu]:before {
       .app-inline-icon("menu"; @fontSize: 32px);
     }

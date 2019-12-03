@@ -6,9 +6,15 @@
   box-sizing: border-box;
 }
 
+html, body {
+  position: fixed;
+  left: 0; right: 0; top: 0; bottom: 0;
+  margin: 0; padding: 0;
+  overflow: hidden;
+}
+
 html {
   .linear-gradient(#0ff, #eff);
-  height: 100%;
   display: inherit;
 }
 
@@ -17,12 +23,9 @@ body, input, textarea, button {
 }
 
 body {
-  height: 100%;
-  overflow: hidden;
-  overflow-x: auto;
   margin: 0;
   padding: 0;
-  min-width: @bodyWidth / 2;
+  min-width: @bodyWidth / 3;
   min-height: 300px;
   font-size: @defaultFontSize;
   color: @colorText;
