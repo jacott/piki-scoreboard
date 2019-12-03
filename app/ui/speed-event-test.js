@@ -252,8 +252,8 @@ Z
 `);
         resultsAre('Qualifiers', `
 A 1.112 H -
-B 4.444 I fall
-C 1.111 J fs
+B 4.444 I FALL
+C 1.111 J FS
 D fall  K 4.444
 E 4.444 L 8.881
 F fall  M 8.888

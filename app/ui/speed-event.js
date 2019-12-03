@@ -476,7 +476,7 @@ data.heatNumber}`});
 
   ABList.$events({
     'change .score>input'(event) {
-      const value = this.value.trim() || undefined;
+      const value = this.value.trim().toLowerCase() || undefined;
       const num = Math.floor(+value >= 1000 ? +value : (+value)*1000);
       const {round} = $.ctx.parentCtx.data;
 
