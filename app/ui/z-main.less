@@ -25,8 +25,6 @@ body, input, textarea, button {
 body {
   margin: 0;
   padding: 0;
-  min-width: @bodyWidth / 3;
-  min-height: 300px;
   font-size: @defaultFontSize;
   color: @colorText;
   background: rgba(0,0,0,0) url(/images/jj.svg) no-repeat -1px @headerHeight - 1;
@@ -39,6 +37,10 @@ body {
   &:not(.sAccess) .suAccess {
     display: none;
   }
+
+  @media all and (max-width: @minBodyWidth) {
+    overflow: scroll;
+  }
 }
 
 #Header {
@@ -49,7 +51,7 @@ body {
     position: relative;
     width: @bodyWidth;
     max-width: 100%;
-    min-width: @bodyWidth / 2;
+    min-width: @minBodyWidth;
     background-color: @colorHeaderBackground;
     color: @colorHeaderText;
     height: @headerHeight;
@@ -71,7 +73,7 @@ body>section {
     margin: auto;
     width: @bodyWidth;
     max-width: 100%;
-    min-width: @bodyWidth / 2;
+    min-width: @minBodyWidth;
   }
 }
 

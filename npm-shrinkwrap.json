@@ -235,9 +235,9 @@
       "dev": true
     },
     "caniuse-lite": {
-      "version": "1.0.30001013",
-      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001013.tgz",
-      "integrity": "sha512-hOAXaWKuq/UVFgYawxIOdPdyMQdYcwOCDOjnZcKn7wCgFUrhP7smuNZjGLuJlPSgE6aRA4cRJ+bGSrhtEt7ZAg=="
+      "version": "1.0.30001015",
+      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001015.tgz",
+      "integrity": "sha512-/xL2AbW/XWHNu1gnIrO8UitBGoFthcsDgU9VLK1/dpsoxbaD5LscHozKze05R6WLsBvLhqv78dAPozMFQBYLbQ=="
     },
     "caseless": {
       "version": "0.12.0",
@@ -717,9 +717,9 @@
       }
     },
     "koru": {
-      "version": "0.32.3",
-      "resolved": "https://registry.npmjs.org/koru/-/koru-0.32.3.tgz",
-      "integrity": "sha512-49xqmEYrcK5i3DN+AxLcdtKssdYxnUqUYRmtJ3Cd0lWayhXdYND9RMKebo6Fs5EpCMZTpzeDDN/cv3D1LFeTQw==",
+      "version": "0.32.4",
+      "resolved": "https://registry.npmjs.org/koru/-/koru-0.32.4.tgz",
+      "integrity": "sha512-fus+Pm6JYWjWZtr71ZRAzpHljQAAKJaRt+TQu+H3prqLGKOmvW1SCWn8vXcEa6Q4t6xE2i+Ryb3g1Hyg9R7Yjg==",
       "requires": {
         "autoprefixer": "^9.7.3",
         "commander": "^4.0.1",
@@ -880,17 +880,17 @@
       "integrity": "sha512-tgp+dl5cGk28utYktBsrFqA7HKgrhgPsg6Z/EfhWI4gl1Hwq8B/GmY/0oXZ6nF8hDVesS/FpnYaD/kOWhYQvyg=="
     },
     "node-releases": {
-      "version": "1.1.41",
-      "resolved": "https://registry.npmjs.org/node-releases/-/node-releases-1.1.41.tgz",
-      "integrity": "sha512-+IctMa7wIs8Cfsa8iYzeaLTFwv5Y4r5jZud+4AnfymzeEXKBCavFX0KBgzVaPVqf0ywa6PrO8/b+bPqdwjGBSg==",
+      "version": "1.1.42",
+      "resolved": "https://registry.npmjs.org/node-releases/-/node-releases-1.1.42.tgz",
+      "integrity": "sha512-OQ/ESmUqGawI2PRX+XIRao44qWYBBfN54ImQYdWVTQqUckuejOg76ysSqDBK8NG3zwySRVnX36JwDQ6x+9GxzA==",
       "requires": {
         "semver": "^6.3.0"
       }
     },
     "nodemailer": {
-      "version": "6.3.1",
-      "resolved": "https://registry.npmjs.org/nodemailer/-/nodemailer-6.3.1.tgz",
-      "integrity": "sha512-j0BsSyaMlyadEDEypK/F+xlne2K5m6wzPYMXS/yxKI0s7jmT1kBx6GEKRVbZmyYfKOsjkeC/TiMVDJBI/w5gMQ=="
+      "version": "6.4.0",
+      "resolved": "https://registry.npmjs.org/nodemailer/-/nodemailer-6.4.0.tgz",
+      "integrity": "sha512-UBqPOfQGD1cM3HnjhuQe+0u3DWx47WWK7lBjG5UtPnGOysr7oDK5lNCzcjK6zzeBSdTk4m1tGx1xNbWFZQmMNA=="
     },
     "nodemailer-fetch": {
       "version": "1.6.0",

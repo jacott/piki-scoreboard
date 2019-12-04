@@ -10,6 +10,7 @@
 @fixedBorderRadius: 2px;
 
 @bodyWidth: 800px;
+@minBodyWidth: 300px;
 @headerHeight: 60px;
 
 @iconWidth: 16px;

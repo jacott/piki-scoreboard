@@ -21,7 +21,7 @@
   "dependencies": {
     "archiver": "^3.1.1",
     "csv-parse": "^4.8.2",
-    "koru": "^0.32.3",
+    "koru": "^0.32.4",
     "pg-libpq": "^3.1.0"
   },
   "devDependencies": {
