@@ -279,7 +279,7 @@ define((require)=>{
         let sumPoints = Heat.pointsTable[0];
 
         for (let i = 1; i <= results.length; ++i) {
-          if (! results[i] || comparitor(results[previ], results[i])) {
+          if (i == results.length || comparitor(results[previ], results[i])) {
             for(let j = previ; j < i; ++j) {
                 results[j].sPoints =
                 (results[j].scores.length === 1) ? null :

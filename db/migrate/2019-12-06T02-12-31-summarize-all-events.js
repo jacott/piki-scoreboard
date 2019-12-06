@@ -14,4 +14,6 @@ define((require)=> mig =>{
       db.query('truncate "ClimberRanking"');
     }
   });
+
+  mig.addIndex("Competitor", {columns: ['event_id', 'climber_id'], unique: true});
 });

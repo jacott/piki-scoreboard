@@ -94,7 +94,7 @@ isServer && define((require, exports, module)=>{
       });
 
       assert.equals(sum.map(s => [s.climber_id, s.rank, s.points]), [
-        ['cl01', 1, 100], ['cl02', 3, 55], ['cl03', 2, 72], ['cl04', 2, 72]]);
+        ['cl01', 1, 100], ['cl02', 4, 55], ['cl03', 2, 72], ['cl04', 2, 72]]);
 
       res.r04.$update({scores: [0.4, 1050, 400]});
 

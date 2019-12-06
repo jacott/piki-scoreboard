@@ -7,6 +7,26 @@ define((require, exports, module)=>{
   const Result          = require('models/result');
   const SpeedRound      = require('models/speed-round');
 
+  const setPoints = (results, comparitor)=>{
+    let previ = 0;
+    let sumPoints = Heat.pointsTable[0];
+
+    for (let i = 1; i <= results.length; ++i) {
+      if (i == results.length || comparitor(results[previ], results[i])) {
+        for(let j = previ; j < i; ++j) {
+          results[j].sPoints =
+            (results[j].scores.length === 1) ? null :
+            Math.floor(sumPoints / (i-previ));
+        }
+        sumPoints = 0;
+        previ = i;
+      }
+      sumPoints += Heat.pointsTable[i] || 0;
+    }
+  };
+
+  const compareRanking = (a, b)=> SpeedRound.ranking(a) - SpeedRound.ranking(b);
+
   class ClimberRanking extends Model.BaseModel {
     static summarize(event) {
       const {heats, _id: event_id} = event;
@@ -24,7 +44,11 @@ define((require, exports, module)=>{
 
           round.rankResults();
 
-          for (const r of round) {
+          const results = Array.from(round);
+
+          setPoints(results, compareRanking);
+
+          for (const r of results) {
             const rank = SpeedRound.ranking(r);
             ClimberRanking.docs.insert({
               climber_id: r.climber_id, event_id, category_id,
@@ -38,13 +62,17 @@ define((require, exports, module)=>{
           const heat = new Heat(-1, format);
           const results = query.fetch();
           let ppoints = -1;
-          let rank = 0;
+          let rank = 1;
           heat.sort(results);
-          for (const r of results) {
-            if (ppoints !== r.sPoints) {
-              ppoints = r.sPoints;
-              ++rank;
-            }
+
+          let prev, r;
+          const compareResults = heat.compareResults();
+
+          for(let i = 0; i < results.length; ++i, prev = r) {
+            r = results[i];
+            if (prev === void 0 || compareResults(prev, r) !== 0)
+              rank = i + 1;
+
             ClimberRanking.docs.insert({
               climber_id: r.climber_id, event_id, category_id,
               rank,
