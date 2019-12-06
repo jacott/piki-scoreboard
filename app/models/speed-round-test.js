@@ -1,4 +1,4 @@
-isClient && define((require, exports, module)=>{
+define((require, exports, module)=>{
   const Enumerable      = require('koru/enumerable');
   const Result          = require('models/result');
   const TH              = require('test-helper');
@@ -25,6 +25,10 @@ isClient && define((require, exports, module)=>{
 
   const toResId = (round)=> Array.from(round).map(r => +r._id.slice(1));
   const toRanking = (round)=> Array.from(round).map(r => ranking(r));
+
+  const serverUpdScores = isServer ? (...args)=>{
+    for (const res of args) res.$update('scores', res.scores);
+  } : ()=>{};
 
   TH.testCase(module, ({before, after, beforeEach, afterEach, group, test})=>{
     afterEach(()=>{
@@ -553,6 +557,8 @@ isClient && define((require, exports, module)=>{
       });
       res.r5.scores[1][0] = 6602;
 
+      serverUpdScores(res.r5);
+
       round.rankResults();
       assert.same(round.cutoff, 8);
       assert.equals(toResId(round), [1, 2, 3, 4, 5, 6, 7, 8, 9]);
@@ -560,18 +566,21 @@ isClient && define((require, exports, module)=>{
 
       res.r1.scores[4] = {opponent_id: 'r8', time: 6543};
       res.r8.scores[4] = {opponent_id: 'r1', time: 6443};
+      serverUpdScores(res.r1, res.r8);
 
       round.rankResults();
       assert.equals(toResId(round), [8, 1, 2, 3, 4, 5, 6, 7, 9]);
 
       res.r2.scores[4] = {opponent_id: 'r7', time: 6243};
       res.r7.scores[4] = {opponent_id: 'r2', time: 6343};
+      serverUpdScores(res.r2, res.r7);
 
       round.rankResults();
       assert.equals(toResId(round), [2, 8, 7, 1, 3, 4, 5, 6, 9]);
 
       res.r8.scores[3] = {opponent_id: 'r2', time: 7643};
       res.r2.scores[3] = {opponent_id: 'r8', time: 7543};
+      serverUpdScores(res.r2, res.r8);
 
       assert.same(Math.sign(private.compareFinals(res.r2, res.r8)), -1);
       round.rankResults();

@@ -1,4 +1,5 @@
-define((require)=>{
+define((require, exports, module)=>{
+  'use strict';
   const match           = require('koru/match');
   const Val             = require('koru/model/validation');
   const util            = require('koru/util');
@@ -39,7 +40,5 @@ define((require)=>{
         this.changes.series_id && Val.allowAccessIf(this.series && user.canAdminister(this.series));
       },
     });
-
   };
-
 });

@@ -31,6 +31,7 @@ where org_id = '${orgId}' and t.event_id = e._id)`;
     Migration: ()=>'true',
     Competitor: whereEvent,
     Result: whereEvent,
+    ClimberRanking: whereEvent,
     Org: orgId =>`_id = '${orgId}'`,
     User: orgId => `EXISTS(select 1 from "Role" as r
 where r.org_id = '${orgId}' and r.user_id = t._id)`,

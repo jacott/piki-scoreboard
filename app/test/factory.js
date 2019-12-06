@@ -179,6 +179,7 @@ define((require)=>{
         .addField('role', 'a')
       ;
     },
+
     //$$newModel$$ - DO NOT REMOVE THIS LINE!
   });
 

@@ -3,6 +3,7 @@ define((require, exports, module)=>{
   require('koru/server');
   const StackErrorConvert = require('koru/stack-error-convert');
   const UserAccount     = require('koru/user-account');
+  const ClimberRanking  = require('models/climber-ranking');
   const Ranking         = require('models/ranking');
   const EventPub        = require('pubsub/event-pub');
   const OrgPub          = require('pubsub/org-pub');

@@ -2,6 +2,7 @@ define((require, exports, module)=>{
   const koru            = require('koru');
   const Val             = require('koru/model/validation');
   const Random          = require('koru/random').global;
+  const session         = require('koru/session');
   const util            = require('koru/util');
   const Model           = require('model');
   const Category        = require('./category');
@@ -49,7 +50,30 @@ define((require, exports, module)=>{
     get org_id() {
       return this.event && this.event.org_id;
     }
+
+    setScore(index, score) {
+      var num = new Heat(index, this.event.heats[this.category_id]).scoreToNumber(score, index);
+      if (index === 99 && this.time === num) return;
+      if (this.scores[index] === num) return;
+
+      session.rpc('Result.setScore', this._id, index, score);
+    }
+
+    setBoulderScore(index, problem, bonus, top) {
+      if (this.problems) {
+        var round = this.problems[index-1];
+        if (round && round[problem-1] === (
+          bonus === "dnc" ? -1 : bonus === undefined ? null : bonus+top*100))
+          return;
+      }
+      session.rpc('Result.setBoulderScore', this._id, index, problem, bonus, top);
+    }
+
+    setSpeedScore(options) {
+      session.rpc("Result.setSpeedScore", this._id, options);
+    }
   }
+
   Result.define({
     module,
     fields: {
@@ -261,6 +285,8 @@ define((require, exports, module)=>{
   }));
 
   module.onUnload(Competitor.beforeRemove(doc =>{removeResults(doc.category_ids || [], doc)}));
+
+  Result.eventCatIndex = Result.addUniqueIndex('event_id', 'category_id', 'climber_id');
 
   require('koru/env!./result')(Result);
 

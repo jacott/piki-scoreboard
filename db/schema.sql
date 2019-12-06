@@ -77,6 +77,20 @@ CREATE TABLE public."Climber" (
 
 
 --
+-- Name: ClimberRanking; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public."ClimberRanking" (
+    climber_id text COLLATE pg_catalog."C",
+    event_id text COLLATE pg_catalog."C",
+    category_id text COLLATE pg_catalog."C",
+    rank integer,
+    points integer,
+    type character(1)
+);
+
+
+--
 -- Name: Club; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -362,6 +376,13 @@ ALTER TABLE ONLY public."User"
 --
 
 CREATE INDEX "ChangeLog_createdAt_parent_id" ON public."ChangeLog" USING btree ("createdAt" DESC, parent_id);
+
+
+--
+-- Name: ClimberRanking_event_id_category_id_climber_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX "ClimberRanking_event_id_category_id_climber_id" ON public."ClimberRanking" USING btree (event_id, category_id, climber_id);
 
 
 --
