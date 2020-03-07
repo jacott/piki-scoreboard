@@ -20,15 +20,15 @@
   "author": "Geoff Jacobsen <geoffjacobsen@gmail.com>",
   "dependencies": {
     "archiver": "^3.1.1",
-    "csv-parse": "^4.8.2",
-    "koru": "^0.32.4",
+    "csv-parse": "^4.8.8",
+    "koru": "^0.32.6",
     "pg-libpq": "^3.1.0"
   },
   "devDependencies": {
-    "unzipper": "^0.10.5"
+    "unzipper": "^0.10.10"
   },
   "engines": {
-    "node": ">=10.14.0"
+    "node": ">=12.16.0"
   },
-  "version": "1.2.8"
+  "version": "1.2.9"
 }
