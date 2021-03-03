@@ -1,3 +1,5 @@
+const unzipper        = require('unzipper');
+
 define((require, exports, module)=>{
   'use strict';
   const TH              = require('koru/model/test-db-helper');
@@ -10,7 +12,6 @@ define((require, exports, module)=>{
   const Org             = require('models/org');
   const Result          = require('models/result');
   const Factory         = require('test/factory');
-  const unzipper        = requirejs.nodeRequire('unzipper');
 
   const {Writable, Transform}      = requirejs.nodeRequire('stream');
 

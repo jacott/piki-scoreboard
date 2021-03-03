@@ -1,3 +1,5 @@
+const archiver        = require('archiver');
+
 define((require, exports, module)=>{
   'use strict';
   const koru            = require('koru');
@@ -8,7 +10,6 @@ define((require, exports, module)=>{
   const WebServer       = require('koru/web-server');
   const Role            = require('models/role');
   const User            = require('models/user');
-  const archiver        = requirejs.nodeRequire('archiver');
   const {spawn}         = requirejs.nodeRequire('child_process');
   const fs              = requirejs.nodeRequire('fs');
   const path            = requirejs.nodeRequire('path');

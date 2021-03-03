@@ -33,7 +33,7 @@ define((require, exports, module)=>{
     const future = new Future();
 
     parse(Buffer.from(data).toString(), {
-      columns: ()=> ['Fee level', 'First Name', 'Last Name', 'Birth Date', 'Participant ID']
+      columns: true
     }, (err, rows) => {
       if (err) return future.throw(err);
       data = rows;
@@ -70,6 +70,8 @@ define((require, exports, module)=>{
         throw 'Name: "' + name + '" registered ' + climbers[name] + ' times';
 
       const meta = get('Fee level');
+
+      if (meta === void 0) throw('Missing "Fee level" field');
 
       const clubName = meta.split(',')[0].trim();
 

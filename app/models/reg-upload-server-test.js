@@ -54,11 +54,11 @@ define((require, exports, module)=>{
 
     test("uploading", ()=>{
       const csv =
-          '"Fee level","First Name","Last Name","Birth Date","Participant ID"\n' +
-          '"Rock Hoppers,Junior (Early Bird) [FJL,FOL]","Anna","Smith","1996-04-16","149"\n' +
-          '"Rock Hoppers,Junior (Early Bird) [MJL]","Sam","Smith","1996-04-16","148"\n' +
-          '"Mountain Goats,Junior (Early Bird) [MJL]","Mark","Ford","1995-11-26","230"\n' +
-          '"Rock Hoppers,Junior (Early Bird)","Henry","Smith","2002-04-16","147"\n';
+          '"Fee level","First Name","Last Name","Birth Date","Participant ID","Email"\n' +
+          '"Rock Hoppers,Junior (Early Bird) [FJL,FOL]","Anna","Smith","1996-04-16","149","asmith@test.com"\n' +
+          '"Rock Hoppers,Junior (Early Bird) [MJL]","Sam","Smith","1996-04-16","148","ssmith@test.com"\n' +
+          '"Mountain Goats,Junior (Early Bird) [MJL]","Mark","Ford","1995-11-26","230","mford@test.com"\n' +
+          '"Rock Hoppers,Junior (Early Bird)","Henry","Smith","2002-04-16","147","hsmith@test.com"\n';
 
       v.rpc('Reg.upload', v.event._id, csv);
 
@@ -67,13 +67,16 @@ define((require, exports, module)=>{
         'First Name': 'Mark',
         'Last Name': 'Ford',
         'Birth Date': '1995-11-26',
-        'Participant ID': '230'
+        'Participant ID': '230',
+        'Email': 'mford@test.com'
       }, "Can't find club 'Mountain Goats'"],[4, {
         'Fee level': "Rock Hoppers,Junior (Early Bird)",
         'First Name': 'Henry',
         'Last Name': 'Smith',
         'Birth Date': '2002-04-16',
-        'Participant ID': '147'}, "Invalid or missing codes"]]);
+        'Participant ID': '147',
+        'Email': 'hsmith@test.com'
+      }, "Invalid or missing codes"]]);
 
       const club = Team.findBy('name', 'Rock Hoppers');
       assert(club);
