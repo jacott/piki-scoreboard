@@ -10,8 +10,8 @@ customizable.
 
 ## Online service
 
-A Piki system is hosted by [Obeya Limited](http://getobeya.com) as
-[piki.getobeya.com](https://piki.getobeya.com/). Organizations wanting
+A Piki system is hosted by [Vimaly](http://vimaly.com) as
+[piki.vimaly.com](https://piki.vimaly.com/). Organizations wanting
 to use the service please read the help page within the system.
 
 ## Installing and Testing
@@ -25,8 +25,8 @@ is rectified contributing to either project might prove challenging.
 Server Dependencies
 
 * Unix-like
-* [Node.js](https://nodejs.org/en/) v6.3.0 or above
-* [PostgreSQL](http://www.postgresql.org)
+* [Node.js](https://nodejs.org/en/) v14.16.0 or above
+* [PostgreSQL](http://www.postgresql.org) v12 or above
 
 Check out the project
 
