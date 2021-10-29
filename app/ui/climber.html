@@ -102,7 +102,16 @@
       {{labelField "name"}}
       {{labelField "dateOfBirth" placeholder="yyyy-mm-dd"}}
       {{labelField "gender" selectList=genderList type="selectMenu" class="on"}}
-      {{labelField "number"}}
+      <!--{{labelField "number"}}-->
+      <label>
+        <span class="name">
+          Number<br>
+        </span>
+        {{field "number"}}<inlinehelp>
+          <info></info>
+          <popup>Changes to this number will take effect in the climber’s <em>future</em> event registrations, but not in events the climber is already registered for. To change the climber’s number in an event they are already registered for, go to the <em>Registrations</em> tab for that event.</popup>
+        </inlinehelp>
+      </label>
     </fieldset>
   </template>
 
