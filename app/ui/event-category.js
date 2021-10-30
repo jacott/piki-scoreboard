@@ -1,14 +1,15 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const Dom             = require('koru/dom');
   const Route           = require('koru/ui/route');
   const util            = require('koru/util');
+  const eventTpl        = require('./event');
   const Category        = require('models/category');
+  const Climber         = require('models/climber');
   const Heat            = require('models/heat');
   const Result          = require('models/result');
   const ClimberCell     = require('ui/climber-cell');
   const EventHelper     = require('ui/event-helper');
   const SpeedEvent      = require('ui/speed-event');
-  const eventTpl        = require('./event');
 
   const orig$ = Symbol();
 
@@ -19,11 +20,11 @@ define((require, exports, module)=>{
 
   let focusField = null;
 
-  const createAttempts = (name, attempts, number, canInput)=>{
+  const createAttempts = (name, attempts, number, canInput) => {
     let elm;
     if (canInput) {
       elm = document.createElement('input');
-      elm.tabIndex = number+1;
+      elm.tabIndex = number + 1;
       elm[orig$] = elm.value = attempts || '';
     } else {
       elm = document.createElement('span');
@@ -33,7 +34,7 @@ define((require, exports, module)=>{
     return elm;
   };
 
-  const updateResults = (ctx)=>{
+  const updateResults = (ctx) => {
     let input, value, start, end;
 
     ctx.updateAllTags();
@@ -54,12 +55,12 @@ define((require, exports, module)=>{
     document.activeElement.blur();
   };
 
-  const getFocusElm = ()=>{
+  const getFocusElm = () => {
     return focusField && document.querySelector(
-      '#' + focusField.id + ' td.score input[tabIndex="'+focusField.tabIndex+'"].'+focusField.name);
+      '#' + focusField.id + ' td.score input[tabIndex="' + focusField.tabIndex + '"].' + focusField.name);
   };
 
-  const saveScore = (elm)=>{
+  const saveScore = (elm) => {
     if (elm.value === elm[orig$]) return true;
     const ctx = Dom.ctx(elm);
     const data = ctx.data;
@@ -86,21 +87,21 @@ define((require, exports, module)=>{
     top = top.value.trim();
     const bonusElm = parent.querySelector('input.bonus');
     let bonus = bonusElm.value.trim();
-    if (top === "-") top = "0";
-    if (bonus === "-") bonus = "0";
+    if (top === '-') top = '0';
+    if (bonus === '-') bonus = '0';
     const tabIndex = +elm.getAttribute('tabIndex');
     if (! top && ! bonus) {
       data.result.setBoulderScore(data.heat.number, tabIndex);
       return true;
     }
     if (top.match(/nc/i) || bonus.match(/nc/i)) {
-      data.result.setBoulderScore(data.heat.number, tabIndex, "dnc");
+      data.result.setBoulderScore(data.heat.number, tabIndex, 'dnc');
       return true;
     }
     top = +(top || 0);
     bonus = +(bonus || 0);
     const isNumber = ! (isNaN(top) || isNaN(bonus));
-    if (isNumber && top >=0 && bonus >= 0) {
+    if (isNumber && top >= 0 && bonus >= 0) {
       if (top && ! bonus) {
         parent.classList.add('incomplete');
         parent.classList.remove('error');
@@ -116,15 +117,15 @@ define((require, exports, module)=>{
     return isNumber;
   };
 
-  const setFocusField = (input)=>{
+  const setFocusField = (input) => {
     focusField = {
       id: Dom.getClosest(input, 'tr').id,
       tabIndex: +input.getAttribute('tabIndex'),
       name: input.className.replace(/ .*$/, ''),
     };
-  };;
+  };
 
-  const nextField = (elm, direction)=>{
+  const nextField = (elm, direction) => {
     let tabIndex = +elm.getAttribute('tabIndex');
     let name, row = elm.parentNode.parentNode;
 
@@ -133,16 +134,17 @@ define((require, exports, module)=>{
       row = row.parentNode;
 
       name = Dom.hasClass(elm, 'top') ? 'bonus' : 'top';
-      if (direction > 0 && name === 'top')
+      if (direction > 0 && name === 'top') {
         row = row.nextElementSibling;
-      else if (direction < 0 && name === 'bonus')
+      } else if (direction < 0 && name === 'bonus') {
         row = row.previousElementSibling;
+      }
 
       // if there is no next row, move to next column
       if (row === null) {
-        elm = document.querySelector('.results tr:'+
-                                     (direction > 0 ? 'first' : 'last')+'-child>td.score input'+
-                                     '[tabIndex="'+(tabIndex+direction)+'"]');
+        elm = document.querySelector('.results tr:' +
+                                     (direction > 0 ? 'first' : 'last') + '-child>td.score input' +
+                                     '[tabIndex="' + (tabIndex + direction) + '"]');
         // if there is no next column
         if (elm === null) return null;
 
@@ -151,7 +153,6 @@ define((require, exports, module)=>{
         // row = tr
         row = elm.parentNode.parentNode.parentNode;
       }
-
     } else {
       name = 'score';
       // not invoked in boulder?
@@ -159,9 +160,9 @@ define((require, exports, module)=>{
 
       if (row === null) {
         elm =
-          document.querySelector('.results tr:'+
-                                 (direction > 0 ? 'first' : 'last')+'-child>td.score>input'+
-                                 ':not([tabIndex="'+tabIndex+'"])');
+          document.querySelector('.results tr:' +
+                                 (direction > 0 ? 'first' : 'last') + '-child>td.score>input' +
+                                 ':not([tabIndex="' + tabIndex + '"])');
 
         if (elm === null) return null;
 
@@ -174,7 +175,7 @@ define((require, exports, module)=>{
     if (row) return {id: row.id, tabIndex, name};
   };
 
-  const nextHorizField = (elm, direction)=>{
+  const nextHorizField = (elm, direction) => {
     let tabIndex = +elm.getAttribute('tabIndex');
     let cell = elm.parentNode;
     let name, row = cell.parentNode;
@@ -207,7 +208,7 @@ define((require, exports, module)=>{
 
   const saveAndMove = (elm, which) => {
     Dom.stopEvent();
-    switch(which) {
+    switch (which) {
     case 38: // up arrow / shift tab
       focusField = nextField(document.activeElement, -1);
       break;
@@ -231,7 +232,7 @@ define((require, exports, module)=>{
 
   Tpl.$helpers({
     classes() {
-      return (this.showingResults ? "Category rank " : "Category start ") +
+      return (this.showingResults ? 'Category rank ' : 'Category start ') +
         this.heat.className() + ' ' + this.heat.type;
     },
     heats() {
@@ -240,7 +241,7 @@ define((require, exports, module)=>{
     headers() {
       const frag = document.createDocumentFragment();
       this.heat.headers((number, name) => {
-        frag.appendChild(HeatHeader.$render({heat: number, name: name}));
+        frag.appendChild(HeatHeader.$render({heat: number, name}));
       });
       return frag;
     },
@@ -254,18 +255,20 @@ define((require, exports, module)=>{
 
       const {heat} = this;
 
-      if (this.showingResults)
+      if (this.showingResults) {
         heat.sort(results);
-      else
+      } else {
         heat.sortByStartOrder(results);
+      }
 
       let prev, row, rank = 0;
       const compareResults = heat.compareResults();
 
-      for(let i = 0; i < results.length; ++i, prev = row) {
+      for (let i = 0; i < results.length; ++i, prev = row) {
         row = results[i];
-        if (! prev || compareResults(prev, row) !== 0)
+        if (! prev || compareResults(prev, row) !== 0) {
           rank = i + 1;
+        }
         row.rank = rank;
         frag.appendChild(Tpl.Result.$render(row));
       }
@@ -274,7 +277,7 @@ define((require, exports, module)=>{
   });
 
   Tpl.$extend({
-    onEntry: (page, pageRoute)=>{
+    onEntry: (page, pageRoute) => {
       if (! eventTpl.event) Route.abortPage();
       const params = Route.searchParams(pageRoute);
       const category = Category.findById(pageRoute.append);
@@ -295,13 +298,14 @@ define((require, exports, module)=>{
         category, heatNumber};
       Dom('#Event .body').appendChild(
         category.type === 'S'
-          ? SpeedEvent.$autoRender(data) : page.$autoRender(data)
+          ? SpeedEvent.$autoRender(data)
+          : page.$autoRender(data),
       );
 
       Dom('.Category [name=selectHeat]').focus();
     },
 
-    onExit: ()=>{
+    onExit: () => {
       Dom.removeChildren(Dom('#Event .body'));
     },
 
@@ -309,14 +313,15 @@ define((require, exports, module)=>{
       const {data} = ctx;
       let {showingResults} = data;
       util.merge(data, {
-        heat: new Heat(data.heatNumber,  eventTpl.event.heats[data.category._id]),
+        heat: new Heat(data.heatNumber, eventTpl.event.heats[data.category._id]),
         get selectHeat() {return this.heat.number},
         set selectHeat(value) {return this.heat.number = value},
         get showingResults() {return showingResults},
         set showingResults(value) {
           showingResults = value;
-          if (showingResults)
+          if (showingResults) {
             focusField = null;
+          }
           this.canInput = ! (value || eventTpl.event.closed) &&
             Dom.hasClass(document.body, 'jAccess');
           return value;
@@ -324,11 +329,13 @@ define((require, exports, module)=>{
       });
       data.showingResults = showingResults; // set canInput
 
-      ctx.autoUpdate({subject: data.category});
-      ctx.onDestroy(Result.onChange(({doc}) =>{
+      ctx.onDestroy(Category.observeId(data.category._id, () => {ctx.updateAllTags()}));
+
+      ctx.onDestroy(Result.onChange(({doc}) => {
         if (doc.event_id !== eventTpl.event._id ||
-            doc.category_id !== ctx.data.category._id)
+            doc.category_id !== ctx.data.category._id) {
           return;
+        }
 
         updateResults(ctx);
       }));
@@ -345,7 +352,7 @@ define((require, exports, module)=>{
     'change td.score input'(event) {
       if (! saveScore(this)) {
         Dom.stopEvent();
-        (getFocusElm()||this).focus();
+        (getFocusElm() || this).focus();
         return;
       }
     },
@@ -362,7 +369,7 @@ define((require, exports, module)=>{
         saveAndMove(elm, which);
         return;
       }
-      switch(which) {
+      switch (which) {
       case 27: // escape
         focusField = null;
         if (Dom.hasClass(this, 'score')) {
@@ -373,7 +380,6 @@ define((require, exports, module)=>{
         }
         document.activeElement.blur();
         break;
-
       case 13: // return
         Dom.stopEvent();
         if (saveScore(elm)) {
@@ -391,11 +397,13 @@ define((require, exports, module)=>{
     'pointerdown td.score'(event) {
       const elm = event.target;
       if (elm === document.activeElement ||
-          ! Dom.hasClass(document.body, 'jAccess'))
+          ! Dom.hasClass(document.body, 'jAccess')) {
         return;
+      }
 
       let input = elm.tagName === 'INPUT'
-          ? elm : elm.querySelector('input') || this.querySelector('input');
+          ? elm
+          : elm.querySelector('input') || this.querySelector('input');
       if (input != null) {
         Dom.stopEvent();
 
@@ -409,10 +417,10 @@ define((require, exports, module)=>{
 
       const scoreData = $.data(this);
       let heat = scoreData.heat;
-      if (typeof heat === 'object')
+      if (typeof heat === 'object') {
         heat = heat.number;
+      }
       if (heat < 1) return;
-
 
       input = document.activeElement;
       if (Dom.hasClass(input, 'score') && ! saveScore(input)) {
@@ -428,12 +436,13 @@ define((require, exports, module)=>{
 
       const scoreData = $.data(this);
       let heat = scoreData.heat;
-      if (typeof heat === 'object')
+      if (typeof heat === 'object') {
         heat = heat.number;
+      }
       if (heat < 1) return;
 
       Dom.stopEvent();
-      EventHelper.gotoPage(data, false,  heat === 99 ? data.heat.total : heat);
+      EventHelper.gotoPage(data, false, heat === 99 ? data.heat.total : heat);
     },
   });
 
@@ -445,7 +454,7 @@ define((require, exports, module)=>{
 
   Tpl.Result.$extend({
     $created(ctx) {
-      ctx.autoUpdate({subject: ctx.data.climber});
+      ctx.onDestroy(ctx.data.constructor.observeId(ctx.data.climber._id, () => {ctx.updateAllTags()}));
     },
   });
 
@@ -461,16 +470,19 @@ define((require, exports, module)=>{
       const boulder = heat.type === 'B';
       let canInput = parentCtx.parentCtx.data.canInput;
 
-      const renderScore = (i, canInput, qr)=>{
+      const renderScore = (i, canInput, qr) => {
         frag.appendChild(Score.$render(
-          qr ? {
-            result: result, heat: -2,
-            score: scores[i] == null && heat.total !== heat.rankIndex ? ''
-              : heat.numberToScore(Math.pow(result.rankMult, 1/i), -2, result.event.ruleVersion)
-          } : {
-            result: result, canInput: canInput, heat: i,
+          qr
+            ? {
+              result, heat: -2,
+              score: scores[i] == null && heat.total !== heat.rankIndex
+                ? ''
+                : heat.numberToScore(Math.pow(result.rankMult, 1 / i), -2, result.event.ruleVersion),
+            }
+          : {
+            result, canInput, heat: i,
             score: heat.numberToScore(scores[i], i, result.event.ruleVersion),
-            rank: scores[i] == null ? '' : result['rank'+i]}
+            rank: scores[i] == null ? '' : result['rank' + i]},
         ));
       };
 
@@ -481,23 +493,23 @@ define((require, exports, module)=>{
       canInput = canInput && ! boulder;
 
       if (heat.number <= heat.rankIndex) {
-
         if (heat.number >= 0) {
           renderScore(heat.number, canInput);
-
         } else {
-          frag.appendChild(Score.$render({result: result, heat: -2, score: result.rank}));
-          for(let i = heat.total; i > 0; --i) {
-            if (heat.rankIndex === i)
+          frag.appendChild(Score.$render({result, heat: -2, score: result.rank}));
+          for (let i = heat.total; i > 0; --i) {
+            if (heat.rankIndex === i) {
               renderScore(i, null, -2);
+            }
 
             renderScore(i);
           }
         }
       } else {
-        if (heat.type === 'L' && heat.isFinalRound())
-          frag.appendChild(Score.$render({result: result, canInput: canInput, heat: 99,
+        if (heat.type === 'L' && heat.isFinalRound()) {
+          frag.appendChild(Score.$render({result, canInput, heat: 99,
                                           score: result.displayTimeTaken()}));
+        }
         renderScore(heat.number, canInput);
         renderScore(heat.number - 1, null, heat.rankIndex === heat.number - 1);
       }
@@ -508,7 +520,7 @@ define((require, exports, module)=>{
   Score.$helpers({
     rank() {
       if (! this.rank) return;
-      const elm =  document.createElement('i');
+      const elm = document.createElement('i');
       elm.textContent = this.rank;
       return elm;
     },
@@ -517,11 +529,12 @@ define((require, exports, module)=>{
       let elm;
       if (this.canInput) {
         elm = document.createElement('input');
-        elm.setAttribute('placeholder', this.heat === 99 ? "m:ss" : "n+");
+        elm.setAttribute('placeholder', this.heat === 99 ? 'm:ss' : 'n+');
         elm.tabIndex = this.heat;
         elm.className = 'score';
-        if (this.score != null)
+        if (this.score != null) {
           elm[orig$] = elm.value = this.score.toString();
+        }
       } else {
         const {score} = this;
         const parts = typeof score === 'number' ? null : this.score.split(/([TZA]+)(?!o)/);
@@ -529,8 +542,7 @@ define((require, exports, module)=>{
           elm = document.createElement('span');
           elm.textContent = this.score;
         } else {
-
-          elm =  Dom.h({class: 'tza-score', span: parts.map(p => /^[TZA]+$/.test(p) ? {b: p} : {span: p})});
+          elm = Dom.h({class: 'tza-score', span: parts.map((p) => /^[TZA]+$/.test(p) ? {b: p} : {span: p})});
         }
       }
 
@@ -549,21 +561,24 @@ define((require, exports, module)=>{
       const canInput = this.canInput;
 
       const frag = document.createDocumentFragment();
-      for(let i = 0; i < len; ++i) {
+      for (let i = 0; i < len; ++i) {
         const prob = problems[i];
         const elm = document.createElement('div');
         if (prob === -1) {
-          elm.className = "dnc";
-          elm.appendChild(createAttempts('top', "nc", i, canInput));
-          elm.appendChild(createAttempts('bonus', "", i, canInput));
+          elm.className = 'dnc';
+          elm.appendChild(createAttempts('top', 'nc', i, canInput));
+          elm.appendChild(createAttempts('bonus', '', i, canInput));
         } else if (prob == null) {
-          elm.appendChild(createAttempts('top', "", i, canInput));
-          elm.appendChild(createAttempts('bonus', "", i, canInput));
+          elm.appendChild(createAttempts('top', '', i, canInput));
+          elm.appendChild(createAttempts('bonus', '', i, canInput));
         } else {
-          if (prob > 0) elm.className = prob >= 100 ? 'top' : 'bonus';
-          else elm.className = "ns";
+          if (prob > 0) {
+            elm.className = prob >= 100 ? 'top' : 'bonus';
+          } else {
+            elm.className = 'ns';
+          }
           elm.appendChild(createAttempts('top', Math.floor(prob / 100), i, canInput));
-          elm.appendChild(createAttempts('bonus', (prob % 100) || "-", i, canInput));
+          elm.appendChild(createAttempts('bonus', (prob % 100) || '-', i, canInput));
         }
         frag.appendChild(elm);
       }

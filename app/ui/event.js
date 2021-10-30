@@ -177,7 +177,7 @@ define((require, exports, module)=>{
             observeScores();
 
             eventSub && eventSub.stop();
-            eventSub = EventSub.subscribe(pageRoute.eventId, ()=>{callback()});
+            eventSub = EventSub.subscribe(pageRoute.eventId, callback);
           }
         }
       }

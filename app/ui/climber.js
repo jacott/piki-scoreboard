@@ -1,35 +1,34 @@
-define(function(require, exports, module) {
+define(function (require, exports, module) {
   const koru            = require('koru');
   const Dom             = require('koru/dom');
   const session         = require('koru/session');
   const ConfirmRemove   = require('koru/ui/confirm-remove');
   const Dialog          = require('koru/ui/dialog');
+  const Flash           = require('koru/ui/flash');
   const Form            = require('koru/ui/form');
   const Route           = require('koru/ui/route');
   const util            = require('koru/util');
+  const App             = require('./app-base');
   const Climber         = require('models/climber');
   const TeamType        = require('models/team-type');
   const CrudPage        = require('ui/crud-page');
-  const Flash           = require('ui/flash');
   const TeamHelper      = require('ui/team-helper');
-  const App             = require('./app-base');
 
   const Tpl = CrudPage.newTemplate(module, Climber, require('koru/html!./climber'));
   const $ = Dom.current;
   const Index = Tpl.Index;
   const Merge = Tpl.Merge;
 
-  Tpl.title = "Climbers";
+  Tpl.title = 'Climbers';
 
   Tpl.route.addTemplate(module, Merge, {
     focus: true,
     data(page, pageRoute) {
-
       const doc = Climber.findById(pageRoute.modelId);
       if (doc) return doc;
 
       Route.abortPage(Index);
-    }
+    },
   });
 
   Index.$extend({
@@ -49,34 +48,33 @@ define(function(require, exports, module) {
   });
 
   Index.$helpers({
-    teamTypeList: ()=>() => TeamType.query,
+    teamTypeList: () => () => TeamType.query,
   });
 
   Index.$events({
     'click [name=clearAllNumbers]'(event) {
       Dom.stopEvent();
       ConfirmRemove.show({
-        title: "Clear all climber numbers?", okay: 'Clear',
+        title: 'Clear all climber numbers?', okay: 'Clear',
         description: Dom.h({div: [
           'You are about to permanently clear all climber numbers. Do you want to continue?',
           {br: ''}, {br: ''},
-          "Note: numbers will not be removed from climbers' previous registrations in events."
+          "Note: numbers will not be removed from climbers' previous registrations in events.",
         ]}),
         onConfirm() {
           const notice = Flash.confirm('Clearing all climber numbers...');
-          session.rpc('Climber.clearAllNumbers', App.orgId, err => {
+          session.rpc('Climber.clearAllNumbers', App.orgId, (err) => {
             Dom.remove(notice);
             err == null ? Flash.notice('Climber numbers cleared') : Flash.error(err);
           });
-        }
+        },
       });
-
     },
   });
 
   Tpl.Add.$events({
     'click [name=cancel]': cancel,
-    'click [type=submit]': Form.submitFunc('AddClimber', "back"),
+    'click [type=submit]': Form.submitFunc('AddClimber', 'back'),
   });
 
   Tpl.Edit.$events({
@@ -102,15 +100,14 @@ define(function(require, exports, module) {
           }
         },
       });
-
     },
-    'click [type=submit]': Form.submitFunc('EditClimber', "back"),
+    'click [type=submit]': Form.submitFunc('EditClimber', 'back'),
   });
 
   Tpl.Edit.$extend({
     $destroyed(ctx, elm) {
       ctx.data.$clearChanges();
-    }
+    },
   });
 
   function cancel(event) {
@@ -121,7 +118,7 @@ define(function(require, exports, module) {
   Merge.$extend({
     $created(ctx) {
       ctx.selected = {};
-      ctx.filter = "";
+      ctx.filter = '';
     },
   });
 
@@ -131,13 +128,13 @@ define(function(require, exports, module) {
       const ctx = $.ctx;
       const filterRe = new RegExp(
         ctx.filter.split(/\s+/)
-          .map(p => `\\b${p}`).join('.*'),
-        "i"
+          .map((p) => `\\b${p}`).join('.*'),
+        'i',
       );
       return {
-        query: Climber.where(doc  => doc._id !== climber._id &&
-            (ctx.selected[doc._id] ||
-             filterRe.test(doc.name))),
+        query: Climber.where((doc) => doc._id !== climber._id &&
+                             (ctx.selected[doc._id] ||
+                              filterRe.test(doc.name))),
         compare: util.compareByName,
       };
     },
@@ -164,13 +161,12 @@ define(function(require, exports, module) {
           session.rpc(
             'Climber.merge', ctx.data._id,
             Object.keys(ctx.selected),
-            err => {
+            (err) => {
               Route.history.back();
-              err ? Flash.error(err) : Flash.notice("Climbers merged");
+              err ? Flash.error(err) : Flash.notice('Climbers merged');
             });
         },
       });
-
     },
 
     'click [name=cancel]': cancel,
@@ -179,7 +175,7 @@ define(function(require, exports, module) {
   Merge.Row.$helpers({
     selected() {
       Dom.setClass('selected', $.ctx.parentCtx.selected[this._id]);
-    }
+    },
   });
 
   Merge.Row.$events({

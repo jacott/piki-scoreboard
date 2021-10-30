@@ -1,14 +1,14 @@
-isClient && define((require, exports, module)=>{
+isClient && define((require, exports, module) => {
   const Dom             = require('koru/dom');
   const Subscription    = require('koru/pubsub/subscription');
   const Route           = require('koru/ui/route');
   const util            = require('koru/util');
+  const TH              = require('./test-helper');
   const Result          = require('models/result');
   const User            = require('models/user');
   const EventSub        = require('pubsub/event-sub');
   const Factory         = require('test/factory');
   const EventCategory   = require('ui/event-category');
-  const TH              = require('./test-helper');
 
   const SpeedEvent = require('./speed-event');
 
@@ -16,101 +16,103 @@ isClient && define((require, exports, module)=>{
 
   const $ = Dom.current;
 
-  TH.testCase(module, ({before, after, beforeEach, afterEach, group, test})=>{
+  TH.testCase(module, ({before, after, beforeEach, afterEach, group, test}) => {
     let org, user, cat, event, climbers;
 
-    const gotoNextStage = (stageName, tiebreak)=>{
+    const gotoNextStage = (stageName, tiebreak) => {
       TH.click('.nextStage');
       if (tiebreak) {
         assert.dom('.nextStage>.info', /Break ties by further attempts on Lane A./);
       } else {
         refute.dom('.nextStage>.info');
         TH.confirm();
-        assert.dom(document.body, ()=>{
-          assert.dom('#Event .Speed .selectedHeat', stageName+' - Results');
+        assert.dom(document.body, () => {
+          assert.dom('#Event .Speed .selectedHeat', stageName + ' - Results');
         });
         const format = event.heats[cat._id];
-        const ns = format[format.length-1];
+        const ns = format[format.length - 1];
         goto('startlists', ns === 'R' ? 1 : +ns);
       }
     };
 
-    const withStartlist = (text)=>{
+    const withStartlist = (text) => {
       let so = 0.1234;
       climbers = [];
-      for(const name of text.split(/\s+/)) {
+      for (const name of text.split(/\s+/)) {
         if (name === '') continue;
         climbers.push(Factory.createClimber({name}));
         const competitor = Factory.createCompetitor();
         so += 0.0001;
-        Factory.createResult({_id: 'res'+name, scores: [so]});
+        Factory.createResult({_id: 'res' + name, scores: [so]});
       }
       TH.loginAs(Factory.createUser('admin'));
       goto('startlists', 0);
-      assert.dom('#Event .Speed table.results>tbody', tbody =>{
+      assert.dom('#Event .Speed table.results>tbody', (tbody) => {
         assert.dom('tr', {count: climbers.length});
-        const rows = tbody.querySelectorAll("tr");
-        for(let i = 0; i < climbers.length; ++i) {
-          assert.dom(`tr:nth-child(${i+1})`, tr =>{
+        const rows = tbody.querySelectorAll('tr');
+        for (let i = 0; i < climbers.length; ++i) {
+          assert.dom(`tr:nth-child(${i + 1})`, (tr) => {
             assert.dom('td:first-child.climber .name', climbers[i].name);
           });
         }
       });
     };
 
-    const resultsAre = (stageName, results, tiebreak)=>{
+    const resultsAre = (stageName, results, tiebreak) => {
       const elm = Dom('#Event .Speed');
       elm || assert.dom('#Event .Speed');
       try {
-        assert.dom('.selectedHeat', stageName+' - Start list');
+        assert.dom('.selectedHeat', stageName + ' - Start list');
         let i = 0;
-        if (stageName === 'Final')  {
-          const rows = results.trim().split('\n').map(r => r.trim().split(/\s+/));
-          for(let i = 0; i < 2; ++i) {
+        if (stageName === 'Final') {
+          const rows = results.trim().split('\n').map((r) => r.trim().split(/\s+/));
+          for (let i = 0; i < 2; ++i) {
             const parts = rows[i];
-            assert.dom(`table:${i == 0 ? 'first' : 'last'}-of-type `+
-                       'tbody>tr:first-child:last-child', ()=>{
-              assert.dom('td:first-child.climber .name', parts[0]);
-              TH.change('td:nth-child(2) input', parts[1]);
-              assert.dom('td:last-child.climber .name', parts[2]);
-              TH.change('td:nth-child(3) input', parts[3]);
-            });
+            assert.dom(`table:${i == 0 ? 'first' : 'last'}-of-type ` +
+                       'tbody>tr:first-child:last-child', () => {
+                         assert.dom('td:first-child.climber .name', parts[0]);
+                         TH.change('td:nth-child(2) input', parts[1]);
+                         assert.dom('td:last-child.climber .name', parts[2]);
+                         TH.change('td:nth-child(3) input', parts[3]);
+                       });
           }
-        } else assert.dom('table.results>tbody', ()=>{
-          for (let row of results.split('\n')) {
-            row = row.trim();
-            if (row === '') continue;
-            const parts = row.split(/\s+/);
-            assert.dom(`tr:nth-child(${++i})`, tr =>{
-              assert.dom('td:first-child.climber .name', parts[0]);
-              TH.change('td:nth-child(2) input', parts[1]);
-              assert.dom('td:last-child.climber .name', parts[2]);
-              TH.change('td:nth-child(3) input', parts[3]);
-            });
-          }
-        });
+        } else {
+          assert.dom('table.results>tbody', () => {
+            for (let row of results.split('\n')) {
+              row = row.trim();
+              if (row === '') continue;
+              const parts = row.split(/\s+/);
+              assert.dom(`tr:nth-child(${++i})`, (tr) => {
+                assert.dom('td:first-child.climber .name', parts[0]);
+                TH.change('td:nth-child(2) input', parts[1]);
+                assert.dom('td:last-child.climber .name', parts[2]);
+                TH.change('td:nth-child(3) input', parts[3]);
+              });
+            }
+          });
+        }
         gotoNextStage(stageName, tiebreak);
-      } catch(err) {
-        assert.fail(err.message + "\n" + htmlToText(elm), 1);
+      } catch (err) {
+        assert.fail(err.message + '\n' + htmlToText(elm), 1);
       }
     };
 
-    const tiebreaksAre = (stageName, attempt, results, tiebreak)=>{
-      assert.dom('#Event .Speed', elm =>{
-        assert.dom('.selectedHeat', stageName+' - Start list');
+    const tiebreaksAre = (stageName, attempt, results, tiebreak) => {
+      assert.dom('#Event .Speed', (elm) => {
+        assert.dom('.selectedHeat', stageName + ' - Start list');
         for (const row of results.split('\n')) {
           if (row === '') continue;
           const parts = row.split(/\s+/);
-          assert.dom('td:first-child.climber .name', {text: parts[0], parent: p =>{
+          assert.dom('td:first-child.climber .name', {text: parts[0], parent: (p) => {
             assert.domParent(
-              `td:nth-child(2) input[tabindex="10"][data-attempt="${attempt}"]`, input =>{
-                TH.change(input,parts[1]);
+              `td:nth-child(2) input[tabindex="10"][data-attempt="${attempt}"]`, (input) => {
+                TH.change(input, parts[1]);
               });
           }});
           if (parts.length > 2) {
-            assert.dom('td:last-child.climber .name', {text: parts[2], parent: p =>{
-              assert.domParent(`td:nth-child(3) input[data-attempt="${attempt}"]`, input =>{
-                TH.change(input,parts[3]);
+            assert.dom('td:last-child.climber .name', {text: parts[2], parent: (p) => {
+              assert.domParent(`td:nth-child(3) input[data-attempt="${attempt}"]`, (input) => {
+                TH.change(input, parts[3]);
               });
             }});
           }
@@ -119,29 +121,30 @@ isClient && define((require, exports, module)=>{
       });
     };
 
-    const htmlToText = html =>{
+    const htmlToText = (html) => {
       const {childNodes} = html, len = childNodes.length;
       let result = '';
-      for(let i = 0; i < len; ++i) {
+      for (let i = 0; i < len; ++i) {
         const elm = childNodes[i];
-        if (elm.nodeType === document.TEXT_NODE)
+        if (elm.nodeType === document.TEXT_NODE) {
           result += elm.textContent.replace(/\s+/g, ' ');
-        else {
-          switch(elm.tagName) {
+        } else {
+          switch (elm.tagName) {
           case 'BR': case 'TR':
             result += '\n';
             break;
           }
           const ans = htmlToText(elm);
-          if (ans)
+          if (ans) {
             result += ans + ' ';
+          }
         }
       }
 
       return result;
     };
 
-    const generalResultsAre = (results)=>{
+    const generalResultsAre = (results) => {
       goto('results', -1);
       const elm = Dom('#Event .Speed');
       elm || assert.dom('#Event .Speed');
@@ -150,7 +153,7 @@ isClient && define((require, exports, module)=>{
         for (const row of results.split('\n')) {
           if (row === '') continue;
           if (++i == 0) {
-            assert.dom('thead', ()=>{
+            assert.dom('thead', () => {
               let j = 0;
               for (const heading of row.split(/\s+/)) {
                 ++j;
@@ -158,67 +161,65 @@ isClient && define((require, exports, module)=>{
               }
             });
           } else {
-            assert.dom(`tbody tr:nth-child(${i})`, tr =>{
+            assert.dom(`tbody tr:nth-child(${i})`, (tr) => {
               let j = 0;
               for (let v of row.split(/\s+/)) {
                 v = v.replace(/_/g, ' ').trim();
                 ++j;
-                if (j == 2)
+                if (j == 2) {
                   assert.dom(`td:nth-child(${j}).climber .name`, v);
-                else
+                } else {
                   assert.dom(`td:nth-child(${j})`, v);
+                }
               }
             });
           }
         }
-      } catch(err) {
-        assert.fail(err.message + "\n" + htmlToText(elm), 1);
+      } catch (err) {
+        assert.fail(err.message + '\n' + htmlToText(elm), 1);
       }
     };
 
-    const goto = (type, heatNumber)=>{
+    const goto = (type, heatNumber) => {
       Route.replacePage(EventCategory, {
         eventId: event._id, append: cat._id, search: `?type=${type}&heat=${heatNumber}`});
     };
 
-    const createResults = (ans, arg2, cb)=>{
+    const createResults = (ans, arg2, cb) => {
       if (typeof arg2 === 'number') {
-        for(let i = 0; i < arg2; ++i) {
-          Factory.createClimber(); Factory.createCompetitor({number: i+100});
+        for (let i = 0; i < arg2; ++i) {
+          Factory.createClimber(); Factory.createCompetitor({number: i + 100});
           const changes = {
-            scores: [(((i+1)*498764321)%5741)/10000, [6543+i*100, 7503+i*100]]};
+            scores: [(((i + 1) * 498764321) % 5741) / 10000, [6543 + i * 100, 7503 + i * 100]]};
           cb && cb(changes);
           ans.push(Factory.createResult(changes));
         }
       } else {
         let num = 100;
         for (const id in arg2) {
-          Factory.createClimber({name: 'climber_'+id});
+          Factory.createClimber({name: 'climber_' + id});
           Factory.createCompetitor({number: ++num});
           ans[id] = Factory.createResult({_id: id, scores: arg2[id]});
         }
       }
     };
 
-    const stubSub = (...args) =>{
-      const last = args[args.length-1];
-      if (typeof last === 'function') last();
-      return {stop: ()=>{}};
-    };
-
-    beforeEach(()=>{
+    beforeEach(() => {
       org = Factory.createOrg();
       cat = Factory.createCategory({type: 'S'});
       event = Factory.createEvent();
-      intercept(Subscription, 'subscribe', stubSub);
+      intercept(Subscription, 'subscribe', (...args) => {
+        const last = args[args.length - 1];
+        if (typeof last === 'function') last();
+        return {stop: () => {}};
+      });
     });
 
-    afterEach(()=>{
+    afterEach(() => {
       TH.tearDown();
     });
 
-    group("scenarios", ()=>{
-
+    group('scenarios', () => {
       // All scores are compared to 1/1000th second (rule 9.15-B1).
 
       /* Test qual rankings (rule 9.17-A). 1. Competitors are ranked according to their faster
@@ -230,7 +231,7 @@ isClient && define((require, exports, module)=>{
        * should have no rank in the competition - exactly as if H was not registered. Currently Piki
        * gives H a rank lower than all other competitors.
        */
-      test("qual rankings #1", ()=>{
+      test('qual rankings #1', () => {
         withStartlist(`
 A
 B
@@ -292,7 +293,7 @@ Rank Climber 1/4-final Qual
 `);
       });
 
-            test("qual rankings #2", ()=>{
+      test('qual rankings #2', () => {
         withStartlist(`
 A
 B
@@ -326,8 +327,8 @@ Rank Climber Semi-final Qual
 
       // Test placement in stages of final.
 
-      test("quota of 4", ()=>{
-                withStartlist(`
+      test('quota of 4', () => {
+        withStartlist(`
 A
 B
 C
@@ -372,7 +373,7 @@ Rank Climber Final  Semi-final Qual
       // If a stage of the final round is not carried out, the comp is considered concluded, and
       // the winners of the last completed stage are ranked relative to each other based on their
       // qual rank (rule 9.18-C).
-      test("quota of 8", ()=>{
+      test('quota of 8', () => {
         withStartlist(`
 A
 B
@@ -454,7 +455,7 @@ Rank Climber Final Semi-final  1/4-final    Qual
       // of their times in the stage they were eliminated in, if tied then their times in succeeding
       // previous stages **except that their times can't be compared in any stage where one of them
       // has a wildcard**, and if nec. their times in the qual round (rule 9.18-A2)
-      test("quota of 16", ()=>{
+      test('quota of 16', () => {
         withStartlist(`
 A
 B
@@ -539,7 +540,7 @@ Rank Climber Semi-final 1/4-final   1/8-final     Qual
       // TODO: test that Piki shows the competition as complete after the Qual - no option to run a
       // final.
 
-      test("less than 4 valid qual times #1", ()=>{
+      test('less than 4 valid qual times #1', () => {
         withStartlist(`
 A
 B
@@ -563,7 +564,7 @@ Rank Climber     Qual
 `);
       });
 
-      test("less than 4 valid qual times #2", ()=>{
+      test('less than 4 valid qual times #2', () => {
         withStartlist(`
 A
 B
@@ -604,7 +605,7 @@ Rank Climber     Qual
       // And test rule 9.6-B: that competitors tied following the Qual round are randomly placed in
       // the final
 
-      test("quota tie", ()=>{
+      test('quota tie', () => {
         withStartlist(`
 Ron
 Hermione
@@ -659,7 +660,7 @@ Rank Climber   Final Semi-final Qual
 `);
       });
 
-      test("rand placement", ()=>{
+      test('rand placement', () => {
         withStartlist(`
 A
 B
@@ -694,7 +695,7 @@ Rank Climber Final Semi-final Qual
       // Test relative overall rank of competitors eliminated and not tied in a stage of Final
       // Round: faster beats slower beats {fall/fs/-}
 
-      test("eliminated not tied in Final", ()=>{
+      test('eliminated not tied in Final', () => {
         withStartlist(`
 A
 B
@@ -768,7 +769,7 @@ Rank Climber 1/4-final  1/8-final    Qual
 
       // test relative overall rank of competitors eliminated and tied in 1/4-final,
       // with previous stage scores also tied: fall, fall, false start, false start
-      test("eliminated and tied in Final", ()=>{
+      test('eliminated and tied in Final', () => {
         withStartlist(`
 A
 B
@@ -845,8 +846,7 @@ Rank Climber Semi-final 1/4-final   1/8-final     Qual
 `);
       });
 
-
-      test("eliminated and tied times in Final", ()=>{
+      test('eliminated and tied times in Final', () => {
         /**
          * relative overall rank of competitors eliminated and tied in 1/4-final, with previous
          * stage scores not all tied: faster time, slower time, equal times
@@ -938,7 +938,7 @@ Rank Climber Semi-final 1/4-final   1/8-final     Qual
        * test time beats fall
        * test time beats -
        */
-      test("race results #1", ()=>{
+      test('race results #1', () => {
         withStartlist(`
 A
 B
@@ -985,7 +985,7 @@ Rank Climber Final  Semi-final  Qual
        * report. Once the Rules do address this, update Piki. In the meantime, Piki treats - vs - as
        * a tie.
        */
-      test("race ties", ()=>{
+      test('race ties', () => {
         withStartlist(`
 A
 B
@@ -1055,7 +1055,7 @@ Rank Climber Final  Semi-final 1/4-final Qual
        *
        */
 
-      test("race results #2", ()=>{
+      test('race results #2', () => {
         withStartlist(`
 A
 B
@@ -1063,7 +1063,7 @@ C
 D
 `);
 
-        resultsAre('Qualifiers',`
+        resultsAre('Qualifiers', `
 A 1.1   C 9.9
 B 2.2   D 9.9
 C 3.3   A 9.9
@@ -1096,7 +1096,7 @@ Rank Climber Final  Semi-final  Qual
        *
        */
 
-      test("race results #3", ()=>{
+      test('race results #3', () => {
         withStartlist(`
 A
 B
@@ -1105,7 +1105,7 @@ D
 E
 `);
 
-        resultsAre('Qualifiers',`
+        resultsAre('Qualifiers', `
 A 3.3   D 9.9
 B 3.3   E 9.9
 C 3.3   A 9.9
@@ -1153,7 +1153,7 @@ Rank Climber Final  Semi-final  Qual
 
     });
 
-    test("render qual startlist", ()=>{
+    test('render qual startlist', () => {
       user = Factory.createUser('guest');
       TH.loginAs(user);
 
@@ -1166,19 +1166,19 @@ Rank Climber Final  Semi-final  Qual
 
       goto('startlists', 0);
 
-      assert.dom('#Event .Category.Speed', ()=>{
+      assert.dom('#Event .Category.Speed', () => {
         assert.dom('h1', 'Category 1');
         assert.dom('h1.selectedHeat', 'Qualifiers - Start list');
       });
 
-      assert.dom('#Event .results', catElm =>{
-        assert.dom('tbody>tr:first-child', tr =>{
-          assert.dom('td.climber:first-child', td =>{
+      assert.dom('#Event .results', (catElm) => {
+        assert.dom('tbody>tr:first-child', (tr) => {
+          assert.dom('td.climber:first-child', (td) => {
             assert.dom('.teams>span', 'SN3');
             assert.dom('.name', 'Climber 2');
             assert.dom('.number', '101');
           });
-          assert.dom('td.climber:last-child', td =>{
+          assert.dom('td.climber:last-child', (td) => {
             assert.dom('.teams>span', 'SN3');
             assert.dom('.name', 'Climber 3');
             assert.dom('.number', '102');
@@ -1186,13 +1186,13 @@ Rank Climber Final  Semi-final  Qual
           assert.dom('td:nth-child(2)', '');
           assert.dom('td:nth-child(3)', '');
         });
-        assert.dom('tbody>tr:nth-child(2)', tr =>{
+        assert.dom('tbody>tr:nth-child(2)', (tr) => {
           assert.dom('td.climber:first-child .name', 'Climber 1');
           assert.dom('td.climber:last-child .name', 'Climber 2');
           assert.dom('td:nth-child(2)', '6.543');
           assert.dom('td:nth-child(3)', '7.603');
         });
-        assert.dom('tbody>tr:nth-child(3):last-child', tr =>{
+        assert.dom('tbody>tr:nth-child(3):last-child', (tr) => {
           assert.dom('td.climber:first-child .name', 'Climber 3');
           assert.dom('td.climber:last-child .name', 'Climber 1');
           assert.dom('td:nth-child(2)', '');
@@ -1204,7 +1204,7 @@ Rank Climber Final  Semi-final  Qual
       assert.dom('#Event .Category.Speed h1.selectedHeat', 'Qualifiers - Results');
     });
 
-    test("render qual results", ()=>{
+    test('render qual results', () => {
       user = Factory.createUser('admin');
       TH.loginAs(user);
 
@@ -1217,37 +1217,37 @@ Rank Climber Final  Semi-final  Qual
 
       goto('results', 0);
 
-      assert.dom('#Event .Category.Speed', ()=>{
+      assert.dom('#Event .Category.Speed', () => {
         assert.dom('h1', 'Category 1');
         assert.dom('h1.selectedHeat', 'Qualifiers - Results');
       });
 
-      assert.dom('#Event .results', catElm =>{
+      assert.dom('#Event .results', (catElm) => {
         assert.dom('thead', 'RankClimberLane ALane B');
-        assert.dom('tbody>tr:first-child', tr =>{
+        assert.dom('tbody>tr:first-child', (tr) => {
           assert.dom('td.rank', '1');
-          assert.dom('td.climber', {count: 1}, td =>{
+          assert.dom('td.climber', {count: 1}, (td) => {
             assert.dom('.teams>span', 'SN3');
             assert.dom('.name', 'Climber 1');
             assert.dom('.number', '100');
           });
         });
-        assert.dom('tbody>tr:nth-child(2)', tr =>{
+        assert.dom('tbody>tr:nth-child(2)', (tr) => {
           assert.dom('td.rank', '2');
           assert.dom('td.climber .name', 'Climber 4');
         });
-        assert.dom('tbody>tr:nth-child(3)', tr =>{
+        assert.dom('tbody>tr:nth-child(3)', (tr) => {
           assert.dom('td.rank', '3');
           assert.dom('td.climber .name', 'Climber 5');
         });
-        assert.dom('tbody>tr:last-child', tr =>{
+        assert.dom('tbody>tr:last-child', (tr) => {
           assert.dom('td.rank', '');
           assert.dom('td.climber .name', 'Climber 3');
         });
 
         res[2].setSpeedScore({time: 5000, attempt: 1});
 
-        assert.dom('tbody>tr:first-child', tr =>{
+        assert.dom('tbody>tr:first-child', (tr) => {
           assert.dom('td.rank', '1');
           assert.dom('td.climber .name', 'Climber 3');
           assert.dom('td.score', '5.000');
@@ -1258,12 +1258,12 @@ Rank Climber Final  Semi-final  Qual
       assert.dom('#Event .Category.Speed h1.selectedHeat', 'Qualifiers - Start list');
     });
 
-    group("nextStage", ()=>{
-      beforeEach(()=>{
+    group('nextStage', () => {
+      beforeEach(() => {
         TH.loginAs(Factory.createUser('admin'));
       });
 
-      test("tiebreak quals", ()=>{
+      test('tiebreak quals', () => {
         event.$updatePartial('heats', [cat._id, 'S']);
         const res = {};
         createResults(res, {
@@ -1285,19 +1285,19 @@ Rank Climber Final  Semi-final  Qual
         assert.equals(event.heats, {[cat._id]: 'S'});
         assert.dom('.nextStage>.info', 'Break ties by further attempts on Lane A.');
 
-        assert.dom('tr', {data: res.r1}, tr =>{
+        assert.dom('tr', {data: res.r1}, (tr) => {
           refute.dom('td:nth-child(2).score>input+input');
         });
 
         assert.equals(res.r3.scores[1], [6201, 6501, 'tie']);
 
-        assert.dom('tr', {data: res.r3}, tr =>{
+        assert.dom('tr', {data: res.r3}, (tr) => {
           TH.change('td:nth-child(2).score>input+input[data-attempt="1"]', '7654');
         });
-        assert.dom('tr', {data: res.r4}, tr =>{
+        assert.dom('tr', {data: res.r4}, (tr) => {
           TH.change('td:nth-child(2).score>input+input[data-attempt="1"]', '7654');
         });
-        assert.dom('tr', {data: res.r5}, tr =>{
+        assert.dom('tr', {data: res.r5}, (tr) => {
           TH.change('td:nth-child(2).score>input+input[data-attempt="1"]', '7654');
         });
         assert.equals(res.r3.scores[1], [6201, 6501, 7654]);
@@ -1305,16 +1305,15 @@ Rank Climber Final  Semi-final  Qual
         TH.click('.nextStage>button');
         refute.called(Route.gotoPage);
 
-
-        assert.dom('tr', {data: res.r3}, tr =>{
+        assert.dom('tr', {data: res.r3}, (tr) => {
           TH.change('td:nth-child(2).score>input+input+input[data-attempt="2"]', '7553');
         });
 
-        assert.dom('tr', {data: res.r4}, tr =>{
+        assert.dom('tr', {data: res.r4}, (tr) => {
           TH.change('td:nth-child(2).score>input+input+input[data-attempt="2"]', '7553');
         });
 
-        assert.dom('tr', {data: res.r5}, tr =>{
+        assert.dom('tr', {data: res.r5}, (tr) => {
           TH.change('td:nth-child(2).score>input+input+input[data-attempt="2"]', '7554');
         });
 
@@ -1327,7 +1326,7 @@ Rank Climber Final  Semi-final  Qual
         assert.equals(event.heats[cat._id], 'S2');
       });
 
-      test("tiebreak semis", ()=>{
+      test('tiebreak semis', () => {
         event.$updatePartial('heats', [cat._id, 'S']);
         const res = {};
         createResults(res, {
@@ -1343,7 +1342,7 @@ Rank Climber Final  Semi-final  Qual
         goto('startlists', 0);
 
         TH.click('.nextStage>button');
-        assert.dom('.Dialog', ()=>{
+        assert.dom('.Dialog', () => {
           assert.dom('div', `Do you wish to proceed from the "Qualifiers" to the "Semi final"`);
           TH.click('[name=cancel]');
         });
@@ -1355,8 +1354,8 @@ Rank Climber Final  Semi-final  Qual
 
         const OPPONENTS = {1: 'r04', 4: 'r01', 2: 'r03', 3: 'r02'};
 
-        for(let i = 1; i <= 4; ++i) {
-          res['r0'+i].setSpeedScore({time: 5892, stage: 2, opponent_id: OPPONENTS[i], attempt: 1});
+        for (let i = 1; i <= 4; ++i) {
+          res['r0' + i].setSpeedScore({time: 5892, stage: 2, opponent_id: OPPONENTS[i], attempt: 1});
         }
 
         goto('startlists', 2);
@@ -1366,12 +1365,11 @@ Rank Climber Final  Semi-final  Qual
         assert.equals(res.r03.scores[3], {time: 5892, opponent_id: 'r02', tiebreak: ['tie']});
         assert.dom('.nextStage>.info', 'Break ties by further attempts on Lane A.');
 
-
-        assert.dom('tr', {data: res.r01}, tr =>{
+        assert.dom('tr', {data: res.r01}, (tr) => {
           TH.change('td:nth-child(2).score>input[data-attempt="1"]', '7654');
           TH.change('td:nth-child(3).score>input[data-attempt="1"]', '7654');
         });
-        assert.dom('tr', {data: res.r03}, tr =>{
+        assert.dom('tr', {data: res.r03}, (tr) => {
           TH.change('td:nth-child(2).score>input[data-attempt="1"]', '7654');
           TH.change('td:nth-child(3).score>input[data-attempt="1"]', '7654');
         });
@@ -1386,11 +1384,11 @@ Rank Climber Final  Semi-final  Qual
 
         assert.dom('.nextStage>.info');
 
-        assert.dom('tr', {data: res.r01}, tr =>{
+        assert.dom('tr', {data: res.r01}, (tr) => {
           TH.change('td:nth-child(2).score>input[data-attempt="2"]', '8653');
           TH.change('td:nth-child(3).score>input[data-attempt="2"]', '8654');
         });
-        assert.dom('tr', {data: res.r03}, tr =>{
+        assert.dom('tr', {data: res.r03}, (tr) => {
           TH.change('td:nth-child(2).score>input[data-attempt="2"]', '8654');
           TH.change('td:nth-child(3).score>input[data-attempt="2"]', '8653');
         });
@@ -1405,7 +1403,7 @@ Rank Climber Final  Semi-final  Qual
         assert.equals(event.heats[cat._id], 'S21');
       });
 
-      test("qual no final", ()=>{
+      test('qual no final', () => {
         const res = []; createResults(res, 3);
 
         goto('startlists', 0);
@@ -1416,15 +1414,15 @@ Rank Climber Final  Semi-final  Qual
         assert.equals(event.heats, {[cat._id]: 'SC'});
       });
 
-      test("semi to final", ()=>{
+      test('semi to final', () => {
         event.$updatePartial('heats', [cat._id, 'S2']);
 
         const res = []; createResults(res, 8);
 
         let time = 6123;
-        let i=0;
+        let i = 0;
         for (const r of res) {
-          r.$updatePartial('scores', ['3', {time: time+=343, opponent_id: res[8-(++i)]._id}]);
+          r.$updatePartial('scores', ['3', {time: time += 343, opponent_id: res[8 - (++i)]._id}]);
         }
 
         goto('startlists', 2);
@@ -1436,16 +1434,16 @@ Rank Climber Final  Semi-final  Qual
 
         goto('startlists', 2);
 
-        assert.dom('#Event', ()=>{
+        assert.dom('#Event', () => {
           assert.dom('.reopen', 'Reopen Semi final');
           TH.click('.reopen');
         });
-        assert.dom('.Dialog', ()=>{
+        assert.dom('.Dialog', () => {
           assert.dom('div', 'Are you sure you want to reopen "Semi final" and later stages?');
           TH.click('[name=okay]');
         });
 
-        assert.dom('#Event', ()=>{
+        assert.dom('#Event', () => {
           refute.dom('.reopen');
           assert.dom('.nextStage');
         });
@@ -1453,7 +1451,7 @@ Rank Climber Final  Semi-final  Qual
         assert.equals(event.heats, {[cat._id]: 'S2'});
       });
 
-      test("no quals entered", ()=>{
+      test('no quals entered', () => {
         const res = []; createResults(res, 2);
         goto('startlists', 0);
 
@@ -1467,13 +1465,12 @@ Rank Climber Final  Semi-final  Qual
 
         assert.equals(event.heats, {[cat._id]: 'S'});
 
-
         res[0].$updatePartial('scores', [1, [6763, 7503]]);
 
         TH.click('.nextStage>button');
         TH.confirm();
         assert.calledWith(Route.gotoPage, EventCategory, m(
-          o => assert.specificAttributes(o, {
+          (o) => assert.specificAttributes(o, {
             eventId: event._id, append: cat._id, search: '?type=results&heat=0'})));
 
         assert.equals(event.heats, {[cat._id]: 'SC'});
@@ -1494,7 +1491,7 @@ Rank Climber Final  Semi-final  Qual
       });
     });
 
-    test("click to enter scores", ()=>{
+    test('click to enter scores', () => {
       TH.loginAs(Factory.createUser('admin'));
       event.$updatePartial('heats', [cat._id, 'S']);
       const res = {};
@@ -1509,18 +1506,18 @@ Rank Climber Final  Semi-final  Qual
 
       spy(Route, 'gotoPage');
 
-      assert.dom('#Event .Speed .quals', list =>{
-        assert.dom('.score', 6.001, elm =>{
+      assert.dom('#Event .Speed .quals', (list) => {
+        assert.dom('.score', 6.001, (elm) => {
           TH.click(elm);
           assert.calledWith(Route.gotoPage, EventCategory);
         });
       });
-      assert.dom('#Event .Speed .ABList', list =>{
-        assert.dom('input', {value: "6.001"});
+      assert.dom('#Event .Speed .ABList', (list) => {
+        assert.dom('input', {value: '6.001'});
       });
     });
 
-    test("general result", ()=>{
+    test('general result', () => {
       event.$updatePartial('heats', [cat._id, 'S']);
       const res = {};
       createResults(res, {
@@ -1548,19 +1545,19 @@ Rank Climber Final  Semi-final  Qual
       TH.loginAs(Factory.createUser('judge'));
       goto('results', -1);
 
-      assert.dom('#Event .Speed .GeneralList', list =>{
+      assert.dom('#Event .Speed .GeneralList', (list) => {
         assert.dom('thead th', {count: 3});
-        assert.dom('tbody', body =>{
+        assert.dom('tbody', (body) => {
           assert.dom('tr', {count: 19});
-          assert.dom('tr:nth-child(1)', tr =>{
+          assert.dom('tr:nth-child(1)', (tr) => {
             assert.dom('.climber .name', 'climber_r10');
             assert.dom('.score', '6.001');
           });
-          assert.dom('tr:nth-child(16)', tr =>{
+          assert.dom('tr:nth-child(16)', (tr) => {
             assert.dom('.climber .name', 'climber_r18');
             assert.dom('.score', '6.808');
           });
-          assert.dom('tr:nth-child(19)', tr =>{
+          assert.dom('tr:nth-child(19)', (tr) => {
             assert.dom('.climber .name', 'climber_r19');
             assert.dom('.score', '7.016');
           });
@@ -1572,12 +1569,12 @@ Rank Climber Final  Semi-final  Qual
         res.r10.$updatePartial('scores', ['5', {opponent_id: 'r8', time: 6891}]);
         res.r8.$updatePartial('scores', ['5', {opponent_id: 'r10', time: 6247}]);
 
-        assert.dom('tbody>tr:nth-child(1)', tr =>{
+        assert.dom('tbody>tr:nth-child(1)', (tr) => {
           assert.dom('.climber .name', 'climber_r8');
           assert.dom('.score:nth-child(3)', '6.247');
           assert.dom('.score:last-child', '6.808');
         });
-        assert.dom('tbody>tr:nth-child(2)', tr =>{
+        assert.dom('tbody>tr:nth-child(2)', (tr) => {
           assert.dom('.climber .name', 'climber_r10');
           assert.dom('.score:nth-child(3)', '6.891');
           assert.dom('.score:last-child', '6.001');
@@ -1592,14 +1589,14 @@ Rank Climber Final  Semi-final  Qual
       assert.dom('#Event .Speed .ABList .score', '6.891');
     });
 
-    test("selectHeat", ()=>{
+    test('selectHeat', () => {
       event.$updatePartial('heats', [cat._id, 'S4321']);
 
       TH.loginAs(Factory.createUser('judge'));
       goto('results', -1);
 
       stub(Route, 'gotoPage');
-      TH.selectMenu('#Event [name=selectHeat]', 0, elm =>{
+      TH.selectMenu('#Event [name=selectHeat]', 0, (elm) => {
         assert.domParent('li', {data: m.field('_id', -1), text: 'General'});
         assert.domParent('li', {data: m.field('_id', 2), text: 'Semi-final'});
         TH.click(elm);
@@ -1609,8 +1606,8 @@ Rank Climber Final  Semi-final  Qual
         eventId: event._id, append: cat._id, search: '?type=results&heat=0'});
     });
 
-    group("finals startList", ()=>{
-      test("petit final", ()=>{
+    group('finals startList', () => {
+      test('petit final', () => {
         TH.loginAs(Factory.createUser('judge'));
 
         event.$updatePartial('heats', [cat._id, 'S1']);
@@ -1620,11 +1617,10 @@ Rank Climber Final  Semi-final  Qual
 
         goto('startlists', 1);
 
-        assert.dom('#Event .Speed .ABList', list =>{
-        });
+        assert.dom('#Event .Speed .ABList', (list) => {});
       });
 
-      test("enter round of sixteen", ()=>{
+      test('enter round of sixteen', () => {
         TH.loginAs(Factory.createUser('judge'));
 
         event.$updatePartial('heats', [cat._id, 'S4']);
@@ -1634,10 +1630,10 @@ Rank Climber Final  Semi-final  Qual
 
         goto('startlists', 4);
 
-        assert.dom('#Event .Speed .ABList', list =>{
-          assert.dom('tbody>tr:nth-child(3)', tr =>{
+        assert.dom('#Event .Speed .ABList', (list) => {
+          assert.dom('tbody>tr:nth-child(3)', (tr) => {
             assert.dom('td.climber:first-child .name', 'Climber 4');
-            assert.dom('td:nth-child(2)>input', {value: ''}, input =>{
+            assert.dom('td:nth-child(2)>input', {value: ''}, (input) => {
               input.focus();
               TH.change(input, '1.432');
               assert.same(document.activeElement, input);
@@ -1646,7 +1642,7 @@ Rank Climber Final  Semi-final  Qual
             assert.dom('td.climber:first-child:not(.winner)');
 
             assert.dom('td.climber:last-child .name', 'Climber 13');
-            assert.dom('td:nth-child(3)>input', {value: ''}, input =>{
+            assert.dom('td:nth-child(3)>input', {value: ''}, (input) => {
               input.focus();
               input.value = 'xyz';
               TH.keydown(input, 27);
@@ -1671,7 +1667,7 @@ Rank Climber Final  Semi-final  Qual
       });
     });
 
-    test("enter qual scores", ()=>{
+    test('enter qual scores', () => {
       TH.loginAs(Factory.createUser('judge'));
 
       const res = [];
@@ -1683,11 +1679,11 @@ Rank Climber Final  Semi-final  Qual
 
       goto('startlists', 0);
 
-      assert.dom('#Event .results', catElm =>{
-        assert.dom('tbody>tr:nth-child(2)', tr =>{
+      assert.dom('#Event .results', (catElm) => {
+        assert.dom('tbody>tr:nth-child(2)', (tr) => {
           assert.dom('td.climber:first-child .name', 'Climber 1');
           assert.dom('td.climber:last-child .name', 'Climber 2');
-          assert.dom('td:nth-child(2)>input', {value: '6.543'}, input =>{
+          assert.dom('td:nth-child(2)>input', {value: '6.543'}, (input) => {
             input.focus();
             TH.change(input, '1432');
             assert.equals(res[0].scores[1], [1432, 'fall']);
@@ -1695,7 +1691,7 @@ Rank Climber Final  Semi-final  Qual
             assert.same(document.activeElement, input);
           });
 
-          assert.dom('td:nth-child(3)>input', {value: '7.603'}, input =>{
+          assert.dom('td:nth-child(3)>input', {value: '7.603'}, (input) => {
             input.focus();
             input.value = 'xyz';
             TH.keydown(input, 27);
@@ -1709,7 +1705,7 @@ Rank Climber Final  Semi-final  Qual
             assert.equals(res[1].scores[1], [undefined, undefined]);
           });
         });
-        assert.dom('tbody>tr:nth-child(3):last-child', tr =>{
+        assert.dom('tbody>tr:nth-child(3):last-child', (tr) => {
           assert.dom('td.climber:first-child .name', 'Climber 3');
           assert.dom('td.climber:last-child .name', 'Climber 1');
           assert.dom('td:nth-child(2)>input', {value: ''});
@@ -1717,28 +1713,28 @@ Rank Climber Final  Semi-final  Qual
           assert.dom('td:nth-child(3)>input', {value: 'fall'});
         });
 
-        assert.dom('tbody>tr:first-child', tr =>{
+        assert.dom('tbody>tr:first-child', (tr) => {
           assert.dom('td.climber:first-child .name', 'Climber 2');
           assert.dom('td.climber:last-child .name', 'Climber 3');
         });
 
-        createResults(res, 1, changes =>{
+        createResults(res, 1, (changes) => {
           changes.scores[0] = 0.001;
         });
 
-        assert.dom('tbody>tr:first-child', tr =>{
+        assert.dom('tbody>tr:first-child', (tr) => {
           assert.dom('td.climber:first-child .name', 'Climber 2');
           assert.dom('td.climber:last-child .name', 'Climber 3');
         });
 
-        assert.dom('tbody>tr:last-child', tr =>{
+        assert.dom('tbody>tr:last-child', (tr) => {
           assert.dom('td.climber:first-child .name', 'Climber 3');
           assert.dom('td.climber:last-child .name', 'Climber 1');
         });
 
         res[3].$remove();
 
-        assert.dom('tbody>tr:first-child', tr =>{
+        assert.dom('tbody>tr:first-child', (tr) => {
           assert.dom('td.climber:first-child .name', 'Climber 2');
           assert.dom('td.climber:last-child .name', 'Climber 3');
         });

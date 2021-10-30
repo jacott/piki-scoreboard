@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define(function (require, exports, module) {
   const koru            = require('koru');
   const Dom             = require('koru/dom');
   const DomTemplate     = require('koru/dom/template');
@@ -6,33 +6,35 @@ define(function(require, exports, module) {
   const Random          = require('koru/random');
   const session         = require('koru/session');
   const Dialog          = require('koru/ui/dialog');
+  const Flash           = require('koru/ui/flash');
   const Route           = require('koru/ui/route');
   const SelectMenu      = require('koru/ui/select-menu');
   const UserAccount     = require('koru/user-account');
   const ClientLogin     = require('koru/user-account/client-login');
   const util            = require('koru/util');
   const uColor          = require('koru/util-color');
+  const App             = require('./app-base');
   const Org             = require('models/org');
   const User            = require('models/user');
-  const Flash           = require('ui/flash');
   const Help            = require('ui/help');
   const NotifyBar       = require('ui/notify-bar');
-  const App             = require('./app-base');
 
   const Tpl = Dom.newTemplate(require('koru/html!./header'));
   const $ = Dom.current;
 
-  const getUser = ()=>{
+  const getUser = () => {
     const user = User.me();
-    if (user && user._id !== 'guest')
+    if (user && user._id !== 'guest') {
       return user;
+    }
   };
 
   Tpl.$helpers({
     style() {
       const user = getUser();
-      return user && user.email ?
-        `background-image:url(${App.AVATAR_URL}${md5sum(user.email)}?d=blank` : '';
+      return user && user.email
+        ? `background-image:url(${App.AVATAR_URL}${md5sum(user.email)}?d=blank`
+        : '';
     },
 
     initials() {
@@ -54,7 +56,7 @@ define(function(require, exports, module) {
         const rnd = new Random(user.email);
 
         const color = uColor.rgb2hex(uColor.hsl2rgb({
-          h: rnd.fraction(), s: 1 - rnd.fraction()/2, l: 0.5}));
+          h: rnd.fraction(), s: 1 - rnd.fraction() / 2, l: 0.5}));
         $.element.style.backgroundColor = color;
         App.addColorClass($.element, color);
       }
@@ -100,7 +102,7 @@ define(function(require, exports, module) {
       list.push(
         ['category', 'Categories'],
         ['climber', 'Climbers'],
-        ['team', 'Teams']
+        ['team', 'Teams'],
       );
       list.push('disabled sep');
       list.push(['$help', 'Help']);
@@ -120,10 +122,11 @@ define(function(require, exports, module) {
 
     $signOutOther() {
       UserAccount.logoutOtherClients(function (error) {
-        if (error)
+        if (error) {
           Flash.error('Unexpected error.');
-        else
+        } else {
           Flash.notice('You have been signed out of any other sessions.');
+        }
       });
     },
 
@@ -135,16 +138,17 @@ define(function(require, exports, module) {
   function onSelect(elm) {
     const id = $.data(elm)._id;
     const action = Actions[id];
-    if (action)
+    if (action) {
       action(elm);
-    else
+    } else {
       Route.gotoPath(id);
+    }
     return true;
   }
 
   Tpl.$extend({
     $created(ctx, elm) {
-      ctx.onDestroy(ClientLogin.onChange(session, state => {
+      ctx.onDestroy(ClientLogin.onChange(session, (state) => {
         if (state === 'ready') {
           const uid = koru.userId();
           ctx.userObserve && ctx.userObserve.stop();
@@ -152,8 +156,8 @@ define(function(require, exports, module) {
             App.setAccess();
             ctx.updateAllTags();
 
-            Route.currentPage instanceof DomTemplate
-              && Route.replacePage(Route.currentPage, Route.currentPageRoute);
+            Route.currentPage instanceof DomTemplate &&
+              Route.replacePage(Route.currentPage, Route.currentPageRoute);
           };
 
           ctx.userObserve = User.observeId(uid, updateAll);
@@ -166,7 +170,7 @@ define(function(require, exports, module) {
         if (ctx.orgSN !== orgSN) {
           ctx.orgSN = orgSN;
           document.getElementById('HeaderOrgName').textContent =
-            (Org.findBy('shortName', orgSN)||{}).name || '';
+            (Org.findBy('shortName', orgSN) || {}).name || '';
         }
       }));
 
@@ -183,7 +187,7 @@ define(function(require, exports, module) {
     },
   });
 
-  Dom.setTitle = title => {
+  Dom.setTitle = (title) => {
     const pageTitle = document.getElementById('PageTitle');
 
     const pageRoute = Route.currentPageRoute;
@@ -197,16 +201,18 @@ define(function(require, exports, module) {
           break;
         }
       }
-      if (! title)
-        title = prev ? util.capitalize(util.humanize(prev.name)) : "Piki";
+      if (! title) {
+        title = prev ? util.capitalize(util.humanize(prev.name)) : 'Piki';
+      }
     }
 
     if (pageTitle && pageTitle.textContent !== title) {
       pageTitle.textContent = title;
     }
 
-    if (page && page.titleSuffix)
+    if (page && page.titleSuffix) {
       title = `${title} - ${page.titleSuffix}`;
+    }
 
     return `Piki ${(pageRoute && pageRoute.orgSN) || ''}: ${title}`;
   };

@@ -1,15 +1,15 @@
-define(function(require, exports, module) {
+define(function (require, exports, module) {
   const koru            = require('koru');
   const Dom             = require('koru/dom');
   const session         = require('koru/session');
   const Dialog          = require('koru/ui/dialog');
+  const Flash           = require('koru/ui/flash');
   const Form            = require('koru/ui/form');
   const Route           = require('koru/ui/route');
   const UserAccount     = require('koru/user-account');
   const login           = require('koru/user-account/client-login');
-  const User            = require('models/user');
-  const Flash           = require('ui/flash');
   const SystemSetup     = require('./system-setup');
+  const User            = require('models/user');
 
   const Tpl = Dom.newTemplate(require('koru/html!./profile'));
 
@@ -25,60 +25,62 @@ define(function(require, exports, module) {
   base.addTemplate(module, Tpl.ChangePassword, {focus: true});
 
   Tpl.$helpers({
-    systemSetup () {
+    systemSetup() {
       const user = $.data();
       if (user && user.isSuperUser()) {
-        return Form.pageLink({value: "Org settings", template: "SystemSetup"});
+        return Form.pageLink({value: 'Org settings', template: 'SystemSetup'});
       }
     },
   });
 
   Tpl.$events({
-    'click [name=signOut]' (event) {
+    'click [name=signOut]'(event) {
       Dom.stopEvent();
       UserAccount.logout();
     },
 
-    'click [name=signOutOthers]' (event) {
+    'click [name=signOutOthers]'(event) {
       Dom.stopEvent();
 
       const elm = Tpl.SignOutOthers.$autoRender({});
 
       Dialog.open(elm);
 
-      UserAccount.logoutOtherClients(error =>{
-        elm.firstChild.textContent = error ? 'Unexpected error.' :
-          'You have been signed out of any other sessions.';
+      UserAccount.logoutOtherClients((error) => {
+        elm.firstChild.textContent = error
+          ? 'Unexpected error.'
+          : 'You have been signed out of any other sessions.';
       });
     },
   });
 
   Tpl.SignOutOthers.$events({
-    'click [name=close]' (event) {
+    'click [name=close]'(event) {
       Dom.stopEvent();
       Dialog.close('SignOutOthers');
     },
   });
 
   Tpl.$extend({
-    title: "Profile",
-    onBaseEntry () {
+    title: 'Profile',
+    onBaseEntry() {
       const user = User.me();
 
-      if (! user || user._id === 'guest')
+      if (! user || user._id === 'guest') {
         Route.abortPage(Route.root.defaultPage);
+      }
 
       const elm = this.$autoRender(User.me());
       base.childAnchor = elm.querySelector('.body');
       Route.childAnchor.appendChild(elm);
     },
 
-    onBaseExit () {
+    onBaseExit() {
       Dom.removeId('Profile');
     },
 
-    $created (ctx) {
-      ctx.onDestroy(login.onChange(session, state => {
+    $created(ctx) {
+      ctx.onDestroy(login.onChange(session, (state) => {
         state === 'ready' && Route.replacePage(Route.root.defaultPage);
       }));
     },
@@ -101,7 +103,7 @@ define(function(require, exports, module) {
         doc.changes.org_id = doc.org_id;
 
         return doc.$save();
-      }
+      },
     }),
 
     'click [name=cancel]'(event) {
@@ -111,9 +113,8 @@ define(function(require, exports, module) {
     },
   });
 
-
   ChangePassword.$events({
-    'submit' (event) {
+    'submit'(event) {
       Dom.stopEvent();
       const form = event.currentTarget;
       const oldPassword = form.querySelector('[name=oldPassword]').value;
@@ -121,7 +122,7 @@ define(function(require, exports, module) {
 
       Dom.addClass(form, 'submitting');
 
-      UserAccount.changePassword(User.me().email, oldPassword, newPassword.value, error =>{
+      UserAccount.changePassword(User.me().email, oldPassword, newPassword.value, (error) => {
         if (error) {
           Dom.removeClass(form, 'submitting');
           Form.renderError(form, 'oldPassword', 'invalid password.');
@@ -131,7 +132,7 @@ define(function(require, exports, module) {
       });
     },
 
-    'input [name=newPassword],[name=confirm]' (event) {
+    'input [name=newPassword],[name=confirm]'(event) {
       Dom.stopEvent();
 
       const form = event.currentTarget;
@@ -139,14 +140,15 @@ define(function(require, exports, module) {
       const confirm = form.querySelector('[name=confirm]').value;
       const submit = form.querySelector('[type=submit]');
 
-      if (newPassword.length >= 5 && newPassword === confirm)
+      if (newPassword.length >= 5 && newPassword === confirm) {
         submit.removeAttribute('disabled');
-      else
+      } else {
         submit.setAttribute('disabled', 'disabled');
+      }
     },
   });
 
-  koru.onunload(module, ()=>{Route.root.removeBase(Tpl)});
+  koru.onunload(module, () => {Route.root.removeBase(Tpl)});
 
   return Tpl;
 });

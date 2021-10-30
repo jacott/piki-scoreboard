@@ -1,0 +1,37 @@
+#!/bin/bash
+set -e
+
+export TZ=Pacific/Auckland
+export LANG="en_US.UTF-8"
+export LANGUAGE="en_US"
+export LC_ALL="en_US.UTF-8"
+
+user_data_dir=$(readlink -fm "$0/../../tmp")/test-browser
+
+prefs=$user_data_dir/Default/Preferences
+
+if [[ -e $prefs ]]; then
+    sed -i -e 's/"exit_type":"Crashed"/"exit_type":"none"/' $prefs
+fi
+
+echo "$@" >~/tmp/args
+
+if [[ "$1" == "--disable-translate" ]]; then
+    exec google-chrome --lang=en_US "$@"
+fi
+
+exec ${KORU_BROWSER:-google-chrome} --lang=en_US \
+     --disable-translate --disable-extensions \
+     --disable-background-networking --safebrowsing-disable-auto-update \
+     --disable-sync --metrics-recording-only --disable-default-apps \
+     --disable-session-crashed-bubble \
+     --mute-audio --no-first-run \
+     --window-size=1220,1024 \
+     --remote-debugging-port=9222 \
+     --user-data-dir="$user_data_dir" \
+     "$@" \
+     "http://localhost:${KORU_PORT:-3000}/"
+
+#      --incognito \
+#      --disable-setuid-sandbox \
+#      --no-sandbox \

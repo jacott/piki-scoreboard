@@ -1,4 +1,4 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const koru            = require('koru');
   const Dom             = require('koru/dom');
   const CompleteList    = require('koru/ui/complete-list');
@@ -7,6 +7,9 @@ define((require, exports, module)=>{
   const Route           = require('koru/ui/route');
   const SelectMenu      = require('koru/ui/select-menu');
   const util            = require('koru/util');
+  const App             = require('./app-base');
+  require('./climber');
+  const eventTpl        = require('./event');
   const Category        = require('models/category');
   const Climber         = require('models/climber');
   const Competitor      = require('models/competitor');
@@ -15,11 +18,8 @@ define((require, exports, module)=>{
   const User            = require('models/user');
   const TeamTpl         = require('ui/team');
   const TeamHelper      = require('ui/team-helper');
-  const App             = require('./app-base');
-  require('./climber');
-  const eventTpl        = require('./event');
 
-  const Tpl   = Dom.newTemplate(require('koru/html!./event-register'));
+  const Tpl = Dom.newTemplate(require('koru/html!./event-register'));
   const $ = Dom.current;
   const {
     Index, Add, Edit, Category: catTpl,
@@ -41,7 +41,7 @@ define((require, exports, module)=>{
     focus: true,
     data(page, pageRoute) {
       return Competitor.findById(pageRoute.append) || Route.abortPage();
-    }
+    },
   });
 
   Tpl.$helpers({
@@ -52,7 +52,7 @@ define((require, exports, module)=>{
     competitors(each) {
       return {
         query: Competitor.query,
-        compare: asc == 1 ? sortFunc : (a,b)=>sortFunc(b,a),
+        compare: asc == 1 ? sortFunc : (a, b) => sortFunc(b, a),
         compareKeys: sortFunc.compareKeys,
       };
     },
@@ -60,17 +60,17 @@ define((require, exports, module)=>{
     sortOrder() {
       var parent = $.element.parentNode;
       var ths = parent.getElementsByTagName('th');
-      for(var i = 0; i < ths.length; ++i) {
+      for (var i = 0; i < ths.length; ++i) {
         Dom.removeClass(ths[i], 'sort');
         Dom.removeClass(ths[i], 'desc');
       }
 
-      var elm = parent.querySelector('[data-sort="'+sortField+'"]');
+      var elm = parent.querySelector('[data-sort="' + sortField + '"]');
       Dom.addClass(elm, 'sort');
-      asc === -1 &&  Dom.addClass(elm, 'desc');
+      asc === -1 && Dom.addClass(elm, 'desc');
     },
 
-    teamTypeList: ()=> ctx => TeamType.where({_id: ctx.data.teamType_ids}),
+    teamTypeList: () => (ctx) => TeamType.where({_id: ctx.data.teamType_ids}),
   });
 
   Tpl.$events({
@@ -87,9 +87,9 @@ define((require, exports, module)=>{
     'click th'(event) {
       Dom.stopEvent();
       var sort = this.getAttribute('data-sort');
-      if (sortField === sort)
+      if (sortField === sort) {
         asc = asc * -1;
-      else {
+      } else {
         sortField = sort;
         asc = 1;
       }
@@ -110,7 +110,6 @@ define((require, exports, module)=>{
       return sortFunc = util.compareByField(sortField);
     }
   }
-
 
   Tpl.$extend({
     onBaseEntry(page, pageRoute) {
@@ -148,15 +147,13 @@ define((require, exports, module)=>{
         classes: 'warn',
         okay: 'Deregister',
         content: Tpl.ConfirmDelete,
-        callback: function(confirmed) {
+        callback: function (confirmed) {
           if (confirmed) {
             doc.$remove();
             Route.replacePath(Tpl);
           }
         },
       });
-
-
     },
   });
 
@@ -179,7 +176,7 @@ define((require, exports, module)=>{
       var input = this;
       var value = input.value;
       if (value) value = value.trim();
-      if (value)  {
+      if (value) {
         var form = event.currentTarget;
         var competitor = $.data();
         competitor.$clearCache();
@@ -193,7 +190,7 @@ define((require, exports, module)=>{
         });
         if (completeList.length === 0) {
           if (found) {
-            completeList = [{name: "Already registered"}];
+            completeList = [{name: 'Already registered'}];
           } else {
             completeList = [{name: 'Add "' + value + '"', addNew: true}];
           }
@@ -201,7 +198,7 @@ define((require, exports, module)=>{
       }
       Form.completeList({
         input: this,
-        completeList: completeList,
+        completeList,
         callback(ret) {
           if (ret._id) {
             input.value = ret.name;
@@ -219,11 +216,11 @@ define((require, exports, module)=>{
   Tpl.Row.$helpers({
     categories() {
       var frag = document.createDocumentFragment();
-      this.category_ids.forEach(id =>{
+      this.category_ids.forEach((id) => {
         var abbr = document.createElement('abbr');
         var cat = Category.findById(id);
         if (! cat) return;
-        abbr.setAttribute("title", cat.name);
+        abbr.setAttribute('title', cat.name);
         abbr.textContent = cat.shortName;
         frag.appendChild(abbr);
       });
@@ -235,7 +232,7 @@ define((require, exports, module)=>{
 
   Tpl.Row.$extend({
     $created(ctx) {
-      ctx.autoUpdate({subject: ctx.data.climber});
+      ctx.onDestroy(Climber.observeId(ctx.data.climber._id, () => {ctx.updateAllTags()}));
     },
   });
 
@@ -280,8 +277,9 @@ define((require, exports, module)=>{
       let team = competitor.getTeam(this._id);
 
       Dom.setClass('none', ! team, $.element.parentNode);
-      if (team)
+      if (team) {
         return team.name;
+      }
       return 'Select';
     },
   });
@@ -294,7 +292,7 @@ define((require, exports, module)=>{
       let competitor = Teams.$data();
       let list = Team.where('teamType_id', $.ctx.data._id).sort('name');
 
-      list = [{_id: null, name: Dom.h({i:'none'})}, ...list,
+      list = [{_id: null, name: Dom.h({i: 'none'})}, ...list,
               {_id: '$new', name: Dom.h({i: 'add new team'})}];
       SelectMenu.popup(this, {
         list,
@@ -310,7 +308,7 @@ define((require, exports, module)=>{
             ctx.updateAllTags();
           }
           return true;
-        }
+        },
       });
     },
   });
@@ -349,9 +347,8 @@ define((require, exports, module)=>{
           data.category_id = $.data(elm)._id;
           ctx.updateAllTags();
           return true;
-        }
+        },
       });
-
     },
   });
 
@@ -365,7 +362,7 @@ define((require, exports, module)=>{
     competitor.number = form.querySelector('[name=number]') || undefined;
 
     var groups = form.getElementsByClassName('Category');
-    for(var i = 0; i < groups.length; ++i) {
+    for (var i = 0; i < groups.length; ++i) {
       var row = $.data(groups[i]);
       if (row.category_id) ids.push(row.category_id);
     }
@@ -378,7 +375,7 @@ define((require, exports, module)=>{
   }
 
   function addNew(form, name) {
-    Dom.tpl.Dialog.open(AddClimber.$autoRender(Climber.build({org_id: App.orgId, name: name})), {focus: '[name=dateOfBirth]'});
+    Dom.tpl.Dialog.open(AddClimber.$autoRender(Climber.build({org_id: App.orgId, name})), {focus: '[name=dateOfBirth]'});
   }
 
   function addGroups(form, competitor) {
@@ -415,7 +412,7 @@ define((require, exports, module)=>{
 
   App.restrictAccess(Tpl);
 
-  module.onUnload(()=>{eventTpl.route.removeBase(Tpl)});
+  module.onUnload(() => {eventTpl.route.removeBase(Tpl)});
 
   return Tpl;
 });
