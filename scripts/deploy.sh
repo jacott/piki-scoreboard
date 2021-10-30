@@ -68,12 +68,29 @@ echo "Compressing..."
 IFS="," read -ra va <build/version.sh || true
 hash="${va[1]}"
 
-mv app/index.html build/
-sed <build/index.html >app/index.html "s/CACHE_BUST_HASH/$hash/g"
+sed <app/index.html >build/index.html "s/CACHE_BUST_HASH/$hash/g"
 
 cp build/version.sh config/version.sh
 
-mv build/index.{css,js} app/
+esbuild=`pwd`/node_modules/.bin/esbuild
+
+cd build
+
+mv index.js index-in.js
+mv index.css index-in.css
+
+${esbuild} \
+    --minify --target=es2020 --charset=utf8 \
+    --define:isClient=true --define:isServer=false --define:isTest=false \
+    --sourcemap --source-root=/ \
+    --outfile=index.js index-in.js
+
+${esbuild} \
+    --minify \
+    --sourcemap --source-root=/ \
+    --outfile=index.css index-in.css
+
+mv index.* ../app
 
 cd $builddir/app
 gzip -9 -k index.css index.html index.js
