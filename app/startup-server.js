@@ -31,7 +31,7 @@ define((require, exports, module)=>{
 
 
   return ()=>{
-    require('koru/email').initPool(koru.config.mailUrl);
+    require('koru/email').initPool(koru.config.mailUrl ?? void 0);
     UserAccount.start();
   };
 });
