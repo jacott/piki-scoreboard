@@ -1,6 +1,6 @@
 const parse = require('csv-parse');
 
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const koru            = require('koru');
   const Val             = require('koru/model/validation');
   const session         = require('koru/session');
@@ -27,13 +27,14 @@ define((require, exports, module)=>{
     const event = Event.findById(eventId);
     Val.allowAccessIf(event && user.canAdminister(event));
 
-    const clubTeamType = TeamType.where({org_id:  event.org_id, name: 'Club'}).fetchOne();
+    const clubTeamType = TeamType.where({org_id: event.org_id, name: 'Club'}).fetchOne();
     Val.allowAccessIf(clubTeamType, 'No Team type named Club found for this organization');
 
     const future = new Future();
 
     parse(Buffer.from(data).toString(), {
-      columns: true
+      bom: true,
+      columns: true,
     }, (err, rows) => {
       if (err) return future.throw(err);
       data = rows;
@@ -46,32 +47,35 @@ define((require, exports, module)=>{
     const climbers = {};
     let row;
 
-    const get = (field)=>{
+    const get = (field) => {
       const val = row[field];
       return val && val.trim();
     };
 
-    if (data.length === 0)
+    if (data.length === 0) {
       throw new koru.Error(415, 'unsupported_import_format');
-
-    for(let i = 0; i < data.length; ++i) {
-      row =  data[i];
-      var name = get('First Name') + ' ' + get('Last Name');
-      if (name in climbers)
-        ++climbers[name];
-      else
-        climbers[name] = 1;
     }
 
-    const importCompetitor = ()=>{
+    for (let i = 0; i < data.length; ++i) {
+      row = data[i];
+      var name = get('First Name') + ' ' + get('Last Name');
+      if (name in climbers) {
+        ++climbers[name];
+      } else {
+        climbers[name] = 1;
+      }
+    }
+
+    const importCompetitor = () => {
       const name = get('First Name') + ' ' + get('Last Name');
 
-      if (climbers[name] > 1)
+      if (climbers[name] > 1) {
         throw 'Name: "' + name + '" registered ' + climbers[name] + ' times';
+      }
 
       const meta = get('Fee level');
 
-      if (meta === void 0) throw('Missing "Fee level" field');
+      if (meta === void 0) throw ('Missing "Fee level" field');
 
       const clubName = meta.split(',')[0].trim();
 
@@ -85,32 +89,35 @@ define((require, exports, module)=>{
       let gender = (codes && codes[0][0]) || null;
       gender = gender && gender.toLowerCase();
 
-      const climber = Climber.query.where({name: name, org_id: event.org_id}).fetchOne() ||
+      const climber = Climber.query.where({name, org_id: event.org_id}).fetchOne() ||
             Climber.build({
-              name: name, org_id: event.org_id, team_ids: [club._id],
+              name, org_id: event.org_id, team_ids: [club._id],
               dateOfBirth: get('Birth Date').trim(),
               gender,
               uploadId: get('Participant ID'),
             });
 
-      if (climber.dateOfBirth !== get('Birth Date').trim())
+      if (climber.dateOfBirth !== get('Birth Date').trim()) {
         throw "Climber's date-of-birth does not match: " + climber.dateOfBirth;
+      }
 
-      if (! climber.$isValid())
-        throw "Climber: " + Val.inspectErrors(climber);
+      if (! climber.$isValid()) {
+        throw 'Climber: ' + Val.inspectErrors(climber);
+      }
 
       climber.$save();
 
-      if (! (codes && codes.length))
-        throw "Invalid or missing codes";
+      if (! (codes && codes.length)) {
+        throw 'Invalid or missing codes';
+      }
 
       const category_ids = [];
 
-      codes.forEach(code =>{
+      codes.forEach((code) => {
         code = code.trim();
         var cat = Category.query.where({shortName: code, org_id: event.org_id}).fetchOne();
         if (! cat) {
-          throw "Category not found: " + code;
+          throw 'Category not found: ' + code;
         }
         category_ids.push(cat._id);
       });
@@ -128,15 +135,15 @@ define((require, exports, module)=>{
       competitor.$$save();
     };
 
-    for(let i = 0; i < data.length; ++i) {
+    for (let i = 0; i < data.length; ++i) {
       try {
-        row =  data[i];
+        row = data[i];
         importCompetitor();
-      } catch(ex) {
-        errors.push([i+1, data[i], ex.toString()]);
+      } catch (ex) {
+        errors.push([i + 1, data[i], ex.toString()]);
       }
-    };
+    }
 
-    Event.query.onId(event._id).update({errors: errors});
+    Event.query.onId(event._id).update({errors});
   });
 });
