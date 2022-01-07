@@ -1,14 +1,14 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
+  const Climber         = require('./climber');
   const TH              = require('test-helper');
   const Factory         = require('test/factory');
-  const Climber         = require('./climber');
 
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
-    afterEach(()=>{
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
+    afterEach(() => {
       TH.clearDB();
     });
 
-    test("creation", ()=>{
+    test('creation', () => {
       const climber = Factory.createClimber({team_ids: ['tm1']});
 
       assert(Climber.exists(climber._id));
@@ -19,7 +19,7 @@ define((require, exports, module)=>{
       assert(climber.org);
     });
 
-    test("standard validators", ()=>{
+    test('standard validators', () => {
       const validators = Climber._fieldValidators;
 
       assert.validators(validators.name, {

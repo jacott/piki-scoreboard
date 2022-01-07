@@ -1,4 +1,4 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const Org             = require('./org');
   const Team            = require('./team');
 
@@ -11,7 +11,7 @@ define((require, exports, module)=>{
   Climber.define({
     module,
     fields: {
-      name: {type:  'text', trim: true, required: true, maxLength: 200, unique: {scope: 'org_id'}},
+      name: {type: 'text', trim: true, required: true, maxLength: 200, unique: {scope: 'org_id'}},
       org_id: 'belongs_to',
       team_ids: 'has_many',
       dateOfBirth: {type: 'text', inclusion: {matches: /^\d{4}-[01]\d-[0-3]\d$/}},
