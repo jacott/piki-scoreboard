@@ -15,7 +15,7 @@ define((require, exports, module) => {
       org_id: 'belongs_to',
       team_ids: 'has_many',
       dateOfBirth: {type: 'text', inclusion: {matches: /^\d{4}-[01]\d-[0-3]\d$/}},
-      gender: {type: 'text', inclusion: {allowBlank: true, matches: /^[mf]$/ }},
+      gender: {type: 'text', inclusion: {allowBlank: true, matches: /^[mfn]$/}},
       number: {type: 'integer', number: {integer: true, $gt: 0}},
       uploadId: 'text',
       disabled: {type: 'boolean', boolean: 'trueOnly'},

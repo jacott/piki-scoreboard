@@ -24,8 +24,8 @@ define((require, exports, module) => {
 
       assert.validators(validators.name, {
         maxLength: [200], required: [true], trim: [true], unique: [{scope: 'org_id'}]});
-      assert.validators(validators.gender, {inclusion: [{allowBlank: true, matches: /^[mf]$/ }]});
-      assert.validators(validators.dateOfBirth, {inclusion: [{matches: /^\d{4}-[01]\d-[0-3]\d$/ }]});
+      assert.validators(validators.gender, {inclusion: [{allowBlank: true, matches: /^[mfn]$/}]});
+      assert.validators(validators.dateOfBirth, {inclusion: [{matches: /^\d{4}-[01]\d-[0-3]\d$/}]});
       assert.validators(validators.number, {number: [{integer: true, $gt: 0}]});
     });
   });

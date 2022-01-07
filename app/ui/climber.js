@@ -45,6 +45,9 @@ define(function (require, exports, module) {
 
   Index.Row.$helpers({
     team: TeamHelper.teamTD,
+    gender() {
+      return this.gender == 'n' ? 'nb' : this.gender;
+    },
   });
 
   Index.$helpers({
