@@ -14,18 +14,18 @@ the help page within the system.
 
 ## Installing and Testing
 
-Piki is developed and tested only for use with the Google Chrome web browser. Piki may or may not
-work with other web browsers. Piki is built using the [koru](https://github.com/jacott/koru) web
-application framework. Both Piki and Koru are lacking documentation and until that is rectified
-contributing to either project might prove challenging.
+Piki is developed and tested only for use with the Google Chrome web
+browser. Piki may or may not work with other web browsers. Piki is
+built using the [koru](https://github.com/jacott/koru) web application
+framework.
 
-Server Dependencies
+Server Dependencies:
 
 * Unix-like
 * [Node.js](https://nodejs.org/en/) v18.7.0 or above
 * [PostgreSQL](http://www.postgresql.org) v14 or above
 
-Check out the project
+Check out the project:
 
 ```sh
 sudo -u postgres createuser -drs $USER
@@ -34,7 +34,7 @@ createdb pikidemo
 ./scripts/reset-test
 ```
 
-To Demo the system
+To Demo the system:
 
 ```sh
 ./scripts/start-dev demo
