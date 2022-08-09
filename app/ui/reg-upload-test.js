@@ -1,18 +1,19 @@
-isClient && define((require, exports, module)=>{
+isClient && define((require, exports, module) => {
   const koru            = require('koru');
   const Route           = require('koru/ui/route');
-  const EventSub        = require('pubsub/event-sub');
-  const Factory         = require('test/factory');
   const Tpl             = require('./reg-upload');
   const TH              = require('./test-helper');
+  const EventSub        = require('pubsub/event-sub');
+  const Factory         = require('test/factory');
 
   const RegUpload = require('models/reg-upload-client');
 
   const {stub, spy, onEnd} = TH;
 
   let v = {};
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
-    beforeEach(()=>{
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
+    beforeEach(() => {
+      TH.startTransaction();
       v.event = Factory.createEvent();
       v.user = Factory.createUser('admin');
       v.origListener = Tpl.$findEvent('change', 'input[name=filename]')[2];
@@ -25,13 +26,14 @@ isClient && define((require, exports, module)=>{
       v.eventSub.yield();
     });
 
-    afterEach(()=>{
-      TH.tearDown();
+    afterEach(() => {
+      TH.domTearDown();
       v = {};
+      TH.rollbackTransaction();
     });
 
-    group("import", ()=>{
-      test("bad", ()=>{
+    group('import', () => {
+      test('bad', () => {
         uploadResult(new koru.Error(415, 'unsupported_import_format'));
         assert.dom('#RegUpload:not(.uploading)', function () {
           assert.dom('input.error[name=filename]');
@@ -39,32 +41,32 @@ isClient && define((require, exports, module)=>{
         });
       });
 
-      test("success", ()=>{
+      test('success', () => {
         uploadResult(null, 'new_id');
 
         refute.dom('.Dialog');
       });
 
-      test("uploading", ()=>{
+      test('uploading', () => {
         const uploadStub = stub(RegUpload, 'upload');
 
-        assert.dom('#RegUpload:not(.uploading)', form =>{
+        assert.dom('#RegUpload:not(.uploading)', (form) => {
           v.origListener.call(v.fileStub, {currentTarget: form});
         });
         assert.calledOnceWith(uploadStub, v.event._id, 'foo file',
-                              TH.match(result => typeof result === 'function'));
+                              TH.match((result) => typeof result === 'function'));
         assert.dom('#RegUpload.uploading');
       });
     });
 
-    test("rendering", ()=>{
+    test('rendering', () => {
       assert.dom('#Event #RegUpload .upload', function () {
         assert.dom('label input[type=file][name=filename]');
       });
     });
   });
 
-  const uploadResult = (error, result)=>{
+  const uploadResult = (error, result) => {
     const uploadStub = stub(RegUpload, 'upload');
 
     TH.trigger('#RegUpload input[name=filename]', 'change');

@@ -1,5 +1,5 @@
-define((require, exports, module)=>{
-  const TH              = require('test-helper');
+define((require, exports, module) => {
+  const TH              = require('koru/model/test-db-helper');
   const Factory         = require('test/factory');
 
   const {error$} = require('koru/symbols');
@@ -8,17 +8,21 @@ define((require, exports, module)=>{
 
   const Org = require('./org');
 
-  TH.testCase(module, ({before, after, beforeEach, afterEach, group, test})=>{
-    afterEach(()=>{
-      TH.clearDB();
+  TH.testCase(module, ({before, after, beforeEach, afterEach, group, test}) => {
+    beforeEach(async () => {
+      await TH.startTransaction();
     });
 
-    test("creation", ()=>{
-      const org = Factory.createOrg();
-      assert(Org.exists(org._id));
+    afterEach(async () => {
+      await TH.rollbackTransaction();
     });
 
-    test("standard validators", ()=>{
+    test('creation', async () => {
+      const org = await Factory.createOrg();
+      assert(await Org.exists(org._id));
+    });
+
+    test('standard validators', () => {
       const validators = Org._fieldValidators;
 
       assert.validators(validators.name, {

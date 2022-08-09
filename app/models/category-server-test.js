@@ -1,60 +1,54 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
+  const TH              = require('koru/model/test-db-helper');
+  const UserAccount     = require('koru/user-account');
   const Competitor      = require('models/competitor');
-  const TH              = require('test-helper');
   const Factory         = require('test/factory');
 
   const Category = require('./category');
 
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
     let org, user;
-    beforeEach(()=>{
-      org = Factory.createOrg();
-      user = Factory.createUser();
+    beforeEach(async () => {
+      UserAccount.sendResetPasswordEmail = async () => {};
+
+      await TH.startTransaction();
+      org = await Factory.createOrg();
+      user = await Factory.createUser();
     });
 
-    afterEach(()=>{
-      TH.clearDB();
+    afterEach(async () => {
+      await TH.rollbackTransaction();
     });
 
-    group("authorize", ()=>{
-      test("denied", ()=>{
-        const oOrg = Factory.createOrg();
-        const oUser = Factory.createUser();
+    group('authorize', () => {
+      test('denied', async () => {
+        const oOrg = await Factory.createOrg();
+        const oUser = await Factory.createUser();
 
-        const category = Factory.buildCategory();
-
-        TH.noInfo();
-        assert.accessDenied(()=>{
-          category.authorize(user._id);
-        });
-      });
-
-      test("allowed", ()=>{
-        const category = Factory.buildCategory();
-
-        refute.accessDenied(()=>{
-          category.authorize(user._id);
-        });
-      });
-
-      test("okay to remove", ()=>{
-        const category = Factory.createCategory();
-
-        refute.accessDenied(()=>{
-          category.authorize(user._id, {remove: true});
-        });
-
-      });
-
-      test("remove in use", ()=>{
-        const category = Factory.createCategory();
-        const competitor = Factory.createCompetitor();
+        const category = await Factory.buildCategory();
 
         TH.noInfo();
-        assert.accessDenied(()=>{
-          category.authorize(user._id, {remove: true});
-        });
+        await assert.accessDenied(() => category.authorize(user._id));
+      });
 
+      test('allowed', async () => {
+        const category = await Factory.buildCategory();
+
+        await refute.accessDenied(() => category.authorize(user._id));
+      });
+
+      test('okay to remove', async () => {
+        const category = await Factory.createCategory();
+
+        await refute.accessDenied(() => category.authorize(user._id, {remove: true}));
+      });
+
+      test('remove in use', async () => {
+        const category = await Factory.createCategory();
+        const competitor = await Factory.createCompetitor();
+
+        TH.noInfo();
+        await assert.accessDenied(() => category.authorize(user._id, {remove: true}));
       });
     });
   });

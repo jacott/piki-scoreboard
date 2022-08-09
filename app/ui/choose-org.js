@@ -1,10 +1,11 @@
-define(function(require, exports, module) {
-  const koru  = require('koru');
-  const Dom   = require('koru/dom');
-  const Route = require('koru/ui/route');
-  const util  = require('koru/util');
-  const Org   = require('models/org');
-  const App   = require('./app-base');
+define((require, exports, module) => {
+  'use strict';
+  const koru            = require('koru');
+  const Dom             = require('koru/dom');
+  const Route           = require('koru/ui/route');
+  const util            = require('koru/util');
+  const App             = require('./app-base');
+  const Org             = require('models/org');
 
   const Tpl = module.exports = Dom.newTemplate(require('koru/html!./choose-org'));
   const $ = Dom.current;
@@ -15,7 +16,7 @@ define(function(require, exports, module) {
     orgs(each) {
       return {
         query: Org.query,
-        compare: util.compareByName
+        compare: util.compareByName,
       };
     },
   });

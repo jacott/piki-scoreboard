@@ -1,4 +1,4 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const koru            = require('koru');
   const session         = require('koru/session');
   const util            = require('koru/util');
@@ -10,41 +10,40 @@ define((require, exports, module)=>{
 
   const User = require('./user');
 
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
-    afterEach(()=>{
-      TH.clearDB();
-    });
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
+    beforeEach(() => TH.startTransaction());
+    afterEach(() => TH.rollbackTransaction());
 
-    test("DEFAULT_USER_ID", ()=>{
+    test('DEFAULT_USER_ID', () => {
       assert.same(session.DEFAULT_USER_ID, 'guest');
     });
 
-    test("me", ()=>{
+    test('me', async () => {
       let _id = 'guest';
 
-      intercept(koru, 'userId', ()=> _id);
+      intercept(koru, 'userId', () => _id);
 
-      const guest = User.me();
+      const guest = await User.me();
 
       assert.same(guest._id, 'guest');
 
-      assert.same(User.me(), guest);
+      assert.same(await User.me(), guest);
 
-      const user = Factory.createUser();
+      const user = await Factory.createUser();
       _id = user._id;
 
-      assert.same(User.me()._id, _id);
+      assert.same((await User.me())._id, _id);
     });
 
-    test("isGuest", ()=>{
+    test('isGuest', async () => {
       /**
        * Current user is guest only if logged in with koru.userId() 'guest' which is the default
        * user ID
        **/
-      const adminUser = Factory.createUser({role: 'a'});
-      const user = Factory.createUser({role: 'j'});
-      const su = Factory.createUser('su');
-      const guest = isServer ? User.guestUser() : Factory.createUser({_id: 'guest'});
+      const adminUser = await Factory.createUser({role: 'a'});
+      const user = await Factory.createUser({role: 'j'});
+      const su = await Factory.createUser('su');
+      const guest = isServer ? await User.guestUser() : Factory.createUser({_id: 'guest'});
 
       TH.loginAs(adminUser);
       assert.isFalse(User.isGuest());
@@ -56,41 +55,37 @@ define((require, exports, module)=>{
       assert.isTrue(User.isGuest());
     });
 
-    test("fetchAdminister", ()=>{
+    test('fetchAdminister', async () => {
       TH.noInfo();
-      const user = Factory.createUser();
+      const user = await Factory.createUser();
 
       const ca = stub(User.prototype, 'canAdminister').returns(false);
 
-      assert.accessDenied(()=>{
-        User.fetchAdminister(user._id, 'x');
-      });
+      await assert.accessDenied(() => User.fetchAdminister(user._id, 'x'));
 
       assert.calledOnceWith(ca, 'x');
       assert.same(ca.firstCall.thisValue._id, user._id);
 
-       assert.accessDenied(()=>{
-        User.fetchAdminister('123');
-      });
+      await assert.accessDenied(() => User.fetchAdminister('123'));
 
       ca.returns(true);
 
       assert.same(User.fetchAdminister(user._id)._id, user._id);
     });
 
-    test("emailWithName", ()=>{
-      const user = Factory.buildUser();
+    test('emailWithName', async () => {
+      const user = await Factory.buildUser();
       assert.same(user.emailWithName(), 'fn user 1 <email-user.1@test.co>');
-
     });
-    test("creation", ()=>{
-      const user=Factory.createUser();
-      const us = User.findById(user._id);
+
+    test('creation', async () => {
+      const user = await Factory.createUser();
+      const us = await User.findById(user._id);
 
       assert(us);
     });
 
-    test("standard validators", ()=>{
+    test('standard validators', () => {
       const validators = User._fieldValidators;
 
       assert.validators(validators.name, {

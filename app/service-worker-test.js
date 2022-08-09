@@ -1,4 +1,4 @@
-isClient && define((require, exports, module)=>{
+isClient && define((require, exports, module) => {
   const koru            = require('koru');
   const MockCacheStorage = require('koru/client/mock-cache-storage');
   const MockIndexedDB   = require('koru/model/mock-indexed-db');
@@ -12,7 +12,7 @@ isClient && define((require, exports, module)=>{
   const staticCacheName = 'app-v3';
   const APP_ICONS_WOFF2 = '/public/app-icons-e4e23a2742db90efa1248eaf73efb6fc.woff2';
 
-  const MAX_AGE_UNIT = 24 * 60 * 60 * 1000;
+  const MAX_AGE_UNIT = 24*60*60*1000;
   const MAX_AGE = 30 * MAX_AGE_UNIT;
   const userCacheName = 'app-user';
 
@@ -31,7 +31,7 @@ isClient && define((require, exports, module)=>{
 
   const shouldAlsoFetchUrl = 'https://secure.gravatar.com/avatar/d2fc40c5527da8c6ede7703f5fb23d1d?d=blank';
 
-  TH.testCase(module, ({before, after, beforeEach, afterEach, group, test})=>{
+  TH.testCase(module, ({before, after, beforeEach, afterEach, group, test}) => {
     let indexedDB, self, event;
 
     class Request {
@@ -46,7 +46,7 @@ isClient && define((require, exports, module)=>{
       }
     }
 
-    beforeEach(()=>{
+    beforeEach(() => {
       indexedDB = new MockIndexedDB(0);
       self = {
         addEventListener: stub(),
@@ -62,39 +62,38 @@ isClient && define((require, exports, module)=>{
       };
     });
 
-    group("action messages", ()=>{
+    group('action messages', () => {
       let onmessage;
-      beforeEach(()=>{
-        self.fetch = url => Promise.resolve({url});
+      beforeEach(() => {
+        self.fetch = (url) => Promise.resolve({url});
         self.caches = {};
         self.clients = {};
         ServiceWorker(self);
-        assert.calledWith(self.addEventListener, 'message', m(func => onmessage = func));
+        assert.calledWith(self.addEventListener, 'message', m((func) => onmessage = func));
       });
 
-      test("loadBase", async ()=>{
+      test('loadBase', async () => {
         const {caches} = self;
         const staticCache = caches[staticCacheName] = {
           put: stub(),
         };
-        caches.open = function (name) {return Promise.resolve(this[name])};
+        caches.open = function (name) {return Promise.resolve(this[name])}
         event.data = {action: 'loadBase', search: '?search_str'};
         onmessage(event);
         await event.waitUntil.args(0, 0);
 
         for (const asset of BASE_ASSETS) {
-
-          assert.calledWith(staticCache.put, 'https://koru.test'+asset,
-                            {url: 'https://koru.test'+asset+'?search_str'});
+          assert.calledWith(staticCache.put, 'https://koru.test' + asset,
+                            {url: 'https://koru.test' + asset + '?search_str'});
         }
       });
 
-      test("reload", async ()=>{
+      test('reload', async () => {
         const c1 = {postMessage: stub()};
         const c2 = {postMessage: stub()};
 
         const {clients} = self;
-        self.skipWaiting = () => Promise.resolve(void 0);
+        self.skipWaiting = () => Promise.resolve(undefined);
         clients.matchAll = stub().withArgs({includeUncontrolled: true, type: 'window'})
           .returns(Promise.resolve([c1, c2]));
 
@@ -107,10 +106,10 @@ isClient && define((require, exports, module)=>{
         assert.calledWith(c2.postMessage, {action: 'reload'});
       });
 
-      test("reloads if action unknown", async ()=>{
+      test('reloads if action unknown', async () => {
         const c1 = {postMessage: stub()};
         const {clients} = self;
-        self.skipWaiting = () => Promise.resolve(void 0);
+        self.skipWaiting = () => Promise.resolve(undefined);
         clients.matchAll = stub().withArgs({includeUncontrolled: true, type: 'window'})
           .returns(Promise.resolve([c1]));
 
@@ -123,9 +122,9 @@ isClient && define((require, exports, module)=>{
       });
     });
 
-    group("fetchAndCache", ()=>{
+    group('fetchAndCache', () => {
       let fetchAndCache, cacheQueue;
-      beforeEach(()=>{
+      beforeEach(() => {
         self.caches = {};
         self.fetch = stub();
         const sw = ServiceWorker(self);
@@ -133,7 +132,7 @@ isClient && define((require, exports, module)=>{
         cacheQueue = sw.cacheQueue;
       });
 
-      test("only GET cached", async ()=>{
+      test('only GET cached', async () => {
         self.caches.open = stub();
         const response = {status: 200};
         self.fetch.returns({then: stub().yields(response)});
@@ -144,7 +143,7 @@ isClient && define((require, exports, module)=>{
         refute.called(self.caches.open);
       });
 
-      test("500 not cached", async ()=>{
+      test('500 not cached', async () => {
         self.caches.open = stub();
         self.fetch.returns({then: stub().yields({status: 500})});
 
@@ -153,62 +152,62 @@ isClient && define((require, exports, module)=>{
         refute.called(self.caches.open);
       });
 
-      test("404 cached", async ()=>{
+      test('404 cached', async () => {
         const request = {method: 'GET', url: '/index.js'};
-        const cache = {put: stub().withArgs(m.is(request)).returns("putResponse")};
+        const cache = {put: stub().withArgs(m.is(request)).returns('putResponse')};
         self.caches.open = stub().withArgs(staticCacheName).returns(
-          new Promise((resolve, reject)=>{resolve(cache)}));
+          new Promise((resolve, reject) => {resolve(cache)}));
         const respClone = {};
         const fetchResp = {status: 404, clone: stub().returns(respClone)};
-        self.fetch.withArgs("myReq")
+        self.fetch.withArgs('myReq')
           .returns(Promise.resolve(fetchResp));
 
         assert.same(
-          await fetchAndCache(staticCacheName, request, "myReq"),
+          await fetchAndCache(staticCacheName, request, 'myReq'),
           fetchResp);
 
         assert.called(self.caches.open);
       });
 
-      test("static not indexed", async ()=>{
+      test('static not indexed', async () => {
         spy(cacheQueue, 'then');
         const respClone = {};
         const request = {method: 'GET', url: '/index.js'};
-        const cache = {put: stub().withArgs(m.is(request), m.is(respClone)).returns("putResponse")};
+        const cache = {put: stub().withArgs(m.is(request), m.is(respClone)).returns('putResponse')};
         self.caches.open = stub().withArgs(staticCacheName).returns(
-          new Promise((resolve, reject)=>{resolve(cache)}));
+          new Promise((resolve, reject) => {resolve(cache)}));
 
         const fetchResp = {status: 200, clone: stub().returns(respClone)};
-        self.fetch.withArgs("myReq")
+        self.fetch.withArgs('myReq')
           .returns(Promise.resolve(fetchResp));
 
         assert.same(
-          await fetchAndCache(staticCacheName, request, "myReq"),
+          await fetchAndCache(staticCacheName, request, 'myReq'),
           fetchResp);
 
         refute.called(cacheQueue.then);
       });
 
-      test("storing in db", async ()=>{
+      test('storing in db', async () => {
         let openResolve;
-        const openPromise = new Promise(r =>{openResolve = r});
-        spy(indexedDB, 'open').invokes(c =>(openResolve(c),c.returnValue));
+        const openPromise = new Promise((r) => {openResolve = r});
+        spy(indexedDB, 'open').invokes((c) => (openResolve(c), c.returnValue));
 
         const now = Date.now();
         stub(Date, 'now').returns(now);
 
         const respClone = {};
         const request = {method: 'GET', url: lookInCacheUrl};
-        const cache = {put: stub().withArgs(m.is(request), m.is(respClone)).returns("putResponse")};
+        const cache = {put: stub().withArgs(m.is(request), m.is(respClone)).returns('putResponse')};
         self.caches.open = stub().withArgs(userCacheName).returns(
-          new Promise((resolve, reject)=>{resolve(cache)}));
+          new Promise((resolve, reject) => {resolve(cache)}));
 
         const fetchResp = {status: 200, clone: stub().returns(respClone)};
-        self.fetch.withArgs("myReq")
+        self.fetch.withArgs('myReq')
           .returns(Promise.resolve(fetchResp));
 
         assert.same(
-          await fetchAndCache(userCacheName, request, "myReq"),
+          await fetchAndCache(userCacheName, request, 'myReq'),
           fetchResp);
 
         await openPromise;
@@ -218,7 +217,7 @@ isClient && define((require, exports, module)=>{
         assert.equals(store, {[lookInCacheUrl]: {url: lookInCacheUrl, timestamp: now}});
       });
 
-      test("bustCache", async()=>{
+      test('bustCache', async () => {
         self.fetch.returns({then: stub().yields({status: 200, clone: stub().returns({})})});
 
         await fetchAndCache(staticCacheName, {url: '/foo'}, '/foo?test_bust');
@@ -227,12 +226,12 @@ isClient && define((require, exports, module)=>{
       });
     });
 
-    test("fetching from user-cache updates timestamp", async ()=>{
+    test('fetching from user-cache updates timestamp', async () => {
       let now = 0;
       intercept(Date, 'now', () => now += MAX_AGE_UNIT);
       const {respondWith} = event;
       let count = 0;
-      self.fetch = req => {
+      self.fetch = (req) => {
         const resp = {status: 200, req, count: ++count, clone() {return Object.assign({}, this)}};
         return Promise.resolve(resp);
       };
@@ -241,11 +240,11 @@ isClient && define((require, exports, module)=>{
 
       ServiceWorker(self);
 
-      const url1 = 'https://koru.test/'+lookInCacheUrl;
-      const [url2, url3] = otherLookInCacheUrls.map(u => 'https://koru.test/'+u);
+      const url1 = 'https://koru.test/' + lookInCacheUrl;
+      const [url2, url3] = otherLookInCacheUrls.map((u) => 'https://koru.test/' + u);
 
       let ans;
-      const call = async url =>{
+      const call = async (url) => {
         event.request = new self.Request(url);
         fetchListener.yield(event);
 
@@ -265,7 +264,6 @@ isClient && define((require, exports, module)=>{
       assert.same(ans.status, 200);
       assert.equals(store, {[url1]: {url: url1, timestamp: MAX_AGE_UNIT}});
 
-
       await call(url2);
 
       assert.same(ans.count, 2);
@@ -273,14 +271,12 @@ isClient && define((require, exports, module)=>{
       assert.same(ans.status, 200);
       assert.equals(store[url2], {url: url2, timestamp: 2 * MAX_AGE_UNIT});
 
-
       /** cache lookup **/
       await call(url1);
 
       assert.same(ans.count, 1); // fetch not called
       assert.same(ans.req.url, url1);
       assert.same(ans.status, 200);
-
 
       assert.equals(store[url1], {url: url1, timestamp: 3 * MAX_AGE_UNIT}); // updates timestamp
 
@@ -293,20 +289,20 @@ isClient && define((require, exports, module)=>{
       await call(url3);
       await 1;
 
-      assert.same(store[url2], void 0); // deleted
+      assert.same(store[url2], undefined); // deleted
       assert.equals(store[url1], {url: url1, timestamp: 3 * MAX_AGE_UNIT}); // updates timestamp
       assert.equals(store[url3], {url: url3, timestamp: 33 * MAX_AGE_UNIT}); // updates timestamp
     });
 
-    group("fetch", ()=>{
+    group('fetch', () => {
       let staticResponse, fetchListener;
-      beforeEach(()=>{
-        staticResponse = void 0;
+      beforeEach(() => {
+        staticResponse = undefined;
         self.caches = {
           open(name) {return Promise.resolve(this[name])},
           [staticCacheName]: {
             match({url}) {return Promise.resolve(staticResponse)},
-            put: stub(()=> new Promise(stub())),
+            put: stub(() => new Promise(stub())),
           },
 
           match({url}) {return Promise.resolve(this[url])},
@@ -320,19 +316,19 @@ isClient && define((require, exports, module)=>{
         assert.called(fetchListener);
       });
 
-      group("assetCache", ()=>{
+      group('assetCache', () => {
         let put, request, resp;
-        beforeEach(()=>{
+        beforeEach(() => {
           self.caches[userCacheName] = {
             match({url}) {return Promise.resolve(null)},
-            put: put = stub(()=> new Promise(stub())),
+            put: put = stub(() => new Promise(stub())),
           };
-          request = async url => {
+          request = async (url) => {
             event.request = {url, clone() {return {url, cloned: true}}};
             fetchListener.yield(event);
 
             const store = {clone() {return 'cloned'}};
-            self.fetch.withArgs(m(r => r.cloned && r.url === url)).returns(Promise.resolve(store));
+            self.fetch.withArgs(m((r) => r.cloned && r.url === url)).returns(Promise.resolve(store));
             const resp = await event.respondWith.args(0, 0);
             event.respondWith.reset();
 
@@ -340,16 +336,15 @@ isClient && define((require, exports, module)=>{
           };
         });
 
-
-        test("lookInCacheUrls", async ()=>{
-          await request('https://koru.test/'+lookInCacheUrl);
+        test('lookInCacheUrls', async () => {
+          await request('https://koru.test/' + lookInCacheUrl);
           for (const url of otherLookInCacheUrls) {
-            await request('https://koru.test/'+url);
+            await request('https://koru.test/' + url);
           }
         });
       });
 
-      test("avatar", async ()=>{
+      test('avatar', async () => {
         const avatarOrig = {avatarOrig: true};
         const avatar = {status: 200, clone() {return 'cloned'}};
         let put = stub().returns(Promise.resolve());
@@ -363,7 +358,7 @@ isClient && define((require, exports, module)=>{
           method: 'GET',
           clone() {return {url, cloned: true}},
         };
-        self.fetch.withArgs(m(r => r.cloned && r.url === url)).returns(Promise.resolve(avatar));
+        self.fetch.withArgs(m((r) => r.cloned && r.url === url)).returns(Promise.resolve(avatar));
         fetchListener.yield(event);
         assert.calledOnce(event.respondWith);
         const resp = await event.respondWith.args(0, 0);
@@ -373,7 +368,7 @@ isClient && define((require, exports, module)=>{
         assert.calledWith(put, event.request, 'cloned');
       });
 
-      test("cached", async ()=>{
+      test('cached', async () => {
         event.request = {url: 'https://koru.test/a/b'};
         fetchListener.yield(event);
         const resp = await event.respondWith.args(0, 0);
@@ -381,7 +376,7 @@ isClient && define((require, exports, module)=>{
         assert.same(resp, 'my response');
       });
 
-      test("not cached", async ()=>{
+      test('not cached', async () => {
         event.request = {url: 'https://koru.test//a/c'};
         fetchListener.yield(event);
 
@@ -393,7 +388,7 @@ isClient && define((require, exports, module)=>{
         assert.same(resp, 'fetch promise');
       });
 
-      test("reload asset cached", async ()=>{
+      test('reload asset cached', async () => {
         staticResponse = 'static response';
         event.request = {url: 'https://koru.test/index.css?CACHE_BUSTER', clone() {}};
         fetchListener.yield(event);
@@ -405,20 +400,20 @@ isClient && define((require, exports, module)=>{
         assert.same(resp, 'static response');
       });
 
-      test("reload asset fetch", async ()=>{
+      test('reload asset fetch', async () => {
         event.request = {
           method: 'GET',
           url: 'https://koru.test/index.js?CACHE_BUSTER1',
           clone: () => ({
             url: 'https://koru.test/index.js?CACHE_BUSTER2',
-          })
+          }),
         };
 
         fetchListener.yield(event);
 
         assert.called(event.respondWith);
 
-        const nwResp = {status: 200, clone() {return "cloned message"}};
+        const nwResp = {status: 200, clone() {return 'cloned message'}};
 
         const fetchPromise = Promise.resolve(nwResp);
 
@@ -434,7 +429,7 @@ isClient && define((require, exports, module)=>{
       });
     });
 
-    test("activate", async ()=>{
+    test('activate', async () => {
       const caches = self.caches = {
         keys() {return Promise.resolve(['c2', staticCacheName, 'c3'])},
         delete: stub(),
@@ -458,7 +453,7 @@ isClient && define((require, exports, module)=>{
       assert.called(clients.claim);
     });
 
-    test("install", async ()=>{
+    test('install', async () => {
       const caches = self.caches = {
         open(name) {return Promise.resolve(this[name])},
         [staticCacheName]: {addAll: stub('addAll', null, () => Promise._resolveOrReject())},

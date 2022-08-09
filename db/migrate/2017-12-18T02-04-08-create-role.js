@@ -1,6 +1,4 @@
-define(function(require, exports, module) {
-
-  module.exports = mig =>{
+define(() => (mig) => {
     mig.createTable({
       name: 'Role',
       fields: {
@@ -12,22 +10,21 @@ define(function(require, exports, module) {
     });
 
     mig.reversible({
-      add(db) {
-        db.query(`select * from "User"`).forEach(user => {
+      async add(db) {
+        for(const user of await db.query(`select * from "User"`)) {
           if (user.role === 'g') {
             if (user._id !== 'guest')
-              db.query(`delete from "User" where _id = $1`, [user._id]);
+              await db.query(`delete from "User" where _id = $1`, [user._id]);
           } else {
-            db.query(
+            await db.query(
               `insert into "Role" (_id, org_id, user_id, role) values ($1, $2, $1, $3)`, [
                 user._id, user.role === 's' ? null : user.org_id, user.role
               ]
             );
           }
-        });
-        db.query('alter table "User" drop column org_id, drop column role');
+        }
+        await db.query('alter table "User" drop column org_id, drop column role');
       },
       revert(db) {throw new Error('revert not implemented')}
     });
-  };
 });

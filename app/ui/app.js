@@ -1,4 +1,4 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const koru            = require('koru');
   const Dom             = require('koru/dom');
   const localStorage    = require('koru/local-storage');
@@ -10,6 +10,7 @@ define((require, exports, module)=>{
   const Route           = require('koru/ui/route');
   const util            = require('koru/util');
   const uColor          = require('koru/util-color');
+  const App             = require('./app-base');
   const Org             = require('models/org');
   const User            = require('models/user');
   const OrgSub          = require('pubsub/org-sub');
@@ -17,9 +18,8 @@ define((require, exports, module)=>{
   const ResourceString  = require('resource-string');
   const header          = require('ui/header');
   const Loading         = require('ui/loading');
-  const App             = require('./app-base');
 
-  const pageChanged = event =>{
+  const pageChanged = (event) => {
     if (Dialog.isOpen()) Dialog.closeAll();
 
     Route.pageChanged(event.state);
@@ -38,7 +38,7 @@ define((require, exports, module)=>{
   util.merge(App, {
     restrictAccess(Tpl, rolere=/[as]/) {
       let orig;
-      const override = (page, pageRoute, callback)=>{
+      const override = (page, pageRoute, callback) => {
         if (koru.userId() == null || User.isGuest() || ! rolere.test(User.me().safeRole)) {
           Route.abortPage(Route.root.defaultPage);
           return;
@@ -69,7 +69,7 @@ define((require, exports, module)=>{
 
       window.removeEventListener('popstate', pageChanged);
 
-      restoreErrorFlash !== void 0 && restoreErrorFlash();
+      restoreErrorFlash !== undefined && restoreErrorFlash();
       Ripple.stop();
     },
 
@@ -82,7 +82,7 @@ define((require, exports, module)=>{
       restoreErrorFlash = KoruApp.flashUncaughtErrors();
 
       App.setAccess();
-      selfSub = SelfSub.subscribe(null, err =>{
+      selfSub = SelfSub.subscribe(null, (err) => {
         err !== null && ! (err.error < 500) && koru.unhandledException(err);
         Dom.removeClass(document.body, 'loading');
         Route.replacePath(koru.getLocation());
@@ -103,15 +103,15 @@ define((require, exports, module)=>{
       Dom.addClass(elm, cc);
     },
 
-    iframeGet: (options)=>{
+    iframeGet: (options) => {
       Dom.removeId(options.id);
       options.cookie && App.setCookie(options.cookie);
       const iframe = Dom.h({
         iframe: [], id: options.id,
         src: options.src,
-        style: "display:none",
+        style: 'display:none',
       });
-      iframe.addEventListener('load', ev =>{
+      iframe.addEventListener('load', (ev) => {
         console.error(ev);
         Dom.tpl.Flash.error(options.errorMsg);
       }, PASSIVE_CAPTURE);
@@ -120,34 +120,37 @@ define((require, exports, module)=>{
 
     _setOrgShortName(value) {
       orgShortName = value;
-    }
+    },
   });
 
   Route.root.routeVar = 'orgSN';
   Route.root.async = true;
 
-  Route.root.onBaseEntry = (page, pageRoute, callback)=>{
-    if (pageRoute.orgSN === undefined)
+  Route.root.onBaseEntry = (page, pageRoute, callback) => {
+    if (pageRoute.orgSN === undefined) {
       pageRoute.orgSN = localStorage.getItem('orgSN') || null;
+    }
 
-    if (pageRoute.orgSN == null && page !== Dom.tpl.ChooseOrg)
+    if (pageRoute.orgSN == null && page !== Dom.tpl.ChooseOrg) {
       Route.abortPage('choose-org');
+    }
 
     if (pageRoute.orgSN !== orgShortName &&
         pageRoute.orgSN !== 'choose-org') {
       subscribeOrg(pageRoute.orgSN, callback);
-    } else
+    } else {
       callback();
+    }
   };
 
-  Route.root.onBaseExit = ()=>{subscribeOrg(null)};
+  Route.root.onBaseExit = () => {subscribeOrg(null)};
 
-  const subscribeOrg = (shortName, callback)=>{
+  const subscribeOrg = (shortName, callback) => {
     App.setAccess();
     if (shortName && App.orgId != null) {
       const doc = Org.findById(App.orgId);
       if (doc && doc.shortName === shortName) {
-        callback && callback();
+        callback?.();
         return;
       }
     }
@@ -156,13 +159,13 @@ define((require, exports, module)=>{
       orgShortName = shortName;
       App.orgId = null;
       const org = Org.findBy('shortName', shortName);
-      if (org === void 0) {
-        koru.globalErrorCatch(new koru.Error(404, 'Org not found: '+shortName));
+      if (org === undefined) {
+        koru.globalErrorCatch(new koru.Error(404, 'Org not found: ' + shortName));
         callback();
         return;
       }
 
-      orgSub = OrgSub.subscribe(org._id, (err)=>{
+      orgSub = OrgSub.subscribe(org._id, (err) => {
         Loading.done();
         if (err != null && err.error !== 409) {
           koru.globalErrorCatch(err);
@@ -170,7 +173,7 @@ define((require, exports, module)=>{
           return;
         }
         const doc = Org.findBy('shortName', orgShortName);
-        if (doc === void 0) {
+        if (doc === undefined) {
           subscribeOrg();
           return;
         }
@@ -180,7 +183,6 @@ define((require, exports, module)=>{
         Dom.addClass(document.body, 'inOrg');
         callback();
       });
-
     } else {
       orgSub = orgShortName = App.orgId = null;
       Dom.removeClass(document.body, 'inOrg');

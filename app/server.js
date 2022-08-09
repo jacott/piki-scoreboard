@@ -1,29 +1,30 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const koru            = require('koru');
   const IdleCheck       = require('koru/idle-check').singleton;
   const session         = require('koru/session');
   const webServer       = require('koru/web-server');
-  const bootstrap       = require('server/bootstrap');
   const startup         = require('./startup-server');
+  const bootstrap       = require('server/bootstrap');
 
   koru.onunload(module, 'reload');
 
-  return ()=>{
-    bootstrap();
+  return async () => {
+    await bootstrap();
 
     startup();
 
-    process.on('SIGTERM', ()=>{
+    process.on('SIGTERM', () => {
       console.log('Closing [SIGTERM]');
       webServer.stop();
       session.stop();
-      IdleCheck.waitIdle(()=>{
+      IdleCheck.waitIdle(() => {
         console.log('=> Shutdown');
         process.exit(0);
       });
     });
 
-    webServer.start();
+    await webServer.start();
+
     console.log('=> Ready');
   };
 });

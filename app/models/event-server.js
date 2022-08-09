@@ -1,10 +1,11 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   'use strict';
   const match           = require('koru/match');
   const Val             = require('koru/model/validation');
   const util            = require('koru/util');
   const ChangeLog       = require('./change-log');
   const User            = require('./user');
+  const Category        = require('models/category');
 
   const FIELD_SPEC = {
     name: 'string',
@@ -21,23 +22,36 @@ define((require, exports, module)=>{
     org_id: 'id',
   };
 
-  return Event =>{
+  return (Event) => {
     ChangeLog.logChanges(Event);
 
     Event.registerObserveField('org_id');
 
     util.merge(Event.prototype, {
-      authorize(userId) {
-        const user = User.fetchAdminister(userId, this);
+      async authorize(userId) {
+        const user = await User.fetchAdminister(userId, this);
 
         const {changes} = this;
 
         Val.assertDocChanges(this, FIELD_SPEC, NEW_FIELD_SPEC);
 
-        if (! changes.hasOwnProperty('closed'))
+        if (! changes.hasOwnProperty('closed')) {
           Val.allowAccessIf(! this.closed);
+        }
 
-        this.changes.series_id && Val.allowAccessIf(this.series && user.canAdminister(this.series));
+        this.changes.series_id && Val.allowAccessIf(this.series && await user.canAdminister(this.series));
+      },
+
+      async validate() {
+        const heats = this.changes.heats;
+        if (heats != null) for (const id in heats) {
+          const cat = await Category.findById(id);
+          Val.allowAccessIf(cat.org_id === this.org_id);
+          const format = heats[id];
+          if (format[0] !== cat.type || ! cat.heatFormatRegex.test(format.slice(1))) {
+            return Val.addError(this, 'heats', 'is_invalid');
+          }
+        }
       },
     });
   };

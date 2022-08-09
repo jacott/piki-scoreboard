@@ -1,18 +1,18 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const session         = require('koru/session');
   const TH              = require('test-helper');
+  const Factory         = require('test/factory');
 
   const {stub, spy, onEnd} = TH;
 
   const User = require('./user');
 
-  TH.testCase(module, {
-    tearDown() {
-      TH.clearDB();
-    },
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
+    beforeEach(() => TH.startTransaction());
+    afterEach(() => TH.rollbackTransaction());
 
-    "test isSuperUser"() {
-      var user = TH.Factory.buildUser('su');
+    test('isSuperUser', () => {
+      var user = Factory.buildUser('su');
 
       assert.isFalse(user.isSuperUser());
       user.attributes.role = 's';
@@ -21,12 +21,12 @@ define((require, exports, module)=>{
 
       user.attributes.role = 'x';
       assert.isFalse(user.isSuperUser());
-    },
+    });
 
-    "test isAdmin"() {
-      var adminUser = TH.Factory.createUser({role: 'a'});
-      var user = TH.Factory.createUser({role: 'j'});
-      var su = TH.Factory.createUser('su');
+    test('isAdmin', () => {
+      var adminUser = Factory.createUser({role: 'a'});
+      var user = Factory.createUser({role: 'j'});
+      var su = Factory.createUser('su');
 
       assert.isFalse(user.isAdmin());
       user.role = 'a';
@@ -34,10 +34,9 @@ define((require, exports, module)=>{
 
       assert.isTrue(adminUser.isAdmin());
       assert.isTrue(su.isAdmin());
+    });
 
-    },
-
-    "test canAdminister, canJudge"() {
+    test('canAdminister, canJudge', () => {
       var doc = new User({org_id: '123'});
       doc.attributes.role = User.ROLE.superUser;
 
@@ -65,15 +64,15 @@ define((require, exports, module)=>{
       doc.attributes.role = User.ROLE.climber;
 
       refute(doc.canJudge(event));
-    },
+    });
 
-    "test forgotPassword"() {
+    test('forgotPassword', () => {
       stub(session, 'rpc');
       const cb = stub();
 
       User.forgotPassword('email@address', cb);
 
       assert.calledWith(session.rpc, 'User.forgotPassword', 'email@address', cb);
-    },
+    });
   });
 });

@@ -1,14 +1,14 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const koru            = require('koru');
   const session         = require('koru/session');
   const util            = require('koru/util');
 
-  return User =>{
+  return (User) => {
     const {pretendRole} = module.config();
 
     const guest = new User({_id: 'guest'});
 
-    User.guestUser = ()=> User.docs.guest === void 0 ? (User.docs.guest = guest) : guest;
+    User.guestUser = () => User.docs.guest === undefined ? (User.docs.guest = guest) : guest;
 
     User.defineFields({
       org_id: {type: 'belongs_to'},
@@ -19,7 +19,7 @@ define((require, exports, module)=>{
       const desc = Object.getOwnPropertyDescriptor(User.prototype, 'safeRole');
       desc.get = function () {
         return this._id === koru.userId() ? pretendRole : this.attributes.role;
-      };
+      }
       Object.defineProperty(User.prototype, 'safeRole', desc);
     }
 
@@ -27,20 +27,21 @@ define((require, exports, module)=>{
 
     util.merge(User.prototype, {
       accessClasses(orgId) {
-        if (this._id === 'guest' || (! this.isSuperUser() && this.org_id !== orgId))
-          return "readOnly";
-
-        let classes = "";
-        switch(this.safeRole) {
-        case 's':
-          classes += "sAccess ";
-        case 'a':
-          classes += "aAccess ";
-        case 'j':
-          classes += "jAccess";
+        if (this._id === 'guest' || (! this.isSuperUser() && this.org_id !== orgId)) {
+          return 'readOnly';
         }
 
-        return classes + " p";
+        let classes = '';
+        switch (this.safeRole) {
+        case 's':
+          classes += 'sAccess ';
+        case 'a':
+          classes += 'aAccess ';
+        case 'j':
+          classes += 'jAccess';
+        }
+
+        return classes + ' p';
       },
 
       get safeRole() {
@@ -67,12 +68,12 @@ define((require, exports, module)=>{
             (role === 's' || ((doc.attributes.org_id) || doc.org_id) === this.org_id);
         }
         return false;
-      }
+      },
     });
 
     util.merge(User, {
       forgotPassword(email, callback) {
-        session.rpc("User.forgotPassword", email, callback);
+        session.rpc('User.forgotPassword', email, callback);
       },
     });
   };

@@ -1,9 +1,9 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const Val             = require('koru/model/validation');
-  const Team            = require('models/team');
   const Category        = require('./category');
   const Climber         = require('./climber');
   const Event           = require('./event');
+  const Team            = require('models/team');
 
   class Competitor extends Team.HasTeam {
     setTeam(teamType_id, team_id) {
@@ -39,7 +39,7 @@ define((require, exports, module)=>{
   });
 
   Competitor.registerObserveField('event_id');
-  module.onUnload(Competitor.afterLocalChange(dc =>{
+  module.onUnload(Competitor.afterLocalChange((dc) => {
     if (dc.isDelete) return;
 
     const team_idsChanged = (dc.hasField('team_ids'));
@@ -48,30 +48,31 @@ define((require, exports, module)=>{
     if (team_idsChanged || numberChanged) {
       const {doc} = dc;
       doc.$cache.teamMap = null;
-      let climber = Climber.findById(doc.climber_id);
       let updates = {};
 
-      if (team_idsChanged) {
-        let clTeamMap = climber.teamMap;
-        let coTeamMap = doc.teamMap;
+      return ifPromise(Climber.findById(doc.climber_id), (climber) => {
+        if (team_idsChanged) {
+          let clTeamMap = climber.teamMap;
+          let coTeamMap = doc.teamMap;
 
-        for (let tt_id in coTeamMap) {
-          clTeamMap[tt_id] = coTeamMap[tt_id];
+          for (let tt_id in coTeamMap) {
+            clTeamMap[tt_id] = coTeamMap[tt_id];
+          }
+
+          let list = [];
+          for (let ttid in clTeamMap) {
+            let team = clTeamMap[ttid];
+            team && list.push(team._id);
+          }
+          updates.team_ids = list;
         }
 
-        let list = [];
-        for (let ttid in clTeamMap) {
-          let team = clTeamMap[ttid];
-          team && list.push(team._id);
+        if (numberChanged) {
+          updates.number = doc.number;
         }
-        updates.team_ids = list;
-      }
 
-      if (numberChanged) {
-        updates.number = doc.number;
-      }
-
-      climber.$update(updates);
+        return climber.$update(updates);
+      });
     }
   }));
 

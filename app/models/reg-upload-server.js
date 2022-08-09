@@ -1,6 +1,7 @@
-const parse = require('csv-parse');
+const {parse} = require('csv-parse');
 
 define((require, exports, module) => {
+  'use strict';
   const koru            = require('koru');
   const Val             = require('koru/model/validation');
   const session         = require('koru/session');
@@ -14,34 +15,19 @@ define((require, exports, module) => {
   const TeamType        = require('models/team-type');
   const User            = require('models/user');
 
-  const {Future} = util;
-
-  session.defineRpc('Reg.upload', function (eventId, data) {
+  session.defineRpc('Reg.upload', async function (eventId, data) {
     Val.ensureString(eventId);
 
     const {ROLE} = User;
 
-    const user = User.findById(this.userId);
+    const user = await User.findById(this.userId);
     Val.allowAccessIf(user);
 
-    const event = Event.findById(eventId);
-    Val.allowAccessIf(event && user.canAdminister(event));
+    const event = await Event.findById(eventId);
+    Val.allowAccessIf(event && await user.canAdminister(event));
 
-    const clubTeamType = TeamType.where({org_id: event.org_id, name: 'Club'}).fetchOne();
+    const clubTeamType = await TeamType.where({org_id: event.org_id, name: 'Club'}).fetchOne();
     Val.allowAccessIf(clubTeamType, 'No Team type named Club found for this organization');
-
-    const future = new Future();
-
-    parse(Buffer.from(data).toString(), {
-      bom: true,
-      columns: true,
-    }, (err, rows) => {
-      if (err) return future.throw(err);
-      data = rows;
-      future.return();
-    });
-
-    future.wait();
 
     const errors = [];
     const climbers = {};
@@ -51,6 +37,17 @@ define((require, exports, module) => {
       const val = row[field];
       return val && val.trim();
     };
+
+    await new Promise((resolve, reject) => {
+      parse(Buffer.from(data).toString(), {
+        bom: true,
+        columns: true,
+      }, (err, rows) => {
+        if (err) return reject(err);
+        data = rows;
+        resolve();
+      });
+    });
 
     if (data.length === 0) {
       throw new koru.Error(415, 'unsupported_import_format');
@@ -66,7 +63,7 @@ define((require, exports, module) => {
       }
     }
 
-    const importCompetitor = () => {
+    const importCompetitor = async () => {
       const name = get('First Name') + ' ' + get('Last Name');
 
       if (climbers[name] > 1) {
@@ -75,21 +72,21 @@ define((require, exports, module) => {
 
       const meta = get('Fee level');
 
-      if (meta === void 0) throw ('Missing "Fee level" field');
+      if (meta === undefined) throw ('Missing "Fee level" field');
 
       const clubName = meta.split(',')[0].trim();
 
-      const club = Team.query.where({name: clubName, teamType_id: clubTeamType._id}).fetchOne();
+      const club = await Team.query.where({name: clubName, teamType_id: clubTeamType._id}).fetchOne();
       if (club === undefined) throw "Can't find club '" + clubName + "'";
 
       const mCodes = /\[(.+)\]/.exec(meta);
 
       const codes = mCodes === null ? undefined : mCodes[1].trim().split(',');
 
-      let gender = (codes && codes[0][0]) || null;
+      let gender = (codes?.[0][0]) ?? null;
       gender = gender && gender.toLowerCase();
 
-      const climber = Climber.query.where({name, org_id: event.org_id}).fetchOne() ||
+      const climber = await Climber.query.where({name, org_id: event.org_id}).fetchOne() ??
             Climber.build({
               name, org_id: event.org_id, team_ids: [club._id],
               dateOfBirth: get('Birth Date').trim(),
@@ -101,11 +98,11 @@ define((require, exports, module) => {
         throw "Climber's date-of-birth does not match: " + climber.dateOfBirth;
       }
 
-      if (! climber.$isValid()) {
+      if (! await climber.$isValid()) {
         throw 'Climber: ' + Val.inspectErrors(climber);
       }
 
-      climber.$save();
+      await climber.$save();
 
       if (! (codes && codes.length)) {
         throw 'Invalid or missing codes';
@@ -113,17 +110,16 @@ define((require, exports, module) => {
 
       const category_ids = [];
 
-      codes.forEach((code) => {
+      for (let code of codes) {
         code = code.trim();
-        var cat = Category.query.where({shortName: code, org_id: event.org_id}).fetchOne();
-        if (! cat) {
+        var cat = await Category.query.where({shortName: code, org_id: event.org_id}).fetchOne();
+        if (cat === undefined) {
           throw 'Category not found: ' + code;
         }
         category_ids.push(cat._id);
-      });
+      }
 
-      const competitor = Competitor.query
-            .where({event_id: event._id, climber_id: climber._id}).fetchOne() ||
+      const competitor = await Competitor.query.where({event_id: event._id, climber_id: climber._id}).fetchOne() ??
             Competitor.build({
               event_id: event._id,
               climber_id: climber._id,
@@ -132,18 +128,18 @@ define((require, exports, module) => {
             });
 
       competitor.category_ids = category_ids.sort();
-      competitor.$$save();
+      await competitor.$$save();
     };
 
     for (let i = 0; i < data.length; ++i) {
       try {
         row = data[i];
-        importCompetitor();
+        await importCompetitor();
       } catch (ex) {
         errors.push([i + 1, data[i], ex.toString()]);
       }
     }
 
-    Event.query.onId(event._id).update({errors});
+    await Event.query.onId(event._id).update({errors});
   });
 });

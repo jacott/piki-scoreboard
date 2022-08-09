@@ -1,6 +1,3 @@
-define(function(require, exports, module) {
-
-  module.exports = mig =>{
-    mig.addColumns("Event", "ruleVersion:smallint default 0");
-  };
+define(() => (mig) => {
+  mig.addColumns("Event", "ruleVersion:smallint default 0");
 });

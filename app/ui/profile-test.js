@@ -4,54 +4,56 @@ isClient && define(function (require, exports, module) {
   const Route           = require('koru/ui/route');
   const UserAccount     = require('koru/user-account');
   const ClientLogin     = require('koru/user-account/client-login');
-  const User            = require('models/user');
-  const Event           = require('ui/event');
   const TH              = require('./test-helper');
+  const User            = require('models/user');
+  const Factory         = require('test/factory');
+  const Event           = require('ui/event');
 
   const {stub, spy, onEnd} = TH;
 
   const Profile = require('./profile');
   let v = null;
 
-  TH.testCase(module, {
-    setUp() {
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
+    beforeEach(() => {
+      TH.startTransaction();
       v = {};
-      v.su = TH.Factory.createUser('su');
+      v.su = Factory.createUser('su');
       TH.setOrg();
-      TH.loginAs(v.user = TH.Factory.createUser());
+      TH.loginAs(v.user = Factory.createUser());
       Route.gotoPage(Profile);
-    },
+    });
 
-    tearDown() {
-      TH.tearDown();
+    afterEach(() => {
+      TH.domTearDown();
       v = null;
-    },
+      TH.rollbackTransaction();
+    });
 
-    "test rendering"() {
+    test('rendering', () => {
       assert.dom('#Profile', function () {
         assert.dom('h1', v.user.name);
-        assert.dom('.fields', fields => {
+        assert.dom('.fields', (fields) => {
           assert.dom('[name=name]', {value: v.user.name});
           assert.dom('[name=initials]', {value: v.user.initials});
           assert.dom('[name=email]', {value: v.user.email});
         });
       });
-    },
+    });
 
-    "test change email"() {
+    test('change email', () => {
       assert.dom('form', function () {
         TH.input('[name=name]', {value: v.user.name}, 'new name');
         TH.click('[type=submit]');
       });
 
       assert.equals(User.me().name, 'new name');
+    });
 
-    },
+    test('change password', () => {
+      var cpwStub = stub(UserAccount, 'changePassword');
 
-    "test change password"() {
-      var cpwStub = stub(UserAccount,'changePassword');
-
-      TH.click('.link', "Change password");
+      TH.click('.link', 'Change password');
       assert.dom('#Profile .body #ChangePassword', function () {
         TH.input('input[name=oldPassword]', 'oldpw');
         assert.dom('button[type=submit][disabled=disabled]');
@@ -64,7 +66,7 @@ isClient && define(function (require, exports, module) {
 
         assert.className(this, 'submitting');
 
-        assert.calledWith(cpwStub,v.user.email, 'oldpw', 'newpw', TH.match(function (func) {
+        assert.calledWith(cpwStub, v.user.email, 'oldpw', 'newpw', TH.match(function (func) {
           v.func = func;
           return typeof func === 'function';
         }));
@@ -80,6 +82,6 @@ isClient && define(function (require, exports, module) {
         v.func();
       });
       assert.called(Route.history.back);
-    },
+    });
   });
 });

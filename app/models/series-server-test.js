@@ -1,92 +1,81 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const util            = require('koru/util');
   const TH              = require('test-helper');
+  const Factory         = require('test/factory');
 
   const Series = require('./series');
 
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
     let rpc, org, user;
-    beforeEach(()=>{
+    beforeEach(async () => {
+      await TH.startTransaction();
       rpc = TH.mockRpc();
-      org = TH.Factory.createOrg();
-      user = TH.Factory.createUser();
+      org = await Factory.createOrg();
+      user = await Factory.createUser();
     });
 
-    afterEach(()=>{
-      TH.clearDB();
+    afterEach(async () => {
+      await TH.rollbackTransaction();
     });
 
-    group("authorize", ()=>{
-      test("wrong org denied", ()=>{
-        const oOrg = TH.Factory.createOrg();
-        const oUser = TH.Factory.createUser();
+    group('authorize', () => {
+      test('wrong org denied', async () => {
+        const oOrg = await Factory.createOrg();
+        const oUser = await Factory.createUser();
 
-        const series = TH.Factory.buildSeries();
+        const series = await Factory.buildSeries();
 
         TH.noInfo();
-        assert.accessDenied(()=>{
-          series.authorize(user._id);
-        });
+        await assert.accessDenied(() => series.authorize(user._id));
       });
 
-      test("allowed", ()=>{
-        const series = TH.Factory.buildSeries();
+      test('allowed', async () => {
+        const series = await Factory.buildSeries();
 
-        refute.accessDenied(()=>{
-          series.authorize(user._id);
-        });
+        await refute.accessDenied(() => series.authorize(user._id));
       });
 
-      test("permitParams", ()=>{
-        const series = TH.Factory.buildSeries();
+      test('permitParams', async () => {
+        const series = await Factory.buildSeries();
 
         series.attributes = series.changes;
-        series.changes = {'name': 'new name'};
-        assert.docChanges(series, {
+        series.changes = {name: 'new name'};
+        await assert.docChanges(series, {
           name: 'string',
           org_id: 'id',
           teamType_ids: ['id'],
           date: 'string',
-          closed: TH.match(arg => {
-            return arg.test(undefined)
-              && arg.test(false) && ! arg.test([])
-              && arg.test("f") && ! arg.test(1);
+          closed: TH.match((arg) => {
+            return arg.test(undefined) &&
+              arg.test(false) && ! arg.test([]) &&
+              arg.test('f') && ! arg.test(1);
           }),
-        }, ()=>{
-          series.authorize(user._id);
-        });
-
+        }, () => series.authorize(user._id));
       });
 
-      test("closing", ()=>{
-        const series = TH.Factory.buildSeries();
+      test('closing', async () => {
+        const series = await Factory.buildSeries();
         series.attributes = series.changes;
         series.changes = {closed: true};
 
-        refute.accessDenied(()=>{
-          series.authorize(user._id);
-        });
+        await refute.accessDenied(() => series.authorize(user._id));
       });
 
-      test("change on closed", ()=>{
-        const series = TH.Factory.buildSeries({closed: true});
+      test('change on closed', async () => {
+        const series = await Factory.buildSeries({closed: true});
         series.attributes = series.changes;
         series.changes = {name: 'bob'};
 
         TH.noInfo();
-        assert.accessDenied(()=>{
-          series.authorize(user._id);
-        });
+        await assert.accessDenied(() => series.authorize(user._id));
       });
 
-      test("opening", ()=>{
-        const series = TH.Factory.buildSeries({closed: false});
+      test('opening', async () => {
+        const series = await Factory.buildSeries({closed: false});
         series.attributes = series.changes;
         series.changes = {closed: 'true'};
 
-        refute.accessDenied(()=>{
-          series.authorize(user._id);
-        });
+        await refute.accessDenied(() => series.authorize(user._id));
       });
     });
   });

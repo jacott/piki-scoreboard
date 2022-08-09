@@ -1,65 +1,56 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const koru            = require('koru');
-  const Competitor      = require('models/competitor');
-  const TH              = require('test-helper');
   const Org             = require('./org');
   const User            = require('./user');
+  const Competitor      = require('models/competitor');
+  const TH              = require('test-helper');
+  const Factory         = require('test/factory');
 
   const {stub, spy, onEnd} = TH;
 
   const Team = require('./team');
 
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
     let org, user;
-    beforeEach(()=>{
-      org = TH.Factory.createOrg();
-      user = TH.Factory.createUser();
+    beforeEach(async () => {
+      await TH.startTransaction();
+      org = await Factory.createOrg();
+      user = await Factory.createUser();
       stub(koru, 'info');
     });
 
-    afterEach(()=>{
-      TH.clearDB();
+    afterEach(async () => {
+      await TH.rollbackTransaction();
     });
 
-    group("authorize", ()=>{
-      test("denied", ()=>{
-        const oOrg = TH.Factory.createOrg();
-        const oUser = TH.Factory.createUser();
+    group('authorize', () => {
+      test('denied', async () => {
+        const oOrg = await Factory.createOrg();
+        const oUser = await Factory.createUser();
 
-        const team = TH.Factory.buildTeam();
+        const team = await Factory.buildTeam();
 
-        assert.accessDenied(()=>{
-          team.authorize(user._id);
-        });
+        await assert.accessDenied(() => team.authorize(user._id));
       });
 
-      test("allowed", ()=>{
-        const team = TH.Factory.buildTeam();
+      test('allowed', async () => {
+        const team = await Factory.buildTeam();
 
-        refute.accessDenied(()=>{
-          team.authorize(user._id);
-        });
+        await refute.accessDenied(() => team.authorize(user._id));
       });
 
-      test("okay to remove", ()=>{
-        const team = TH.Factory.createTeam();
+      test('okay to remove', async () => {
+        const team = await Factory.createTeam();
 
-        refute.accessDenied(()=>{
-          team.authorize(user._id, {remove: true});
-        });
-
+        await refute.accessDenied(() => team.authorize(user._id, {remove: true}));
       });
 
-      test("remove in use", ()=>{
-        const team = TH.Factory.createTeam();
-        const competitor = TH.Factory.createCompetitor();
+      test('remove in use', async () => {
+        const team = await Factory.createTeam();
+        const competitor = await Factory.createCompetitor();
 
-        assert.accessDenied(()=>{
-          team.authorize(user._id, {remove: true});
-        });
-
+        await assert.accessDenied(() => team.authorize(user._id, {remove: true}));
       });
     });
-
   });
 });

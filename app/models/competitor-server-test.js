@@ -1,51 +1,49 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const Val             = require('koru/model/validation');
-  const TH              = require('test-helper');
   const Competitor      = require('./competitor');
-  const Event           = require('./event');
   const User            = require('./user');
+  const Role            = require('models/role');
+  const TH              = require('test-helper');
+  const Factory         = require('test/factory');
 
   const {stub, spy} = TH;
 
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
     let event, user;
-    beforeEach(()=>{
-      event = TH.Factory.createEvent();
-      user = TH.Factory.createUser();
+    beforeEach(async () => {
+      await TH.startTransaction();
+      event = await Factory.createEvent();
+      user = await Factory.createUser();
       TH.noInfo();
 
       stub(Val, 'ensureString');
     });
 
-    afterEach(()=>{
-      TH.clearDB();
-    });
+    afterEach(() => TH.rollbackTransaction());
 
-    group("authorize", ()=>{
-      test("denied", ()=>{
-        const oOrg = TH.Factory.createOrg();
-        const oEvent = TH.Factory.createEvent();
-        const oUser = TH.Factory.createUser();
+    group('authorize', () => {
+      test('denied', async () => {
+        const oOrg = await Factory.createOrg();
+        const oEvent = await Factory.createEvent();
+        const oUser = await Factory.createUser();
 
-        const competitor = TH.Factory.buildCompetitor();
+        const competitor = await Factory.buildCompetitor();
 
-        assert.accessDenied(()=>{competitor.authorize(user._id)});
+        await assert.accessDenied(() => competitor.authorize(user._id));
       });
 
-      test("allowed", ()=>{
+      test('allowed', async () => {
         spy(Val, 'assertDocChanges');
 
-        const competitor = TH.Factory.buildCompetitor({number: 123});
+        const competitor = await Factory.buildCompetitor({number: 123});
 
-        refute.accessDenied(()=>{
-          competitor.authorize(user._id);
-        });
+        await refute.accessDenied(() => competitor.authorize(user._id));
 
         assert.calledWith(Val.ensureString, event._id);
         assert.calledWith(Val.assertDocChanges, TH.matchModel(competitor), {
           category_ids: ['id'],
           team_ids: ['id'],
-          number: 'integer'
+          number: 'integer',
         }, {
           _id: 'id',
           event_id: 'id',
@@ -53,11 +51,11 @@ define((require, exports, module)=>{
         });
       });
 
-      test("event closed", ()=>{
-        const event = TH.Factory.createEvent({closed: true});
-        const competitor = TH.Factory.buildCompetitor();
+      test('event closed', async () => {
+        const event = await Factory.createEvent({closed: true});
+        const competitor = await Factory.buildCompetitor();
 
-        assert.accessDenied(()=>{competitor.authorize(user._id)});
+        await assert.accessDenied(() => competitor.authorize(user._id));
       });
     });
   });

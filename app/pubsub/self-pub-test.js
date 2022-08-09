@@ -1,4 +1,4 @@
-isServer && define((require, exports, module)=>{
+isServer && define((require, exports, module) => {
   const ConnTH          = require('koru/session/conn-th-server');
   const User            = require('models/user');
   const TH              = require('test-helper');
@@ -8,27 +8,28 @@ isServer && define((require, exports, module)=>{
 
   const SelfPub = require('./self-pub');
 
-  TH.testCase(module, ({before, after, beforeEach, afterEach, group, test})=>{
+  TH.testCase(module, ({before, after, beforeEach, afterEach, group, test}) => {
     let conn;
 
-    beforeEach(()=>{
+    beforeEach(async () => {
+      await TH.startTransaction();
       conn = ConnTH.mockConnection('s123');
-      User.guestUser();
+      await User.guestUser();
     });
 
-    afterEach(()=>{
+    afterEach(async () => {
       ConnTH.stopAllSubs(conn);
-      util.thread.userId = void 0;
-      TH.clearDB();
+      util.thread.userId = undefined;
+      await TH.rollbackTransaction();
     });
 
-    test("publish guest", ()=>{
-      const org1 = Factory.createOrg();
-      const org2 = Factory.createOrg();
-      const user = Factory.createUser();
-      const sub = conn.onSubscribe("sub1", 1, "Self");
+    test('publish guest', async () => {
+      const org1 = await Factory.createOrg();
+      const org2 = await Factory.createOrg();
+      const user = await Factory.createUser();
+      const sub = await conn.onSubscribe('sub1', 1, 'Self');
 
-      assert.same(sub.conn.userId, "guest");
+      assert.same(sub.conn.userId, 'guest');
       assert.encodedCall(sub.conn, 'A', [
         'Org', {_id: org1._id, name: 'Org 1', shortName: 'SN1'}]);
       assert.encodedCall(sub.conn, 'A', [
@@ -37,16 +38,16 @@ isServer && define((require, exports, module)=>{
       refute.called(sub.conn.added);
     });
 
-    test("publish user", ()=>{
-      const org1 = Factory.createOrg();
-      const user = Factory.createUser();
+    test('publish user', async () => {
+      const org1 = await Factory.createOrg();
+      const user = await Factory.createUser();
 
-      conn.userId = user._id;
+      await conn.setUserId(user._id);
 
       spy(User, 'observeId');
 
       // Subscribe
-      const sub = conn.onSubscribe('sub1', 1, 'Self');
+      const sub = await conn.onSubscribe('sub1', 1, 'Self');
       onEnd(() => sub && sub.stop());
 
       // Test initial data
@@ -54,10 +55,9 @@ isServer && define((require, exports, module)=>{
 
       // Test changes
       user.name = 'new name';
-      user.$$save();
+      await user.$$save();
 
       assert.calledWith(sub.conn.sendBinary, 'C', ['User', user._id, {name: 'new name'}]);
-
 
       // *** test stopping ***
       assert.calledWith(User.observeId, user._id);
@@ -68,10 +68,10 @@ isServer && define((require, exports, module)=>{
       assert.called(uStop);
     });
 
-    test("user not found", ()=>{
-      conn.userId = 'bad';
+    test('user not found', async () => {
+      await conn.setUserId('bad');
 
-      const sub = conn.onSubscribe('s123', 1, 'Self');
+      const sub = await conn.onSubscribe('s123', 1, 'Self');
 
       refute(sub);
 

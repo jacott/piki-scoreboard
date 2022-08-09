@@ -4,14 +4,18 @@ define((require, exports, module) => {
   const Factory         = require('test/factory');
 
   TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
-    afterEach(() => {
-      TH.clearDB();
+    beforeEach(async () => {
+      await TH.startTransaction();
     });
 
-    test('creation', () => {
-      const climber = Factory.createClimber({team_ids: ['tm1']});
+    afterEach(async () => {
+      await TH.rollbackTransaction();
+    });
 
-      assert(Climber.exists(climber._id));
+    test('creation', async () => {
+      const climber = await Factory.createClimber({team_ids: ['tm1']});
+
+      assert(await Climber.exists(climber._id));
 
       assert.same(climber.number, 1);
 

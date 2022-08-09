@@ -1,41 +1,44 @@
-isClient && define((require, exports, module)=>{
+isClient && define((require, exports, module) => {
   const Route           = require('koru/ui/route');
-  const Ranking         = require('models/ranking');
-  const EventSub        = require('pubsub/event-sub');
-  const EventTpl        = require('ui/event');
-  const TeamHelper      = require('ui/team-helper');
   const sut             = require('./team-results');
   const TH              = require('./test-helper');
+  const Ranking         = require('models/ranking');
+  const EventSub        = require('pubsub/event-sub');
+  const Factory         = require('test/factory');
+  const EventTpl        = require('ui/event');
+  const TeamHelper      = require('ui/team-helper');
 
   const {stub, spy, onEnd} = TH;
 
   let v = {};
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
-    beforeEach(()=>{
-      v.org =  TH.Factory.createOrg();
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
+    beforeEach(() => {
+      TH.startTransaction();
+      v.org = Factory.createOrg();
       TH.login();
       TH.setOrg(v.org);
-      v.tt1 = TH.Factory.createTeamType({_id: 'tt1'});
-      v.team1 = TH.Factory.createTeam({_id: 'team1'});
-      v.team2 = TH.Factory.createTeam({_id: 'team2'});
-      v.tt2 = TH.Factory.createTeamType({_id: 'tt2'});
-      v.team3 = TH.Factory.createTeam({_id: 'team3'});
+      v.tt1 = Factory.createTeamType({_id: 'tt1'});
+      v.team1 = Factory.createTeam({_id: 'team1'});
+      v.team2 = Factory.createTeam({_id: 'team2'});
+      v.tt2 = Factory.createTeamType({_id: 'tt2'});
+      v.team3 = Factory.createTeam({_id: 'team3'});
       TeamHelper.teamType_id = 'tt1';
-      v.event = TH.Factory.createEvent({teamType_ids: ['tt1', 'tt2']});
-      v.tt3 = TH.Factory.createTeamType({_id: 'tt3'});
+      v.event = Factory.createEvent({teamType_ids: ['tt1', 'tt2']});
+      v.tt3 = Factory.createTeamType({_id: 'tt3'});
 
       v.eventSub = stub(EventSub, 'subscribe').returns({stop: v.stop = stub()});
       v.results = {tt1: {team1: 260, team2: 300}, tt2: {team3: 160}};
       stub(Ranking, 'getTeamScores').withArgs(v.event).returns(v.results);
     });
 
-    afterEach(()=>{
+    afterEach(() => {
       TeamHelper.teamType_id = null;
-      TH.tearDown();
+      TH.domTearDown();
       v = {};
+      TH.rollbackTransaction();
     });
 
-    test("show event team results", ()=>{
+    test('show event team results', () => {
       Route.gotoPage(EventTpl.Show, {eventId: v.event._id});
 
       assert.dom('#Event', function () {
@@ -70,7 +73,7 @@ isClient && define((require, exports, module)=>{
 
         assert.dom('th.name>span', v.tt2.name);
 
-         assert.dom('table.list>tbody', function () {
+        assert.dom('table.list>tbody', function () {
           assert.dom('tr:first-child', function () {
             assert.dom('td.name', v.team3.name);
             assert.dom('td.points', 160);

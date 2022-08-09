@@ -1,59 +1,63 @@
-isClient && define((require, exports, module)=>{
+isClient && define((require, exports, module) => {
   const Dom             = require('koru/dom');
   const Route           = require('koru/ui/route');
+  const TH              = require('./test-helper');
   const Climber         = require('models/climber');
   const Competitor      = require('models/competitor');
   const Team            = require('models/team');
   const EventSub        = require('pubsub/event-sub');
+  const Factory         = require('test/factory');
   const App             = require('ui/app');
   const TeamHelper      = require('ui/team-helper');
-  const TH              = require('./test-helper');
 
   const {stub, spy, onEnd, match: m} = TH;
 
   const sut = require('./event-register');
 
   let v = {};
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
-    beforeEach(()=>{
-      v.org =  TH.Factory.createOrg({_id: App.orgId = "org123"});
-      v.tt = TH.Factory.createList(3, 'createTeamType', (index, options) => {
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
+    beforeEach(() => {
+      TH.startTransaction();
+      v.org = Factory.createOrg({_id: App.orgId = 'org123'});
+      v.tt = Factory.createList(3, 'createTeamType', (index, options) => {
         options.name = ['Club', 'School', 'Country'][index];
       });
       TeamHelper.teamType_id = v.tt[0]._id;
-      v.teams1 = TH.Factory.createList(2, 'createTeam', function (index, options) {
+      v.teams1 = Factory.createList(2, 'createTeam', function (index, options) {
         options.teamType_id = v.tt[0]._id;
-        options.name = 'Team '+ (5 - index);
+        options.name = 'Team ' + (5 - index);
       });
 
-      v.teams2 = TH.Factory.createList(2, 'createTeam', function (index, options) {
+      v.teams2 = Factory.createList(2, 'createTeam', function (index, options) {
         options.teamType_id = v.tt[1]._id;
       });
 
-      v.event = TH.Factory.createEvent({teamType_ids: [v.tt[0]._id, v.tt[1]._id]});
+      v.event = Factory.createEvent({teamType_ids: [v.tt[0]._id, v.tt[1]._id]});
       const names = ['Bob', 'brendon', 'bobby', 'robert'];
-      v.climbers = TH.Factory.createList(4, 'createClimber', function (index, options) {
+      v.climbers = Factory.createList(4, 'createClimber', function (index, options) {
         options.name = names[index];
-        options.number = '12'+index;
-        if (index === 1)
+        options.number = '12' + index;
+        if (index === 1) {
           options.team_ids = [v.teams1[0]._id];
+        }
       });
-      v.u16 = TH.Factory.createCategory({group: '1 Youth Lead'});
-      v.u18 = TH.Factory.createCategory({group: '1 Youth Lead'});
-      v.open = TH.Factory.createCategory({group: '2 Open Lead'});
+      v.u16 = Factory.createCategory({group: '1 Youth Lead'});
+      v.u18 = Factory.createCategory({group: '1 Youth Lead'});
+      v.open = Factory.createCategory({group: '2 Open Lead'});
 
       TH.setOrg(v.org);
       v.eventSub = stub(EventSub, 'subscribe').yields().returns({stop: v.stop = stub()});
       TH.login();
     });
 
-    afterEach(()=>{
-      TH.tearDown();
+    afterEach(() => {
+      TH.domTearDown();
       TeamHelper.teamType_id = null;
       v = {};
+      TH.rollbackTransaction();
     });
 
-    test("closed", ()=>{
+    test('closed', () => {
       v.event.$update({closed: true});
 
       gotoPage();
@@ -61,7 +65,7 @@ isClient && define((require, exports, module)=>{
       assert.dom('#Register.closed');
     });
 
-    test("registering", ()=>{
+    test('registering', () => {
       gotoPage();
 
       assert.dom('#Event [name=Register].selected');
@@ -116,10 +120,9 @@ isClient && define((require, exports, module)=>{
             TH.selectMenu('button.select', v.open._id);
             assert.dom('button.select.category:not(.none)', v.open.name);
           }});
-
         });
 
-        assert.dom('.Groups>fieldset.fields', function( ){
+        assert.dom('.Groups>fieldset.fields', function () {
           assert.dom('label', function () {
             assert.dom('.name', 'Competitor number');
             assert.dom('[name=number]', {value: '121'});
@@ -138,12 +141,12 @@ isClient && define((require, exports, module)=>{
         assert.same(competitor.number, 567);
         assert.same(competitor.climber.number, 567);
 
-        assert.dom('table>thead', ()=>{
+        assert.dom('table>thead', () => {
           assert.dom('th[data-sort=team]', 'Club');
           TH.selectMenu(
             'th[data-sort=team]>[name=selectTeamType]',
-            m.field('name', 'School'), elm =>{
-              assert.dom(elm.parentNode, ()=>{
+            m.field('name', 'School'), (elm) => {
+              assert.dom(elm.parentNode, () => {
                 assert.dom('li', {count: 2});
                 assert.dom('li:first-child', 'Club');
               });
@@ -167,12 +170,10 @@ isClient && define((require, exports, module)=>{
 
           assert.attributesEqual(Dom.ctx(this).data.changes, {event_id: v.event._id});
         });
-
       });
-
     });
 
-    test("adding new climber", ()=>{
+    test('adding new climber', () => {
       gotoPage();
 
       assert.dom('#Register', function () {
@@ -194,8 +195,8 @@ isClient && define((require, exports, module)=>{
       assert.dom('.Groups');
     });
 
-    test("can't add twice", ()=>{
-      const oComp = TH.Factory.createCompetitor({climber_id: v.climbers[1]._id});
+    test("can't add twice", () => {
+      const oComp = Factory.createCompetitor({climber_id: v.climbers[1]._id});
 
       gotoPage();
 
@@ -205,7 +206,7 @@ isClient && define((require, exports, module)=>{
       assert.dom('body>ul>li', {count: 1, text: 'Already registered'});
     });
 
-    test("cancel add", ()=>{
+    test('cancel add', () => {
       gotoPage();
 
       assert.dom('#Event #Register', function () {
@@ -220,9 +221,9 @@ isClient && define((require, exports, module)=>{
       });
     });
 
-    group("edit", ()=>{
-      beforeEach(()=>{
-        v.oComp = TH.Factory.createCompetitor({climber_id: v.climbers[1]._id, team_ids: [v.teams1[0]._id]});
+    group('edit', () => {
+      beforeEach(() => {
+        v.oComp = Factory.createCompetitor({climber_id: v.climbers[1]._id, team_ids: [v.teams1[0]._id]});
 
         gotoPage();
 
@@ -231,7 +232,7 @@ isClient && define((require, exports, module)=>{
         }});
       });
 
-      test("editClimber", ()=>{
+      test('editClimber', () => {
         assert.dom('#Register form.edit', function () {
           TH.click('[name=editClimber]');
         });
@@ -243,7 +244,7 @@ isClient && define((require, exports, module)=>{
         });
       });
 
-      test("change team", ()=>{
+      test('change team', () => {
         assert.dom('#Register form.edit', function () {
           assert.dom('.Teams', function () {
             assert.dom('label:first-child', function () {
@@ -280,7 +281,7 @@ isClient && define((require, exports, module)=>{
         assert.same(Team.findBy('name', 'Dynomites Wellington').teamType_id, v.tt[0]._id);
       });
 
-      test("change category", ()=>{
+      test('change category', () => {
         assert.dom('#Register form.edit', function () {
           assert.dom('.Groups', function () {
             assert.dom('button.select.category:not(.none)', 'Category 4', function () {
@@ -291,10 +292,10 @@ isClient && define((require, exports, module)=>{
           TH.click('[type=submit]');
         });
         assert.dom('form.add');
-        assert.equals(v.oComp.$reload().category_ids,[]);
+        assert.equals(v.oComp.$reload().category_ids, []);
       });
 
-      test("cancel", ()=>{
+      test('cancel', () => {
         stub(Route, 'replacePath');
 
         TH.click('#Register form [name=cancel]');
@@ -302,7 +303,7 @@ isClient && define((require, exports, module)=>{
         assert.calledWithExactly(Route.replacePath, Dom.tpl.Event.Register);
       });
 
-      test("delete competitor", ()=>{
+      test('delete competitor', () => {
         assert.dom('#Register form.edit', function () {
           TH.click('[name=delete]');
         });

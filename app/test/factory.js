@@ -1,4 +1,4 @@
-define((require)=>{
+define((require) => {
   const Factory         = require('koru/model/test-factory');
   const Random          = require('koru/random');
   const util            = require('koru/util');
@@ -12,13 +12,13 @@ define((require)=>{
         util.reverseMerge(options, {
           _id: 'guest',
           name: undefined, initials: undefined,
-          email: undefined, role: 'g', org_id: null
+          email: undefined, role: 'g', org_id: null,
         });
       },
       su(options) {
         util.reverseMerge(options, {
-          name: "Super User", initials: "SU",
-          email: "su@example.com", role: 's', org_id: null
+          name: 'Super User', initials: 'SU',
+          email: 'su@example.com', role: 's', org_id: null,
         });
       },
 
@@ -31,7 +31,6 @@ define((require)=>{
       },
     },
   });
-
 
   const defaultAfter = JSON.stringify({name: 'new name'});
 
@@ -53,7 +52,7 @@ define((require)=>{
     Team(options) {
       return new Factory.Builder('Team', options).genName()
         .addRef('teamType')
-        .addField('shortName',  () => Factory.generateName('SN').replace(/\s+/g, ''))
+        .addField('shortName', () => Factory.generateName('SN').replace(/\s+/g, ''))
         .addRef('org');
     },
 
@@ -77,24 +76,38 @@ define((require)=>{
     },
 
     Competitor(options) {
-      if (options.category_ids === undefined) {
-        const category = Factory.last.category || Factory.createCategory();
-        options.category_ids = [category._id];
+      const b = new Factory.Builder('Competitor', options)
+            .addRef('climber')
+            .addRef('event');
+
+      if (isClient) {
+        if (options.category_ids === undefined) {
+          const category = Factory.last.category || Factory.createCategory();
+          options.category_ids = [category._id];
+        }
+
+        if (options.team_ids === undefined) {
+          const team = Factory.last.team || Factory.createTeam();
+          options.team_ids = [team._id];
+        }
+      } else {
+        b.afterPromises(async () => {
+          if (options.category_ids === undefined) {
+            const category = Factory.last.category || await Factory.createCategory();
+            options.category_ids = [category._id];
+          }
+
+          if (options.team_ids === undefined) {
+            const team = Factory.last.team || await Factory.createTeam();
+            options.team_ids = [team._id];
+          }
+        });
       }
 
-      if (options.team_ids === undefined) {
-        const team = Factory.last.team || Factory.createTeam();
-        options.team_ids = [team._id];
-      }
-
-      return new Factory.Builder('Competitor', options)
-        .addRef('climber')
-        .addRef('event');
-
+      return b;
     },
 
     Result(options) {
-      Factory.last.competitor || Factory.createCompetitor();
       return new Factory.Builder('Result', options)
         .addRef('event')
         .addRef('climber')
@@ -104,78 +117,108 @@ define((require)=>{
     },
 
     Event(options) {
-      if (options.teamType_ids === undefined) {
-        const teamType = Factory.last.teamType || Factory.createTeamType();
-        options.teamType_ids = [teamType._id];
-      }
+      const b = new Factory.Builder('Event', options).genName()
+            .addRef('org')
+            .addField('ruleVersion', 1)
+            .addField('date', '2014-04-01');
 
-      const category = Factory.last.category || Factory.createCategory();
-      if (! ('heats' in options)) {
-        options.heats = [category._id];
-      }
+      if (isClient) {
+        if (options.teamType_ids === undefined) {
+          const teamType = Factory.last.teamType || Factory.createTeamType();
+          options.teamType_ids = [teamType._id];
+        }
 
-      if (options.heats && 'forEach' in options.heats) {
-        const heats = {};
-        options.heats.forEach(heat =>{
-          const category = Model.Category.findById(heat);
-          heats[heat] = category.type + (category.heatFormat||'');
+        const category = Factory.last.category || Factory.createCategory();
+        if (! ('heats' in options)) {
+          options.heats = [category._id];
+        }
+
+        if (options.heats && 'forEach' in options.heats) {
+          const heats = {};
+          for (const heat of options.heats) {
+            const category = Model.Category.findById(heat);
+            heats[heat] = category.type + (category.heatFormat || '');
+          }
+          options.heats = heats;
+        }
+        b.addField('heats');
+      } else {
+        b.afterPromises(async () => {
+          if (options.teamType_ids === undefined) {
+            const teamType = Factory.last.teamType || await Factory.createTeamType();
+            options.teamType_ids = [teamType._id];
+          }
+
+          const category = Factory.last.category || await Factory.createCategory();
+          if (! ('heats' in options)) {
+            options.heats = [category._id];
+          }
+
+          if (options.heats && 'forEach' in options.heats) {
+            const heats = {};
+            for (const heat of options.heats) {
+              const category = await Model.Category.findById(heat);
+              heats[heat] = category.type + (category.heatFormat || '');
+            }
+            options.heats = heats;
+          }
+          b.addField('heats');
         });
-        options.heats = heats;
       }
 
-      return new Factory.Builder('Event', options).genName()
-        .addRef('org')
-        .addField('ruleVersion', 1)
-        .addField('heats')
-        .addField('date', '2014-04-01');
+      return b;
     },
 
     Series(options) {
+      const b = new Factory.Builder('Series', options).genName()
+            .addRef('org')
+            .addField('date', '2014-04-01');
+
       if (options.teamType_ids === undefined) {
-        const teamType = Factory.last.teamType || Factory.createTeamType();
-        options.teamType_ids = [teamType._id];
+        b.afterPromises(() => ifPromise(Factory.last.teamType || Factory.createTeamType(), (teamType) => {
+          options.teamType_ids = [teamType._id];
+        }));
       }
 
-      return new Factory.Builder('Series', options).genName()
-        .addRef('org')
-        .addField('date', '2014-04-01');
+      return b;
     },
 
     User(options) {
       const username = 'username' in options ? options.username : Factory.generateName('user');
       const user = new Factory.Builder('User', options)
-            .addField('name', 'name' in options || 'fn '+username)
+            .addField('name', 'name' in options || 'fn ' + username)
             .addField('email', 'email' in options ||
-                      ('email-'+username.replace(/\s+/g,'.')+'@test.co').toLowerCase())
-            .addField('initials', 'initials' in options || 'u'+username.substring(4))
+                      ('email-' + username.replace(/\s+/g, '.') + '@test.co').toLowerCase())
+            .addField('initials', 'initials' in options || 'u' + username.substring(4))
       ;
 
       if (isClient) {
         user.addRef('org').addField('role', 'a');
       } else {
-        const _id = user.attributes._id || Random.id();
-        user.attributes._id = _id;
-        let org_id;
-        if ('org_id' in options) {
-          org_id = options.org_id;
-          delete options.org_id;
-        } else {
-          const org = Factory.last.org || Factory.createOrg();
-          org_id = org._id;
-        }
-        const role = ('role' in options) ? options.role : 'a';
-        delete options.role;
+        user.afterPromises(async () => {
+          const _id = user.attributes._id || Random.id();
+          user.attributes._id = _id;
+          let org_id;
+          if ('org_id' in options) {
+            org_id = options.org_id;
+            delete options.org_id;
+          } else {
+            const org = Factory.last.org ?? await Factory.createOrg();
+            org_id = org._id;
+          }
+          const role = ('role' in options) ? options.role : 'a';
+          delete options.role;
 
-        Factory.createRole({user_id: _id, org_id, role});
+          await Factory.createRole({user_id: _id, org_id, role});
+        });
       }
-
       return user;
     },
 
     Role(options) {
       return new Factory.Builder('Role', options)
-        .addField('org_id', ()=> (Factory.last.org  || Factory.createOrg())._id)
-        .addField('user_id', ()=> (Factory.last.user || Factory.createUser())._id)
+        .addRef('org')
+        .addRef('user')
         .addField('role', 'a')
       ;
     },

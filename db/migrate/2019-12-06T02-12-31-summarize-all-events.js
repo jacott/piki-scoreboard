@@ -4,14 +4,14 @@ define((require)=> mig =>{
   const Event           = require('models/event');
 
   mig.reversible({
-    add(db) {
-      for (const ev of Event.query.fetch()) {
-        ClimberRanking.summarize(ev);
+    async add(db) {
+      for (const ev of await Event.query.fetch()) {
+        await ClimberRanking.summarize(ev);
       }
     },
 
     revert(db) {
-      db.query('truncate "ClimberRanking"');
+      return db.query('truncate "ClimberRanking"');
     }
   });
 

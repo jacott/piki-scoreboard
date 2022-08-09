@@ -1,4 +1,4 @@
-isClient && define((require, exports, module)=>{
+isClient && define((require, exports, module) => {
   const koru            = require('koru');
   const Dom             = require('koru/dom');
   const localStorage    = require('koru/local-storage');
@@ -7,54 +7,56 @@ isClient && define((require, exports, module)=>{
   const Route           = require('koru/ui/route');
   const UserAccount     = require('koru/user-account');
   const login           = require('koru/user-account/client-login');
+  const TH              = require('./test-helper');
   const User            = require('models/user');
   const Factory         = require('test/factory');
   const App             = require('ui/app');
-  const TH              = require('./test-helper');
 
   const {stub, spy, onEnd, match: m} = TH;
 
   const SignIn = require('./sign-in');
 
   let v = {};
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
-    beforeEach(()=>{
-      stub(UserAccount,'loginWithPassword');
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
+    beforeEach(() => {
+      TH.startTransaction();
+      stub(UserAccount, 'loginWithPassword');
       App.orgId = Factory.createOrg()._id;
     });
 
-    afterEach(()=>{
-      TH.tearDown();
+    afterEach(() => {
+      TH.domTearDown();
       v = {};
+      TH.rollbackTransaction();
     });
 
-    test("clicking forgot password", ()=>{
+    test('clicking forgot password', () => {
       Route.gotoPage(SignIn);
       TH.input('[name=email]', 'email@address');
       TH.click('[name=forgot]');
 
       refute.dom('#SignInDialog');
 
-      assert.dom('.Dialog #ForgotPassword', () =>{
+      assert.dom('.Dialog #ForgotPassword', () => {
         assert.dom('[name=email]', {value: 'email@address'});
       });
     });
 
-    group("forgot password", ()=>{
-      beforeEach( ()=>{
+    group('forgot password', () => {
+      beforeEach(() => {
         v.remoteCall = stub(User, 'forgotPassword');
 
         Dom.tpl.Dialog.open(SignIn.ForgotPassword.$autoRender({email: 'foo@bar.com'}));
 
         TH.click('#ForgotPassword [name=submit]');
 
-        assert.calledWith(v.remoteCall, 'foo@bar.com', m(c => v.callback = c));
+        assert.calledWith(v.remoteCall, 'foo@bar.com', m((c) => v.callback = c));
       });
 
-      test("bad email", ()=>{
+      test('bad email', () => {
         v.callback(null, {email: 'is_invalid'});
 
-        assert.dom('#ForgotPassword', elm =>{
+        assert.dom('#ForgotPassword', (elm) => {
           assert.dom('input.error[name=email]');
           assert.dom('input.error[name=email]+.errorMsg', 'is not valid');
 
@@ -64,15 +66,14 @@ isClient && define((require, exports, module)=>{
         });
       });
 
-      test("unexpected error", ()=>{
+      test('unexpected error', () => {
         stub(koru, 'error');
 
         v.callback({message: 'foo'});
 
-        assert.dom('#ForgotPassword', ()=>{
-          assert.dom('[name=submit].error', elm =>{
+        assert.dom('#ForgotPassword', () => {
+          assert.dom('[name=submit].error', (elm) => {
             assert.same(elm.style.display, 'none');
-
           });
           assert.dom('[name=submit]+.errorMsg', 'An unexpected error occured. Please reload page.');
         });
@@ -81,7 +82,7 @@ isClient && define((require, exports, module)=>{
       });
     });
 
-    test("signing in", ()=>{
+    test('signing in', () => {
       TH.loginAs(Factory.createUser('guest'));
       Route.gotoPage(SignIn);
       stub(Route.history, 'back');
@@ -101,7 +102,7 @@ isClient && define((require, exports, module)=>{
         TH.click('form>fieldset:nth-child(2)>[type=submit]');
 
         assert.calledWith(UserAccount.loginWithPassword, 'test', 'bad',
-                          m(func => v.loginCallback = func));
+                          m((func) => v.loginCallback = func));
 
         assert.dom('form.submit-state #SignInProgress', 'Signing in...');
         v.loginCallback('ex');
@@ -117,7 +118,7 @@ isClient && define((require, exports, module)=>{
       assert.called(Route.history.back);
     });
 
-    test("cancel", ()=>{
+    test('cancel', () => {
       Route.gotoPage(SignIn);
       stub(Route.history, 'back');
       TH.click('[name=cancel]');

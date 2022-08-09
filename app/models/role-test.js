@@ -1,23 +1,27 @@
-isServer && define((require, exports, module)=>{
+isServer && define((require, exports, module) => {
+  const TH              = require('koru/model/test-db-helper');
   const Org             = require('models/org');
   const User            = require('models/user');
-  const TH              = require('test-helper');
   const Factory         = require('test/factory');
 
   const Role = require('./role');
 
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
-    afterEach(()=>{
-      TH.clearDB();
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
+    beforeEach(async () => {
+      await TH.startTransaction();
     });
 
-    test("persistence", ()=>{
-      const org = Factory.createOrg();
-      const user = Factory.createUser();
+    afterEach(async () => {
+      await TH.rollbackTransaction();
+    });
+
+    test('persistence', async () => {
+      const org = await Factory.createOrg();
+      const user = await Factory.createUser();
       const doc = Factory.last.role;
 
-      const loaded = doc.$reload(true); // true avoids cache
-      assert.same(Role.query.count(), 1);
+      const loaded = await doc.$reload(true); // true avoids cache
+      assert.same(await Role.query.count(), 1);
       assert.equals(loaded.org_id, org._id);
       assert.equals(loaded.user_id, user._id);
       assert.equals(loaded.role, doc.role);

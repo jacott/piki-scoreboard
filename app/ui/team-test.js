@@ -1,34 +1,35 @@
-isClient && define(function (require, exports, module) {
-  var test, v;
-  const Route      = require('koru/ui/route');
-  const Team       = require('models/team');
-  const TeamType   = require('models/team-type');
-  const App        = require('ui/app');
-  const TeamHelper = require('ui/team-helper');
-  const sut        = require('./team');
-  const TH         = require('./test-helper');
+isClient && define((require, exports, module) => {
+  'use strict';
+  const Route           = require('koru/ui/route');
+  const sut             = require('./team');
+  const TH              = require('./test-helper');
+  const Team            = require('models/team');
+  const TeamType        = require('models/team-type');
+  const Factory         = require('test/factory');
+  const App             = require('ui/app');
+  const TeamHelper      = require('ui/team-helper');
 
-  TH.testCase(module, {
-    setUp() {
-      test = this;
-      v = {};
-      v.org =  TH.Factory.createOrg();
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
+    let org;
+    beforeEach(() => {
+      TH.startTransaction();
+      org = Factory.createOrg();
       TH.login();
-      TH.setOrg(v.org);
-      TH.Factory.createTeamType({_id: 'tt1', name: 'type 1'});
+      TH.setOrg(org);
+      Factory.createTeamType({_id: 'tt1', name: 'type 1'});
       App.setAccess();
-    },
+    });
 
-    tearDown() {
-      TH.tearDown();
-      v = null;
+    afterEach(() => {
+      TH.domTearDown();
       TeamHelper.teamType_id = null;
-    },
+      TH.rollbackTransaction();
+    });
 
-    "test rendering"() {
-      var teams = TH.Factory.createList(2, 'createTeam');
-      TH.Factory.createTeamType();
-      var other = TH.Factory.createTeam();
+    test('rendering', () => {
+      var teams = Factory.createList(2, 'createTeam');
+      Factory.createTeamType();
+      var other = Factory.createTeam();
 
       TeamHelper.teamType_id = 'foo'; // should self correct
 
@@ -54,9 +55,9 @@ isClient && define(function (require, exports, module) {
         });
         assert.dom('nav [name=addTeam]', 'Add new type 1');
       });
-    },
+    });
 
-    "test adding new team"() {
+    test('adding new team', () => {
       Route.gotoPage(sut.Index);
 
       TH.selectMenu('#Team [name=teamType_id]', 'tt1');
@@ -72,12 +73,12 @@ isClient && define(function (require, exports, module) {
         refute.dom('#AddTeam');
       });
 
-      assert(Team.exists({org_id: v.org._id, name: 'Dynomites Wellington', shortName: 'Wgtn', teamType_id: 'tt1'}));
+      assert(Team.exists({org_id: org._id, name: 'Dynomites Wellington', shortName: 'Wgtn', teamType_id: 'tt1'}));
 
       assert.dom('#Team [name=addTeam]');
-    },
+    });
 
-    "test non admin can't add teamType "() {
+    test("non admin can't add teamType ", () => {
       TH.user().attributes.role = 'j';
       Route.gotoPage(sut.Index);
 
@@ -86,9 +87,9 @@ isClient && define(function (require, exports, module) {
           assert.dom('li', {count: 1});
         });
       });
-    },
+    });
 
-    "test adding new teamType"() {
+    test('adding new teamType', () => {
       Route.gotoPage(sut.Index);
 
       TH.selectMenu('#Team [name=teamType_id]', '$new');
@@ -101,7 +102,7 @@ isClient && define(function (require, exports, module) {
       });
       refute.dom('#AddTeamType');
 
-      assert(TeamType.exists({org_id: v.org._id, name: 'Club', default: true}));
+      assert(TeamType.exists({org_id: org._id, name: 'Club', default: true}));
 
       TH.selectMenu('#Team [name=teamType_id]', '$new');
 
@@ -111,17 +112,17 @@ isClient && define(function (require, exports, module) {
       });
       refute.dom('#AddTeamType');
 
-      assert(TeamType.exists({org_id: v.org._id, name: 'School', default: false}));
+      assert(TeamType.exists({org_id: org._id, name: 'School', default: false}));
 
       TH.selectMenu('#Team [name=teamType_id]', '$new');
       assert.dom('#AddTeamType', function () {
         TH.click('[name=cancel]');
       });
       refute.dom('#AddTeamType');
-    },
+    });
 
-    "test edit teamType"() {
-      let tt = TH.Factory.createTeamType({default: true});
+    test('edit teamType', () => {
+      let tt = Factory.createTeamType({default: true});
       Route.gotoPage(sut.Index);
       TH.selectMenu('#Team [name=teamType_id]', tt._id);
 
@@ -144,42 +145,43 @@ isClient && define(function (require, exports, module) {
       refute.dom('#EditTeamType');
 
       assert(TeamType.exists({org_id: tt.org_id, name: 'new name', default: false}));
-    },
+    });
 
-    "edit": {
-      setUp() {
-        v.team = TH.Factory.createTeam();
-        v.team2 = TH.Factory.createTeam();
+    group('edit', () => {
+      let team, team2;
+      beforeEach(() => {
+        team = Factory.createTeam();
+        team2 = Factory.createTeam();
 
         Route.gotoPage(sut.Index);
         TH.selectMenu('#Team [name=teamType_id]', 'tt1');
 
-        TH.click('td', v.team.name);
-      },
+        TH.click('td', team.name);
+      });
 
-      "test change name"() {
+      test('change name', () => {
         assert.dom('#Edit', function () {
-          assert.dom('h1', 'Edit ' + v.team.name);
-          TH.input('[name=name]', {value: v.team.name}, 'new name');
+          assert.dom('h1', 'Edit ' + team.name);
+          TH.input('[name=name]', {value: team.name}, 'new name');
           TH.click('[type=submit]');
         });
 
         assert.dom('#Team td', 'new name');
-      },
+      });
 
-      "test delete"() {
+      test('delete', () => {
         assert.dom('#Edit', function () {
           TH.click('[name=delete]');
         });
 
         assert.dom('.Dialog.Confirm', function () {
-          assert.dom('h1', 'Delete ' + v.team.name + '?');
+          assert.dom('h1', 'Delete ' + team.name + '?');
           TH.click('[name=cancel]');
         });
 
         refute.dom('.Dialog');
 
-        assert(Team.exists(v.team._id));
+        assert(Team.exists(team._id));
 
         TH.click('#Edit [name=delete]');
 
@@ -189,9 +191,8 @@ isClient && define(function (require, exports, module) {
 
         refute.dom('#Edit');
 
-        refute(Team.exists(v.team._id));
-      },
-    },
-
+        refute(Team.exists(team._id));
+      });
+    });
   });
 });

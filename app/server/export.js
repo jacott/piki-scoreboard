@@ -12,18 +12,19 @@ define((require, exports, module) => {
   const fs              = requirejs.nodeRequire('fs');
   const Role            = require('models/role');
   const User            = require('models/user');
-  const path            = requirejs.nodeRequire('path');
-  const {Readable}      = requirejs.nodeRequire('stream');
+
+  const path = requirejs.nodeRequire('path');
+  const {Readable} = requirejs.nodeRequire('stream');
 
   const {env} = process;
 
   const userFromAuth = (auth) => {
     const [sessId] = auth.split('|', 1);
     const conn = Session.conns[sessId];
-    return conn && conn.sessAuth === auth ? User.findById(conn.userId) : void 0;
+    return conn && conn.sessAuth === auth ? User.findById(conn.userId) : undefined;
   };
 
-  const EXCLUDE = '{"UserLogin", "ChangeLog"}';
+  const EXCLUDE = ['UserLogin', 'ChangeLog'];
 
   const whereEvent = (orgId) => `EXISTS(select 1 from "Event" as e
 where org_id = '${orgId}' and t.event_id = e._id)`;
@@ -49,7 +50,7 @@ where r.org_id = '${orgId}' and r.user_id = t."userId")`,
     return fn;
   };
 
-  const getTables = (pg) => pg.execParams(`
+  const getTables = (pg) => pg.exec(`
 SELECT table_name as name FROM information_schema.tables
  WHERE table_schema='public' AND table_type='BASE TABLE' AND NOT (table_name = ANY($1));`, [EXCLUDE]);
 
@@ -69,16 +70,18 @@ SELECT table_name as name FROM information_schema.tables
   const copyToStream = (pg, name, orgId, columns='*', format='') => {
     const whereFunc = WHERE_FUNCS[name];
     const where = whereFunc ? whereFunc(orgId) : `org_id = '${orgId}'`;
-    return pg.copyToStream(
+    return pg.conn.copyToStream(
       `COPY (select ${columns} from "${name}" as t where ${where}) TO STDOUT ` + format);
   };
+
+  const connectDb = () => Driver.connect(Driver.config.url, 'piki-export');
 
   const EXPORTERS = {
     sql: (res, orgId, filename) => {
       const writeTables = async () => {
+        const db = connectDb();
+        const pg = await db._getConn();
         try {
-          const pg = await Driver.Libpq.connect(Driver.config.url);
-
           const writeSql = (name) => {
             res.write(`COPY public."${name}" FROM stdin;\n`);
           };
@@ -104,6 +107,9 @@ SELECT table_name as name FROM information_schema.tables
         } catch (err) {
           koru.unhandledException(err);
           res.destroy(err);
+        } finally {
+          db._releaseConn();
+          db.end();
         }
       };
 
@@ -118,11 +124,11 @@ SELECT table_name as name FROM information_schema.tables
 
     csv: (res, orgId, filename) => {
       const writeTables = async (archive) => {
+        const db = connectDb();
+        const pg = await db._getConn();
         try {
-          const pg = await Driver.Libpq.connect(Driver.config.url);
-
           const writeData = async (name) => {
-            const stream = copyToStream(pg, name, orgId, void 0, '(FORMAT csv, header)');
+            const stream = copyToStream(pg, name, orgId, undefined, '(FORMAT csv, header)');
             archive.append(stream, {name: name + '.csv'});
 
             await streamEnd(stream);
@@ -136,6 +142,9 @@ SELECT table_name as name FROM information_schema.tables
         } catch (err) {
           koru.unhandledException(err);
           res.destroy(err);
+        } finally {
+          db._releaseConn();
+          db.end();
         }
       };
 
@@ -149,16 +158,16 @@ SELECT table_name as name FROM information_schema.tables
     },
   };
 
-  WebServer.registerHandler(module, 'export', (req, res) => {
+  WebServer.registerHandler(module, 'export', async (req, res) => {
     const [path, search] = req.url.replace(/^.*export\//, '').split('?');
     const [type, filename] = path.split('/');
     const [orgId, auth] = search.split('&');
-    const user = userFromAuth(auth);
-    const role = user && Role.readRole(user._id, orgId);
+    const user = await userFromAuth(auth);
+    const role = user === undefined ? undefined : await Role.readRole(user._id, orgId);
 
     const exporter = EXPORTERS[type];
 
-    if (exporter === void 0 || role === void 0 || ! /[sa]/.test(role.role)) {
+    if (exporter === undefined || role === undefined || ! /[sa]/.test(role.role)) {
       res.writeHead(403);
       res.end('Access denied');
       return;

@@ -1,22 +1,27 @@
-define((require, exports, module)=>{
-  const TH              = require('test-helper');
+define((require, exports, module) => {
+  const TH              = require('koru/model/test-db-helper');
+  const Factory         = require('test/factory');
 
   const Team = require('./team');
 
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
-    afterEach(()=>{
-      TH.clearDB();
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
+    beforeEach(async () => {
+      await TH.startTransaction();
     });
 
-    test("creation", ()=>{
-      const team=TH.Factory.createTeam();
+    afterEach(async () => {
+      await TH.rollbackTransaction();
+    });
+
+    test('creation', async () => {
+      const team = await Factory.createTeam();
 
       assert(team.teamType);
       assert(team.shortName);
       assert(team.org);
     });
 
-    test("standard validators", ()=>{
+    test('standard validators', () => {
       const validators = Team._fieldValidators;
 
       assert.validators(validators.name, {

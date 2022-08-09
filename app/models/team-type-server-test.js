@@ -1,87 +1,72 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const koru            = require('koru');
+  const Org             = require('./org');
+  const User            = require('./user');
   const Event           = require('models/event');
   const Series          = require('models/series');
   const Team            = require('models/team');
   const TH              = require('test-helper');
-  const Org             = require('./org');
-  const User            = require('./user');
+  const Factory         = require('test/factory');
 
   const {stub, spy, onEnd} = TH;
 
   const TeamType = require('./team-type');
 
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
     let org, user;
-    beforeEach(()=>{
-      org = TH.Factory.createOrg();
-      user = TH.Factory.createUser();
+    beforeEach(async () => {
+      await TH.startTransaction();
+      org = await Factory.createOrg();
+      user = await Factory.createUser();
       stub(koru, 'info');
     });
 
-    afterEach(()=>{
-      TH.clearDB();
+    afterEach(async () => {
+      await TH.rollbackTransaction();
     });
 
-    group("authorize", ()=>{
-      test("denied", ()=>{
-        const oOrg = TH.Factory.createOrg();
-        const oUser = TH.Factory.createUser();
+    group('authorize', () => {
+      test('denied', async () => {
+        const oOrg = await Factory.createOrg();
+        const oUser = await Factory.createUser();
 
-        const teamType = TH.Factory.buildTeamType();
+        const teamType = await Factory.buildTeamType();
 
-        assert.accessDenied(()=>{
-          teamType.authorize(user._id);
-        });
+        await assert.accessDenied(() => teamType.authorize(user._id));
       });
 
-      test("allowed", ()=>{
-        const teamType = TH.Factory.buildTeamType();
+      test('allowed', async () => {
+        const teamType = await Factory.buildTeamType();
 
-        refute.accessDenied(()=>{
-          teamType.authorize(user._id);
-        });
+        await refute.accessDenied(() => teamType.authorize(user._id));
       });
 
-      test("okay to remove", ()=>{
-        const teamType = TH.Factory.createTeamType();
+      test('okay to remove', async () => {
+        const teamType = await Factory.createTeamType();
 
-        refute.accessDenied(()=>{
-          teamType.authorize(user._id, {remove: true});
-        });
-
+        await refute.accessDenied(() => teamType.authorize(user._id, {remove: true}));
       });
 
-      test("remove in use with team", ()=>{
-        const teamType = TH.Factory.createTeamType();
-        TH.Factory.createTeam();
+      test('remove in use with team', async () => {
+        const teamType = await Factory.createTeamType();
+        await Factory.createTeam();
 
-        assert.accessDenied(()=>{
-          teamType.authorize(user._id, {remove: true});
-        });
-
+        await assert.accessDenied(() => teamType.authorize(user._id, {remove: true}));
       });
 
-      test("remove in use with series", ()=>{
-        const teamType = TH.Factory.createTeamType();
-        TH.Factory.createSeries({teamType_ids: [teamType._id]});
+      test('remove in use with series', async () => {
+        const teamType = await Factory.createTeamType();
+        await Factory.createSeries({teamType_ids: [teamType._id]});
 
-        assert.accessDenied(()=>{
-          teamType.authorize(user._id, {remove: true});
-        });
-
+        await assert.accessDenied(() => teamType.authorize(user._id, {remove: true}));
       });
 
-      test("remove in use with event", ()=>{
-        const teamType = TH.Factory.createTeamType();
-        TH.Factory.createEvent({teamType_ids: [teamType._id]});
+      test('remove in use with event', async () => {
+        const teamType = await Factory.createTeamType();
+        await Factory.createEvent({teamType_ids: [teamType._id]});
 
-        assert.accessDenied(()=>{
-          teamType.authorize(user._id, {remove: true});
-        });
-
+        await assert.accessDenied(() => teamType.authorize(user._id, {remove: true}));
       });
     });
-
   });
 });

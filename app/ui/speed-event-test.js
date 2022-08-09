@@ -205,6 +205,7 @@ isClient && define((require, exports, module) => {
     };
 
     beforeEach(() => {
+      TH.startTransaction();
       org = Factory.createOrg();
       cat = Factory.createCategory({type: 'S'});
       event = Factory.createEvent();
@@ -216,7 +217,8 @@ isClient && define((require, exports, module) => {
     });
 
     afterEach(() => {
-      TH.tearDown();
+      TH.domTearDown();
+      TH.rollbackTransaction();
     });
 
     group('scenarios', () => {
@@ -323,7 +325,6 @@ Rank Climber Semi-final Qual
 5    E       _          false_start
 `);
       });
-
 
       // Test placement in stages of final.
 
@@ -532,7 +533,6 @@ Rank Climber Semi-final 1/4-final   1/8-final     Qual
 `);
       });
 
-
       // Where fewer than 4 competitors record a valid time in the qual, there is no final round
       // (rule 9.1B2, 9.5). The rules do not state that ties for 1st, 2nd or 3rd should be broken so
       // Lisia proposes that Piki leave them unbroken.
@@ -596,7 +596,6 @@ Rank Climber     Qual
 3    E           fall
 `);
       });
-
 
       // Test rule 9.17-B: when there is a tie for the quota for the final, the tied competitors
       // rerun, but their times in the reruns are only used to decide who qualifies for the final,
@@ -691,7 +690,6 @@ Rank Climber Final Semi-final Qual
 `);
       });
 
-
       // Test relative overall rank of competitors eliminated and not tied in a stage of Final
       // Round: faster beats slower beats {fall/fs/-}
 
@@ -764,8 +762,6 @@ Rank Climber 1/4-final  1/8-final    Qual
 16   J       _          fall         9.100
 `);
       });
-
-
 
       // test relative overall rank of competitors eliminated and tied in 1/4-final,
       // with previous stage scores also tied: fall, fall, false start, false start
@@ -927,7 +923,6 @@ Rank Climber Semi-final 1/4-final   1/8-final     Qual
 `);
       });
 
-
       /* test Final Round race results
        *
        * TODO: ensure there is no difference between how the winner of the race for 1st is decided and how
@@ -970,7 +965,6 @@ Rank Climber Final  Semi-final  Qual
 4    A       fall   -           2.222
 `);
       });
-
 
       /* test Final Round race results
        *
@@ -1144,7 +1138,6 @@ Rank Climber Final  Semi-final  Qual
 4    C       fall   4.400       3.300
 `);
       });
-
 
       /* TODO: invalid combinations of scores in races in the Final round
        * fs vs fs (race should be rerun, rule 9.12-A2b)

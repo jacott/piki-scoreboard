@@ -1,21 +1,22 @@
-isClient && define((require, exports, module)=>{
+isClient && define((require, exports, module) => {
   const Dom             = require('koru/dom');
   const Session         = require('koru/session');
   const Route           = require('koru/ui/route');
   const UserAccount     = require('koru/user-account');
+  const App             = require('./app');
+  const TH              = require('./test-helper');
   const Org             = require('models/org');
   const User            = require('models/user');
   const Factory         = require('test/factory');
-  const App             = require('./app');
-  const TH              = require('./test-helper');
 
   const {stub, spy, after} = TH;
 
   const SystemSetup = require('./system-setup');
   let v = {};
 
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
-    beforeEach(()=>{
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
+    beforeEach(() => {
+      TH.startTransaction();
       v = {};
       App.orgId = Factory.createOrg({_id: 'org001'})._id;
       v.su = Factory.createUser('su');
@@ -23,16 +24,17 @@ isClient && define((require, exports, module)=>{
       App.setAccess();
     });
 
-    afterEach(()=>{
-      TH.tearDown();
+    afterEach(() => {
+      TH.domTearDown();
       v = null;
+      TH.rollbackTransaction();
     });
 
-    test("export data", ()=>{
+    test('export data', () => {
       Route.gotoPage(SystemSetup);
 
-      UserAccount.token = "userId123|token456";
-      TH.stubProperty(Session, 'sessAuth', {value: "mySessAuth"});
+      UserAccount.token = 'userId123|token456';
+      TH.stubProperty(Session, 'sessAuth', {value: 'mySessAuth'});
       stub(App, 'iframeGet');
 
       TH.selectMenu('nav [name=export]', 'sql');
@@ -41,7 +43,6 @@ isClient && define((require, exports, module)=>{
         id: 'iframeExportOrg',
         src: '/export/sql/piki-pg.sql?org001&mySessAuth',
         errorMsg: 'Export Data failed'});
-
 
       App.iframeGet.reset();
 
@@ -53,7 +54,7 @@ isClient && define((require, exports, module)=>{
         errorMsg: 'Export Data failed'});
     });
 
-    test("onEntry onExit", ()=>{
+    test('onEntry onExit', () => {
       Route.gotoPage(SystemSetup);
 
       assert.dom('#SystemSetup', function () {
@@ -62,13 +63,12 @@ isClient && define((require, exports, module)=>{
         });
       });
 
-
       Dom.tpl.SystemSetup.onBaseExit();
 
       refute.dom('#SystemSetup');
     });
 
-    test("renders orgs list", ()=>{
+    test('renders orgs list', () => {
       var orgs = Factory.createList(2, 'createOrg');
 
       Route.gotoPage(Dom.tpl.SystemSetup);
@@ -78,7 +78,7 @@ isClient && define((require, exports, module)=>{
       });
     });
 
-    test("renders users list", ()=>{
+    test('renders users list', () => {
       v.org = Factory.createOrg({name: 'org1'});
 
       setOrg();
@@ -91,7 +91,7 @@ isClient && define((require, exports, module)=>{
       });
     });
 
-    test("addOrg", ()=>{
+    test('addOrg', () => {
       Route.gotoPage(Dom.tpl.SystemSetup);
 
       assert.dom('#SystemSetup', function () {
@@ -115,8 +115,8 @@ isClient && define((require, exports, module)=>{
 
       assert.attributesEqual(org, {name: 'Foo Bar', shortName: 'FB', email: 'fb@foo.com'}, ['_id']);
     });
-    group("edit org", ()=>{
-      beforeEach(()=>{
+    group('edit org', () => {
+      beforeEach(() => {
         v.org = Factory.createOrg();
         v.org2 = Factory.createOrg();
 
@@ -125,7 +125,7 @@ isClient && define((require, exports, module)=>{
         TH.click('td', v.org.name);
       });
 
-      test("change name", ()=>{
+      test('change name', () => {
         assert.dom('#OrgForm', function () {
           TH.input('[name=name]', {value: v.org.name}, 'new name');
           TH.click('[type=submit]');
@@ -136,7 +136,7 @@ isClient && define((require, exports, module)=>{
         });
       });
 
-      test("delete", ()=>{
+      test('delete', () => {
         assert.dom('#OrgForm', function () {
           TH.click('[name=delete]');
         });
@@ -162,7 +162,7 @@ isClient && define((require, exports, module)=>{
       });
     });
 
-    test("addUser", ()=>{
+    test('addUser', () => {
       v.org = Factory.createOrg();
       setOrg();
 
@@ -179,7 +179,6 @@ isClient && define((require, exports, module)=>{
         TH.click('[type=submit]');
       });
 
-
       var user = User.query.where('name', 'Foo Bar').fetchOne();
       assert(user);
       assert.attributesEqual(user, {
@@ -191,8 +190,8 @@ isClient && define((require, exports, module)=>{
       assert.dom('#SystemSetup');
     });
 
-    group("edit user", ()=>{
-      beforeEach(()=>{
+    group('edit user', () => {
+      beforeEach(() => {
         v.org = Factory.createOrg();
         v.user = Factory.createUser();
         v.user2 = Factory.createUser();
@@ -202,7 +201,7 @@ isClient && define((require, exports, module)=>{
         TH.click('td', v.user.name);
       });
 
-      test("change name", ()=>{
+      test('change name', () => {
         assert.dom('#UserForm', function () {
           TH.input('[name=name]', {value: v.user.name}, 'new name');
           TH.click('[type=submit]');
@@ -213,7 +212,7 @@ isClient && define((require, exports, module)=>{
         });
       });
 
-      test("delete", ()=>{
+      test('delete', () => {
         assert.dom('#UserForm', function () {
           TH.click('[name=delete]');
         });

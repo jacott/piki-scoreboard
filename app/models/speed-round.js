@@ -1,5 +1,6 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const BTree           = require('koru/btree');
+  const session         = require('koru/session');
   const Result          = require('models/result');
 
   const {private$} = require('koru/symbols');
@@ -18,7 +19,7 @@ define((require, exports, module)=>{
     timeVsFS: 'Invalid score combination: time/fall vs false start. Enter "wc" (wildcard) instead of time/fall.',
   };
 
-  const isQualFormat = stage => stage == 0;
+  const isQualFormat = (stage) => stage == 0;
 
   const CONVERT_TIME = {
     wc: -1,
@@ -27,35 +28,39 @@ define((require, exports, module)=>{
     tie: NO_TIME,
   };
 
-  const toNumber = time => typeof time === 'number' ? time : CONVERT_TIME[time] || NO_TIME;
-  const isNotClimbed = time => typeof time !== 'number' && CONVERT_TIME[time] === void 0;
-  const stage1ToNumber = time => typeof time === 'number'
-        ? time : (time == 'fs' ? NO_TIME+1 : CONVERT_TIME[time]) || NOT_CLIMBED_SCORE;
+  const toNumber = (time) => typeof time === 'number' ? time : CONVERT_TIME[time] || NO_TIME;
+  const isNotClimbed = (time) => typeof time !== 'number' && CONVERT_TIME[time] === undefined;
+  const stage1ToNumber = (time) => typeof time === 'number'
+        ? time
+        : (time == 'fs' ? NO_TIME + 1 : CONVERT_TIME[time]) || NOT_CLIMBED_SCORE;
 
   const randomOrder = ({scores}, random) => {
-    let x = Math.floor(scores[0]*random);
+    let x = Math.floor(scores[0] * random);
     x ^= x << 13; x ^= x >> 17; x ^= x << 5;
-    return (x+10000500001)%999727999;
+    return (x + 10000500001) % 999727999;
   };
 
-  const compareQualStartOrder = (a, b)=>{
+  const compareQualStartOrder = (a, b) => {
     const a0 = a.scores[0];
     const b0 = b.scores[0];
     return a0 - b0;
   };
   compareQualStartOrder.compareKeys = ['scores', '_id'];
 
-  const scoreAB = (idx, scores, minQual) =>{
+  const scoreAB = (idx, scores, minQual) => {
     const qualScore = scores[idx];
-    if (qualScore == null || (qualScore[0] == null && qualScore[1] == null))
+    if (qualScore == null || (qualScore[0] == null && qualScore[1] == null)) {
       return NOT_CLIMBED_SCORE;
+    }
 
     const laneA = qualScore[0], laneB = qualScore[1];
-    if (laneA === 'fs' || laneB === 'fs')
+    if (laneA === 'fs' || laneB === 'fs') {
       return NO_TIME;
+    }
 
-    if (isNotClimbed(laneA) && isNotClimbed(laneB))
+    if (isNotClimbed(laneA) && isNotClimbed(laneB)) {
       return NOT_CLIMBED_SCORE;
+    }
 
     if (minQual) return Math.min(toNumber(laneA), toNumber(laneB));
     return Math.max(toNumber(laneA), toNumber(laneB));
@@ -66,28 +71,29 @@ define((require, exports, module)=>{
 
   function *finalsOrder(a, b, l, max) {
     if (l < max) {
-      yield *finalsOrder(a, b+l, l<<1, max);
-      yield *finalsOrder(b, a+l, l<<1, max);
+      yield* finalsOrder(a, b + l, l << 1, max);
+      yield* finalsOrder(b, a + l, l << 1, max);
     } else {
       yield a;
     }
   }
 
-  const compareQualResult = (idx, usage=COMPARE) =>{
-    return (a, b)=>{
+  const compareQualResult = (idx, usage=COMPARE) => {
+    return (a, b) => {
       if (a === b) return 0;
       const ma = minQual(idx, a.scores), mb = minQual(idx, b.scores);
       const ans = ma - mb;
 
       if (ans == 0) {
         const ans = maxQual(idx, a.scores) - maxQual(idx, b.scores);
-        if (ans != 0 || usage == COMPARE)
+        if (ans != 0 || usage == COMPARE) {
           return ans;
+        }
 
         const aRep = a.scores[idx], bRep = b.scores[idx];
         if (aRep != null && bRep != null) {
           const minLen = Math.min(aRep.length, bRep.length);
-          for(let i = 2; i < minLen; ++i) {
+          for (let i = 2; i < minLen; ++i) {
             const ans = toNumber(aRep[i]) - toNumber(bRep[i]);
             if (ans != 0) return ans;
           }
@@ -95,7 +101,8 @@ define((require, exports, module)=>{
         if (usage == TIEBREAK) return 0;
         const rnd = a.scores[0] - b.scores[0];
         return rnd == 0
-          ? (a._id < b._id ? -1 : 1) : rnd;
+          ? (a._id < b._id ? -1 : 1)
+          : rnd;
       }
       return ans;
     };
@@ -105,154 +112,163 @@ define((require, exports, module)=>{
   const compareQualResultCOMPARE = compareQualResult(1, COMPARE);
   const compareQualResultTIEBREAK = compareQualResult(1, TIEBREAK);
 
-  const timeFor = (scores, stage)=>{
+  const timeFor = (scores, stage) => {
     if (stage == 0) return minQual(1, scores);
-    const score = scores[stage+1];
+    const score = scores[stage + 1];
     if (score == null || score.time == null) return NOT_CLIMBED_SCORE;
     return toNumber(score.time);
   };
 
-  const rankQualResults = round =>{
+  const rankQualResults = (round) => {
     const {stage} = round;
     const list = new BTree(compareQualResultSORT);
 
     let invalid = 0;
-    for (const res of round.query) {
-      if (minQual(1, res.scores) >= NO_TIME) ++invalid;
-      list.add(res);
-    }
+    const {query} = round;
 
-    let validSize = list.size - invalid;
-
-    let cutoff;
-    for (cutoff of [16, 8, 4]) if (validSize >= cutoff) break;
-    round.cutoff = cutoff;
-
-    let ranking;
-    let count = -1;
-
-    count = 0;
-    let prev = null;
-
-    const random = round[random$];
-    const entries = round.entries = new BTree(compareRankingSORT);
-    for (const res of list) {
-      ++count;
-
-      if (prev === null ||
-          (count-1 == cutoff
-           ? compareQualResultTIEBREAK(prev, res)
-           : compareQualResultCOMPARE(prev, res)) != 0) {
-        ranking = count;
+    return ifPromise(isServer && typeof query.fetch === 'function' ? query.fetch() : query, (rows) => {
+      for (const res of rows) {
+        if (minQual(1, res.scores) >= NO_TIME) ++invalid;
+        list.add(res);
       }
-      res[ranking$] = ranking;
-      res[random$] = randomOrder(res, random);
-      entries.add(res);
-      prev = res;
-    }
+
+      let validSize = list.size - invalid;
+
+      let cutoff;
+      for (cutoff of [16, 8, 4]) if (validSize >= cutoff) break;
+      round.cutoff = cutoff;
+
+      let ranking;
+      let count = -1;
+
+      count = 0;
+      let prev = null;
+
+      const random = round[random$];
+      const entries = round.entries = new BTree(compareRankingSORT);
+      for (const res of list) {
+        ++count;
+
+        if (prev === null ||
+            (count - 1 == cutoff
+             ? compareQualResultTIEBREAK(prev, res)
+             : compareQualResultCOMPARE(prev, res)) != 0) {
+          ranking = count;
+        }
+        res[ranking$] = ranking;
+        res[random$] = randomOrder(res, random);
+        entries.add(res);
+        prev = res;
+      }
+    });
   };
 
-  const compareLevel = (a, b, stage)=>{
+  const compareLevel = (a, b, stage) => {
     const ass = a.scores, bss = b.scores;
-    const als = ass.length-2, bls = bss.length-2;
-    for(; stage < 5; ++stage) {
+    const als = ass.length - 2, bls = bss.length - 2;
+    for (;stage < 5; ++stage) {
       if (stage > als) {
         if (stage > bls) return 0;
-        if (bss[stage+1] != null) return stage;
+        if (bss[stage + 1] != null) return stage;
       } else {
-        if (ass[stage+1] != null) return stage;
-        if (stage <= bls && bss[stage+1] != null) return stage;
+        if (ass[stage + 1] != null) return stage;
+        if (stage <= bls && bss[stage + 1] != null) return stage;
       }
     }
     return 0;
   };
 
-  const winnerLooser = (res, previous)=>{
+  const winnerLooser = (res, previous) => {
     for (let stage = previous; stage < 5; ++stage) {
-      const rs = res.scores[stage+1];
+      const rs = res.scores[stage + 1];
       if (rs != null) {
         const o = Result.findById(rs.opponent_id);
         if (isWinner(res, o, stage)) return [res, o];
-        stage = previous-1;
+        stage = previous - 1;
         res = o;
       }
     }
     return [res];
   };
 
-  const compareKnockout = (a, b, stage)=>{
+  const compareKnockout = (a, b, stage) => {
     if (a === b) return 0;
     if (a === undefined) return 1;
     if (b === undefined) return -1;
-    const sa = a.scores[stage+1];
-    const sb = b.scores[stage+1];
+    const sa = a.scores[stage + 1];
+    const sb = b.scores[stage + 1];
     if (sb == null) return sa == null ? 0 : -1;
     if (sa == null) return 1;
     let ans = stage == 1
-        ? stage1ToNumber(sa.time) - stage1ToNumber(sb.time) : toNumber(sa.time) - toNumber(sb.time);
+        ? stage1ToNumber(sa.time) - stage1ToNumber(sb.time)
+        : toNumber(sa.time) - toNumber(sb.time);
     if (ans != 0) return ans;
     ans = compareQualResultCOMPARE(a, b);
     if (ans != 0) return ans;
     const tba = sa.tiebreak, tbb = sb.tiebreak;
     if (tba == null || tbb == null) return 0;
     const len = Math.min(tba.length, tbb.length);
-    for(let i = 0; i < len; ++i) {
+    for (let i = 0; i < len; ++i) {
       const ans = toNumber(tba[i]) - toNumber(tbb[i]);
       if (ans != 0) return ans;
     }
     return 0;
   };
 
-  const isWinner = (a, b, stage)=>compareKnockout(a, b, stage) < 0;
+  const isWinner = (a, b, stage) => compareKnockout(a, b, stage) < 0;
 
-  const calcQualStartList = (round)=>{
+  const calcQualStartList = (round) => {
     const entries = round.entries = new BTree(compareQualStartOrder);
     for (const res of round.query) entries.add(res);
 
     round.recalcQualsStartList();
   };
 
-  const compareRankingSORT = (a, b)=>{
+  const compareRankingSORT = (a, b) => {
     const ans = a[ranking$] - b[ranking$];
-    if (ans != 0)
+    if (ans != 0) {
       return ans;
-    else {
+    } else {
       const ans = a[random$] - b[random$];
       return ans == 0
-        ? a._id === b._id ? 0 : a._id < b._id ? -1 : 1 : ans;
+        ? a._id === b._id ? 0 : a._id < b._id ? -1 : 1
+      : ans;
     }
   };
   compareRankingSORT.compareKeys = [ranking$, random$, '_id'];
 
-  const compareRankingCOMPARE = (a, b)=> a[ranking$] - b[ranking$];
+  const compareRankingCOMPARE = (a, b) => a[ranking$] - b[ranking$];
 
-  const compareKnockoutTimes = (a, b, level)=>{
-    if (level != 4 || (compareLevel(a, b, 4) == 0))
+  const compareKnockoutTimes = (a, b, level) => {
+    if (level != 4 || (compareLevel(a, b, 4) == 0)) {
       return compareRankingCOMPARE(a, b);
-    const mas = a.scores[level+1], mbs = b.scores[level+1];
-    if (mas == null)
+    }
+    const mas = a.scores[level + 1], mbs = b.scores[level + 1];
+    if (mas == null) {
       return 1;
-    else if (mbs == null)
+    } else if (mbs == null) {
       return -1;
+    }
 
     const ans = toNumber(mas.time) - toNumber(mbs.time);
-    return ans != 0 ? ans : compareKnockoutTimes(a, b, level+1);
+    return ans != 0 ? ans : compareKnockoutTimes(a, b, level + 1);
   };
 
-  const compareFinals = (a, b)=>{
+  const compareFinals = (a, b) => {
     if (a === b) return 0;
     const level = compareLevel(a, b, 1);
-    const mas = a.scores[level+1], mbs = b.scores[level+1];
-    if (mas == null)
+    const mas = a.scores[level + 1], mbs = b.scores[level + 1];
+    if (mas == null) {
       return 1;
-    else if (mbs == null)
+    } else if (mbs == null) {
       return -1;
+    }
 
     if (mas.opponent_id === b._id) {
       return compareKnockout(a, b, level);
     } else if (level == 1) {
       const pl = compareLevel(a, b, 2);
-      const mas = a.scores[pl+1];
+      const mas = a.scores[pl + 1];
       return mas != null && isWinner(a, Result.findById(mas.opponent_id), pl) ? -1 : 1;
     } else {
       const aOpp = Result.findById(mas.opponent_id);
@@ -265,18 +281,18 @@ define((require, exports, module)=>{
         return 1;
       } else {
         const ans = toNumber(mas.time) - toNumber(mbs.time);
-        return ans != 0 ? ans : compareKnockoutTimes(a, b, level+1);
+        return ans != 0 ? ans : compareKnockoutTimes(a, b, level + 1);
       }
     }
   };
 
-  const breakElimWC = (a, b)=>{
+  const breakElimWC = (a, b) => {
     const mas = a.scores[4], mbs = b.scores[4];
     const ans = toNumber(mas && mas.time) - toNumber(mbs && mbs.time);
     return ans != 0 ? ans : compareRankingCOMPARE(a, b);
   };
 
-  const reAddGeneralResult = (entries, res, ranking)=>{
+  const reAddGeneralResult = (entries, res, ranking) => {
     if (res === null) return;
     entries.delete(res);
     res[ranking$] = ranking;
@@ -284,9 +300,7 @@ define((require, exports, module)=>{
     entries.add(res);
   };
 
-  const rankGeneralResults = (round)=>{
-    rankQualResults(round);
-
+  const rankGeneralResults = (round) => ifPromise(rankQualResults(round), () => {
     const {cutoff, entries} = round;
 
     if (entries.size < cutoff) return;
@@ -302,10 +316,10 @@ define((require, exports, module)=>{
     let isWcIn16Elim = false;
 
     if (finalists.length >= 16 && finalists[0].scores.length == 6) {
-      for(let i = 4; i < 8; ++i) {
+      for (let i = 4; i < 8; ++i) {
         const {scores} = finalists[i];
         if (scores.length == 6 && scores[5].time == 'wc') {
-          finalists.splice(4, 4, ...finalists.slice(4,8).sort(breakElimWC));
+          finalists.splice(4, 4, ...finalists.slice(4, 8).sort(breakElimWC));
           isWcIn16Elim = true;
           break;
         }
@@ -313,23 +327,23 @@ define((require, exports, module)=>{
     }
 
     let prev = null, ranking;
-    for(let count = 0; count < cutoff; ++count) {
+    for (let count = 0; count < cutoff; ++count) {
       const res = finalists[count];
       const pRanking = ranking;
       if (isWcIn16Elim && count > 4 && count < 8) {
         if (breakElimWC(prev, res) != 0) {
-          ranking = count+1;
+          ranking = count + 1;
         }
       } else if (prev === null || compareFinals(prev, res) != 0) {
-        ranking = count+1;
+        ranking = count + 1;
       }
       reAddGeneralResult(entries, prev, pRanking);
       prev = res;
     }
     reAddGeneralResult(entries, prev, ranking);
-  };
+  });
 
-  const assignLanes = (resA=null, resB=null)=>{
+  const assignLanes = (resA=null, resB=null) => {
     if (resA !== null) {
       resA[laneA$] = resA;
       resA[laneB$] = resB;
@@ -340,45 +354,47 @@ define((require, exports, module)=>{
     }
   };
 
-  const INV_LOG2 = 1/Math.log(2);
-  const countToStage = (count)=>Math.max(1, Math.floor(Math.log(.2+Math.min(16, count))*INV_LOG2));
+  const INV_LOG2 = 1 / Math.log(2);
+  const countToStage = (count) => Math.max(1, Math.floor(Math.log(.2 + Math.min(16, count)) * INV_LOG2));
 
   function *tiesOfQual(round, cutoff) {
     const compare = compareQualResultTIEBREAK;
     const nr = Array.from(round).sort(compare);
-    const coRes = nr[cutoff-1];
+    const coRes = nr[cutoff - 1];
     let tiesFound = false;
-    for(let i = cutoff; i < nr.length; ++i) {
+    for (let i = cutoff; i < nr.length; ++i) {
       const res = nr[i];
       if (compare(coRes, res) == 0) {
         tiesFound = true;
         yield res;
-      } else
+      } else {
         break;
+      }
     }
     if (! tiesFound) return;
 
     yield coRes;
-    for(let i = cutoff - 1; i >=0 ; --i) {
+    for (let i = cutoff - 1; i >= 0; --i) {
       const res = nr[i];
       if (compare(coRes, res) == 0) {
         yield res;
-      } else
+      } else {
         break;
+      }
     }
   }
 
-  const addTieAttempt = (round, res)=>{
+  const addTieAttempt = (round, res, updates) => {
     const {stage} = round;
 
     if (stage > 0) {
-      const scores = res.scores[stage+1];
+      const scores = res.scores[stage + 1];
       const {tiebreak} = scores;
       let attempt = 2;
       if (tiebreak != null) {
-        let last = tiebreak.length-1;
+        let last = tiebreak.length - 1;
 
-        for(; last >= 0; --last) {
+        for (;last >= 0; --last) {
           if (tiebreak[last] != null) {
             if (tiebreak[last] === 'tie') return;
             ++last;
@@ -387,15 +403,15 @@ define((require, exports, module)=>{
         }
         attempt += last;
       }
-      res.setSpeedScore({time: 'tie', stage, opponent_id: scores.opponent_id, attempt});
+      updates.push({_id: res._id, time: 'tie', stage, opponent_id: scores.opponent_id, attempt});
       return;
     }
     const scores = round.stageScores(res);
     const start = 2;
 
-    let last = scores.length-1;
+    let last = scores.length - 1;
 
-    for(; last >= start; --last) {
+    for (;last >= start; --last) {
       if (scores[last] != null) {
         if (scores[last] === 'tie') return;
         ++last;
@@ -404,10 +420,10 @@ define((require, exports, module)=>{
     }
 
     if (last < start) last = start;
-    res.setSpeedScore({time: 'tie', attempt: last+1});
+    updates.push({_id: res._id, time: 'tie', attempt: last + 1});
   };
 
-  const fallOrTime = (score)=> score === 'fall' || typeof score === 'number';
+  const fallOrTime = (score) => score === 'fall' || typeof score === 'number';
 
   const DNCRE = /d?nc/i;
 
@@ -416,7 +432,8 @@ define((require, exports, module)=>{
       Object.assign(this, opts);
       this.entries = null;
       this[random$] = this.stage == -1
-        ? GENERAL_RESULTS_PRIME:  PRIME[this.stage];
+        ? GENERAL_RESULTS_PRIME
+        : PRIME[this.stage];
     }
 
     isTimeValid(res) {return timeFor(res.scores, this.stage) < NO_TIME}
@@ -424,24 +441,26 @@ define((require, exports, module)=>{
 
     getTime(res, lane) {
       const {stage} = this;
-      const score = res.scores[stage+1];
+      const score = res.scores[stage + 1];
       if (score == null) return null;
       if (stage < 1) return score[lane];
       return score.time;
     }
 
     setTime(res, {time, lane, attempt, opponent_id}) {
-      if (DNCRE.test(time))
+      if (DNCRE.test(time)) {
         time = '-';
+      }
       const {stage} = this;
-      if (lane === undefined && attempt !== undefined)
-        lane = attempt+1;
+      if (lane === undefined && attempt !== undefined) {
+        lane = attempt + 1;
+      }
       if (stage == 0) {
-        return res.setSpeedScore({time, attempt: lane+1});
+        return res.setSpeedScore({time, attempt: lane + 1});
       } else if (opponent_id === undefined) {
         ++attempt;
         return res.setSpeedScore({
-          time, attempt, stage, opponent_id: res.scores[stage+1].opponent_id});
+          time, attempt, stage, opponent_id: res.scores[stage + 1].opponent_id});
       } else {
         return res.setSpeedScore({opponent_id, time, stage, attempt: 1});
       }
@@ -452,16 +471,18 @@ define((require, exports, module)=>{
       if (isQualFormat(stage)) {
         const quals = resA.scores[stage == 0 ? 1 : 2];
         return (quals !== undefined && quals[0] != null && quals[1] != null)
-          ? '' : ERROR.missingScore;
+          ? ''
+          : ERROR.missingScore;
       }
-      const scoreA = resA.scores[stage+1];
+      const scoreA = resA.scores[stage + 1];
       if (scoreA == null || scoreA.time == null) return ERROR.missingScore;
-      const scoreB = resA[laneB$].scores[stage+1];
+      const scoreB = resA[laneB$].scores[stage + 1];
       if (scoreB == null || scoreB.time == null) return ERROR.missingScore;
       if (stage != 1 &&
           ((scoreA.time === 'fs' && fallOrTime(scoreB.time)) ||
-           (scoreB.time === 'fs' && fallOrTime(scoreA.time))))
+           (scoreB.time === 'fs' && fallOrTime(scoreA.time)))) {
         return ERROR.timeVsFS;
+      }
       return '';
     }
 
@@ -482,12 +503,14 @@ define((require, exports, module)=>{
 
     calcStartList() {
       const {stage} = this;
-      if (isQualFormat(stage))
+      if (isQualFormat(stage)) {
         return calcQualStartList(this);
+      }
 
-      if (stage < 0)
-        throw new Error("invalid stage: "+stage);
-      const len = Math.max(1<<stage, 4), hlen = len>>1;
+      if (stage < 0) {
+        throw new Error('invalid stage: ' + stage);
+      }
+      const len = Math.max(1 << stage, 4), hlen = len >> 1;
       const quals = new SpeedRound({stage: 0, query: this.query});
       rankQualResults(quals);
 
@@ -512,12 +535,12 @@ define((require, exports, module)=>{
         assignLanes(pA, pB);
         entries[1] = pA;
       } else {
-        for(let i = 0; i < hlen; ++i) {
+        for (let i = 0; i < hlen; ++i) {
           const res = winnerLooser(iter.next().value, previous)[0];
           entries[res[ranking$] = posMap[i]] = res;
         }
 
-        for(let i = hlen-1; i >= 0; --i) {
+        for (let i = hlen - 1; i >= 0; --i) {
           const resA = entries[posMap[i]];
           const resB = winnerLooser(iter.next().value, previous)[0];
           assignLanes(resA, resB);
@@ -530,10 +553,10 @@ define((require, exports, module)=>{
     recalcQualsStartList() {
       const {entries} = this;
       const {size} = entries;
-      const step = (3+size)>>1;
+      const step = (3 + size) >> 1;
 
       let iterB = entries.values(), ansB;
-      for(let i = 0; i < step; ++i) ansB = iterB.next();
+      for (let i = 0; i < step; ++i) ansB = iterB.next();
 
       for (const resA of entries) {
         if (ansB.done) {
@@ -559,42 +582,45 @@ define((require, exports, module)=>{
       let validCount = 0;
       for (const res of this) {
         error = this.checkValid(res);
-        if (error !== '') break;
+        if (error !== '') return {error, nextStage};
         this.isTimeValid(res) && ++validCount;
       }
-      if (error === '') {
-        if (isQualFormat(stage)) {
-          const cutoff = stage == 0 ? 1<<countToStage(validCount) : 3;
 
-          if (validCount > 3 && validCount > cutoff) {
-            for (const res of tiesOfQual(this, cutoff)) {
-              error = ERROR.hasTies;
-              addTieAttempt(this, res);
-            }
+      const updates = [];
+      if (isQualFormat(stage)) {
+        const cutoff = stage == 0 ? 1 << countToStage(validCount) : 3;
+
+        if (validCount > 3 && validCount > cutoff) {
+          for (const res of tiesOfQual(this, cutoff)) {
+            error = ERROR.hasTies;
+            addTieAttempt(this, res, updates);
           }
-          if (error === '') {
-            nextStage = stage == 0 && validCount >= 4 ? countToStage(validCount) : -3;
+        }
+        if (error === '') {
+          nextStage = stage == 0 && validCount >= 4 ? countToStage(validCount) : -3;
+        }
+      } else {
+        for (const res of this) {
+          if (compareKnockout(res, res[laneB$], stage) == 0) {
+            addTieAttempt(this, res, updates);
+            addTieAttempt(this, res[laneB$], updates);
+            error = ERROR.hasTies;
           }
-        } else {
-          for (const res of this) {
-            if (compareKnockout(res, res[laneB$], stage) == 0) {
-              addTieAttempt(this, res);
-              addTieAttempt(this, res[laneB$]);
-              error = ERROR.hasTies;
-            }
-          }
-          if (error === '') {
-            if (stage > 1) --nextStage;
-            else nextStage = -3;
+        }
+        if (error === '') {
+          if (stage > 1) {
+            --nextStage;
+          } else {
+            nextStage = -3;
           }
         }
       }
-      return {error, nextStage};
+      return ifPromise(session.rpc('Result.complete', updates), () => ({error, nextStage}));
     }
 
     stageScores(res) {
       const {stage} = this;
-      return res.scores[stage+1];
+      return res.scores[stage + 1];
     }
 
     *attempts(res) {
@@ -603,33 +629,35 @@ define((require, exports, module)=>{
       if (scores == null) return;
       if (stage < 1) {
         const start = 2;
-        let last = scores.length-1;
-        for(; last >= start; --last) if (scores[last] != null) break;
+        let last = scores.length - 1;
+        for (;last >= start; --last) if (scores[last] != null) break;
 
-        for(let i = start; i <= last; ++i) {
+        for (let i = start; i <= last; ++i) {
           yield scores[i];
         }
       } else {
         const {tiebreak} = scores;
-        if (tiebreak != null) for (const time of tiebreak)
+        if (tiebreak != null) for (const time of tiebreak) {
           yield time;
+        }
       }
     }
   }
 
   SpeedRound.ERROR = ERROR;
-  SpeedRound.laneA = res => res[laneA$];
-  SpeedRound.laneB = res => res[laneB$];
-  SpeedRound.ranking = res => res[ranking$];
-  SpeedRound.minQual = (res, idx=1) =>{
+  SpeedRound.laneA = (res) => res[laneA$];
+  SpeedRound.laneB = (res) => res[laneB$];
+  SpeedRound.ranking = (res) => res[ranking$];
+  SpeedRound.minQual = (res, idx=1) => {
     const qualScores = res.scores[idx];
     if (qualScores == null) return '';
-    if (qualScores[0] == 'fs' || qualScores[1] == 'fs')
+    if (qualScores[0] == 'fs' || qualScores[1] == 'fs') {
       return 'false start';
+    }
     const time = minQual(idx, res.scores);
     if (time == -1) return 'wildcard';
     if (time < NO_TIME) return time;
-    if (time == NOT_CLIMBED_SCORE)  return '';
+    if (time == NOT_CLIMBED_SCORE) return '';
     return 'fall';
   };
   SpeedRound.compareRankingSORT = compareRankingSORT;

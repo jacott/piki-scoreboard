@@ -156,7 +156,7 @@
     </nav>
 
     <section name="general-info">
-      <h1>General Information</h1>
+      <h1>General information</h1>
       <ul>
         <li>Piki is a web application for managing the results
         of <a href="https://www.ifsc-climbing.org">IFSC</a>-format climbing competitions. Piki
@@ -191,7 +191,7 @@
         Please contact a <i>Piki Org Admin</i> from your organization to arrange to be added as a Piki user.
       </p>
       <p>
-        When you have been added as a user, a <i>Reset password</i> link will be sent to the email address entered for you.
+        When you have been added as a user, a <i>Reset password</i> link will be sent to your email address.
       </p>
     </section>
 
@@ -240,7 +240,7 @@
               </inlinehelp> (Lead and Boulder only).
             </li>
 
-            <li>Select the <b>gender</b> from the dropdown menu.</li>
+            <li>If desired, select a <b>gender</b> from the dropdown menu.</li>
 
             <li>If desired, enter a <b>minimum age</b> and <b>maximum age</b>.
           </ol>
@@ -318,12 +318,19 @@
     <section name="registration">
       <h1>Upload multiple registrations from file</h1>
       <span name="upload-registrations">
-        <p>The current <i>Upload registrations</i> feature is a hack designed for use with Climbing
-        NZ's registration system. Climbing NZ users, please contact your Org Admin for
-        instructions. Other organizations,
-        please <a href="mailto:piki@vimaly.com?subject=requesting%20Piki%20upload%20reg%20instructions%20and%20sample">email
-        Piki</a> to request instructions and a sample CSV file showing the format you will need to
-        use in your upload file.
+        <p>The current <i>Upload registrations</i> feature accepts csv files matching the format of
+          exports from Climbing NZ's registration system. Sample file:
+        </p>
+        <p id="sample-file">
+          Fee level,First Name,Last Name,Birth Date,Participant ID<br>
+          "Rotorua Climbing Club, Junior Female [FJL]",Elizabeth,Bennet,2003-02-21,121<br>
+          "Dynomites Climbing Club, Masters Boulder, Masters Lead [MB, ML]",Atticus,Finch,1973-11-11,
+        </p>
+        <p>
+          The <i>Fee level</i> column format is "&lt;club-name&gt;, &lt;text&gt; [&lt;CODES&gt;]" where:<br>
+          &lt;club-name&gt; must match the club name in Piki exactly and may not contain any "," commas.<br>
+          &lt;text&gt; can be anything.<br>
+          &lt;CODES&gt; is a comma-separated list of category codes that must match exactly to the Piki category short names. The list must be surround by square brackets "[ ]".<br>
         </p>
       </span>
     </section>
@@ -346,20 +353,22 @@
         Admins and judges only.
       </p>
       {{> SignedIn}}
-      <ol>
-        <li>
-          <inlinehelp>
-            Go to the <i>Start lists</i> page<popup>{{> NavStartLists}}</popup>
-          </inlinehelp>
-          for the event, and click on the desired round or route.<br>  Alternatively, from
-          the <i>Results</i> page for the desired round or route, click <i>Show start order</i> at
-          the top right of the page, or click in one of the <i>score</i> cells.
-        </li>
-        <li>At the start list, click in the appropriate cell in the table and type the score
-          (see <i>Lead scores</i>, <i>Boulder scores</i> and <i>Speed scores</i> below for
-          details).</li>
-        <li>Press <i>Tab</i> to move to the next cell.</li>
-      </ol>
+      <p>
+        <ol>
+          <li>
+            <inlinehelp>
+              Go to the <i>Start lists</i> page<popup>{{> NavStartLists}}</popup>
+            </inlinehelp>
+            for the event, and click on the desired round or route.<br>  Alternatively, from
+            the <i>Results</i> page for the desired round or route, click <i>Show start order</i> at
+            the top right of the page, or click in one of the <i>score</i> cells.
+          </li>
+          <li>At the start list, click in the appropriate cell in the table and type the score
+            (see <i>Lead scores</i>, <i>Boulder scores</i> and <i>Speed scores</i> below for
+            details).</li>
+          <li>Press <i>Tab</i> to move to the next cell.</li>
+        </ol>
+      </p>
 
       <section>
         <h1>Lead scores</h1>
@@ -619,7 +628,7 @@
     <section name="contact-us">
       <h1>Contact us</h1>
       <p>
-        <a href="mailto:piki@vimaly.com?subject=Application%20to%20register%20as%20an%20organization%20on%20Piki&body=Organization%20name:%20%0a%0aOrganization%20website:%20%0a%0aOrganization%20email%20address:%20%0a%0aName%20of%20person%20to%20be%20my%20organization's%20Piki%20Admin:%20%0a%0aThe%20email%20address%20that%20person%20wishes%20to%20use%20to%20sign%20in:%20%0a%0aName%20and%20date%20of%20the%20first%20event%20where%20we%20would%20like%20to%20test%20Piki:%20%0a%0aMy%20organization%20_____________________________%20(insert%20organization%20name)%20understands%20and%20accepts%20the%20Disclaimer%20and%20General%20Information%20in%20the%20Help%20on%20the%20Piki%20website.%0a%0aHow%20we%20heard%20about%20Piki:%20%0a%0aAny%20further%20information:%20">Apply to register as an organization</a>. (Please read the <a href="#disclaimer">Disclaimer</a> and <a href="#general-info">General information</a>.)
+        <a href="#org-reg">Apply to use Piki for your organization's climbing competitions.</a>
       </p>
       <p>
         To sign up to manage your organization's Piki events, please contact a <i>Piki Org Admin</i>
@@ -627,8 +636,7 @@
       </p>
       <p>If you have feedback, suggestions, or questions not answered in the Help,
       please <a href="mailto:piki@vimaly.com?subject=enquiry%20from%20Piki%20website">email
-      Piki</a>. We have a long list of improvements we'd like to make to Piki; it's very helpful to
-      hear from Piki's users which improvements and new features would be most useful to you.
+      Piki</a>.
       </p>
     </section>
 

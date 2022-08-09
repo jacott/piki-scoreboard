@@ -1,6 +1,6 @@
-const unzipper        = require('unzipper');
+const unzipper = require('unzipper');
 
-define((require, exports, module)=>{
+define((require, exports, module) => {
   'use strict';
   const TH              = require('koru/model/test-db-helper');
   const Driver          = require('koru/pg/driver');
@@ -13,38 +13,32 @@ define((require, exports, module)=>{
   const Result          = require('models/result');
   const Factory         = require('test/factory');
 
-  const {Writable, Transform}      = requirejs.nodeRequire('stream');
+  const {Writable, Transform} = requirejs.nodeRequire('stream');
 
   const {stub, spy, util, intercept, stubProperty} = TH;
 
   const Export = require('./export');
 
-  TH.testCase(module, ({before, after, beforeEach, afterEach, group, test})=>{
+  TH.testCase(module, ({before, after, beforeEach, afterEach, group, test}) => {
     let exportOrg;
-    beforeEach(()=>{
-      TH.startTransaction();
+    beforeEach(async () => {
+      await TH.startTransaction();
       exportOrg = WebServer.getHandler('export');
       stub(UserAccount, 'sendResetPasswordEmail');
     });
 
-    afterEach(()=>{
-      TH.rollbackTransaction();
-    });
+    afterEach(() => TH.rollbackTransaction());
 
-    test("export csv", async ()=>{
+    test('export csv', async () => {
       let id = 1000;
-      intercept(Random, 'id', () => 'id'+(++id));
-      const org = Factory.createOrg();
-      const user = Factory.createUser('admin');
-      Factory.createResult();
-      Factory.createResult();
-      const org2 = Factory.createOrg();
-      Factory.createResult();
-      const future = new util.Future;
-      Org.db.withConn(conn =>{future.return(conn)});
-      const pg = future.wait();
-      const {Libpq} = Driver;
-      stub(Libpq, 'connect', url => Driver.config.url === url ? pg : void 0);
+      intercept(Random, 'id', () => 'id' + (++id));
+      const org = await Factory.createOrg();
+      const user = await Factory.createUser('admin');
+      await Factory.createResult();
+      await Factory.createResult();
+      const org2 = await Factory.createOrg();
+      await Factory.createResult();
+      stub(Driver, 'connect', (url) => Driver.config.url === url ? Org.db : undefined);
       let ended = false;
       let output = '';
 
@@ -74,7 +68,7 @@ define((require, exports, module)=>{
 
       res
         .pipe(zip)
-        .on('entry', entry =>{
+        .on('entry', (entry) => {
           const name = entry.path;
           tables[name] = '';
           const wr = new Writable({
@@ -85,47 +79,41 @@ define((require, exports, module)=>{
             autoDestroy: true,
           });
           entry.pipe(wr);
-        })
-      ;
+        });
 
       exportOrg(req, res);
 
-      assert.calledWith(res.writeHead, 200, {
-        'Content-Type': 'application/zip',
-        'Content-disposition': 'attachment; filename=output-csv.zip',
-        'Transfer-Encoding': 'chunked'
-      });
-
-      await new Promise((resolve, reject)=>{
+      await new Promise((resolve, reject) => {
         zip.on('finish', resolve);
         res.on('error', reject);
         zip.on('error', reject);
       });
 
+      assert.calledWith(res.writeHead, 200, {
+        'Content-Type': 'application/zip',
+        'Content-disposition': 'attachment; filename=output-csv.zip',
+        'Transfer-Encoding': 'chunked',
+      });
       assert.equals(
         tables['Org.csv'],
-        "_id,name,email,shortName\n"+
-          "id1001,Org 1,email1@vimaly.com,SN1\n");
+        '_id,name,email,shortName\n' +
+          'id1001,Org 1,email1@vimaly.com,SN1\n');
       assert.equals(
         tables['Event.csv'],
-        "_id,name,org_id,heats,date,errors,closed,teamType_ids,series_id,ruleVersion\n"+
-          "id1009,Event 1,id1001,\"{\"\"id1005\"\": \"\"LQQF8\"\"}\",2014-04-01,,,{id1006},,1\n");
+        '_id,name,org_id,heats,date,errors,closed,teamType_ids,series_id,ruleVersion\n' +
+          'id1007,Event 1,id1001,"{""id1006"": ""LQQF8""}",2014-04-01,,,{id1005},,1\n');
     });
 
-    test("export sql", async ()=>{
+    test('export sql', async () => {
       let id = 1000;
-      intercept(Random, 'id', () => 'id'+(++id));
-      const org = Factory.createOrg();
-      const user = Factory.createUser('admin');
-      Factory.createResult();
-      Factory.createResult();
-      const org2 = Factory.createOrg();
-      Factory.createResult();
-      const future = new util.Future;
-      Org.db.withConn(conn =>{future.return(conn)});
-      const pg = future.wait();
-      const {Libpq} = Driver;
-      stub(Libpq, 'connect', url => Driver.config.url === url ? pg : void 0);
+      intercept(Random, 'id', () => 'id' + (++id));
+      const org = await Factory.createOrg();
+      const user = await Factory.createUser('admin');
+      await Factory.createResult();
+      await Factory.createResult();
+      const org2 = await Factory.createOrg();
+      await Factory.createResult();
+      stub(Driver, 'connect', (url) => Driver.config.url === url ? Org.db : undefined);
       let ended = false;
       let output = '';
       const res = new Writable({
@@ -143,7 +131,7 @@ define((require, exports, module)=>{
         headers: {},
       };
 
-      const p =  new Promise((resolve, reject)=>{
+      const p = new Promise((resolve, reject) => {
         res.end = resolve;
         res.on('error', reject);
       });
@@ -156,17 +144,17 @@ define((require, exports, module)=>{
 
       exportOrg(req, res);
 
-      assert.same(await p, void 0);
+      assert.same(await p, undefined);
 
       assert.calledWith(res.writeHead, 200, {
         'Content-Type': 'application/sql',
         'Content-disposition': 'attachment; filename=fooBar.json.sql',
-        'Transfer-Encoding': 'chunked'
+        'Transfer-Encoding': 'chunked',
       });
 
       assert.match(output, `CREATE TABLE public."Climber"`);
       assert.match(output, `COPY public."Climber" FROM stdin;
-id1008	Climber 1	id1001	\\N	2000-01-01	m	1	\\N	\\N	{id1007}
+id1008	Climber 1	id1001	\\N	2000-01-01	m	1	\\N	\\N	{id1009}
 \\.
 `);
 

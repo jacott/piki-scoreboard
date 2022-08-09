@@ -1,4 +1,4 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const koru            = require('koru');
   const Dom             = require('koru/dom');
   const localStorage    = require('koru/local-storage');
@@ -22,14 +22,8 @@ define((require, exports, module)=>{
       Dom.addClass(document.body, 'inOrg');
     },
 
-    tearDown(v) {
-      TH.clearDB();
-      TH.domTearDown();
-      util.thread.userId = null;
-    },
-
     addStyles(styles) {
-      var style = Dom.h({style: '', class: "testStyle"});
+      var style = Dom.h({style: '', class: 'testStyle'});
 
       style.innerHTML = styles;
       document.head.appendChild(style);
@@ -37,9 +31,9 @@ define((require, exports, module)=>{
 
     pointer(node, eventName, args) {
       if (typeof node === 'string') {
-        assert.elideFromStack.dom(node, elm =>{TH.pointer(elm, eventName, args)});
+        assert.elideFromStack.dom(node, (elm) => {TH.pointer(elm, eventName, args)});
       } else {
-        assert.elideFromStack(node,'node not found');
+        assert.elideFromStack(node, 'node not found');
         if (typeof eventName === 'object') {
           args = eventName;
           eventName = 'pointermove';
@@ -49,15 +43,15 @@ define((require, exports, module)=>{
         }
         var bbox = node.getBoundingClientRect();
 
-        args.clientX = bbox.left + bbox.width/2;
-        args.clientY = bbox.top + bbox.height/2;
+        args.clientX = bbox.left + bbox.width / 2;
+        args.clientY = bbox.top + bbox.height / 2;
 
-        var event =  TH.buildEvent(eventName, args);
+        var event = TH.buildEvent(eventName, args);
 
         if (document.createEvent) {
           TH.dispatchEvent(node, event);
         } else {
-          node.fireEvent("on" + event.__name, event);
+          node.fireEvent('on' + event.__name, event);
         }
         return event;
       }
@@ -65,11 +59,11 @@ define((require, exports, module)=>{
 
     stubRAF(v) {
       let func = null;
-      TH.intercept(window, 'requestAnimationFrame', arg =>{
+      TH.intercept(window, 'requestAnimationFrame', (arg) => {
         func = arg;
         return 123;
       });
-      v.nextRaf = ()=>{
+      v.nextRaf = () => {
         if (func !== null) {
           func();
           func = null;
@@ -86,7 +80,7 @@ define((require, exports, module)=>{
     confirm(func) {
       const dialog = document.body.querySelector('.Dialog');
       assert.elideFromStack.msg('should display Confirm Dialog')(dialog);
-      assert.elideFromStack.dom(dialog, elm=>{
+      assert.elideFromStack.dom(dialog, (elm) => {
         const data = Dom.current.data(elm);
         assert.isFunction(data.onConfirm);
         func && func(elm);
@@ -99,14 +93,14 @@ define((require, exports, module)=>{
 
   let onAnimationEnd;
 
-  TH.Core.onStart(()=>{
+  TH.Core.onStart(() => {
     onAnimationEnd = Dom.Ctx.prototype.onAnimationEnd;
     Dom.Ctx.prototype.onAnimationEnd = function (func, repeat) {
       func(this, this.element());
-    };
+    }
   });
 
-  TH.Core.onEnd(()=>{Dom.Ctx.prototype.onAnimationEnd = onAnimationEnd});
+  TH.Core.onEnd(() => {Dom.Ctx.prototype.onAnimationEnd = onAnimationEnd});
 
   module.exports = TH;
 });

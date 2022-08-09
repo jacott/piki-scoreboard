@@ -1,8 +1,8 @@
-define((require)=>{
+define((require) => {
   const Val             = require('koru/model/validation');
-  const Event           = require('models/event');
   const ChangeLog       = require('./change-log');
   const User            = require('./user');
+  const Event           = require('models/event');
 
   const FIELD_SPEC = {
     time: 'integer',
@@ -18,13 +18,21 @@ define((require)=>{
     competitor_id: 'id',
   };
 
-  return Result =>{
+  return (Result) => {
     ChangeLog.logChanges(Result, {parent: Event});
 
-    Result.prototype.authorize = function (userId) {
+    Result.prototype.authorize = async function (userId) {
       Val.assertDocChanges(this, FIELD_SPEC, NEW_FIELD_SPEC);
-      User.fetchAdminister(userId, this);
+      await User.fetchAdminister(userId, this);
       Val.allowAccessIf(! this.event.closed);
-    };
+    }
+
+    Result.remote({
+      async complete(results) {
+        for (const row of results) {
+          await (await Result.findById(row._id))._doSetSpeedScore(row);
+        }
+      },
+    });
   };
 });

@@ -1,24 +1,23 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const TH              = require('test-helper');
+  const Factory         = require('test/factory');
 
   const TeamType = require('./team-type');
 
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
-    afterEach(()=>{
-      TH.clearDB();
-    });
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
+    beforeEach(() => TH.startTransaction());
+    afterEach(() => TH.rollbackTransaction());
 
-    test("creation", ()=>{
-      const teamType=TH.Factory.createTeamType();
+    test('creation', async () => {
+      const teamType = await Factory.createTeamType();
 
-      assert(TeamType.exists(teamType._id));
+      assert(await TeamType.exists(teamType._id));
       assert(teamType.name);
       assert(teamType.org);
       assert.same(teamType.default, false);
-
     });
 
-    test("standard validators", ()=>{
+    test('standard validators', () => {
       const validators = TeamType._fieldValidators;
 
       assert.validators(validators.name, {

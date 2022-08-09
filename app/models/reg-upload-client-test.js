@@ -1,31 +1,34 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const session         = require('koru/session');
   const Event           = require('models/event');
   const TH              = require('test-helper');
+  const Factory         = require('test/factory');
 
   const {stub, spy, onEnd, match: m} = TH;
 
   const RegUpload = require('./reg-upload-client');
 
   let v = {};
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
-    beforeEach(()=>{
-      v.event = TH.Factory.createEvent();
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
+    beforeEach(() => {
+      TH.startTransaction();
+      v.event = Factory.createEvent();
       v.fileReader = window.FileReader;
     });
 
-    afterEach(()=>{
+    afterEach(() => {
       window.fileReader = v.fileReader;
+      TH.rollbackTransaction();
       v = {};
     });
 
-    test("uploading", ()=>{
-      const file = {name: 'foo.csv', slice: stub().returns("abcd")};
+    test('uploading', () => {
+      const file = {name: 'foo.csv', slice: stub().returns('abcd')};
       const frStub = window.FileReader = TH.MockFileReader(v);
 
       stub(session, 'rpc');
 
-      RegUpload.upload(v.event._id, file, (error, result)=>{
+      RegUpload.upload(v.event._id, file, (error, result) => {
         v.callResultError = error;
         v.callResultResult = result;
       });
@@ -34,13 +37,13 @@ define((require, exports, module)=>{
       const fr = v.fileReader;
       assert.same(fr.constructor, frStub);
       assert.isFunction(fr.onload);
-      assert.same(fr._result2Str(), "abcd");
+      assert.same(fr._result2Str(), 'abcd');
 
       fr.onload();
       let callResultFunc;
       assert.calledWithExactly(session.rpc, 'Reg.upload', v.event._id,
-                               m(arg => 'abcd' === fr._result2Str(arg)),
-                               m(func => callResultFunc = func));
+                               m((arg) => 'abcd' === fr._result2Str(arg)),
+                               m((func) => callResultFunc = func));
 
       callResultFunc('bad file', 'the result');
 

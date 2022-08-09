@@ -1,4 +1,4 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const TH              = require('test-helper');
   const Factory         = require('test/factory');
 
@@ -8,26 +8,25 @@ define((require, exports, module)=>{
 
   const Category = require('./category');
 
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
-    afterEach(()=>{
-      TH.clearDB();
-    });
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
+    beforeEach(() => TH.startTransaction());
+    afterEach(() => TH.rollbackTransaction());
 
-    test("creation", ()=>{
-      const category = Factory.createCategory();
+    test('creation', async () => {
+      const category = await Factory.createCategory();
 
-      assert(Category.exists(category._id));
+      assert(await Category.exists(category._id));
 
       assert(category.org);
     });
 
-    test("standard validators", ()=>{
+    test('standard validators', () => {
       const validators = Category._fieldValidators;
 
       assert.validators(validators.name, {maxLength: [200], required: [true], trim: [true]});
       assert.validators(validators.group, {maxLength: [30], required: [true], trim: [true]});
-      assert.validators(validators.type, {inclusion: [{matches: /^[BLS]$/ }]});
-      assert.validators(validators.gender, {inclusion: [{allowBlank: true, matches: /^[mf]$/ }]});
+      assert.validators(validators.type, {inclusion: [{matches: /^[BLS]$/}]});
+      assert.validators(validators.gender, {inclusion: [{allowBlank: true, matches: /^[mf]$/}]});
       assert.validators(validators.shortName, {maxLength: [10], required: [true], trim: [true],
                                                normalize: ['upcase']});
       assert.validators(validators.minAge, {number: [{integer: true, $gt: 0, $lt: 100}]});
@@ -35,17 +34,17 @@ define((require, exports, module)=>{
       assert.validators(validators.heatFormat, {validate: [m.func]});
     });
 
-    test("heatFormat", ()=>{
-      const cat = Factory.buildCategory({type: 'L'});
+    test('heatFormat', async () => {
+      const cat = await Factory.buildCategory({type: 'L'});
 
-      const assertInvalid = (heatFormat, msg="is_invalid")=>{
+      const assertInvalid = (heatFormat, msg='is_invalid') => {
         cat.heatFormat = heatFormat;
 
         refute(cat.$isValid());
         assert.equals(cat[error$], {heatFormat: [[msg]]});
       };
 
-      const assertValid = (heatFormat)=>{
+      const assertValid = (heatFormat) => {
         cat.heatFormat = heatFormat;
 
         assert.elideFromStack.msg(TH.showErrors(cat))(cat.$isValid());

@@ -1,26 +1,29 @@
-isClient && define((require, exports, module)=>{
+isClient && define((require, exports, module) => {
   const Route           = require('koru/ui/route');
-  const Category        = require('models/category');
-  const App             = require('ui/app');
   const TH              = require('./test-helper');
+  const Category        = require('models/category');
+  const Factory         = require('test/factory');
+  const App             = require('ui/app');
 
   const sut = require('./category');
 
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
     let org;
-    beforeEach(()=>{
-      org =  TH.Factory.createOrg();
+    beforeEach(() => {
+      TH.startTransaction();
+      org = Factory.createOrg();
       TH.login();
       TH.setOrg(org);
       App.setAccess();
     });
 
-    afterEach(()=>{
-      TH.tearDown();
+    afterEach(() => {
+      TH.domTearDown();
+      TH.rollbackTransaction();
     });
 
-    test("rendering", ()=>{
-      const categories = TH.Factory.createList(2, 'createCategory');
+    test('rendering', () => {
+      const categories = Factory.createList(2, 'createCategory');
 
       Route.gotoPage(sut.Index);
 
@@ -40,12 +43,12 @@ isClient && define((require, exports, module)=>{
       });
     });
 
-    test("adding new category", ()=>{
+    test('adding new category', () => {
       Route.gotoPage(sut.Index);
 
-      assert.dom('#Category', ()=>{
+      assert.dom('#Category', () => {
         TH.click('[name=addCategory]');
-        assert.dom('#AddCategory', ()=>{
+        assert.dom('#AddCategory', () => {
           TH.input('[name=name]', 'Dynomites Wellington');
           TH.input('[name=shortName]', 'YB M');
           TH.selectMenu('[name=type]', 'L');
@@ -66,12 +69,12 @@ isClient && define((require, exports, module)=>{
       assert.dom('#Category [name=addCategory]');
     });
 
-    test("adding speed", ()=>{
+    test('adding speed', () => {
       Route.gotoPage(sut.Index);
 
-      assert.dom('#Category', ()=>{
+      assert.dom('#Category', () => {
         TH.click('[name=addCategory]');
-        assert.dom('#AddCategory', ()=>{
+        assert.dom('#AddCategory', () => {
           TH.input('[name=name]', 'Dynomites Wellington');
           TH.input('[name=shortName]', 'YB M');
           TH.selectMenu('[name=type]', 'S');
@@ -91,18 +94,18 @@ isClient && define((require, exports, module)=>{
       assert(Category.exists({type: 'S', heatFormat: null}));
     });
 
-    group("edit", ()=>{
+    group('edit', () => {
       let category, category2;
-      beforeEach(()=>{
-        category = TH.Factory.createCategory();
-        category2 = TH.Factory.createCategory();
+      beforeEach(() => {
+        category = Factory.createCategory();
+        category2 = Factory.createCategory();
 
         Route.gotoPage(sut.Index);
 
         TH.click('td', category.name);
       });
 
-      test("change heat format", ()=>{
+      test('change heat format', () => {
         assert.dom('#EditCategory', function () {
           TH.input('[name=heatFormat]', 'QQF2');
         });
@@ -111,7 +114,7 @@ isClient && define((require, exports, module)=>{
         assert.same(category.$reload().heatFormat, 'QQF2');
       });
 
-      test("change name", ()=>{
+      test('change name', () => {
         assert.dom('#EditCategory', function () {
           assert.dom('h1', 'Edit ' + category.name);
           TH.input('[name=name]', {value: category.name}, 'new name');
@@ -121,7 +124,7 @@ isClient && define((require, exports, module)=>{
         assert.dom('#Category td', 'new name');
       });
 
-      test("delete", ()=>{
+      test('delete', () => {
         assert.dom('#EditCategory', function () {
           TH.click('[name=delete]');
         });
@@ -146,7 +149,5 @@ isClient && define((require, exports, module)=>{
         refute(Category.exists(category._id));
       });
     });
-
-
   });
 });

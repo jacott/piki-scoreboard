@@ -1,48 +1,49 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const koru            = require('koru');
   const Val             = require('koru/model/validation');
   const session         = require('koru/session');
-  const TH              = require('test-helper');
-  const Factory         = require('test/factory');
   const Climber         = require('./climber');
   const Org             = require('./org');
   const Result          = require('./result');
   const User            = require('./user');
+  const TH              = require('test-helper');
+  const Factory         = require('test/factory');
 
   const {stub, spy, onEnd} = TH;
 
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
     let org, user;
-    beforeEach(()=>{
-      org = Factory.createOrg();
-      user = Factory.createUser();
-      stub(koru, 'info');
+    beforeEach(async () => {
+      await TH.startTransaction();
+      org = await Factory.createOrg();
+      user = await Factory.createUser();
+      TH.noInfo();
     });
 
-    afterEach(()=>{
-      TH.clearDB();
+    afterEach(async () => {
+      await TH.rollbackTransaction();
     });
 
-    test("merge", ()=>{
+    test('merge', async () => {
       const rpc = TH.mockRpc();
       stub(Val, 'assertCheck');
       spy(Climber.prototype, 'authorize');
 
-      TH.login();
+      await TH.login();
 
-      const c1 = Factory.createClimber();
-      const c2 = Factory.createClimber();
-      const comp21 = Factory.createCompetitor();
-      const comp22 = Factory.createCompetitor();
-      const result21 = Factory.createResult();
+      const c1 = await Factory.createClimber();
+      const c2 = await Factory.createClimber();
+      const comp21 = await Factory.createCompetitor();
+      const comp22 = await Factory.createCompetitor();
+      const result21 = await Factory.createResult();
 
-      const c3 = Factory.createClimber();
-      const comp31 = Factory.createCompetitor();
-      const result31 = Factory.createResult();
+      const c3 = await Factory.createClimber();
+      const comp31 = await Factory.createCompetitor();
+      const result31 = await Factory.createResult();
 
-      const c4 = Factory.createClimber();
-      const comp41 = Factory.createCompetitor();
-      const result41 = Factory.createResult();
+      const c4 = await Factory.createClimber();
+      const comp41 = await Factory.createCompetitor();
+      const result41 = await Factory.createResult();
 
       const myConns = {
         a: {org_id: c1.org_id, sendBinary: stub()},
@@ -52,7 +53,7 @@ define((require, exports, module)=>{
 
       TH.stubProperty(session, 'conns', {value: myConns});
 
-      rpc("Climber.merge", c1._id, [c2._id, c3._id]);
+      await rpc('Climber.merge', c1._id, [c2._id, c3._id]);
 
       assert.calledWith(Val.assertCheck, c1._id, 'id');
       assert.calledWith(Val.assertCheck, [c2._id, c3._id], ['id']);
@@ -60,88 +61,85 @@ define((require, exports, module)=>{
       assert.calledWith(Climber.prototype.authorize, TH.userId());
       assert.equals(Climber.prototype.authorize.firstCall.thisValue, TH.matchModel(c1));
 
-      assert.same(Climber.query.count(), 2);
+      assert.same(await Climber.query.count(), 2);
 
-      assert.same(comp41.$reload(true).climber_id, c4._id);
-      assert.same(comp22.$reload(true).climber_id, c1._id);
-      assert.same(comp31.$reload(true).climber_id, c1._id);
-      assert.same(comp21.$reload(true).climber_id, c1._id);
+      assert.same((await comp41.$reload(true)).climber_id, c4._id);
+      assert.same((await comp22.$reload(true)).climber_id, c1._id);
+      assert.same((await comp31.$reload(true)).climber_id, c1._id);
+      assert.same((await comp21.$reload(true)).climber_id, c1._id);
 
-      assert.same(result21.$reload(true).climber_id, c1._id);
-      assert.same(result31.$reload(true).climber_id, c1._id);
-      assert.same(result41.$reload(true).climber_id, c4._id);
+      assert.same((await result21.$reload(true)).climber_id, c1._id);
+      assert.same((await result31.$reload(true)).climber_id, c1._id);
+      assert.same((await result41.$reload(true)).climber_id, c4._id);
 
       assert.calledWith(myConns.a.sendBinary, 'B', ['mergeClimbers', c1._id, [c2._id, c3._id]]);
       assert.calledWith(myConns.b.sendBinary, 'B', ['mergeClimbers', c1._id, [c2._id, c3._id]]);
       refute.called(myConns.c.sendBinary);
     });
 
-    group("clearAllNumbers", ()=>{
-      beforeEach(()=>{
-        org = Factory.createOrg();
+    group('clearAllNumbers', () => {
+      beforeEach(async () => {
+        org = await Factory.createOrg();
       });
 
-      test("non admin", ()=>{
+      test('non admin', async () => {
         const rpc = TH.mockRpc();
         spy(Val, 'assertCheck');
 
-        TH.loginAs(Factory.createUser('judge'));
+        TH.loginAs(await Factory.createUser('judge'));
 
-        assert.exception(()=>{
-          rpc("Climber.clearAllNumbers");
-        }, {error: 403});
+        await assert.exception(() => rpc('Climber.clearAllNumbers'), {error: 403});
 
         assert.calledWith(Val.assertCheck, undefined, 'id');
       });
 
-      test("success", ()=>{
+      test('success', async () => {
         const rpc = TH.mockRpc();
 
-        TH.loginAs(Factory.createUser('admin'));
+        await TH.loginAs(await Factory.createUser('admin'));
 
-        const c1 = Factory.createClimber({number: 123});
-        const c2 = Factory.createClimber({number: 456});
+        const c1 = await Factory.createClimber({number: 123});
+        const c2 = await Factory.createClimber({number: 456});
 
-        const org2 = Factory.createOrg();
+        const org2 = await Factory.createOrg();
 
-        const c3 = Factory.createClimber({number: 123});
+        const c3 = await Factory.createClimber({number: 123});
 
-        rpc("Climber.clearAllNumbers", org._id);
+        await rpc('Climber.clearAllNumbers', org._id);
 
-        assert.same(c1.number, undefined);
-        assert.same(c2.$reload(true).number, undefined);
-        assert.same(c3.$reload(true).number, 123);
+        assert.same((await c1.$reload(true)).number, undefined);
+        assert.same((await c2.$reload(true)).number, undefined);
+        assert.same((await c3.$reload(true)).number, 123);
       });
     });
 
-    group("authorize", ()=>{
-      test("denied", ()=>{
-        const oOrg = Factory.createOrg();
-        const oUser = Factory.createUser();
+    group('authorize', () => {
+      test('denied', async () => {
+        const oOrg = await Factory.createOrg();
+        const oUser = await Factory.createUser();
 
-        const climber = Factory.buildClimber();
+        const climber = await Factory.buildClimber();
 
-        assert.accessDenied(()=>{climber.authorize(user._id)});
+        await assert.accessDenied(() => climber.authorize(user._id));
       });
 
-      test("allowed", ()=>{
-        const climber = Factory.buildClimber();
+      test('allowed', async () => {
+        const climber = await Factory.buildClimber();
 
-        refute.accessDenied(()=>{climber.authorize(user._id)});
+        await refute.accessDenied(() => climber.authorize(user._id));
       });
 
-      test("okay to remove", ()=>{
-        const climber = Factory.createClimber();
+      test('okay to remove', async () => {
+        const climber = await Factory.createClimber();
 
-        refute.accessDenied(()=>{climber.authorize(user._id, {remove: true})});
-
+        await refute.accessDenied(() => climber.authorize(user._id, {remove: true}));
       });
 
-      test("remove in use", ()=>{
-        const climber = Factory.createClimber();
-        const competitor = Factory.createCompetitor();
+      test('remove in use', async () => {
+        const climber = await Factory.createClimber();
+        const competitor = await Factory.createCompetitor();
 
-        assert.accessDenied(()=>{climber.authorize(user._id, {remove: true})});
+        await assert.accessDenied(() => climber.authorize(user._id, {remove: true}));
       });
     });
   });

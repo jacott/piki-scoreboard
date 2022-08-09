@@ -1,4 +1,4 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const Dom             = require('koru/dom');
   const Route           = require('koru/ui/route');
   const util            = require('koru/util');
@@ -24,17 +24,17 @@ define((require, exports, module)=>{
       base.addTemplate(subm, subTpl.Index, {defaultPage: true, path: ''});
       base.addTemplate(subm, subTpl.Add, {
         focus: true,
-        data: ()=> new model({org_id: App.orgId}),
+        data: () => new model({org_id: App.orgId}),
       });
 
       base.addTemplate(subm, subTpl.Edit, {
         focus: true,
-        data: (page, pageRoute)=>{
+        data: (page, pageRoute) => {
           const doc = model.findById(pageRoute.modelId);
           if (doc) return doc;
 
           Route.abortPage(subTpl);
-        }
+        },
       });
 
       subTpl.Index.sorting = {
@@ -50,9 +50,9 @@ define((require, exports, module)=>{
           Dom.stopEvent();
           const {sorting} = subTpl.Index;
           const sort = this.getAttribute('data-sort');
-          if (sorting.sortField === sort)
+          if (sorting.sortField === sort) {
             sorting.asc *= -1;
-          else {
+          } else {
             sorting.sortField = sort;
             sorting.asc = 1;
           }
@@ -99,14 +99,14 @@ define((require, exports, module)=>{
       const parent = $.element.parentNode;
       const ths = parent.getElementsByTagName('th');
       const {sortField, asc} = $.template.sorting;
-      for(var i = 0; i < ths.length; ++i) {
+      for (var i = 0; i < ths.length; ++i) {
         Dom.removeClass(ths[i], 'sort');
         Dom.removeClass(ths[i], 'desc');
       }
 
-      const elm = parent.querySelector('[data-sort="'+sortField+'"]');
+      const elm = parent.querySelector('[data-sort="' + sortField + '"]');
       Dom.addClass(elm, 'sort');
-      asc === -1 &&  Dom.addClass(elm, 'desc');
+      asc === -1 && Dom.addClass(elm, 'desc');
     },
   });
 

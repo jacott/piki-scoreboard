@@ -1,4 +1,4 @@
-define((require)=>{
+define((require) => {
   const Model           = require('koru/model');
   const Val             = require('koru/model/validation');
   const util            = require('koru/util');
@@ -16,18 +16,18 @@ define((require)=>{
     teamType_id: 'id',
   };
 
-  return Team =>{
+  return (Team) => {
     ChangeLog.logChanges(Team);
 
     Team.registerObserveField('org_id');
 
     util.merge(Team.prototype, {
-      authorize(userId, options) {
+      async authorize(userId, options) {
         Val.assertDocChanges(this, FIELD_SPEC, NEW_FIELD_SPEC);
-        User.fetchAdminister(userId, this);
+        await User.fetchAdminister(userId, this);
 
         if (options && options.remove) {
-          Val.allowAccessIf(! Model.Competitor.exists({team_ids: this._id}));
+          Val.allowAccessIf(! await Model.Competitor.exists({team_ids: this._id}));
         }
       },
     });

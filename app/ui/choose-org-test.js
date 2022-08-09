@@ -1,37 +1,39 @@
-isClient && define(function (require, exports, module) {
-  const Dom          = require('koru/dom');
-  const localStorage = require('koru/local-storage');
-  const Route        = require('koru/ui/route');
-  const Event        = require('ui/event');
-  const Climber      = require('./climber');
-  const TH           = require('./test-helper');
+isClient && define((require, exports, module) => {
+  const Dom             = require('koru/dom');
+  const localStorage    = require('koru/local-storage');
+  const Route           = require('koru/ui/route');
+  const Climber         = require('./climber');
+  const TH              = require('./test-helper');
+  const Factory         = require('test/factory');
+  const Event           = require('ui/event');
+
+  const {stub, spy, after} = TH;
 
   const sut = require('./choose-org');
-  var v;
 
-  TH.testCase(module, {
-    setUp() {
-      v = {};
-      TH.loginAs(TH.Factory.createUser('guest'));
-    },
+  TH.testCase(module, ({before, after, beforeEach, afterEach, group, test}) => {
+    beforeEach(() => {
+      TH.startTransaction();
+      TH.loginAs(Factory.createUser('guest'));
+    });
 
-    tearDown() {
-      TH.tearDown();
-      v = null;
-    },
+    afterEach(() => {
+      TH.domTearDown();
+      TH.rollbackTransaction();
+    });
 
-    "test Choose org"() {
+    test('Choose org', () => {
       localStorage.removeItem('orgSN');
-      v.org = TH.Factory.createOrg();
+      const org = Factory.createOrg();
 
       Route.gotoPage(sut);
 
-      this.stub(Route, 'gotoPath');
-      assert.dom('#ChooseOrg', function () {
-        TH.click('.link', v.org.name);
+      stub(Route, 'gotoPath');
+      assert.dom('#ChooseOrg', () => {
+        TH.click('.link', org.name);
       });
 
-      assert.calledWith(Route.gotoPath, `/#${v.org.shortName}/event`);
-    },
+      assert.calledWith(Route.gotoPath, `/#${org.shortName}/event`);
+    });
   });
 });

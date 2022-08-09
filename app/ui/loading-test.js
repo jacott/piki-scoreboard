@@ -2,25 +2,28 @@ isClient && define(function (require, exports, module) {
   const koru            = require('koru');
   const Dom             = require('koru/dom');
   const session         = require('koru/session');
+  const TH              = require('./test-helper');
   const IDB             = require('lib/idb');
   const NetworkSync     = require('ui/network-sync');
   const NotifyBar       = require('ui/notify-bar');
-  const TH              = require('./test-helper');
 
   const {stub, spy, onEnd, stubProperty} = TH;
 
-  const sut  = require('./loading');
+  const sut = require('./loading');
 
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
-    afterEach(()=>{
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
+    beforeEach(() => TH.startTransaction());
+
+    afterEach(() => {
       sut.stop();
-      TH.tearDown();
+      TH.domTearDown();
       NetworkSync.mode = 'online';
+      TH.rollbackTransaction();
     });
 
-    test("progress", ()=>{
+    test('progress', () => {
       sut.start();
-      assert.dom(sut.loadingProgressElement, elm => {
+      assert.dom(sut.loadingProgressElement, (elm) => {
         sut.loadProgress(50);
         refute.className(elm, 'hide');
         assert.cssNear(elm.firstElementChild.style.width, 50, 0.1, '%');
@@ -41,9 +44,9 @@ isClient && define(function (require, exports, module) {
       });
     });
 
-    group("when started", ()=>{
+    group('when started', () => {
       let stop;
-      beforeEach(()=>{
+      beforeEach(() => {
         stub(koru, 'afTimeout');
         stop = stub();
         stub(session.state.pending, 'onChange').returns({stop});
@@ -53,14 +56,14 @@ isClient && define(function (require, exports, module) {
         sut.start();
       });
 
-      test("network sync pending", ()=>{
+      test('network sync pending', () => {
         document.body.appendChild(NotifyBar.$autoRender());
         const callback = session.state.pending.onChange.args(0, 0);
         assert.isFunction(callback);
 
-        assert.dom('#NotifyBar', elm => {
+        assert.dom('#NotifyBar', (elm) => {
           callback(true);
-          assert.dom('#NetworkSync.show[name=pending]', elm => {
+          assert.dom('#NetworkSync.show[name=pending]', (elm) => {
             assert.same(elm.getAttribute('title'), 'Waiting for response');
           });
 
@@ -69,13 +72,13 @@ isClient && define(function (require, exports, module) {
         });
       });
 
-      test("offline network sync pending", ()=>{
+      test('offline network sync pending', () => {
         NetworkSync.mode = 'offline';
         document.body.appendChild(NotifyBar.$autoRender());
         const callback = session.state.pending.onChange.args(0, 0);
         assert.isFunction(callback);
 
-        assert.dom('#NotifyBar', elm => {
+        assert.dom('#NotifyBar', (elm) => {
           callback(true);
           assert.dom('#NetworkSync.show[name=offline]');
 
@@ -84,7 +87,7 @@ isClient && define(function (require, exports, module) {
         });
       });
 
-      test("startup with IDB", ()=>{
+      test('startup with IDB', () => {
         const idb = {isReady: true};
         stubProperty(IDB, 'idb', {value: idb});
 
@@ -94,10 +97,10 @@ isClient && define(function (require, exports, module) {
 
         idb.isReady = false;
         window.addEventListener.yield(ev);
-        assert.same(ev.returnValue, "You have unsaved changes.");
+        assert.same(ev.returnValue, 'You have unsaved changes.');
       });
 
-      test("startup", ()=>{
+      test('startup', () => {
         assert.same(sut.progress, 50);
 
         assert.called(session.state.pending.onChange);
@@ -108,9 +111,7 @@ isClient && define(function (require, exports, module) {
         assert.calledOnceWith(koru.afTimeout, TH.match.func, 2000);
         stub(session.state, 'pendingCount')
           .onCall(0).returns(4)
-          .onCall(1).returns(0)
-        ;
-
+          .onCall(1).returns(0);
         sut.loadProgress(100);
 
         koru.afTimeout.yield();
@@ -127,7 +128,7 @@ isClient && define(function (require, exports, module) {
         let ev = {};
         window.addEventListener.yield(ev);
 
-        assert.same(ev.returnValue, "You have unsaved changes.");
+        assert.same(ev.returnValue, 'You have unsaved changes.');
 
         pendingUpdateCount = 0;
 

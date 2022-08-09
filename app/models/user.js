@@ -1,10 +1,10 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const koru            = require('koru');
   const Val             = require('koru/model/validation');
   const util            = require('koru/util');
+  const Org             = require('./org');
   const Model           = require('model');
   const Role            = require('models/role');
-  const Org             = require('./org');
 
   const ROLE = {
     superUser: 's',
@@ -23,19 +23,18 @@ define((require, exports, module)=>{
     canJudge(doc) {return this.canEdit(doc, /[saj]/)}
 
     emailWithName() {
-      return this.name.replace('/<>/','')+" <"+this.email+">";
+      return this.name.replace('/<>/', '') + ' <' + this.email + '>';
     }
 
     static me() {
       const userId = koru.userId();
       if (userId === 'guest') return User.guestUser();
-      return userId ? User.findById(userId) : void 0;
+      return userId ? User.findById(userId) : undefined;
     }
 
     static fetchAdminister(userId, doc) {
-      const user = User.toDoc(userId);
-      Val.allowAccessIf(user && user.canAdminister(doc));
-      return user;
+      return ifPromise(User.toDoc(userId), (user) => ifPromise(
+        user?.canAdminister(doc), (okay) => (Val.allowAccessIf(okay), user)));
     }
   }
 
@@ -44,10 +43,10 @@ define((require, exports, module)=>{
   User.define({
     module,
     fields: {
-      name: {type:  'text', trim: true, required: true, maxLength: 200},
-      email: {type:  'text', trim: true, required: true, maxLength: 200,
-              inclusion: {allowBlank: true, matches: util.EMAIL_RE },
-              normalize: 'downcase' , unique: true},
+      name: {type: 'text', trim: true, required: true, maxLength: 200},
+      email: {type: 'text', trim: true, required: true, maxLength: 200,
+              inclusion: {allowBlank: true, matches: util.EMAIL_RE},
+              normalize: 'downcase', unique: true},
       initials: {type: 'text', trim: true, required: true, maxLength: 3},
     },
   });

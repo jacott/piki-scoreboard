@@ -1,4 +1,4 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const match           = require('koru/match');
   const Val             = require('koru/model/validation');
   const util            = require('koru/util');
@@ -17,22 +17,22 @@ define((require, exports, module)=>{
     org_id: 'id',
   };
 
-  return Series =>{
+  return (Series) => {
     Series.registerObserveField('org_id');
     util.merge(Series.prototype, {
-      authorize(userId) {
-        User.fetchAdminister(userId, this);
+      async authorize(userId) {
+        await User.fetchAdminister(userId, this);
 
         const changes = this.changes;
 
         Val.assertDocChanges(this, FIELD_SPEC, NEW_FIELD_SPEC);
 
-        if (changes.hasOwnProperty('closed'))
+        if (changes.hasOwnProperty('closed')) {
           Val.allowAccessIf(Object.keys(changes).length === 1);
-        else
+        } else {
           Val.allowAccessIf(! this.closed &&
                             (this.$isNewRecord() || ! changes.hasOwnProperty('org_id')));
-
+        }
       },
     });
   };

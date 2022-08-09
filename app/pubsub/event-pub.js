@@ -1,4 +1,4 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const koru            = require('koru');
   const Val             = require('koru/model/validation');
   const Publication     = require('koru/pubsub/publication');
@@ -23,11 +23,11 @@ define((require, exports, module)=>{
       delete unions[this.eventId];
     }
 
-    loadInitial(encoder) {
+    async loadInitial(encoder) {
       for (const model of OrgChildren) {
-        model.query.where('event_id', this.eventId).forEach(doc =>{
+        for await (const doc of model.query.where('event_id', this.eventId)) {
           encoder.addDoc(doc);
-        });
+        }
       }
     }
 
@@ -40,13 +40,13 @@ define((require, exports, module)=>{
   }
 
   class EventPub extends Publication {
-    init(eventId) {
+    async init(eventId) {
       Val.ensureString(eventId);
 
-      const event = Event.findById(eventId);
-      if (! event) throw new koru.Error(404, 'Event not found');
+      const event = await Event.findById(eventId);
+      if (event === undefined) throw new koru.Error(404, 'Event not found');
 
-      (unions[eventId] || new EventUnion(eventId)).addSub(this);
+      await (unions[eventId] ?? new EventUnion(eventId)).addSub(this);
     }
 
     static shutdown() {

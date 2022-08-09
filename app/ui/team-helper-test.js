@@ -1,29 +1,26 @@
-define(function (require, exports, module) {
-  var test, v;
-  const TH     = require('test-helper');
-  const sut    = require('./team-helper');
+define((require, exports, module) => {
+  'use strict';
+  const sut             = require('./team-helper');
+  const TH              = require('test-helper');
+  const Factory         = require('test/factory');
 
-  TH.testCase(module, {
-    setUp() {
-      test = this;
-      v = {};
-    },
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
+    beforeEach(() => {TH.startTransaction()});
 
-    tearDown() {
-      TH.clearDB();
+    afterEach(() => {
       sut.teamType_id = undefined;
-      v = null;
-    },
+      TH.rollbackTransaction();
+    });
 
-    "test setSeriesTeamType"() {
-      const club = TH.Factory.createTeamType({_id: 'club', name: 'club'});
-      const co = TH.Factory.createTeamType({_id: 'co', name: 'country'});
-      const sch = TH.Factory.createTeamType({_id: 'sch', name: 'school', default: true});
-      const series = TH.Factory.createSeries({teamType_ids: ['club', 'sch']});
+    test('setSeriesTeamType', () => {
+      const club = Factory.createTeamType({_id: 'club', name: 'club'});
+      const co = Factory.createTeamType({_id: 'co', name: 'country'});
+      const sch = Factory.createTeamType({_id: 'sch', name: 'school', default: true});
+      const series = Factory.createSeries({teamType_ids: ['club', 'sch']});
 
       sut.setSeriesTeamType(series, co);
 
       assert.same(sut.teamType_id, 'sch');
-    },
+    });
   });
 });

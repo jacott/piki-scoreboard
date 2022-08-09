@@ -1,8 +1,7 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const koru            = require('koru');
   const localStorage    = require('koru/local-storage');
   const Model           = require('koru/model');
-  const dbBroker        = require('koru/model/db-broker');
   const Val             = require('koru/model/validation');
   const session         = require('koru/session');
   const sessionTH       = require('koru/session/test-helper');
@@ -16,7 +15,7 @@ define((require, exports, module)=>{
 
   const {hasOwn} = util;
 
-  let TH = Object.create(require('koru/test-helper'));
+  let TH = Object.create(require('koru/model/test-db-helper'));
 
   let user = null;
   let txSave = null, txClient = null;
@@ -26,57 +25,37 @@ define((require, exports, module)=>{
 
   let sendBinary = null, _sendM = null;
 
-  TH.Factory = Factory;
-
   const runRpc = (self, method, args) => {
     const func = session._rpcs[method];
-    if (typeof func !== 'function')
+    if (typeof func !== 'function') {
       throw new Error(`"${method}" is not an rpc`);
+    }
     return func.apply(self, args);
   };
 
-
   util.mergeOwnDescriptors(TH, sessionTH);
   util.merge(TH, {
-    showErrors (doc) {return () => Val.inspectErrors(doc)},
+    showErrors(doc) {return () => Val.inspectErrors(doc)},
 
-    clearDB: isClient ? () => {
-      Factory.clear();
-      const models = Model._databases.default;
-      for(const name in models) {
-        const model = Model[name];
-        model.docs = undefined;
-      }
-    } : () => {
-      Factory.clear();
-      for(const name in Model) {
-        const model = Model[name];
-        if ('docs' in model) {
-          txSave || model.docs.truncate();
-          model._$docCacheClear();
-        }
-      }
-    },
+    user() {return null},
 
-    user () {return null;},
+    userId() {return user && user._id},
 
-    userId () {return user && user._id;},
-
-    mockRpc (v, sessId) {
-      sessId = (sessId || "1").toString();
+    mockRpc(v, sessId) {
+      sessId = (sessId || '1').toString();
       if (isServer) {
         const ws = this.mockWs();
         let conn;
-        if (v && v.conn)
+        if (v && v.conn) {
           conn = v.conn;
-        else {
+        } else {
           const id = 'koru/session/server-connection';
           conn = new (require(id))(session, ws, ws._upgradeReq, sessId, () => {});
           conn.dbId = 'sch00';
           if (v) v.conn = conn;
         }
-        return TH.intercept(session, 'rpc', (method, ...args) => {
-          conn.userId = koru.userId();
+        return TH.intercept(session, 'rpc', async (method, ...args) => {
+          await conn.setUserId(koru.userId());
           const prevUserId = util.thread.userId;
           const prevConnection = util.thread.connection;
           try {
@@ -90,22 +69,23 @@ define((require, exports, module)=>{
           }
         });
       } else {
-        return TH.intercept(session, 'rpc', (method, ...args)=>runRpc(util.thread, method, args));
+        return TH.intercept(session, 'rpc', (method, ...args) => runRpc(util.thread, method, args));
       }
     },
 
-    login(func) {
-      return this.loginAs(user || this.Factory.last.user || this.Factory.createUser('admin'), func);
+    login() {
+      return this.loginAs(user || Factory.last.user || Factory.createUser('admin'));
     },
 
-    loginAs(newUser, func) {
+    loginAs(newUser) {
       const {test} = TH;
 
       if (newUser !== user) {
-        user && this.user.restore();
+        user != null && this.user.restore();
         koru.userId.restore && koru.userId.restore();
 
-        if (newUser) {
+        if (typeof newUser === 'string') newUser = Model.User.findById(newUser);
+        return ifPromise(newUser, (newUser) => {
           test.intercept(koru, 'userId', () => user._id);
           test.intercept(this, 'user', () => user, () => {
             user = null;
@@ -113,31 +93,29 @@ define((require, exports, module)=>{
             koru.userId.restore && koru.userId.restore();
           });
 
-          user = newUser._id ? newUser : Model.User.findById(newUser);
-          util.thread.userId = user && user._id;
-        }
+          if (newUser !== undefined) {
+            user = newUser;
+            util.thread.userId = user?._id;
+            this.setAccess?.();
+            return newUser;
+          }
+        });
       }
 
-      this.setAccess && this.setAccess();
+      this.setAccess?.();
 
-      if (func === undefined) return user;
-
-      try {
-        return func();
-      } finally {
-        this.user && this.user.restore && this.user.restore();
-      }
+      return user;
     },
 
     matchModel(expect) {
-      const func = this.match(actual => actual != null && actual._id === expect._id);
+      const func = this.match((actual) => actual != null && actual._id === expect._id);
       Object.defineProperty(func, 'message', {get() {return util.inspect(expect)}});
 
       return func;
     },
 
     matchItems(items) {
-      const func = this.match(actual => util.deepEqual(actual && actual.sort(), items && items.sort()));
+      const func = this.match((actual) => util.deepEqual(actual && actual.sort(), items && items.sort()));
 
       Object.defineProperty(func, 'message', {get() {
         return JSON.stringify(items);
@@ -145,40 +123,14 @@ define((require, exports, module)=>{
 
       return func;
     },
-
-    startTransaction() {
-      if (isClient) return;
-      util.forEach(arguments, db => {
-        db._getConn();
-        const tx = util.thread[db[db[private$].tx$]];
-        db[tx$] = tx;
-        tx.transaction = 'ROLLBACK';
-        db.query('BEGIN');
-        dbBroker.db = db;
-      });
-    },
-
-    rollbackTransaction() {
-      if (isClient) return;
-      util.forEach(arguments, db => {
-        const tx = db[tx$];
-        if (! tx) return;
-        dbBroker.db = null;
-        tx.transaction = null;
-        db.query('ROLLBACK');
-        db._releaseConn();
-      });
-      dbBroker.db = null;
-    },
-
   });
 
   if (isClient) {
-    TH.MockFileReader = v => {
+    TH.MockFileReader = (v) => {
       function MockFileReader(...args) {
         v.fileReaderargs = args.slice();
         v.fileReader = this;
-      };
+      }
 
       MockFileReader.prototype = {
         constructor: MockFileReader,
@@ -195,7 +147,7 @@ define((require, exports, module)=>{
         _str2ab(str) {
           const buf = new ArrayBuffer(str.length);
           const bufView = new Uint8Array(buf);
-          for (let i=0, strLen=str.length; i<strLen; i++) {
+          for (let i = 0, strLen = str.length; i < strLen; i++) {
             bufView[i] = str.charCodeAt(i);
           }
           return buf;
@@ -206,13 +158,11 @@ define((require, exports, module)=>{
     };
   }
 
-
-
-  TH.Core.onStart(() => {
+  TH.Core.onStart(async () => {
     koruAfTimeout = koru.afTimeout;
     koruSetTimeout = koru.setTimeout;
     koruClearTimeout = koru.clearTimeout;
-    koru.setTimeout = () => { return ++kst};
+    koru.setTimeout = () => {return ++kst};
     koru.afTimeout = () => () => {};
     koru.clearTimeout = () => {};
     if (isClient) {
@@ -224,21 +174,10 @@ define((require, exports, module)=>{
         _sendM = session._sendM;
         session._sendM = koru.nullFunc;
       }
-    } else {
-      txClient = dbBroker.db;
-      txClient._getConn();
-      txSave = util.thread[txClient[txClient[private$].tx$]];
-      txSave.transaction = 'ROLLBACK';
     }
   });
 
   TH.Core.onEnd(() => {
-    if (isServer && txSave) {
-      txSave.transaction = null;
-      txSave = null;
-      txClient._releaseConn();
-    }
-
     koru.setTimeout = koruSetTimeout;
     koru.clearTimeout = koruClearTimeout;
     koru.afTimeout = koruAfTimeout;
@@ -254,15 +193,7 @@ define((require, exports, module)=>{
   });
 
   if (isServer) {
-    UserAccount.sendResetPasswordEmail = ()=>{};
-    TH.Core.onTestStart(() => {
-      dbBroker.db = txClient;
-      txSave && txClient.query('BEGIN');
-    });
-
-    TH.Core.onTestEnd(() => {
-      txSave && txClient.query('ROLLBACK');
-    });
+    UserAccount.sendResetPasswordEmail = async () => {};
   } else {
     const orgsStr = JSON.stringify({sch00: {name: 'Org 1'}, sch02: {name: 'Org 2'}});
     localStorage._resetValue = () => ({orgs: orgsStr, orgSN: 'SN1'});
@@ -271,18 +202,18 @@ define((require, exports, module)=>{
   const ga = TH.Core.assertions;
 
   ga.add('docChanges', {
-    assert(doc, spec, newSpec, func) {
+    async assert(doc, spec, newSpec, func) {
       if (! func) {
         func = newSpec;
         newSpec = null;
       }
-      var spy = Stubber.spy(Val,'assertDocChanges');
+      var spy = Stubber.spy(Val, 'assertDocChanges');
 
       try {
-        func.call();
+        await func.call();
         this.args = spy.getCall(0);
         if (newSpec) {
-          this.newSpec = ", "+ util.inspect(newSpec);
+          this.newSpec = ', ' + util.inspect(newSpec);
           return spy.calledWith(doc, spec, newSpec);
         }
         this.newSpec = '';
@@ -292,12 +223,10 @@ define((require, exports, module)=>{
       }
     },
 
-    assertMessage: "Expected Val.assertDocChanges to be called with:\n{i1}, {i0}{$newSpec}\n"+
-      "but was called with:\n{$args}",
-    refuteMessage: "Did not expect Val.assertDocChanges to be called with:\n{i1}, {i0}{$newSpec}"
+    assertMessage: 'Expected Val.assertDocChanges to be called with:\n{i1}, {i0}{$newSpec}\n' +
+      'but was called with:\n{$args}',
+    refuteMessage: 'Did not expect Val.assertDocChanges to be called with:\n{i1}, {i0}{$newSpec}',
   });
-
-  const overrideSub = (name, sub, callback) => true;
 
   koru.onunload(module, 'reload');
 

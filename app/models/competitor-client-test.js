@@ -1,20 +1,21 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const TH              = require('test-helper');
+  const Factory         = require('test/factory');
 
   const Competitor = require('./competitor');
 
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
-    afterEach(()=>{
-      TH.clearDB();
-    });
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
+    beforeEach(() => TH.startTransaction());
 
-    test("setTeam", ()=>{
-      let tt1 = TH.Factory.createTeamType();
-      let team = TH.Factory.createTeam();
-      let team2 = TH.Factory.createTeam();
-      let tt2 = TH.Factory.createTeamType();
-      let team3 = TH.Factory.createTeam();
-      let competitor = TH.Factory.createCompetitor({team_ids: null});
+    afterEach(() => TH.rollbackTransaction());
+
+    test('setTeam', () => {
+      let tt1 = Factory.createTeamType();
+      let team = Factory.createTeam();
+      let team2 = Factory.createTeam();
+      let tt2 = Factory.createTeamType();
+      let team3 = Factory.createTeam();
+      let competitor = Factory.createCompetitor({team_ids: null});
 
       competitor.setTeam(tt1._id, team._id);
       assert.equals(competitor.changes, {team_ids: [team._id]});
@@ -29,23 +30,23 @@ define((require, exports, module)=>{
       assert.equals(competitor.changes, {team_ids: [team2._id]});
     });
 
-    test("team", ()=>{
-      let tt1 = TH.Factory.createTeamType();
-      let t1 = TH.Factory.createTeam();
-      let competitor = TH.Factory.createCompetitor({team_ids: [t1._id]});
+    test('team', () => {
+      let tt1 = Factory.createTeamType();
+      let t1 = Factory.createTeam();
+      let competitor = Factory.createCompetitor({team_ids: [t1._id]});
 
       assert.same(competitor.getTeam('foo'), undefined);
       assert.same(competitor.getTeam(tt1), t1);
     });
 
-    test("categoryIdForGroup", ()=>{
-      const aCategories = TH.Factory.createList(3, 'createCategory', function (index, options) {
-        options.group = "A";
+    test('categoryIdForGroup', () => {
+      const aCategories = Factory.createList(3, 'createCategory', function (index, options) {
+        options.group = 'A';
       });
-      const bCategories = TH.Factory.createList(3, 'createCategory', function (index, options) {
-        options.group = "B";
+      const bCategories = Factory.createList(3, 'createCategory', function (index, options) {
+        options.group = 'B';
       });
-      const competitor = TH.Factory.buildCompetitor({
+      const competitor = Factory.buildCompetitor({
         category_ids: [aCategories[1]._id, bCategories[2]._id]});
 
       assert.same(competitor.categoryIdForGroup('A'), aCategories[1]._id);
@@ -53,8 +54,8 @@ define((require, exports, module)=>{
       assert.same(competitor.categoryIdForGroup('C'), undefined);
     });
 
-    test("test index", ()=>{
-      const competitor = TH.Factory.createCompetitor();
+    test('test index', () => {
+      const competitor = Factory.createCompetitor();
 
       assert.equals(Competitor.eventIndex.lookup({
         event_id: competitor.event_id,

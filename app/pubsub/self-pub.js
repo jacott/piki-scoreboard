@@ -1,4 +1,4 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const koru            = require('koru');
   const AllPub          = require('koru/pubsub/all-pub');
   const ServerConnection = require('koru/session/server-connection');
@@ -7,20 +7,21 @@ define((require, exports, module)=>{
   const noEmail = {email: true};
 
   class SelfPub extends AllPub {
-    init() {
-      if (this.userId == null) this.userId = User.guestUser()._id;
+    async init() {
+      if (this.userId == null) {
+        await this.setUserId((await User.guestUser())._id);
+      }
 
-      const user = User.findById(this.userId);
+      const user = await User.findById(this.userId) ?? (this.userId === 'guest' ? await User.guestUser() : undefined);
 
-      if (user === void 0)
-        throw new koru.Error(404, 'User not found');
+      if (user === undefined) throw new koru.Error(404, 'User not found');
 
-      super.init();
+      await super.init();
 
       if (User.isGuest()) {
-        this.userOb = void 0;
+        this.userOb = undefined;
       } else {
-        this.userOb = User.observeId(this.userId, dc =>{
+        this.userOb = User.observeId(this.userId, (dc) => {
           this.conn.sendBinary(...ServerConnection.buildUpdate(dc));
         });
         this.conn.added('User', user.attributes);
@@ -29,9 +30,9 @@ define((require, exports, module)=>{
 
     stop() {
       super.stop();
-      if (this.userOb !== void 0) {
+      if (this.userOb !== undefined) {
         this.userOb.stop();
-        this.userOb = void 0;
+        this.userOb = undefined;
       }
     }
   }
@@ -40,9 +41,9 @@ define((require, exports, module)=>{
 
   SelfPub.Union = class extends AllPub.Union {
     loadInitial(encoder, discreteLastSubscribed) {
-      super.loadInitial(
-        {addDoc: doc =>{encoder.addDoc(ServerConnection.filterDoc(doc, noEmail))}},
-        discreteLastSubscribed
+      return super.loadInitial(
+        {addDoc: (doc) => {encoder.addDoc(ServerConnection.filterDoc(doc, noEmail))}},
+        discreteLastSubscribed,
       );
     }
   };

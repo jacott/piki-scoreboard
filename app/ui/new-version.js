@@ -1,4 +1,4 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   'use strict';
   const SWManager       = require('koru/client/sw-manager');
   const Session         = require('koru/session');
@@ -6,26 +6,27 @@ define((require, exports, module)=>{
 
   let swListener;
   const newVersion = {
-    start: ()=>{
-      if (swListener !== void 0) return;
-      SessionBase.prototype.newVersion = async ({hash})=>{
+    start: () => {
+      if (swListener !== undefined) return;
+      SessionBase.prototype.newVersion = async ({hash}) => {
         const lastVersion = window.sessionStorage.getItem('lastVersion');
         window.sessionStorage.removeItem('lastVersion');
 
-        if (lastVersion === hash)
+        if (lastVersion === hash) {
           return;
+        }
         window.sessionStorage.setItem('lastVersion', hash);
         await SWManager.update();
         await SWManager.prepareNewVersion(hash);
         SWManager.loadNewVersion();
       };
-      swListener = SWManager.onUpdateWaiting(()=>{SWManager.loadNewVersion()});
+      swListener = SWManager.onUpdateWaiting(() => {SWManager.loadNewVersion()});
     },
 
-    stop: ()=>{
-      if (swListener === void 0) return;
-      SessionBase.prototype.newVersion = void 0;
-      swListener.stop(); swListener = void 0;
+    stop: () => {
+      if (swListener === undefined) return;
+      SessionBase.prototype.newVersion = undefined;
+      swListener.stop(); swListener = undefined;
     },
   };
 

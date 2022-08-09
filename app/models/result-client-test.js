@@ -1,19 +1,19 @@
-define((require, exports, module)=>{
+define((require, exports, module) => {
   const session         = require('koru/session');
   const TH              = require('test-helper');
+  const Factory         = require('test/factory');
 
   const {stub, spy, onEnd} = TH;
 
   const Result = require('./result');
 
-  TH.testCase(module, ({beforeEach, afterEach, group, test})=>{
-    afterEach(()=>{
-      TH.clearDB();
-    });
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
+    beforeEach(() => TH.startTransaction());
+    afterEach(() => TH.rollbackTransaction());
 
-    test("setScore number", ()=>{
+    test('setScore number', () => {
       TH.login();
-      var result = TH.Factory.createResult({scores: [1]});
+      var result = Factory.createResult({scores: [1]});
 
       var rpc = spy(session._rpcs, 'Result.setScore');
 
@@ -27,9 +27,9 @@ define((require, exports, module)=>{
       refute.msg('should not update').called(rpc);
     });
 
-    test("setScore time", ()=>{
+    test('setScore time', () => {
       TH.login();
-      var result = TH.Factory.createResult({scores: [1]});
+      var result = Factory.createResult({scores: [1]});
 
       var rpc = spy(session._rpcs, 'Result.setScore');
 
@@ -43,27 +43,27 @@ define((require, exports, module)=>{
       refute.msg('should not update').called(rpc);
     });
 
-    group("setBoulderScore", ()=>{
+    group('setBoulderScore', () => {
       let result, rpc;
-      beforeEach(()=>{
+      beforeEach(() => {
         TH.login();
-        TH.Factory.createCategory({type: 'B'});
-        result = TH.Factory.createResult({scores: [1]});
+        Factory.createCategory({type: 'B'});
+        result = Factory.createResult({scores: [1]});
 
         rpc = spy(session._rpcs, 'Result.setBoulderScore');
       });
 
-      test("dnc", ()=>{
-        result.setBoulderScore(1, 2, "dnc");
-        assert.calledWith(rpc, result._id, 1, 2, "dnc");
+      test('dnc', () => {
+        result.setBoulderScore(1, 2, 'dnc');
+        assert.calledWith(rpc, result._id, 1, 2, 'dnc');
 
         rpc.reset();
 
-        result.$reload().setBoulderScore(1, 2, "dnc"); // setting again
+        result.$reload().setBoulderScore(1, 2, 'dnc'); // setting again
         refute.msg('should not update').called(rpc);
       });
 
-      test("clear", ()=>{
+      test('clear', () => {
         result.setBoulderScore(1, 2);
         assert.calledWith(rpc, result._id, 1);
 
@@ -73,7 +73,7 @@ define((require, exports, module)=>{
         refute.msg('should not update').called(rpc);
       });
 
-      test("set attempts", ()=>{
+      test('set attempts', () => {
         result.setBoulderScore(1, 2, 3, 4);
 
         assert.calledWith(rpc, result._id, 1, 2, 3, 4);
@@ -85,8 +85,8 @@ define((require, exports, module)=>{
       });
     });
 
-    test("index", ()=>{
-      var result = TH.Factory.createResult();
+    test('index', () => {
+      var result = Factory.createResult();
 
       assert.equals(Result.eventCatIndex.lookup({
         event_id: result.event_id,

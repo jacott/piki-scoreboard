@@ -1,61 +1,60 @@
-isClient && define(function (require, exports, module) {
-  var test, v;
-  var TH = require('./test-helper');
-  var sut = require('./reset-password');
-  var Route = require('koru/ui/route');
-  var User = require('models/user');
-  var App = require('ui/app');
-  var UserAccount = require('koru/user-account');
-  var Random = require('koru/random');
-  var koru = require('koru');
+isClient && define((require, exports, module) => {
+  'use strict';
+  const koru            = require('koru');
+  const Random          = require('koru/random');
+  const Route           = require('koru/ui/route');
+  const UserAccount     = require('koru/user-account');
+  const sut             = require('./reset-password');
+  const TH              = require('./test-helper');
+  const User            = require('models/user');
+  const Factory         = require('test/factory');
+  const App             = require('ui/app');
 
-  TH.testCase(module, {
-    setUp: function () {
-      test = this;
-      v = {};
-      v.org =  TH.Factory.createOrg();
-      TH.loginAs(v.user = TH.Factory.createUser());
-      TH.setOrg(v.org);
-      v = {
-        key: Random.id(),
-      };
-      test.stub(UserAccount, 'resetPassword');
-      test.stub(Route, 'replacePath');
-    },
+  const {stub, spy, after, match: m} = TH;
 
-    tearDown: function () {
-      TH.tearDown();
-      v = null;
-    },
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
+    let org, user, key;
+    beforeEach(() => {
+      TH.startTransaction();
+      org = Factory.createOrg();
+      TH.loginAs(user = Factory.createUser());
+      TH.setOrg(org);
+      key = Random.id();
+      stub(UserAccount, 'resetPassword');
+      stub(Route, 'replacePath');
+    });
 
-    "test token expired": function () {
-      Route.gotoPath('/reset-password/' + v.key);
+    afterEach(() => {
+      TH.domTearDown();
+      TH.rollbackTransaction();
+    });
+
+    test('token expired', () => {
+      Route.gotoPath('/reset-password/' + key);
 
       TH.input('[name=newPassword]', 'secret');
       TH.input('[name=confirm]', 'secret');
       TH.click('[type=submit]');
 
-      assert.calledWith(UserAccount.resetPassword, v.key, 'secret', TH.match(function (callback) {
-        v.callback = callback;
-        return typeof callback === 'function';
-      }));
+      let callback;
+      assert.calledWith(UserAccount.resetPassword, key, 'secret', m((c) => callback = c));
 
-      test.stub(koru, 'error');
+      stub(koru, 'error');
 
-      v.callback({error: 403, reason: 'token expired', message: 'foo'});
+      callback({error: 403, reason: 'token expired', message: 'foo'});
 
-      assert.dom('#ResetPassword', function () {
+      assert.dom('#ResetPassword', () => {
         assert.dom('.error[name=newPassword]+.errorMsg', 'token expired');
       });
 
       assert.calledWith(koru.error, 'foo');
-    },
+    });
 
-    "test update": function () {
-      Route.gotoPath('/reset-password/' + v.key);
+    test('update', () => {
+      Route.gotoPath('/reset-password/' + key);
 
-      assert.dom('#ResetPassword', function () {
-        assert.dom('form', function () {
+      assert.dom('#ResetPassword', () => {
+        assert.dom('form', () => {
           TH.click('[type=submit]');
           refute.called(UserAccount.resetPassword);
           TH.input('[name=newPassword]', 'secret');
@@ -64,15 +63,12 @@ isClient && define(function (require, exports, module) {
         TH.click('[type=submit]');
       });
 
-      assert.calledWith(UserAccount.resetPassword, v.key, 'secret', TH.match(function (callback) {
-        v.callback = callback;
-        return typeof callback === 'function';
-      }));
+      let callback;
+      assert.calledWith(UserAccount.resetPassword, key, 'secret', m((c) => callback = c));
 
-      v.callback(null);
+      callback(null);
 
       assert.calledWith(Route.replacePath, Route.root.defaultPage);
-    },
-
+    });
   });
 });

@@ -1,40 +1,43 @@
-isClient && define(function (require, exports, module) {
-  const session    = require('koru/session');
-  const Route      = require('koru/ui/route');
-  const Climber    = require('models/climber');
-  const App        = require('ui/app');
-  const TeamHelper = require('ui/team-helper');
-  const sut        = require('./climber');
-  const TH         = require('./test-helper');
+isClient && define((require, exports, module) => {
+  const session         = require('koru/session');
+  const Route           = require('koru/ui/route');
+  const sut             = require('./climber');
+  const TH              = require('./test-helper');
+  const Climber         = require('models/climber');
+  const Factory         = require('test/factory');
+  const App             = require('ui/app');
+  const TeamHelper      = require('ui/team-helper');
 
   const {stub, spy, onEnd, util} = TH;
 
   let v = null;
 
-  TH.testCase(module, {
-    setUp() {
+  TH.testCase(module, ({beforeEach, afterEach, group, test}) => {
+    beforeEach(() => {
+      TH.startTransaction();
       v = {};
-      v.org =  TH.Factory.createOrg();
+      v.org = Factory.createOrg();
       TH.login();
       TH.setOrg(v.org);
       App.setAccess();
-    },
+    });
 
-    tearDown() {
-      TH.tearDown();
+    afterEach(() => {
+      TH.domTearDown();
       TeamHelper.teamType_id = null;
       v = null;
-    },
+      TH.rollbackTransaction();
+    });
 
-    "test rendering"() {
-      const tt1 = TH.Factory.createTeamType();
-      const team = TH.Factory.createTeam();
-      var climber1 = TH.Factory.createClimber({team_ids: [team._id]});
-      var climber2 = TH.Factory.createClimber();
+    test('rendering', () => {
+      const tt1 = Factory.createTeamType();
+      const team = Factory.createTeam();
+      var climber1 = Factory.createClimber({team_ids: [team._id]});
+      var climber2 = Factory.createClimber();
 
       Route.gotoPage(sut.Index);
 
-      assert.dom('#Climber', function () {;
+      assert.dom('#Climber', function () {
         assert.dom('.climbers', function () {
           assert.dom('h1', 'Climbers');
 
@@ -54,19 +57,19 @@ isClient && define(function (require, exports, module) {
         });
         assert.dom('nav [name=addClimber]', 'Add new climber');
       });
-    },
+    });
 
-    "test clearAllNumbers"() {
+    test('clearAllNumbers', () => {
       stub(session, 'rpc');
       Route.gotoPage(sut.Index);
 
       TH.click('[name=clearAllNumbers]');
 
-      TH.confirmRemove(()=> {
+      TH.confirmRemove(() => {
         assert.dom('h1', 'Clear all climber numbers?');
       });
 
-      assert.calledWith(session.rpc, 'Climber.clearAllNumbers', v.org._id, TH.match(f => v.cb = f));
+      assert.calledWith(session.rpc, 'Climber.clearAllNumbers', v.org._id, TH.match((f) => v.cb = f));
 
       assert.dom('#Flash .notice:not(.transient)', 'Clearing all climber numbers...');
 
@@ -74,10 +77,10 @@ isClient && define(function (require, exports, module) {
 
       refute.dom('#Flash .notice:not(.transient)');
       assert.dom('#Flash .notice.transient', 'Climber numbers cleared');
-    },
+    });
 
-    "test adding new climber"() {
-      var team = TH.Factory.createTeam();
+    test('adding new climber', () => {
+      var team = Factory.createTeam();
 
       Route.gotoPage(sut.Index);
       stub(Route.history, 'back');
@@ -100,26 +103,26 @@ isClient && define(function (require, exports, module) {
 
       assert(climber);
 
-      assert.same(climber.gender, "m");
-    },
+      assert.same(climber.gender, 'm');
+    });
 
-    "edit": {
-      setUp() {
-        v.climber = TH.Factory.createClimber();
-        v.climber2 = TH.Factory.createClimber();
+    group('edit', () => {
+      beforeEach(() => {
+        v.climber = Factory.createClimber();
+        v.climber2 = Factory.createClimber();
 
         Route.gotoPage(sut.Index);
 
         TH.click('td', v.climber.name);
-      },
+      });
 
-      "test merge other climbers"() {
+      test('merge other climbers', () => {
         stub(session, 'rpc');
-        v.climber3 = TH.Factory.createClimber({name: 'Angela Eiter'});
-        v.climber4 = TH.Factory.createClimber({name: 'Anne-Sophie Koller'});
+        v.climber3 = Factory.createClimber({name: 'Angela Eiter'});
+        v.climber4 = Factory.createClimber({name: 'Anne-Sophie Koller'});
         TH.click('[name=merge]');
         assert.dom('#MergeClimbers', function () {
-          assert.dom('h1', "Select climbers to merge into " + v.climber.name);
+          assert.dom('h1', 'Select climbers to merge into ' + v.climber.name);
           assert.dom('.list tbody', function () {
             assert.dom('tr', {count: 3});
             assert.dom('td.name', {text: v.climber2.name, parent() {
@@ -145,33 +148,33 @@ isClient && define(function (require, exports, module) {
         assert.dom('#MergeClimbers.merging');
         refute.dom('.Confirm');
         assert.calledWith(
-          session.rpc, "Climber.merge", v.climber._id,
-          TH.match(a => assert.equals(
+          session.rpc, 'Climber.merge', v.climber._id,
+          TH.match((a) => assert.equals(
             a.slice(0).sort(),
-            [v.climber2._id, v.climber3._id].sort()
-          ) || true)
+            [v.climber2._id, v.climber3._id].sort(),
+          ) || true),
         );
         stub(Route.history, 'back');
         session.rpc.yield();
-        assert.dom('#Flash', "Climbers merged");
+        assert.dom('#Flash', 'Climbers merged');
         assert.called(Route.history.back);
-      },
+      });
 
-      "test change name"() {
+      test('change name', () => {
         stub(Route.history, 'back');
 
         assert.dom(document.body, function () {
-        assert.dom('#EditClimber', function () {
-          assert.dom('h1', 'Edit ' + v.climber.name);
-          TH.input('[name=name]', {value: v.climber.name}, 'new name');
-          TH.click('[type=submit]');
-        });
+          assert.dom('#EditClimber', function () {
+            assert.dom('h1', 'Edit ' + v.climber.name);
+            TH.input('[name=name]', {value: v.climber.name}, 'new name');
+            TH.click('[type=submit]');
+          });
         });
 
         assert.called(Route.history.back);
-      },
+      });
 
-      "test delete"() {
+      test('delete', () => {
         assert.dom('#EditClimber', function () {
           TH.click('[name=delete]');
         });
@@ -194,9 +197,7 @@ isClient && define(function (require, exports, module) {
         refute.dom('#EditClimber');
 
         refute(Climber.exists(v.climber._id));
-      },
-    },
-
-
+      });
+    });
   });
 });
