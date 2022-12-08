@@ -12,7 +12,7 @@ define((require, exports, module) => {
 
   const {laneA, laneB, ranking} = SpeedRound;
 
-  const private = SpeedRound[private$];
+  const pvt = SpeedRound[private$];
 
   const {hasTies, missingScore, timeVsFS} = SpeedRound.ERROR;
 
@@ -372,14 +372,14 @@ define((require, exports, module) => {
         assert.equals(Array.from(round), [r4, r5, r1, r2]);
       });
 
-      test('private.compareQualStartOrder', () => {
+      test('[private$]compareQualStartOrder', () => {
         let r1, r2, r3, r4;
         const round = new SpeedRound({stage: 0});
         const results = [
           r1 = {scores: [0.21]}, r2 = {scores: [0.42]},
           r3 = {scores: [0.33]}, r4 = {scores: [0.14]}];
 
-        const compare = private.compareQualStartOrder;
+        const compare = pvt.compareQualStartOrder;
         assert.equals(compare.compareKeys, ['scores', '_id']);
 
         let ans = results.sort(compare);
@@ -469,7 +469,7 @@ define((require, exports, module) => {
           const map = new Map(results.map((o, i) => [o, i + 1]));
 
           round.rankResults();
-          assert.equals(round.entries.compare.compareKeys, [private.ranking$, private.random$, '_id']);
+          assert.equals(round.entries.compare.compareKeys, [pvt.ranking$, pvt.random$, '_id']);
 
           assert.equals(
             Array.from(round).map((o) => map.get(o)),
@@ -592,7 +592,7 @@ define((require, exports, module) => {
       res.r2.scores[3] = {opponent_id: 'r8', time: 7543};
       await serverUpdScores(res.r2, res.r8);
 
-      assert.same(Math.sign(private.compareFinals(res.r2, res.r8)), -1);
+      assert.same(Math.sign(pvt.compareFinals(res.r2, res.r8)), -1);
       await round.rankResults();
       assert.equals(toResId(round), [2, 8, 7, 1, 3, 4, 5, 6, 9]);
       assert.equals(toRanking(round), [1, 2, 3, 4, 5, 6, 7, 7, 9]);
@@ -700,14 +700,14 @@ define((require, exports, module) => {
 
         const general = new SpeedRound({stage: -1, query: Enumerable.propertyValues(res)});
 
-        assert.same(Math.sign(private.compareFinals(res.r5, res.r6)), 0);
-        assert.same(Math.sign(private.compareFinals(res.r4, res.r1)), -1);
-        assert.same(Math.sign(private.compareFinals(res.r2, res.r1)), -1);
-        assert.same(Math.sign(private.compareFinals(res.r2, res.r2)), 0);
-        assert.same(Math.sign(private.compareFinals(res.r2, res.r3)), -1);
-        assert.same(Math.sign(private.compareFinals(res.r2, res.r4)), -1);
-        assert.same(Math.sign(private.compareFinals(res.r4, res.r2)), 1);
-        assert.same(Math.sign(private.compareFinals(res.r1, res.r4)), 1);
+        assert.same(Math.sign(pvt.compareFinals(res.r5, res.r6)), 0);
+        assert.same(Math.sign(pvt.compareFinals(res.r4, res.r1)), -1);
+        assert.same(Math.sign(pvt.compareFinals(res.r2, res.r1)), -1);
+        assert.same(Math.sign(pvt.compareFinals(res.r2, res.r2)), 0);
+        assert.same(Math.sign(pvt.compareFinals(res.r2, res.r3)), -1);
+        assert.same(Math.sign(pvt.compareFinals(res.r2, res.r4)), -1);
+        assert.same(Math.sign(pvt.compareFinals(res.r4, res.r2)), 1);
+        assert.same(Math.sign(pvt.compareFinals(res.r1, res.r4)), 1);
 
         general.rankResults();
         assert.equals(toResId(general), [2, 4, 3, 1, 5, 6, 7, 8, 9]);
