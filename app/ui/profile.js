@@ -148,7 +148,7 @@ define(function (require, exports, module) {
     },
   });
 
-  koru.onunload(module, () => {Route.root.removeBase(Tpl)});
+  koru.onunload(module, () => {Route.root?.removeBase(Tpl)});
 
   return Tpl;
 });

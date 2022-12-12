@@ -1,4 +1,5 @@
-define(function(require, exports, module) {
+define((require, exports, module) => {
+  'use strict';
   const koru            = require('koru');
   const Dom             = require('koru/dom');
   const Session         = require('koru/session');
@@ -7,9 +8,9 @@ define(function(require, exports, module) {
   const Route           = require('koru/ui/route');
   const SelectMenu      = require('koru/ui/select-menu');
   const util            = require('koru/util');
+  const App             = require('./app');
   const Org             = require('models/org');
   const User            = require('models/user');
-  const App             = require('./app');
 
   const Tpl = Dom.newTemplate(require('koru/html!./system-setup'));
 
@@ -17,23 +18,22 @@ define(function(require, exports, module) {
 
   const base = Route.root.addBase(module, Tpl);
 
-  koru.onunload(module, ()=>{Route.root.removeBase(Tpl)});
+  koru.onunload(module, () => {Route.root?.removeBase(Tpl)});
 
   base.addTemplate(module, Tpl.Index, {defaultPage: true});
   base.addTemplate(module, Tpl.OrgForm, {
     data(page, pageRoute) {
       return Org.findById(pageRoute.append) || new Org();
-    }
+    },
   });
   base.addTemplate(module, Tpl.UserForm, {
     data(page, pageRoute) {
       return User.findById(pageRoute.append) || new User({org_id: App.orgId});
-    }
+    },
   });
 
-
   Tpl.$extend({
-    title: "Org settings",
+    title: 'Org settings',
     onBaseEntry() {
       const elm = Tpl.$autoRender({});
       base.childAnchor = elm.querySelector('#SystemSetupBody');
@@ -80,19 +80,18 @@ define(function(require, exports, module) {
           ['csv', 'As CSV ZIP file'],
         ],
 
-        onSelect: elm=>{
+        onSelect: (elm) => {
           const location = koru.getLocation();
 
           const id = $.data(elm)._id;
 
           App.iframeGet({
-            id: "iframeExportOrg",
+            id: 'iframeExportOrg',
             src: `/export/${id}/${EXPORT_FILENAMES[id]}?${App.orgId}&${Session.sessAuth}`,
-            errorMsg: "Export Data failed",
+            errorMsg: 'Export Data failed',
           });
           return true;
-        }
-
+        },
       });
     },
     'click [name=cancel]'(event) {
@@ -121,7 +120,6 @@ define(function(require, exports, module) {
           }
         },
       });
-
     },
 
     'click .orgs tr'(event) {
@@ -140,8 +138,6 @@ define(function(require, exports, module) {
     },
   });
 
-
-
   Tpl.OrgForm.$events({
     'click [type=submit]': Form.submitFunc('OrgForm', Tpl),
   });
@@ -152,12 +148,13 @@ define(function(require, exports, module) {
     },
 
     roleList() {
-      var su = User.me().isSuperUser();
-      var role =  User.ROLE;
-      var results = [];
-      for(var name in role) {
-        if (su || name !== 'superUser')
+      const su = User.me().isSuperUser();
+      const role = User.ROLE;
+      const results = [];
+      for (const name in role) {
+        if (su || name !== 'superUser') {
           results.push([role[name], util.capitalize(util.humanize(name))]);
+        }
       }
       return results;
     },
@@ -170,7 +167,7 @@ define(function(require, exports, module) {
         doc.changes.org_id = doc.org_id;
 
         return doc.$save();
-      }
+      },
     }),
   });
 

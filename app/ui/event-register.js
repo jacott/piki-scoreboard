@@ -136,7 +136,7 @@ define((require, exports, module) => {
   });
 
   Edit.$events({
-    'submit': submit,
+    submit: submit,
 
     'click [name=delete]'(event) {
       Dom.stopEvent();
@@ -170,7 +170,7 @@ define((require, exports, module) => {
       Dom.stopEvent();
       Route.replacePath(Tpl);
     },
-    'submit': submit,
+    submit: submit,
 
     'input [name=name]'(event) {
       var input = this;
@@ -237,7 +237,7 @@ define((require, exports, module) => {
   });
 
   AddClimber.$events({
-    'submit': Form.submitFunc('AddClimber', function (doc) {
+    submit: Form.submitFunc('AddClimber', function (doc) {
       Dom.tpl.Dialog.close();
       var form = document.querySelector('#Register form.add');
       var competitor = $.data(form);
@@ -412,7 +412,7 @@ define((require, exports, module) => {
 
   App.restrictAccess(Tpl);
 
-  module.onUnload(() => {eventTpl.route.removeBase(Tpl)});
+  module.onUnload(() => {eventTpl.route?.removeBase(Tpl)});
 
   return Tpl;
 });

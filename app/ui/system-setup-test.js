@@ -1,4 +1,5 @@
 isClient && define((require, exports, module) => {
+  'use strict';
   const Dom             = require('koru/dom');
   const Session         = require('koru/session');
   const Route           = require('koru/ui/route');
