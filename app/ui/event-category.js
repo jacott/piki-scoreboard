@@ -586,7 +586,7 @@ define((require, exports, module) => {
     },
   });
 
-  module.onUnload(() => {eventTpl.route.removeTemplate(Tpl)});
+  module.onUnload(() => {eventTpl.route?.removeTemplate(Tpl)});
 
   return Tpl;
 });

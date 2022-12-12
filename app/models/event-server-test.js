@@ -43,6 +43,10 @@ define((require, exports, module) => {
 
         await assert.accessDenied(() => ev.authorize(user._id));
 
+        ev.changes.series_id = '';
+
+        await assert.exception(() => ev.authorize(user._id), {error: 400, reason: {series_id: [['is_invalid']]}});
+
         ev.changes.series_id = (await Factory.createSeries())._id;
         await ev.authorize(user._id);
 

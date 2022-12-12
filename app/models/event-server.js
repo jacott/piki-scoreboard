@@ -39,7 +39,8 @@ define((require, exports, module) => {
           Val.allowAccessIf(! this.closed);
         }
 
-        this.changes.series_id && Val.allowAccessIf(this.series && await user.canAdminister(this.series));
+        this.changes.series_id !== undefined &&
+          Val.allowAccessIf(await this.series && await user.canAdminister(this.series));
       },
 
       async validate() {

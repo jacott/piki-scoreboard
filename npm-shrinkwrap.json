@@ -11,7 +11,7 @@
       "dependencies": {
         "archiver": "^5.3.0",
         "csv-parse": "^5.3.3",
-        "koru": "github:jacott/koru#eb63ec72705693a4e6ae7724bce5acb1bf635805"
+        "koru": "github:jacott/koru#2eab034e9ad625640f83c9d2ca4aafa81c3aa337"
       },
       "devDependencies": {
         "esbuild": "^0.16.1",
@@ -1145,8 +1145,8 @@
     },
     "node_modules/koru": {
       "version": "0.40.0",
-      "resolved": "git+ssh://git@github.com/jacott/koru.git#eb63ec72705693a4e6ae7724bce5acb1bf635805",
-      "integrity": "sha512-cSazDNdFqIkBkOL46BtEwtYnvfJNLUloHYrVWBhmgo8WvQ4GJFMig3v+mz75vlk6pup0uP0dAYle7wsceCDtJA==",
+      "resolved": "git+ssh://git@github.com/jacott/koru.git#2eab034e9ad625640f83c9d2ca4aafa81c3aa337",
+      "integrity": "sha512-03TipxGP5Y6bpDEVuppqxa8wpHxXrwppLkk8/nQM+BkMVMyD62vpbH7ZVobf8a/BQhBEeowZQjSNCbekE2VFRg==",
       "hasInstallScript": true,
       "license": "MIT",
       "dependencies": {
@@ -2545,9 +2545,9 @@
       "integrity": "sha512-OYu7XEzjkCQ3C5Ps3QIZsQfNpqoJyZZA99wd9aWd05NCtC5pWOkShK2mkL6HXQR6/Cy2lbNdPlZBpuQHXE63gA=="
     },
     "koru": {
-      "version": "git+ssh://git@github.com/jacott/koru.git#eb63ec72705693a4e6ae7724bce5acb1bf635805",
-      "integrity": "sha512-cSazDNdFqIkBkOL46BtEwtYnvfJNLUloHYrVWBhmgo8WvQ4GJFMig3v+mz75vlk6pup0uP0dAYle7wsceCDtJA==",
-      "from": "koru@github:jacott/koru#eb63ec72705693a4e6ae7724bce5acb1bf635805",
+      "version": "git+ssh://git@github.com/jacott/koru.git#2eab034e9ad625640f83c9d2ca4aafa81c3aa337",
+      "integrity": "sha512-03TipxGP5Y6bpDEVuppqxa8wpHxXrwppLkk8/nQM+BkMVMyD62vpbH7ZVobf8a/BQhBEeowZQjSNCbekE2VFRg==",
+      "from": "koru@github:jacott/koru#2eab034e9ad625640f83c9d2ca4aafa81c3aa337",
       "requires": {
         "@babel/generator": "^7.20.5",
         "@babel/parser": "^7.20.5",
