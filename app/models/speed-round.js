@@ -1,6 +1,6 @@
+//;no-client-async
 define((require, exports, module) => {
   const BTree           = require('koru/btree');
-  const session         = require('koru/session');
   const Result          = require('models/result');
 
   const {private$} = require('koru/symbols');
@@ -119,48 +119,44 @@ define((require, exports, module) => {
     return toNumber(score.time);
   };
 
-  const rankQualResults = (round) => {
+  const rankQualResults = async (round) => {
     const {stage} = round;
     const list = new BTree(compareQualResultSORT);
 
     let invalid = 0;
-    const {query} = round;
+    for await (const res of round.query) {
+      if (minQual(1, res.scores) >= NO_TIME) ++invalid;
+      list.add(res);
+    }
 
-    return ifPromise(isServer && typeof query.fetch === 'function' ? query.fetch() : query, (rows) => {
-      for (const res of rows) {
-        if (minQual(1, res.scores) >= NO_TIME) ++invalid;
-        list.add(res);
+    let validSize = list.size - invalid;
+
+    let cutoff;
+    for (cutoff of [16, 8, 4]) if (validSize >= cutoff) break;
+    round.cutoff = cutoff;
+
+    let ranking;
+    let count = -1;
+
+    count = 0;
+    let prev = null;
+
+    const random = round[random$];
+    const entries = round.entries = new BTree(compareRankingSORT);
+    for (const res of list) {
+      ++count;
+
+      if (prev === null ||
+          (count - 1 == cutoff
+           ? compareQualResultTIEBREAK(prev, res)
+           : compareQualResultCOMPARE(prev, res)) != 0) {
+        ranking = count;
       }
-
-      let validSize = list.size - invalid;
-
-      let cutoff;
-      for (cutoff of [16, 8, 4]) if (validSize >= cutoff) break;
-      round.cutoff = cutoff;
-
-      let ranking;
-      let count = -1;
-
-      count = 0;
-      let prev = null;
-
-      const random = round[random$];
-      const entries = round.entries = new BTree(compareRankingSORT);
-      for (const res of list) {
-        ++count;
-
-        if (prev === null ||
-            (count - 1 == cutoff
-             ? compareQualResultTIEBREAK(prev, res)
-             : compareQualResultCOMPARE(prev, res)) != 0) {
-          ranking = count;
-        }
-        res[ranking$] = ranking;
-        res[random$] = randomOrder(res, random);
-        entries.add(res);
-        prev = res;
-      }
-    });
+      res[ranking$] = ranking;
+      res[random$] = randomOrder(res, random);
+      entries.add(res);
+      prev = res;
+    }
   };
 
   const compareLevel = (a, b, stage) => {
@@ -178,11 +174,11 @@ define((require, exports, module) => {
     return 0;
   };
 
-  const winnerLooser = (res, previous) => {
+  const winnerLooser = async (res, previous) => {
     for (let stage = previous; stage < 5; ++stage) {
       const rs = res.scores[stage + 1];
       if (rs != null) {
-        const o = Result.findById(rs.opponent_id);
+        const o = await Result.findById(rs.opponent_id);
         if (isWinner(res, o, stage)) return [res, o];
         stage = previous - 1;
         res = o;
@@ -300,15 +296,16 @@ define((require, exports, module) => {
     entries.add(res);
   };
 
-  const rankGeneralResults = (round) => ifPromise(rankQualResults(round), () => {
+  const rankGeneralResults = async (round) => {
+    await rankQualResults(round);
+
     const {cutoff, entries} = round;
 
     if (entries.size < cutoff) return;
 
-    const finalists = new Array(cutoff);
-    let idx = -1;
+    const finalists = [];
     for (const res of entries) {
-      finalists[++idx] = res;
+      finalists.push(res);
     }
 
     finalists.sort(compareFinals);
@@ -341,7 +338,7 @@ define((require, exports, module) => {
       prev = res;
     }
     reAddGeneralResult(entries, prev, ranking);
-  });
+  };
 
   const assignLanes = (resA=null, resB=null) => {
     if (resA !== null) {
@@ -384,7 +381,7 @@ define((require, exports, module) => {
     }
   }
 
-  const addTieAttempt = (round, res, updates) => {
+  const addTieAttempt = async (round, res) => {
     const {stage} = round;
 
     if (stage > 0) {
@@ -403,7 +400,7 @@ define((require, exports, module) => {
         }
         attempt += last;
       }
-      updates.push({_id: res._id, time: 'tie', stage, opponent_id: scores.opponent_id, attempt});
+      await res.setSpeedScore({time: 'tie', stage, opponent_id: scores.opponent_id, attempt});
       return;
     }
     const scores = round.stageScores(res);
@@ -420,7 +417,7 @@ define((require, exports, module) => {
     }
 
     if (last < start) last = start;
-    updates.push({_id: res._id, time: 'tie', attempt: last + 1});
+    await res.setSpeedScore({time: 'tie', attempt: last + 1});
   };
 
   const fallOrTime = (score) => score === 'fall' || typeof score === 'number';
@@ -501,7 +498,7 @@ define((require, exports, module) => {
       return this.query.onChange(callback);
     }
 
-    calcStartList() {
+    async calcStartList() {
       const {stage} = this;
       if (isQualFormat(stage)) {
         return calcQualStartList(this);
@@ -512,7 +509,7 @@ define((require, exports, module) => {
       }
       const len = Math.max(1 << stage, 4), hlen = len >> 1;
       const quals = new SpeedRound({stage: 0, query: this.query});
-      rankQualResults(quals);
+      await rankQualResults(quals);
 
       const posMap = new Array(hlen), entries = new Array(hlen);
 
@@ -526,8 +523,8 @@ define((require, exports, module) => {
 
       if (stage == 1) {
         const v1 = iter.next().value, v2 = iter.next().value;
-        const [fA, pA] = winnerLooser(v1, previous);
-        const [fB, pB] = winnerLooser(v2, previous);
+        const [fA, pA] = await winnerLooser(v1, previous);
+        const [fB, pB] = await winnerLooser(v2, previous);
 
         assignLanes(fA, fB);
         entries[0] = fA;
@@ -536,13 +533,13 @@ define((require, exports, module) => {
         entries[1] = pA;
       } else {
         for (let i = 0; i < hlen; ++i) {
-          const res = winnerLooser(iter.next().value, previous)[0];
+          const res = (await winnerLooser(iter.next().value, previous))[0];
           entries[res[ranking$] = posMap[i]] = res;
         }
 
         for (let i = hlen - 1; i >= 0; --i) {
           const resA = entries[posMap[i]];
-          const resB = winnerLooser(iter.next().value, previous)[0];
+          const resB = (await winnerLooser(iter.next().value, previous))[0];
           assignLanes(resA, resB);
         }
       }
@@ -568,54 +565,54 @@ define((require, exports, module) => {
       }
     }
 
-    rankResults() {
+    async rankResults() {
       const {stage} = this;
       if (isQualFormat(stage)) return rankQualResults(this);
       if (stage == -1) return rankGeneralResults(this);
 
-      this.calcStartList();
+      await this.calcStartList();
     }
 
-    complete() {
+    async complete() {
       const {stage} = this;
       let error = '', nextStage = stage;
       let validCount = 0;
       for (const res of this) {
         error = this.checkValid(res);
-        if (error !== '') return {error, nextStage};
+        if (error !== '') break;
         this.isTimeValid(res) && ++validCount;
       }
+      if (error === '') {
+        if (isQualFormat(stage)) {
+          const cutoff = stage == 0 ? 1 << countToStage(validCount) : 3;
 
-      const updates = [];
-      if (isQualFormat(stage)) {
-        const cutoff = stage == 0 ? 1 << countToStage(validCount) : 3;
-
-        if (validCount > 3 && validCount > cutoff) {
-          for (const res of tiesOfQual(this, cutoff)) {
-            error = ERROR.hasTies;
-            addTieAttempt(this, res, updates);
+          if (validCount > 3 && validCount > cutoff) {
+            for (const res of tiesOfQual(this, cutoff)) {
+              error = ERROR.hasTies;
+              await addTieAttempt(this, res);
+            }
           }
-        }
-        if (error === '') {
-          nextStage = stage == 0 && validCount >= 4 ? countToStage(validCount) : -3;
-        }
-      } else {
-        for (const res of this) {
-          if (compareKnockout(res, res[laneB$], stage) == 0) {
-            addTieAttempt(this, res, updates);
-            addTieAttempt(this, res[laneB$], updates);
-            error = ERROR.hasTies;
+          if (error === '') {
+            nextStage = stage == 0 && validCount >= 4 ? countToStage(validCount) : -3;
           }
-        }
-        if (error === '') {
-          if (stage > 1) {
-            --nextStage;
-          } else {
-            nextStage = -3;
+        } else {
+          for (const res of this) {
+            if (compareKnockout(res, res[laneB$], stage) == 0) {
+              await addTieAttempt(this, res);
+              await addTieAttempt(this, res[laneB$]);
+              error = ERROR.hasTies;
+            }
+          }
+          if (error === '') {
+            if (stage > 1) {
+              --nextStage;
+            } else {
+              nextStage = -3;
+            }
           }
         }
       }
-      return ifPromise(session.rpc('Result.complete', updates), () => ({error, nextStage}));
+      return {error, nextStage};
     }
 
     stageScores(res) {

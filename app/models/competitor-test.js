@@ -1,4 +1,6 @@
+//;no-client-async
 define((require, exports, module) => {
+  'use strict';
   const Category        = require('./category');
   const Team            = require('models/team');
   const TH              = require('test-helper');

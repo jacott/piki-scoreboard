@@ -1,3 +1,4 @@
+//;no-client-async
 define((require, exports, module) => {
   const Enumerable      = require('koru/enumerable');
   const Result          = require('models/result');
@@ -84,7 +85,7 @@ define((require, exports, module) => {
 
         const round = new SpeedRound({
           stage: 2, previous: 0, query: Enumerable.propertyValues(res)});
-        round.calcStartList();
+        await round.calcStartList();
 
         assert.equals(await round.complete(), {
           error: 'All scores must be entered.',
@@ -108,7 +109,7 @@ define((require, exports, module) => {
 
         const round = new SpeedRound({
           stage: 2, previous: 0, query: Enumerable.propertyValues(res)});
-        round.calcStartList();
+        await round.calcStartList();
 
         assert.equals(await round.complete(), {
           error: 'Invalid score combination: time/fall vs false start. Enter "wc" (wildcard) instead of time/fall.',
@@ -171,7 +172,7 @@ define((require, exports, module) => {
 
         const round = new SpeedRound({
           stage: 0, previous: 0, query: Enumerable.propertyValues(res)});
-        round.calcStartList();
+        await round.calcStartList();
 
         assert.equals(await round.complete(), {
           error: 'Break ties by further attempts on Lane A.', nextStage: 0});
@@ -210,7 +211,7 @@ define((require, exports, module) => {
 
         const round = new SpeedRound({
           stage: 2, previous: 0, query: Enumerable.propertyValues(res)});
-        round.calcStartList();
+        await round.calcStartList();
 
         assert.equals(await round.complete(), {error: hasTies, nextStage: 2});
 
@@ -248,7 +249,7 @@ define((require, exports, module) => {
 
         const round = new SpeedRound({
           stage: 2, previous: 0, query: Enumerable.propertyValues(res)});
-        round.calcStartList();
+        await round.calcStartList();
 
         assert.equals(await round.complete(), {error: hasTies, nextStage: 2});
 
@@ -266,7 +267,7 @@ define((require, exports, module) => {
         const gen = new SpeedRound({
           stage: -1, previous: 4, query: Enumerable.propertyValues(res)});
 
-        gen.rankResults();
+        await gen.rankResults();
 
         assert.equals(toRanking(gen), [1, 1, 3, 3, 5]);
         assert.equals(toResId(gen), [4, 2, 3, 1, 5]);
@@ -283,7 +284,7 @@ define((require, exports, module) => {
 
         const round = new SpeedRound({
           stage: 1, previous: 2, query: Enumerable.propertyValues(res)});
-        round.calcStartList();
+        await round.calcStartList();
 
         assert.equals(await round.complete(), {error: hasTies, nextStage: 1});
 
@@ -326,13 +327,13 @@ define((require, exports, module) => {
         const round = new SpeedRound({
           stage: 0, query: Enumerable.propertyValues(res)});
 
-        round.rankResults();
+        await round.rankResults();
 
         assert.equals(toRanking(round), [1, 1, 1, 4, 4, 4, 4]);
         assert.equals(toResId(round), [3, 1, 2, 5, 4, 6, 7]);
       });
 
-      test('calcStartList', () => {
+      test('calcStartList', async () => {
         let r1, r2, r3, r4, r5;
         const results = [
           r1 = {scores: [0.21]}, r2 = {scores: [0.42]},
@@ -340,7 +341,7 @@ define((require, exports, module) => {
         ];
         const round = new SpeedRound({stage: 0, query: results});
 
-        round.calcStartList();
+        await round.calcStartList();
         assert.equals(round.entries.compare.compareKeys, ['scores', '_id']);
 
         assert.same(laneA(r1), r2);
@@ -448,7 +449,7 @@ define((require, exports, module) => {
       });
 
       group('rankResults', () => {
-        test('quals tiebreak', () => {
+        test('quals tiebreak', async () => {
           const results = [
             {scores: [0.221, [5000, 7000]]},
             {scores: [0.421, [5000, 7000]]},
@@ -468,7 +469,7 @@ define((require, exports, module) => {
 
           const map = new Map(results.map((o, i) => [o, i + 1]));
 
-          round.rankResults();
+          await round.rankResults();
           assert.equals(round.entries.compare.compareKeys, [pvt.ranking$, pvt.random$, '_id']);
 
           assert.equals(
@@ -484,7 +485,7 @@ define((require, exports, module) => {
             [2, 1, 3, 4, 6, 5, 7, 10, 8, 9]);
         });
 
-        test('random ties before cutoff', () => {
+        test('random ties before cutoff', async () => {
           const results = [
             {scores: [0.221, [6192, 7888]]},
             {scores: [0.3411, [6532, 'fall', 10222]]},
@@ -502,7 +503,7 @@ define((require, exports, module) => {
 
           const round = new SpeedRound({stage: 0, query: results.slice()});
 
-          round.rankResults();
+          await round.rankResults();
           const map = new Map(results.map((o, i) => [o, i + 1]));
 
           assert.equals(
@@ -514,7 +515,7 @@ define((require, exports, module) => {
             [1, 1, 3, 3, 5, 6, 6, 6, 9, 9]);
         });
 
-        test('ties after cutoff', () => {
+        test('ties after cutoff', async () => {
           const results = [
             {scores: [0.221, [5000, 6000]]},
             {scores: [0.421, [5000, 6000]]},
@@ -534,7 +535,7 @@ define((require, exports, module) => {
 
           const map = new Map(results.map((o, i) => [o, i + 1]));
 
-          round.rankResults();
+          await round.rankResults();
 
           assert.equals(Array.from(round).map((o) => map.get(o)), [2, 1, 3, 4, 6, 5, 7, 10, 8, 9]);
           assert.equals(Array.from(round).map((o) => ranking(o)), [1, 1, 3, 4, 5, 5, 7, 8, 8, 8]);
@@ -624,13 +625,13 @@ define((require, exports, module) => {
         const round = new SpeedRound({
           stage: -1, previous: 4, query: Enumerable.propertyValues(res)});
 
-        round.rankResults();
+        await round.rankResults();
 
         assert.equals(toRanking(round), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]);
         assert.equals(toResId(round), [2, 5, 6, 8, 7, 4, 3, 1, 9, 10, 11, 12, 13, 14, 15, 16]);
 
         res.r01.scores[5].time = 'wc';
-        round.rankResults();
+        await round.rankResults();
 
         assert.equals(toResId(round), [2, 5, 6, 8, 7, 1, 3, 4, 9, 10, 11, 12, 13, 14, 15, 16]);
         assert.equals(toRanking(round), [1, 2, 3, 4, 5, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]);
@@ -638,7 +639,7 @@ define((require, exports, module) => {
         /** test incomplete scores **/
         res.r03.scores[4] = null;
 
-        round.rankResults();
+        await round.rankResults();
 
         assert.equals(toRanking(round), [1, 2, 3, 4, 5, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]);
         assert.equals(toResId(round), [2, 5, 6, 8, 7, 1, 4, 3, 9, 10, 11, 12, 13, 14, 15, 16]);
@@ -659,9 +660,9 @@ define((require, exports, module) => {
 
         const round = new SpeedRound({
           stage: 0, previous: 0, query: Enumerable.propertyValues(res)});
-        round.calcStartList();
+        await round.calcStartList();
 
-        round.rankResults();
+        await round.rankResults();
 
         assert.equals(toRanking(round), [1, 2, 3, 4, 4, 4, 4]);
         assert.equals(toResId(round), [2, 1, 3, 5, 4, 6, 7]);
@@ -683,7 +684,7 @@ define((require, exports, module) => {
 
         const round = new SpeedRound({
           stage: 1, previous: 2, query: Enumerable.propertyValues(res)});
-        round.calcStartList();
+        await round.calcStartList();
 
         assert.same(round.entries.length, 2);
 
@@ -709,7 +710,7 @@ define((require, exports, module) => {
         assert.same(Math.sign(pvt.compareFinals(res.r4, res.r2)), 1);
         assert.same(Math.sign(pvt.compareFinals(res.r1, res.r4)), 1);
 
-        general.rankResults();
+        await general.rankResults();
         assert.equals(toResId(general), [2, 4, 3, 1, 5, 6, 7, 8, 9]);
         assert.equals(toRanking(general), [1, 2, 3, 4, 5, 5, 7, 8, 8]);
       });
@@ -774,7 +775,7 @@ define((require, exports, module) => {
 
           const round = new SpeedRound({
             stage: 3, previous: 0, query: Enumerable.propertyValues(res)});
-          round.calcStartList();
+          await round.calcStartList();
 
           assert.equals(toResId(round), [1, 4, 2, 3]);
           assert.same(laneB(res.r1), res.r8);
@@ -809,7 +810,7 @@ define((require, exports, module) => {
 
           const round = new SpeedRound({
             stage: 3, previous: 0, query: Enumerable.propertyValues(res)});
-          round.calcStartList();
+          await round.calcStartList();
 
           assert.same(round.whoWonFinals(res.r3), null);
           assert.same(round.whoWonFinals(res.r1), res.r8);
@@ -838,7 +839,7 @@ define((require, exports, module) => {
 
           const round = new SpeedRound({
             stage: 2, previous: 3, query: Enumerable.propertyValues(res)});
-          round.calcStartList();
+          await round.calcStartList();
 
           assert.equals(toResId(round), [8, 2]);
           assert.same(laneB(res.r8), res.r5);
@@ -853,11 +854,11 @@ define((require, exports, module) => {
         });
       });
 
-      test('rankResults calls calcStartList', () => {
+      test('rankResults calls calcStartList', async () => {
         const round = new SpeedRound({stage: 1, previous: 2, query: []});
         stub(round, 'calcStartList');
 
-        round.rankResults();
+        await round.rankResults();
 
         assert.called(round.calcStartList);
       });

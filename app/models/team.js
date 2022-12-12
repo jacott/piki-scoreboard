@@ -1,27 +1,28 @@
-define((require, exports, module)=>{
+//;no-client-async
+define((require, exports, module) => {
+  'use strict';
+  const TeamType        = require('./team-type');
   const Model           = require('model');
   const Org             = require('models/org');
-  const TeamType        = require('./team-type');
 
   class Team extends Model.BaseModel {
-    static teamMap(list) {
-      let map = {};
-      list && list.forEach(id => {
-        let team = Team.findById(id);
-        if (team) map[team.teamType_id] = team;
-      });
+    static async teamMap(list) {
+      const map = {};
+      if (list !== undefined) {
+        for (const id of list) {
+          const team = await Team.findById(id);
+          if (team) map[team.teamType_id] = team;
+        }
+      }
       return map;
     }
   }
 
   class HasTeam extends Model.BaseModel {
     get teamMap() {
-
-      let map = this.$cache.teamMap;
-      if (! map) {
-        map = this.$cache.teamMap = Team.teamMap(this.team_ids);
-      }
-      return map;
+      const map = this.$cache.teamMap;
+      if (map !== undefined) return map;
+      return ifPromise(Team.teamMap(this.team_ids), (map) => this.$cache.teamMap = map);
     }
 
     getTeam(id) {
@@ -34,8 +35,8 @@ define((require, exports, module)=>{
   Team.define({
     module,
     fields: {
-      name: {type:  'text', trim: true, required: true, maxLength: 200, unique: {scope: 'org_id'}},
-      shortName: {type:  'text', trim: true, required: true, maxLength: 5, unique: {scope: ['org_id', 'teamType_id']}},
+      name: {type: 'text', trim: true, required: true, maxLength: 200, unique: {scope: 'org_id'}},
+      shortName: {type: 'text', trim: true, required: true, maxLength: 5, unique: {scope: ['org_id', 'teamType_id']}},
       teamType_id: {type: 'belongs_to', required: true},
       org_id: 'belongs_to',
     },

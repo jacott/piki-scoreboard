@@ -1,4 +1,5 @@
 define((require) => {
+  'use strict';
   const Val             = require('koru/model/validation');
   const util            = require('koru/util');
   const ChangeLog       = require('./change-log');
@@ -26,7 +27,7 @@ define((require) => {
 
         Val.assertDocChanges(this, FIELD_SPEC, NEW_FIELD_SPEC);
 
-        var event = await Event.findById(this.attributes.event_id || this.event_id);
+        const event = await Event.findById(this.attributes.event_id ?? this.event_id);
 
         Val.allowAccessIf(! event.closed);
 

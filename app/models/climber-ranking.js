@@ -43,7 +43,7 @@ define((require, exports, module) => {
         case 'S': {
           const round = new SpeedRound({stage: -1, query});
 
-          round.rankResults();
+          await round.rankResults();
 
           const results = Array.from(round);
 

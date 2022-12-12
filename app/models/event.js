@@ -1,4 +1,6 @@
+//;no-client-async
 define((require, exports, module) => {
+  'use strict';
   const koru            = require('koru');
   const util            = require('koru/util');
   const Org             = require('./org');
@@ -72,11 +74,11 @@ define((require, exports, module) => {
       return this.name;
     }
 
-    canJudge(userOrId=User.me()) {
-      return ifPromise(
-        typeof userOrId === 'string' ? User.findById(userOrId) : userOrId,
-        (user) => user != null && ! this.closed && user.canJudge(this),
-      );
+    async canJudge(userOrId) {
+      const user = typeof userOrId === 'string'
+            ? await User.findById(userOrId)
+            : userOrId ?? await User.me();
+      return user != null && ! this.closed && user.canJudge(this);
     }
   }
 

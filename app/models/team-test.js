@@ -1,3 +1,4 @@
+//;no-client-async
 define((require, exports, module) => {
   const TH              = require('koru/model/test-db-helper');
   const Factory         = require('test/factory');

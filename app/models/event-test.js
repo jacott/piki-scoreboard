@@ -1,4 +1,6 @@
+//;no-client-async
 define((require, exports, module) => {
+  'use strict';
   const TH              = require('test-helper');
   const Factory         = require('test/factory');
 
