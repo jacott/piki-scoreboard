@@ -24,11 +24,12 @@ export BACKUP_DIR=/u/backup
 export APP_DOMAIN=$(hostname -f)
 export APP_DISPLAY_NAME=Piki
 
-export APP_MAILDOMAIN=vimaly.com
+export APP_MAILDOMAIN=staging.vimaly.com
 export APP_MAILURL=setup
 
 . $KORU_HOME/node_modules/koru/lib/koru-env.sh "$@"
 
+export VIMALY_DOMAIN=${VIMALY_DOMAIN-$APP_DOMAIN}
 export APP_URL=${APP_URL-https://${APP_DOMAIN}}
 
 if [[ $APP_MAILURL = setup ]]; then

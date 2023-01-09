@@ -41,7 +41,8 @@ configNginx() {
 
     sed <$template >$srcConf \
         -e "s/{{KORU_PORT}}/$KORU_PORT/g" -e "s/{{APP_DOMAIN}}/$APP_DOMAIN/g" \
-        -e "s/{{KORU_APP_NAME}}/$appName/g"
+        -e "s/{{KORU_APP_NAME}}/$appName/g" \
+        -e "s/{{VIMALY_DOMAIN}}/$VIMALY_DOMAIN/g"
     if test ! -e $destConf || ! diff -q $srcConf $destConf;then
         mv -b $srcConf $destConf
         sudo /bin/systemctl reload nginx
