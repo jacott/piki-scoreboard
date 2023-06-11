@@ -19,10 +19,10 @@ init() {
         createdb $KORU_DB || :
     fi
 
-    nginxConf=/etc/nginx/conf.d/$appName.conf
+    kafeConf=/u/etc/kafe/$appName.yml
     serviceConf=$HOME/.config/systemd/user/$appName.service
 
-    rm -f ${nginxConf}~ ${serviceConf}~
+    rm -f ${kafeConf}~ ${serviceConf}~
 }
 
 completeConfig() {
@@ -34,10 +34,10 @@ completeConfig() {
     fi
 }
 
-configNginx() {
-    template=config/common-nginx.conf
-    srcConf=tmp/nginx.conf
-    destConf=$nginxConf
+configKafe() {
+    template=config/common-kafe.yml
+    srcConf=tmp/kafe.yml
+    destConf=$kafeConf
 
     sed <$template >$srcConf \
         -e "s/{{KORU_PORT}}/$KORU_PORT/g" -e "s/{{APP_DOMAIN}}/$APP_DOMAIN/g" \
@@ -45,7 +45,7 @@ configNginx() {
         -e "s/{{VIMALY_DOMAIN}}/$VIMALY_DOMAIN/g"
     if test ! -e $destConf || ! diff -q $srcConf $destConf;then
         mv -b $srcConf $destConf
-        sudo /bin/systemctl reload nginx
+        /bin/systemctl --user reload kafe || systemctl --user start kafe.service
     fi
 }
 
@@ -82,7 +82,7 @@ if [[ -d $BACKUP_DIR ]]; then
     pg_dump --compress=9 --format=d --file=$buApp/db $appName
 fi
 
-configNginx
+configKafe
 installService
 
 deploy

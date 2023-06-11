@@ -1,0 +1,22 @@
+name: {{APP_DOMAIN}}
+
+listeners: ["[::]:443"]
+
+cert_path: /u/private/live-certs/{{VIMALY_DOMAIN}}
+
+root: /u/app/{{KORU_APP_NAME}}/current/app
+
+services:
+  app:
+    server_socket: "localhost:{{KORU_PORT}}"
+
+locations:
+  /: {rewrite: /index.html}
+  /{index.{html,js,css},service-worker.js,manifest.json}:
+    file: {cache_control: max-age=2592000}
+  /{public,images}/*: {file: {cache_control: max-age=86400}}
+
+  /force-reload.js: {file: {cache_control: no-cache}}
+
+  /ws/*: {websocket_proxy: app}
+  /export/*: {http_proxy: app}
