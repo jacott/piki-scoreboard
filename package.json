@@ -21,7 +21,7 @@
   "dependencies": {
     "archiver": "^5.3.0",
     "csv-parse": "^5.4.0",
-    "koru": "github:jacott/koru#cbce90c5161d85b265e9f05493ac0b219feaedb1"
+    "koru": "github:jacott/koru#db955dc14722880c75580be5073cd1293e2bc7f4"
   },
   "devDependencies": {
     "esbuild": "^0.18.1",

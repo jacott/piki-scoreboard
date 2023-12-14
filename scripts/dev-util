@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+export KORU_ORIG_DIR=`pwd`
+
+. "${0%/*}"/../config/environ.sh ${KORU_ENV:-demo}
+
+cd $KORU_HOME/app
+if [ "$1" = "" ]; then
+    echo -e "Commands:\n$(ls test/util|sed -e /^lib$/d -e s/\.js$//g)"
+    exit 1
+fi
+
+exec_node test/util/lib/runner "$@"
