@@ -19,12 +19,12 @@
   ],
   "author": "Geoff Jacobsen <geoffjacobsen@gmail.com>",
   "dependencies": {
-    "archiver": "^5.3.0",
-    "csv-parse": "^5.4.0",
+    "archiver": "^5.3.2",
+    "csv-parse": "^5.5.3",
     "koru": "github:jacott/koru#db955dc14722880c75580be5073cd1293e2bc7f4"
   },
   "devDependencies": {
-    "esbuild": "^0.18.1",
+    "esbuild": "^0.19.10",
     "unzipper": "^0.10.14"
   },
   "engines": {
