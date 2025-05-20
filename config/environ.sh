@@ -8,7 +8,7 @@ export LANG="en_US"
 export LANGUAGE="en_US:en"
 export LC_ALL="en_US.UTF-8"
 
-export NODE=/u/node-v20.10.0-linux-x64/bin/node
+export NODE=/u/node-v22.15.1-linux-x64/bin/node
 
 case "$1" in
     "demo" | "test" | "check")
